@@ -1,0 +1,42 @@
+const FONT_FAMILY = 'system-ui, sans-serif';
+const MONO_FONT_FAMILY = 'ui-monospace, Consolas, monospace';
+
+export const colors = {
+  background: '#05070d',
+  floor: '#0d1220',
+  floorEdge: '#3a4a6b',
+  wall: '#1b2233',
+  text: '#e8ecf5',
+  textMuted: '#8a94ab',
+  accent: '#ffe81f',
+  overlay: 'rgba(0, 0, 0, 0.65)',
+  debug: '#7cfc00',
+  debugBackground: 'rgba(0, 0, 0, 0.55)',
+};
+
+export const textStyles = {
+  title: {
+    font: `bold 72px ${FONT_FAMILY}`,
+    color: colors.accent,
+    align: 'center',
+    baseline: 'middle',
+  },
+  subtitle: {
+    font: `28px ${FONT_FAMILY}`,
+    color: colors.text,
+    align: 'center',
+    baseline: 'middle',
+  },
+  hint: {
+    font: `20px ${FONT_FAMILY}`,
+    color: colors.textMuted,
+    align: 'center',
+    baseline: 'middle',
+  },
+  debug: {
+    font: `14px ${MONO_FONT_FAMILY}`,
+    color: colors.debug,
+    align: 'left',
+    baseline: 'top',
+  },
+};
