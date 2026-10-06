@@ -142,7 +142,8 @@ export class DuelState extends GameState {
     const { events } = this.simulation;
     if (events.length > 0) {
       const event = events[events.length - 1];
-      this.lastEvent = `${event.type} (${event.attacker.id} → ${event.defender.id})`;
+      const target = event.defender ? ` → ${event.defender.id}` : '';
+      this.lastEvent = `${event.type} (${event.attacker.id}${target})`;
     }
   }
 

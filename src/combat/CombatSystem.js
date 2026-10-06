@@ -102,6 +102,7 @@ export class CombatSystem {
     fighter.combat.attack = attack;
     fighter.combat.attackType = attackType;
     fighter.setState(ATTACK_STATES[attackType]);
+    this.emitAction(CombatEvent.ATTACK_START, fighter, attackType);
     return true;
   }
 
@@ -115,6 +116,7 @@ export class CombatSystem {
     const { moveX } = fighter.intent;
     fighter.combat.dodgeDirection = moveX !== 0 ? Math.sign(moveX) : -fighter.facing;
     fighter.setState(FighterState.DODGING);
+    this.emitAction(CombatEvent.DODGE, fighter, null);
     return true;
   }
 
@@ -259,6 +261,18 @@ export class CombatSystem {
 
     defender.combat.stunDuration = attack.hitstun;
     defender.restartState(FighterState.HIT);
+  }
+
+  emitAction(type, fighter, attackType) {
+    this.events.push(
+      createCombatEvent(type, {
+        attacker: fighter,
+        defender: null,
+        attackType,
+        x: fighter.x,
+        y: fighter.y - fighter.height / 2,
+      }),
+    );
   }
 
   emit(type, contact) {

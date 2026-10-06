@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { AttackPhase, getAttackDuration, getAttackPhase, getPhaseProgress } from '../src/combat/attackPhases.js';
+import { CombatEvent } from '../src/combat/combatEvents.js';
 import { FighterState } from '../src/entities/fighterStates.js';
 import { STEP, createSimulation, repeat, spawnFighter } from './helpers.js';
 
@@ -50,6 +51,29 @@ describe('CombatSystem actions', () => {
     stepFor(simulation, getAttackDuration(attack) + STEP);
     assert.equal(player.state, FighterState.IDLE);
     assert.equal(player.combat.attack, null);
+  });
+
+  it('emits an event when an attack or a dodge starts', () => {
+    const { player, simulation } = createDuel();
+
+    stepWithIntent(simulation, player, { heavyAttack: true });
+    assert.deepEqual(
+      simulation.events.map((event) => [event.type, event.attackType, event.attacker]),
+      [[CombatEvent.ATTACK_START, 'heavy', player]],
+    );
+
+    stepFor(simulation, 1.5);
+    stepWithIntent(simulation, player, { dodge: true });
+    assert.deepEqual(simulation.events.map((event) => event.type), [CombatEvent.DODGE]);
+  });
+
+  it('does not emit an event for a refused action', () => {
+    const { player, simulation } = createDuel();
+    player.stamina = 0;
+
+    stepWithIntent(simulation, player, { heavyAttack: true });
+
+    assert.deepEqual(simulation.events, []);
   });
 
   it('starts a heavy attack', () => {

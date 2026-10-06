@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { getAttackDuration } from '../src/combat/attackPhases.js';
-import { CombatEvent } from '../src/combat/combatEvents.js';
+import { CombatEvent, isContactEvent } from '../src/combat/combatEvents.js';
 import { boxesOverlap, createBox, getAttackHitbox, getHurtbox } from '../src/combat/hitboxes.js';
 import { FighterState } from '../src/entities/fighterStates.js';
 import { STEP, arena, createSimulation, repeat, spawnFighter } from './helpers.js';
@@ -18,7 +18,7 @@ function createDuel(distance = CLOSE_DISTANCE) {
     Object.assign(player.intent, playerIntent);
     Object.assign(opponent.intent, opponentIntent);
     simulation.step(STEP);
-    events.push(...simulation.events);
+    events.push(...simulation.events.filter(isContactEvent));
     player.clearIntent();
     opponent.clearIntent();
   };
