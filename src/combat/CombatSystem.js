@@ -20,9 +20,11 @@ function chooseFallDirection(fighter, arena, roomMargin) {
 }
 
 export class CombatSystem {
-  constructor(arena, { fallRoomMargin }) {
+  constructor(arena, { fallRoomMargin, clash }) {
     this.arena = arena;
     this.fallRoomMargin = fallRoomMargin;
+    this.clash = clash;
+    this.otherHitbox = createBox();
     this.events = [];
     this.hitbox = createBox();
     this.hurtbox = createBox();
@@ -131,6 +133,7 @@ export class CombatSystem {
   }
 
   resolveHits(fighters) {
+    this.resolveClashes(fighters);
     this.findContacts(fighters);
 
     for (const contact of this.contacts) {
@@ -139,6 +142,47 @@ export class CombatSystem {
     for (const contact of this.contacts) {
       this.resolveContact(contact);
     }
+  }
+
+  resolveClashes(fighters) {
+    for (let i = 0; i < fighters.length; i += 1) {
+      for (let j = i + 1; j < fighters.length; j += 1) {
+        this.tryClash(fighters[i], fighters[j]);
+      }
+    }
+  }
+
+  tryClash(a, b) {
+    if (!hasActiveHitbox(a) || !hasActiveHitbox(b)) {
+      return;
+    }
+
+    const boxA = getAttackHitbox(a, a.combat.attack, this.hitbox);
+    const boxB = getAttackHitbox(b, b.combat.attack, this.otherHitbox);
+    if (!boxesOverlap(boxA, boxB)) {
+      return;
+    }
+
+    this.events.push(
+      createCombatEvent(CombatEvent.CLASH, {
+        attacker: a,
+        defender: b,
+        attackType: a.combat.attackType,
+        x: (Math.max(boxA.left, boxB.left) + Math.min(boxA.right, boxB.right)) / 2,
+        y: (Math.max(boxA.top, boxB.top) + Math.min(boxA.bottom, boxB.bottom)) / 2,
+      }),
+    );
+    this.recoil(a, b);
+    this.recoil(b, a);
+  }
+
+  recoil(fighter, opponent) {
+    const awayFromOpponent = Math.sign(fighter.x - opponent.x) || -fighter.facing;
+
+    fighter.clearAttack();
+    fighter.vx = awayFromOpponent * this.clash.pushback;
+    fighter.combat.stunDuration = this.clash.recoil;
+    fighter.restartState(FighterState.HIT);
   }
 
   findContacts(fighters) {

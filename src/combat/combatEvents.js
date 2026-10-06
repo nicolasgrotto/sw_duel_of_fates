@@ -2,6 +2,7 @@ export const CombatEvent = Object.freeze({
   HIT: 'hit',
   BLOCK: 'block',
   GUARD_BREAK: 'guardBreak',
+  CLASH: 'clash',
   DEATH: 'death',
 });
 

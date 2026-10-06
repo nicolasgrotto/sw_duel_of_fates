@@ -17,7 +17,13 @@ export const gameConfig = {
     maxFallSpeed: 1400,
     restingSpeed: 5,
     actionFriction: 1400,
+  },
+  combat: {
     fallRoomMargin: 60,
+    clash: {
+      pushback: 280,
+      recoil: 0.25,
+    },
   },
   duel: {
     playerCharacter: 'guardian',

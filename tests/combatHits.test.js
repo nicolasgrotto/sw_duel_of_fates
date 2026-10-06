@@ -103,10 +103,44 @@ describe('CombatSystem hits', () => {
     assert.equal(duel.opponent.combat.attack, null);
   });
 
-  it('lets both fighters hit each other on the same frame', () => {
+  it('clashes when both attacks are active and the hitboxes touch', () => {
     const duel = createDuel();
     const { player, opponent } = duel;
     player.stats = { ...player.stats, attacks: { ...player.stats.attacks, light: opponent.stats.attacks.light } };
+
+    duel.step({ lightAttack: true }, { lightAttack: true });
+    repeat(20, () => duel.step());
+
+    assert.equal(player.health, player.stats.maxHealth);
+    assert.equal(opponent.health, opponent.stats.maxHealth);
+    assert.deepEqual(eventTypes(duel.events), [CombatEvent.CLASH]);
+  });
+
+  it('pushes both fighters apart and cancels both attacks on a clash', () => {
+    const duel = createDuel();
+    const { player, opponent } = duel;
+    player.stats = { ...player.stats, attacks: { ...player.stats.attacks, light: opponent.stats.attacks.light } };
+    duel.step({ lightAttack: true }, { lightAttack: true });
+
+    while (duel.events.length === 0) {
+      duel.step();
+    }
+
+    assert.equal(player.state, FighterState.HIT);
+    assert.equal(opponent.state, FighterState.HIT);
+    assert.equal(player.combat.attack, null);
+    assert.equal(opponent.combat.attack, null);
+    assert.ok(player.vx < 0);
+    assert.ok(opponent.vx > 0);
+  });
+
+  it('lets both fighters hit each other when the hitboxes do not touch', () => {
+    const duel = createDuel(140);
+    const { player, opponent } = duel;
+    const shortReach = { ...opponent.stats.attacks.light, hitbox: { reach: 100, top: 0.5, bottom: 0.3 } };
+    const highReach = { ...opponent.stats.attacks.light, hitbox: { reach: 100, top: 0.95, bottom: 0.75 } };
+    player.stats = { ...player.stats, attacks: { ...player.stats.attacks, light: shortReach } };
+    opponent.stats = { ...opponent.stats, attacks: { ...opponent.stats.attacks, light: highReach } };
 
     duel.step({ lightAttack: true }, { lightAttack: true });
     repeat(20, () => duel.step());

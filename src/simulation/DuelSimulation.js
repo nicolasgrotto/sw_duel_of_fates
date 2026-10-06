@@ -6,10 +6,10 @@ import { PhysicsSystem } from '../systems/PhysicsSystem.js';
 import { StaminaSystem } from '../systems/StaminaSystem.js';
 
 export class DuelSimulation {
-  constructor({ arena, fighters, physicsConfig, animationConfig }) {
+  constructor({ arena, fighters, physicsConfig, combatConfig, animationConfig }) {
     this.arena = arena;
     this.fighters = fighters;
-    this.combat = new CombatSystem(arena, physicsConfig);
+    this.combat = new CombatSystem(arena, combatConfig);
     this.movement = new MovementSystem(physicsConfig);
     this.physics = new PhysicsSystem(physicsConfig, arena);
     this.collision = new CollisionSystem(arena);

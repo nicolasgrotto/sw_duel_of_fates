@@ -34,6 +34,7 @@ export class DuelState extends GameState {
       arena: this.arena,
       fighters: this.fighters,
       physicsConfig: gameConfig.physics,
+      combatConfig: gameConfig.combat,
       animationConfig: animationStyle,
     });
     this.view = new DuelRenderer();

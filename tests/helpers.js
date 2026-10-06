@@ -15,7 +15,14 @@ export const physicsConfig = {
   maxFallSpeed: 1400,
   restingSpeed: 5,
   actionFriction: 1400,
+};
+
+export const combatConfig = {
   fallRoomMargin: 60,
+  clash: {
+    pushback: 280,
+    recoil: 0.25,
+  },
 };
 
 export function spawnFighter(x, facing = 1, characterId = 'guardian') {
@@ -33,6 +40,7 @@ export function createSimulation(fighters) {
     arena,
     fighters,
     physicsConfig,
+    combatConfig,
     animationConfig: animationStyle,
   });
 }
