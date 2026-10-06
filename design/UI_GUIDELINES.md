@@ -34,8 +34,13 @@ Todos os textos ficam em `src/config/uiConfig.js` (`texts`). Para trocar o nome 
 ### Menu
 
 - Título centralizado, em maiúsculas.
-- Opções: **Duelar** (contra a IA), **Treino** (contra o boneco), **Dificuldade: <nível>**, **Controles**.
-- Na opção de dificuldade, `Enter` troca o nível (Fácil → Normal → Difícil → Fácil). A escolha vale até fechar o jogo.
+- Opções: **Duelar** (contra a IA), **Treino** (contra o boneco), **Opções**, **Controles**.
+
+### Opções
+
+- Lista: **Dificuldade: <nível>**, **Efeitos: Completos/Reduzidos**, **Som: Ligado/Desligado**, **Música: Ligada/Desligada**, **Voltar**.
+- `Enter` troca o valor da opção selecionada. `Esc` volta.
+- As escolhas ficam salvas no navegador (`localStorage`) e voltam na próxima vez.
 - Linha discreta no rodapé com a navegação (`↑ ↓  escolher · Enter  confirmar`).
 
 ### Controles
@@ -83,7 +88,7 @@ NOME ESQUERDA                                         NOME DIREITA
 ## Acessibilidade
 
 - Não depender só de cor: vida baixa também pisca.
-- Flash e screen shake com intensidade limitada (ver VFX_GUIDELINES). Planejado: opção para reduzir efeitos.
+- Flash e screen shake com intensidade limitada (ver VFX_GUIDELINES), e opção **Efeitos: Reduzidos**.
 
 ## Não fazer
 

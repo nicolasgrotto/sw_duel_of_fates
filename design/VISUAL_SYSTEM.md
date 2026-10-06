@@ -53,9 +53,10 @@ A cena é desenhada sempre nesta ordem:
 4. Characters
 5. Sabers
 6. Combat VFX
-7. Foreground effects
-8. UI
-9. Debug
+7. Foreground effects (flash)
+8. Pós-processamento (vinheta)
+9. UI
+10. Debug
 
 Na Pausa, o estado de baixo é desenhado inteiro e depois vem o overlay (ver `StateMachine.render`).
 
@@ -135,6 +136,14 @@ Para os glows, use `globalCompositeOperation = 'lighter'`. Evite `shadowBlur` po
 ### Luz do sabre no corpo
 
 Um brilho suave (sprite radial pré-renderizado por cor) no meio da lâmina, com blend aditivo, ilumina o corpo e o chão por perto. O sprite é criado uma vez por cor e reaproveitado.
+
+### Afterimage da esquiva
+
+Durante a esquiva, o renderer guarda 3 cópias da pose (a cada 0,05 s de simulação) e desenha a silhueta com alpha baixo (0,3 → 0), sem o sabre.
+
+### Vinheta
+
+Escurecimento suave nas bordas da tela (sprite radial pré-renderizado, multiplicativo), desenhado depois do mundo e antes da UI. Deixa a luta mais cinematográfica e puxa o olho para o centro.
 
 ## Efeitos
 

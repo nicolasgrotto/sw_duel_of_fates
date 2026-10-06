@@ -86,12 +86,21 @@ Efeitos curtos e fortes, só em momentos importantes. Ver [design/VFX_GUIDELINES
 
 Toda ação tem 4 fases: **preparação → movimento → impacto → recuperação**. Ver [design/ART_DIRECTION.md](design/ART_DIRECTION.md).
 
-## Áudio (planejado)
+## Áudio
 
-- Zumbido contínuo dos sabres, mais forte em movimento.
-- Choque de sabres: som curto, metálico e elétrico.
-- Música: ambiente tensa durante o duelo e silêncio curto antes do golpe final.
-- Todo áudio externo precisa de registro em [ASSETS.md](ASSETS.md).
+Todo o som é **sintetizado** com a Web Audio API (osciladores, ruído e filtros). Não há arquivos de áudio, então não há questão de licença nem de franquia.
+
+- Zumbido contínuo de cada sabre (grave, levemente desafinado), mais forte e mais agudo durante o golpe. Posição no estéreo segue o lutador.
+- Golpe: "whoosh" de ruído filtrado. O forte é mais grave e longo.
+- Hit: estalo elétrico curto com um baque grave.
+- Bloqueio e clash: som metálico e elétrico. O clash é o mais forte.
+- Quebra de guarda: estalo forte e descendente.
+- Golpe final: baque grave e o sabre do derrotado "desligando" (tom caindo).
+- Esquiva: whoosh curto e agudo.
+- Interface: tique curto ao navegar, tom curto ao confirmar.
+- Música: drone ambiente grave e tenso, com filtro respirando devagar. Abaixa no golpe final (silêncio curto) e volta depois.
+- Som e música podem ser desligados nas Opções.
+- Se um dia entrar áudio gravado, ele precisa de registro em [ASSETS.md](ASSETS.md).
 
 ## O que NÃO fazer
 

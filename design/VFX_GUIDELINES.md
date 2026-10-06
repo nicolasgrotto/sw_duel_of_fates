@@ -32,9 +32,17 @@ Os valores reais ficam em `src/config/effectsConfig.js`.
 | `guard-break` | `guardBreak` | 18–24 faíscas, luz forte | médio | fraco |
 | `saber-clash` | `clash` | 24–32 faíscas, luz forte nas duas cores | forte | médio |
 | `final-blow` | `death` | flash e shake (somados ao efeito do hit) | máximo | máximo |
-| `dodge-afterimage` | — | 2–3 silhuetas transparentes | — | — |
+| `dodge-afterimage` | (render) durante a esquiva | 3 silhuetas transparentes que somem rápido | — | — |
 
-`dodge-afterimage` ainda não está implementado (precisa de um evento de esquiva). Câmera lenta no golpe final e hit stop ficam para a Fase 7.
+### Hit stop e câmera lenta
+
+- **Hit stop**: a simulação congela por um instante no impacto. Efeitos e câmera continuam. Ataque rápido 0,04 s, ataque forte 0,08 s, bloqueio 0,03 s, quebra de guarda 0,1 s, clash 0,1 s.
+- **Câmera lenta no golpe final**: a simulação roda a 30% da velocidade por 0,8 s (tempo real) depois do K.O.
+- Os dois são controlados por `TimeControl` e pedidos pelas receitas de efeito.
+
+### Efeitos reduzidos
+
+Opção de acessibilidade. Com efeitos reduzidos: screen shake a 25% e flash desligado. Hit stop e câmera lenta continuam (não piscam nem tremem).
 
 ### Faíscas
 
