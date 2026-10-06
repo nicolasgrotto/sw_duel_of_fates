@@ -1,11 +1,14 @@
+import { keyBindings } from '../config/controlsConfig.js';
 import { gameConfig } from '../config/gameConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
 import { GameLoop } from './GameLoop.js';
+import { Input } from './Input.js';
 import { Renderer } from './Renderer.js';
 
 export class Game {
   constructor(canvas) {
     this.renderer = new Renderer(canvas, gameConfig.canvas);
+    this.input = new Input({ bindings: keyBindings, target: window });
     this.loop = new GameLoop({
       ...gameConfig.loop,
       update: (dt) => this.update(dt),
@@ -27,6 +30,7 @@ export class Game {
 
   update(dt) {
     this.elapsedTime += dt;
+    this.input.endFrame();
   }
 
   render() {
