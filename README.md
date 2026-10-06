@@ -53,8 +53,9 @@ Os testes cobrem apenas módulos de lógica. Por isso, módulos de lógica não 
 | Pausar / voltar ao jogo | `Esc` ou `P` |
 | Sair para o menu (na pausa) | `Q` |
 | Debug | `F3` |
+| Comportamento do boneco de treino (com debug ligado) | `F4` |
 
-Os controles ficam em [src/config/controlsConfig.js](src/config/controlsConfig.js). Ações de combate ainda não estão implementadas (ver [TASKS.md](TASKS.md)).
+Os controles ficam em [src/config/controlsConfig.js](src/config/controlsConfig.js).
 
 ## Documentação
 

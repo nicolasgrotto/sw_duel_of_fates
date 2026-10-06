@@ -113,3 +113,17 @@ Usar easing nas transições e um pequeno exagero (antecipação e follow-throug
 - **Caminhada**: passos curtos de base de luta (os pés não se cruzam), corpo sobe e desce a cada passo, roupa arrasta levemente para trás do movimento.
 - **Pulo**: pernas recolhidas no ar.
 - A troca entre idle, caminhada e pulo é suavizada (blend), nunca instantânea.
+
+### Poses de combate
+
+| Estado | Pose |
+| --- | --- |
+| Ataque rápido | startup: lâmina sobe para trás · active: corte rápido para baixo e para a frente, tronco avança · recovery: volta à guarda |
+| Ataque forte | igual ao rápido, mas com preparação maior (lâmina bem atrás da cabeça) e corte mais longo |
+| Bloqueio | lâmina quase vertical à frente do corpo, mãos adiantadas, base mais baixa |
+| Esquiva | corpo baixo e inclinado para longe do movimento |
+| Atingido | tronco joga para trás, lâmina cai |
+| Atordoado | corpo curvado, lâmina apontando para o chão, balanço lento |
+| Morto | cai para trás e a lâmina apaga |
+
+Curvas de tempo: startup com easing de saída (prepara devagar no fim), active quase linear e rápido, recovery com easing suave.

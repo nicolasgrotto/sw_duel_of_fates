@@ -67,7 +67,7 @@ O combate é baseado em estados:
 | `BLOCKING` | Bloqueando |
 | `DODGING` | Esquivando |
 | `HIT` | Atingido |
-| `STUNNED` | Atordoado (ex.: após ter um ataque forte bloqueado) |
+| `STUNNED` | Atordoado (guarda quebrada por falta de stamina) |
 | `DEAD` | Morto |
 
 Cada ação possui:
@@ -84,18 +84,64 @@ Cada ação possui:
 
 Os tempos são definidos em segundos e processados com timestep fixo (ver ARCHITECTURE.md), para que o combate seja determinístico.
 
-Exemplo de dados de um ataque (valores reais ficam em `src/config/`):
+Os valores reais ficam em `src/config/fightersConfig.js`, por arquétipo.
 
-```js
-{
-  damage: 20,
-  staminaCost: 10,
-  startup: 0.12,
-  active: 0.18,
-  recovery: 0.25,
-  knockback: 120
-}
-```
+### Regras de combate
+
+**Quando dá para agir**
+
+- Ataques, bloqueio e esquiva só começam no chão, a partir de `IDLE` ou `WALKING`.
+- Prioridade quando várias teclas chegam juntas: esquiva > ataque forte > ataque rápido > bloqueio.
+- Sem stamina suficiente, a ação é recusada.
+- Um ataque não pode ser cancelado. O único jeito de interromper é sendo atingido.
+
+**Ataques**
+
+- Fases: startup → active → recovery. A hitbox só existe no active.
+- No início do active, o atacante dá um pequeno passo à frente (lunge).
+- Cada ataque acerta no máximo uma vez.
+- Ataque rápido: barato, rápido, pouco dano. Ataque forte: caro, lento, muito dano e knockback.
+- A recovery é a janela de contra-ataque: quem erra um golpe fica vulnerável.
+
+**Hitbox e hurtbox**
+
+- Hitbox: retângulo à frente do atacante, com alcance e altura definidos por ataque.
+- Hurtbox: a caixa do corpo do lutador.
+- Durante o início da esquiva, a hurtbox some (invulnerável).
+
+**Bloqueio**
+
+- Segurar bloquear mantém `BLOCKING`. Soltar volta a `IDLE`.
+- Só bloqueia golpes vindos da frente.
+- Golpe bloqueado: sem dano de vida, o defensor perde stamina, é empurrado um pouco e fica preso no bloqueio por um instante (blockstun).
+- **Quebra de guarda**: se o defensor não tiver stamina para o bloqueio, a stamina zera e ele fica `STUNNED`.
+
+**Esquiva**
+
+- Dash rápido para a direção segurada. Sem direção, esquiva para trás.
+- Custa stamina. Invulnerável no começo, vulnerável no fim.
+
+**Ser atingido**
+
+- Perde vida, recebe knockback na direção do golpe e entra em `HIT` (hitstun). Se estava atacando, o ataque é cancelado.
+- Vida zero: `DEAD`. O duelo termina.
+
+**Stamina**
+
+- Ações gastam stamina. Depois de gastar, há um pequeno atraso antes de regenerar.
+- Bloqueando, a regeneração é mais lenta.
+
+**Fim do duelo**
+
+- Quando um lutador morre, os controles param, o resultado aparece ("VITÓRIA" ou "DERROTA") e `Enter` volta ao menu. A tela de resultado completa é da Fase 6.
+
+**Eventos de combate**
+
+O `CombatSystem` emite eventos (`hit`, `block`, `guardBreak`, `death`). Efeitos, câmera e som (fases futuras) reagem a eventos, nunca ao contrário.
+
+### Boneco de treino
+
+Até a IA existir (Fase 5), o oponente é um boneco de treino. Com o debug ligado, `F4` alterna o comportamento: parado → bloqueando → atacando.
 
 ---
 
