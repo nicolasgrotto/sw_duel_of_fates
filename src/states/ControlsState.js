@@ -1,0 +1,40 @@
+import { Action, keyBindings } from '../config/controlsConfig.js';
+import { colors, textStyles } from '../config/themeConfig.js';
+import { controlsScreenActions, layout, texts } from '../config/uiConfig.js';
+import { formatText } from '../ui/formatText.js';
+import { formatActionKeys } from '../ui/keyLabels.js';
+import { GameState } from './GameState.js';
+
+export class ControlsState extends GameState {
+  enter() {
+    this.rows = controlsScreenActions.map((action) => ({
+      label: texts.controls.actions[action],
+      keys: formatActionKeys(keyBindings, action),
+    }));
+    this.footer = formatText(texts.controls.back, { back: formatActionKeys(keyBindings, Action.BACK) });
+  }
+
+  update() {
+    const { input } = this.game;
+    if (input.wasPressed(Action.BACK) || input.wasPressed(Action.CONFIRM)) {
+      this.game.popState();
+    }
+  }
+
+  render(renderer) {
+    const { titleY, firstRowY, rowSpacing, columnGap, footerY } = layout.controls;
+    const centerX = renderer.width / 2;
+
+    renderer.clear(colors.background);
+    renderer.text(texts.controls.title, centerX, titleY, textStyles.heading);
+
+    for (let index = 0; index < this.rows.length; index += 1) {
+      const row = this.rows[index];
+      const y = firstRowY + index * rowSpacing;
+      renderer.text(row.label, centerX - columnGap, y, textStyles.tableLabel);
+      renderer.text(row.keys, centerX + columnGap, y, textStyles.tableValue);
+    }
+
+    renderer.text(this.footer, centerX, footerY, textStyles.hint);
+  }
+}

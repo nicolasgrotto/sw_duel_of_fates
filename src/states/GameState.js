@@ -1,8 +1,9 @@
 const NO_DEBUG_INFO = Object.freeze([]);
 
 export class GameState {
-  constructor(game) {
+  constructor(game, params = {}) {
     this.game = game;
+    this.params = params;
   }
 
   get name() {

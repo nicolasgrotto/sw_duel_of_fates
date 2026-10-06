@@ -31,12 +31,12 @@ export class Game {
     this.loop.start();
   }
 
-  changeState(id) {
-    this.states.change(createState(id, this));
+  changeState(id, params) {
+    this.states.change(createState(id, this, params));
   }
 
-  pushState(id) {
-    this.states.push(createState(id, this));
+  pushState(id, params) {
+    this.states.push(createState(id, this, params));
   }
 
   popState() {

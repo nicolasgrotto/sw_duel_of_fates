@@ -17,8 +17,8 @@ function createFakeGame() {
       wasPressed: (action) => pressed.has(action),
       isDown: () => false,
     },
-    changeState: (id) => game.states.change(createState(id, game)),
-    pushState: (id) => game.states.push(createState(id, game)),
+    changeState: (id, params) => game.states.change(createState(id, game, params)),
+    pushState: (id, params) => game.states.push(createState(id, game, params)),
     popState: () => game.states.pop(),
     stateNames: () => game.states.stack.map((state) => state.name),
     step: (...actions) => {
@@ -40,6 +40,19 @@ describe('state flow', () => {
 
     game.step(Action.CONFIRM);
     assert.deepEqual(game.stateNames(), ['DuelState']);
+  });
+
+  it('opens the controls screen from the menu and goes back', () => {
+    const game = createFakeGame();
+    game.changeState(StateId.MENU);
+
+    game.step(Action.MENU_DOWN);
+    game.step(Action.CONFIRM);
+    assert.deepEqual(game.stateNames(), ['MenuState', 'ControlsState']);
+
+    game.step(Action.BACK);
+    assert.deepEqual(game.stateNames(), ['MenuState']);
+    assert.equal(game.states.current.menu.selected.id, 'controls');
   });
 
   it('pauses the duel and resumes it', () => {

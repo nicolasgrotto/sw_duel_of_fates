@@ -18,6 +18,11 @@ export const colors = {
   debugBody: 'rgba(124, 252, 0, 0.8)',
   debugInvulnerable: 'rgba(124, 252, 0, 0.25)',
   debugHitbox: 'rgba(255, 80, 80, 0.9)',
+  hudHealth: '#e8ecf5',
+  hudDanger: '#e5484d',
+  hudGhost: 'rgba(232, 236, 245, 0.3)',
+  hudStamina: '#8a94ab',
+  hudTrack: 'rgba(255, 255, 255, 0.08)',
 };
 
 export const textStyles = {
@@ -45,15 +50,52 @@ export const textStyles = {
     align: 'center',
     baseline: 'middle',
   },
+  message: {
+    font: `bold 64px ${FONT_FAMILY}`,
+    color: colors.text,
+    align: 'center',
+    baseline: 'middle',
+  },
+  menuItem: {
+    font: `28px ${FONT_FAMILY}`,
+    color: colors.textMuted,
+    align: 'center',
+    baseline: 'middle',
+  },
+  menuItemSelected: {
+    font: `28px ${FONT_FAMILY}`,
+    color: colors.text,
+    align: 'center',
+    baseline: 'middle',
+  },
+  hudNameLeft: {
+    font: `bold 18px ${FONT_FAMILY}`,
+    color: colors.text,
+    align: 'left',
+    baseline: 'middle',
+  },
+  hudNameRight: {
+    font: `bold 18px ${FONT_FAMILY}`,
+    color: colors.text,
+    align: 'right',
+    baseline: 'middle',
+  },
+  tableLabel: {
+    font: `22px ${FONT_FAMILY}`,
+    color: colors.textMuted,
+    align: 'right',
+    baseline: 'middle',
+  },
+  tableValue: {
+    font: `22px ${FONT_FAMILY}`,
+    color: colors.text,
+    align: 'left',
+    baseline: 'middle',
+  },
   debug: {
     font: `14px ${MONO_FONT_FAMILY}`,
     color: colors.debug,
     align: 'left',
     baseline: 'top',
   },
-};
-
-export const animation = {
-  promptBlinkPeriod: 1.2,
-  promptVisibleRatio: 0.65,
 };
