@@ -104,7 +104,9 @@ Cores compartilhadas (em `themeConfig`):
 | `saberHilt` | `#b9bec9` | cabo do sabre |
 | `saberCore` | `#ffffff` | núcleo da lâmina |
 | `groundShadow` | `rgba(0, 0, 0, 0.45)` | sombra no chão |
-| `debugBody` | `rgba(124, 252, 0, 0.8)` | caixa do corpo no debug |
+| `debugBody` | `rgba(124, 252, 0, 0.8)` | hurtbox (caixa do corpo) no debug |
+| `debugInvulnerable` | `rgba(124, 252, 0, 0.25)` | hurtbox durante a invulnerabilidade |
+| `debugHitbox` | `rgba(255, 80, 80, 0.9)` | hitbox ativa no debug |
 
 ## Sabre
 

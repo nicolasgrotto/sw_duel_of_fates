@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { Action } from '../src/config/controlsConfig.js';
+import { colors } from '../src/config/themeConfig.js';
 import { StateMachine } from '../src/core/StateMachine.js';
 import { createState } from '../src/states/stateFactory.js';
 import { StateId } from '../src/states/stateIds.js';
@@ -110,6 +111,26 @@ describe('state flow', () => {
     game.debug.enabled = true;
     game.step(Action.CYCLE_DUMMY);
     assert.equal(duel.dummy.behavior, 'block');
+  });
+
+  it('draws hurtboxes always and the hitbox only during the active phase', () => {
+    const game = createFakeGame();
+    game.changeState(StateId.DUEL);
+    const duel = game.states.current;
+    const [player] = duel.fighters;
+    const drawnColors = () => {
+      const strokes = [];
+      duel.renderDebug({ strokeRect: (x, y, width, height, color) => strokes.push(color) });
+      return strokes;
+    };
+
+    assert.deepEqual(drawnColors(), [colors.debugBody, colors.debugBody]);
+
+    game.step(Action.LIGHT_ATTACK);
+    while (player.stateTime < player.stats.attacks.light.startup) {
+      game.step();
+    }
+    assert.ok(drawnColors().includes(colors.debugHitbox));
   });
 
   it('throws for an unknown state id', () => {

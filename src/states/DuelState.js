@@ -1,5 +1,6 @@
 import { createFighter } from '../characters/characterFactory.js';
 import { CombatEvent } from '../combat/combatEvents.js';
+import { createBox, getAttackHitbox, isAttackActive, isInvulnerable } from '../combat/hitboxes.js';
 import { Action } from '../config/controlsConfig.js';
 import { animation as animationStyle } from '../config/fighterVisualConfig.js';
 import { gameConfig } from '../config/gameConfig.js';
@@ -23,6 +24,8 @@ export class DuelState extends GameState {
   enter() {
     this.duelTime = 0;
     this.outcome = null;
+    this.lastEvent = 'none';
+    this.debugBox = createBox();
     this.dummy = new DummyController(gameConfig.duel.dummy);
     this.arena = createArenaBounds(gameConfig);
     this.participants = this.createParticipants();
@@ -75,12 +78,21 @@ export class DuelState extends GameState {
     }
 
     this.simulation.step(dt);
+    this.rememberLastEvent();
     this.checkForDeath();
   }
 
   updateIntents(dt) {
     for (const { fighter, controller } of this.participants) {
       controller.updateIntent(fighter.intent, dt);
+    }
+  }
+
+  rememberLastEvent() {
+    const { events } = this.simulation;
+    if (events.length > 0) {
+      const event = events[events.length - 1];
+      this.lastEvent = `${event.type} (${event.attacker.id} → ${event.defender.id})`;
     }
   }
 
@@ -133,12 +145,22 @@ export class DuelState extends GameState {
 
   renderDebug(renderer) {
     for (const fighter of this.fighters) {
-      renderer.strokeRect(fighter.left, fighter.top, fighter.width, fighter.height, colors.debugBody);
+      const hurtboxColor = isInvulnerable(fighter) ? colors.debugInvulnerable : colors.debugBody;
+      renderer.strokeRect(fighter.left, fighter.top, fighter.width, fighter.height, hurtboxColor);
+
+      if (isAttackActive(fighter)) {
+        const box = getAttackHitbox(fighter, fighter.combat.attack, this.debugBox);
+        renderer.strokeRect(box.left, box.top, box.right - box.left, box.bottom - box.top, colors.debugHitbox, 2);
+      }
     }
   }
 
   getDebugInfo() {
-    const lines = [`duel time: ${this.duelTime.toFixed(2)}s`, `dummy (F4): ${this.dummy.behavior}`];
+    const lines = [
+      `duel time: ${this.duelTime.toFixed(2)}s`,
+      `dummy (F4): ${this.dummy.behavior}`,
+      `last event: ${this.lastEvent}`,
+    ];
 
     for (const fighter of this.fighters) {
       lines.push(

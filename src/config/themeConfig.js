@@ -16,6 +16,8 @@ export const colors = {
   debug: '#7cfc00',
   debugBackground: 'rgba(0, 0, 0, 0.55)',
   debugBody: 'rgba(124, 252, 0, 0.8)',
+  debugInvulnerable: 'rgba(124, 252, 0, 0.25)',
+  debugHitbox: 'rgba(255, 80, 80, 0.9)',
 };
 
 export const textStyles = {

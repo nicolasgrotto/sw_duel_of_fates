@@ -28,9 +28,13 @@ export function boxesOverlap(a, b) {
   return a.left < b.right && b.left < a.right && a.top < b.bottom && b.top < a.bottom;
 }
 
+export function isAttackActive(fighter) {
+  const { attack } = fighter.combat;
+  return attack !== null && getAttackPhase(attack, fighter.stateTime) === AttackPhase.ACTIVE;
+}
+
 export function hasActiveHitbox(fighter) {
-  const { attack, hasHit } = fighter.combat;
-  return attack !== null && !hasHit && getAttackPhase(attack, fighter.stateTime) === AttackPhase.ACTIVE;
+  return !fighter.combat.hasHit && isAttackActive(fighter);
 }
 
 export function isInvulnerable(fighter) {
