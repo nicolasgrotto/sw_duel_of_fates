@@ -20,6 +20,30 @@ function createGlowSprite(color) {
   return sprite;
 }
 
+function createVignette(width, height, { alpha, innerRadiusRatio, outerRadiusRatio }) {
+  const sprite = document.createElement('canvas');
+  sprite.width = width;
+  sprite.height = height;
+
+  const context = sprite.getContext('2d');
+  const centerX = width / 2;
+  const centerY = height / 2;
+  const diagonal = Math.hypot(centerX, centerY);
+  const gradient = context.createRadialGradient(
+    centerX,
+    centerY,
+    diagonal * innerRadiusRatio,
+    centerX,
+    centerY,
+    diagonal * outerRadiusRatio,
+  );
+  gradient.addColorStop(0, 'rgba(0, 0, 0, 0)');
+  gradient.addColorStop(1, `rgba(0, 0, 0, ${alpha})`);
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, width, height);
+  return sprite;
+}
+
 export class Renderer {
   constructor(canvas, { width, height }) {
     this.canvas = canvas;
@@ -27,6 +51,14 @@ export class Renderer {
     this.width = width;
     this.height = height;
     this.glowSprites = new Map();
+    this.vignette = null;
+  }
+
+  drawVignette(style) {
+    if (!this.vignette) {
+      this.vignette = createVignette(this.width, this.height, style);
+    }
+    this.context.drawImage(this.vignette, 0, 0, this.width, this.height);
   }
 
   getGlowSprite(color) {

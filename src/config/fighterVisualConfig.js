@@ -101,6 +101,13 @@ export const saberStyle = {
   bodyLightAlpha: 0.14,
 };
 
+export const afterimage = {
+  count: 3,
+  interval: 0.05,
+  duration: 0.25,
+  alpha: 0.3,
+};
+
 export const saberTrail = {
   maxSamples: 8,
   duration: 0.12,

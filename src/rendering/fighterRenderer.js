@@ -95,13 +95,15 @@ function drawArms(renderer, fighter, pose) {
   renderer.fillCircle(pose.handX, pose.handY, height * proportions.handRadius, appearance.bodyColor);
 }
 
-export function drawFighterBody(renderer, fighter, pose, floorY) {
+export function drawFighterBody(renderer, fighter, pose, floorY, withShadow = true) {
   const { height, appearance } = fighter;
   const shoulderWidth = height * proportions.shoulderWidth;
   const flare = height * proportions.tunicFlare;
   const legWidth = height * proportions.legWidth;
 
-  drawGroundShadow(renderer, fighter, floorY);
+  if (withShadow) {
+    drawGroundShadow(renderer, fighter, floorY);
+  }
 
   renderer.save();
   renderer.translate(fighter.x, fighter.y);

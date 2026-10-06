@@ -10,6 +10,11 @@ export const effectsConfig = {
     flashScale: 0,
   },
   sparkColors: ['#ffffff', '#ffe9a8', '#fff4d6'],
+  vignette: {
+    alpha: 0.55,
+    innerRadiusRatio: 0.45,
+    outerRadiusRatio: 0.85,
+  },
   particle: {
     gravity: 900,
     drag: 2.5,

@@ -1,6 +1,7 @@
 import { isAttackActive } from '../combat/hitboxes.js';
 import { effectsConfig } from '../config/effectsConfig.js';
 import { drawArena } from './arenaRenderer.js';
+import { DodgeAfterimage } from './DodgeAfterimage.js';
 import { drawFlash, drawImpactLights, drawParticles } from './effectsRenderer.js';
 import { computePose, createPose } from './fighterPose.js';
 import { drawFighterBody } from './fighterRenderer.js';
@@ -11,6 +12,7 @@ export class DuelRenderer {
   constructor() {
     this.poses = new Map();
     this.trails = new Map();
+    this.afterimages = new Map();
     this.bladePoints = { baseX: 0, baseY: 0, tipX: 0, tipY: 0 };
   }
 
@@ -32,6 +34,15 @@ export class DuelRenderer {
     return trail;
   }
 
+  getAfterimage(fighter) {
+    let afterimage = this.afterimages.get(fighter);
+    if (!afterimage) {
+      afterimage = new DodgeAfterimage();
+      this.afterimages.set(fighter, afterimage);
+    }
+    return afterimage;
+  }
+
   render(renderer, arena, fighters, effects, camera) {
     renderer.save();
     renderer.translate(camera.offsetX, camera.offsetY);
@@ -41,6 +52,9 @@ export class DuelRenderer {
 
     for (const fighter of fighters) {
       drawSaberFloorLight(renderer, fighter, this.getPose(fighter), arena.floorY);
+    }
+    for (const fighter of fighters) {
+      this.getAfterimage(fighter).draw(renderer, fighter.animation.time, arena.floorY);
     }
     for (const fighter of fighters) {
       drawFighterBody(renderer, fighter, this.getPose(fighter), arena.floorY);
@@ -61,11 +75,13 @@ export class DuelRenderer {
     renderer.restore();
 
     drawFlash(renderer, effects.flash);
+    renderer.drawVignette(effectsConfig.vignette);
   }
 
   preparePoses(fighters) {
     for (const fighter of fighters) {
       const pose = computePose(fighter, this.getPose(fighter));
+      this.getAfterimage(fighter).record(fighter, pose);
 
       if (isAttackActive(fighter)) {
         getBladeWorldPoints(fighter, pose, this.bladePoints);
