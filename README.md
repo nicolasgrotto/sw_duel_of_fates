@@ -72,3 +72,7 @@ Os controles ficam em [src/config/controlsConfig.js](src/config/controlsConfig.j
 | [AGENTS.md](AGENTS.md) | Regras para agentes de IA (Claude Code, Codex, GPT) |
 | [CREDITS.md](CREDITS.md) | Créditos e aviso de marca |
 | [ASSETS.md](ASSETS.md) | Origem e licença de cada asset |
+
+## Licença
+
+O código está sob a licença [MIT](LICENSE). A licença cobre apenas o código escrito para este projeto. Marcas e personagens de terceiros não estão incluídos (ver [CREDITS.md](CREDITS.md)).

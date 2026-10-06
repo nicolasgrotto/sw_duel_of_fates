@@ -6,7 +6,7 @@ Atualize este arquivo ao terminar cada tarefa.
 
 - [x] Documentação de design (DESIGN.md e design/)
 - [x] CREDITS.md e ASSETS.md
-- [ ] Escolher a licença do código e criar LICENSE
+- [x] Escolher a licença do código e criar LICENSE (MIT)
 - [ ] Definir nomes e visual dos personagens
 - [ ] Definir nome final do jogo (versão de portfólio)
 - [ ] Criar o repositório remoto no GitHub

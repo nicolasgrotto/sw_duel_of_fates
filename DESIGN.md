@@ -123,4 +123,3 @@ Para essa troca não exigir reescrever o jogo:
 - Nome final do jogo (hoje: "Duel of Fates", só para o protótipo).
 - Nomes e visual final dos personagens.
 - Estilo dos sprites: desenho por código (formas e silhuetas) ou sprites desenhados/gerados.
-- Licença do código.
