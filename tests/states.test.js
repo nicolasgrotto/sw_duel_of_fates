@@ -5,6 +5,7 @@ import { colors } from '../src/config/themeConfig.js';
 import { layout } from '../src/config/uiConfig.js';
 import { StateMachine } from '../src/core/StateMachine.js';
 import { createState } from '../src/states/stateFactory.js';
+import { DuelMode } from '../src/states/duelModes.js';
 import { StateId } from '../src/states/stateIds.js';
 
 const STEP = 1 / 60;
@@ -14,6 +15,7 @@ function createFakeGame() {
   const game = {
     states: new StateMachine(),
     debug: { enabled: false },
+    settings: { difficulty: 'normal' },
     input: {
       wasPressed: (action) => pressed.has(action),
       isDown: () => false,
@@ -103,7 +105,7 @@ describe('state flow', () => {
 
   it('ends the duel when a fighter dies and goes back to the menu after the result', () => {
     const game = createFakeGame();
-    game.changeState(StateId.DUEL);
+    game.changeState(StateId.DUEL, { mode: DuelMode.TRAINING });
     const duel = game.states.current;
     const [player, opponent] = duel.fighters;
     opponent.x = player.x + 110;
@@ -133,15 +135,37 @@ describe('state flow', () => {
 
   it('cycles the training dummy only when debug is enabled', () => {
     const game = createFakeGame();
-    game.changeState(StateId.DUEL);
+    game.changeState(StateId.DUEL, { mode: DuelMode.TRAINING });
     const duel = game.states.current;
 
     game.step(Action.CYCLE_DUMMY);
-    assert.equal(duel.dummy.behavior, 'idle');
+    assert.equal(duel.opponentController.behavior, 'idle');
 
     game.debug.enabled = true;
     game.step(Action.CYCLE_DUMMY);
-    assert.equal(duel.dummy.behavior, 'block');
+    assert.equal(duel.opponentController.behavior, 'block');
+  });
+
+  it('uses the AI with the chosen difficulty in versus mode', () => {
+    const game = createFakeGame();
+    game.settings.difficulty = 'hard';
+    game.changeState(StateId.DUEL);
+    const duel = game.states.current;
+
+    assert.equal(duel.opponentController.constructor.name, 'EnemyAI');
+    assert.equal(duel.opponentController.difficulty.reactionTime, 0.15);
+    assert.equal(duel.opponentController.profile.attackChance, 0.8);
+  });
+
+  it('keeps the duel mode when restarting from the pause', () => {
+    const game = createFakeGame();
+    game.changeState(StateId.DUEL, { mode: DuelMode.TRAINING });
+
+    game.step(Action.PAUSE);
+    game.step(Action.MENU_DOWN);
+    game.step(Action.CONFIRM);
+
+    assert.equal(game.states.current.mode, DuelMode.TRAINING);
   });
 
   it('draws hurtboxes always and the hitbox only during the active phase', () => {

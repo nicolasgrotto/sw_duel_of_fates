@@ -36,7 +36,7 @@ export class PauseState extends GameState {
         this.game.popState();
         break;
       case PauseOption.RESTART:
-        this.game.changeState(StateId.DUEL);
+        this.game.changeState(StateId.DUEL, this.params.duelParams);
         break;
       case PauseOption.QUIT:
         this.game.changeState(StateId.MENU);

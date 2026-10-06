@@ -1,3 +1,4 @@
+import { aiConfig } from '../config/aiConfig.js';
 import { Action, keyBindings } from '../config/controlsConfig.js';
 import { gameConfig } from '../config/gameConfig.js';
 import { colors } from '../config/themeConfig.js';
@@ -14,6 +15,7 @@ export class Game {
     this.renderer = new Renderer(canvas, gameConfig.canvas);
     this.input = new Input({ bindings: keyBindings, target: window });
     this.states = new StateMachine();
+    this.settings = { difficulty: aiConfig.defaultDifficulty };
     this.debug = new DebugOverlay(gameConfig.debug);
     this.loop = new GameLoop({
       ...gameConfig.loop,

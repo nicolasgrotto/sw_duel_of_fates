@@ -1,6 +1,9 @@
+import { EnemyAI } from '../ai/EnemyAI.js';
+import { characters } from '../characters/characterData.js';
 import { createFighter } from '../characters/characterFactory.js';
 import { CombatEvent } from '../combat/combatEvents.js';
 import { createBox, getAttackHitbox, isAttackActive, isInvulnerable } from '../combat/hitboxes.js';
+import { aiConfig } from '../config/aiConfig.js';
 import { Action, keyBindings } from '../config/controlsConfig.js';
 import { effectsConfig } from '../config/effectsConfig.js';
 import { animation as animationStyle } from '../config/fighterVisualConfig.js';
@@ -19,6 +22,7 @@ import { Hud } from '../ui/Hud.js';
 import { formatActionKeys } from '../ui/keyLabels.js';
 import { createRandom, createRandomSeed } from '../utils/random.js';
 import { GameState } from './GameState.js';
+import { DuelMode } from './duelModes.js';
 import { StateId } from './stateIds.js';
 
 function createArenaBounds({ canvas, arena }) {
@@ -38,9 +42,11 @@ export class DuelState extends GameState {
     this.stats = { hits: 0, blocks: 0 };
     this.lastEvent = 'none';
     this.debugBox = createBox();
-    this.dummy = new DummyController(gameConfig.duel.dummy);
+    this.mode = this.params.mode ?? DuelMode.VERSUS;
+    this.random = createRandom(createRandomSeed());
     this.arena = createArenaBounds(gameConfig);
     this.participants = this.createParticipants();
+    this.opponentController = this.participants[1].controller;
     this.fighters = this.participants.map((participant) => participant.fighter);
     this.simulation = new DuelSimulation({
       arena: this.arena,
@@ -49,9 +55,8 @@ export class DuelState extends GameState {
       combatConfig: gameConfig.combat,
       animationConfig: animationStyle,
     });
-    const random = createRandom(createRandomSeed());
-    this.camera = new Camera(effectsConfig, random);
-    this.effects = new EffectsSystem(effectsConfig, this.camera, random);
+    this.camera = new Camera(effectsConfig, this.random);
+    this.effects = new EffectsSystem(effectsConfig, this.camera, this.random);
     this.view = new DuelRenderer();
     this.hud = new Hud(this.fighters[0], this.fighters[1]);
     this.message = new CombatMessage();
@@ -64,26 +69,42 @@ export class DuelState extends GameState {
     const centerX = (this.arena.left + this.arena.right) / 2;
     const { floorY } = this.arena;
 
+    const player = createFighter(playerCharacter, { x: centerX - spawnDistance / 2, y: floorY, facing: 1 });
+    const opponent = createFighter(opponentCharacter, { x: centerX + spawnDistance / 2, y: floorY, facing: -1 });
+
     return [
-      {
-        fighter: createFighter(playerCharacter, { x: centerX - spawnDistance / 2, y: floorY, facing: 1 }),
-        controller: new PlayerController(this.game.input),
-      },
-      {
-        fighter: createFighter(opponentCharacter, { x: centerX + spawnDistance / 2, y: floorY, facing: -1 }),
-        controller: this.dummy,
-      },
+      { fighter: player, controller: new PlayerController(this.game.input) },
+      { fighter: opponent, controller: this.createOpponentController(opponent, player, opponentCharacter) },
     ];
+  }
+
+  createOpponentController(opponent, player, characterId) {
+    if (this.mode === DuelMode.TRAINING) {
+      return new DummyController(gameConfig.duel.dummy);
+    }
+
+    return new EnemyAI({
+      self: opponent,
+      opponent: player,
+      profile: aiConfig.profiles[characters[characterId].aiProfile],
+      difficulty: aiConfig.difficulties[this.game.settings.difficulty],
+      perception: aiConfig.perception,
+      random: this.random,
+    });
+  }
+
+  get isTraining() {
+    return this.mode === DuelMode.TRAINING;
   }
 
   update(dt) {
     if (this.game.input.wasPressed(Action.PAUSE)) {
-      this.game.pushState(StateId.PAUSE);
+      this.game.pushState(StateId.PAUSE, { duelParams: this.params });
       return;
     }
 
-    if (this.game.debug.enabled && this.game.input.wasPressed(Action.CYCLE_DUMMY)) {
-      this.dummy.cycleBehavior();
+    if (this.isTraining && this.game.debug.enabled && this.game.input.wasPressed(Action.CYCLE_DUMMY)) {
+      this.opponentController.cycleBehavior();
     }
 
     if (this.outcome) {
@@ -137,6 +158,7 @@ export class DuelState extends GameState {
 
   showResult() {
     this.game.pushState(StateId.GAME_OVER, {
+      duelParams: this.params,
       playerWon: this.outcome.winner === this.player,
       winnerName: this.outcome.winner.name,
       stats: { time: this.duelTime, hits: this.stats.hits, blocks: this.stats.blocks },
@@ -197,7 +219,9 @@ export class DuelState extends GameState {
   getDebugInfo() {
     const lines = [
       `duel time: ${this.duelTime.toFixed(2)}s`,
-      `dummy (F4): ${this.dummy.behavior}`,
+      this.isTraining
+        ? `dummy (F4): ${this.opponentController.behavior}`
+        : `ai: ${this.opponentController.decision} (${this.game.settings.difficulty})`,
       `last event: ${this.lastEvent}`,
     ];
 

@@ -3,6 +3,7 @@ export const characters = {
     id: 'guardian',
     name: 'Guardião',
     archetype: 'guardian',
+    aiProfile: 'balanced',
     appearance: {
       cloakColor: '#6b5a48',
       bodyColor: '#2e2925',
@@ -18,6 +19,7 @@ export const characters = {
     id: 'shadow',
     name: 'Sombra',
     archetype: 'shadow',
+    aiProfile: 'aggressive',
     appearance: {
       cloakColor: '#1f2029',
       bodyColor: '#121319',

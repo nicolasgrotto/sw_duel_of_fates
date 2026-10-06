@@ -38,7 +38,7 @@ export class GameOverState extends GameState {
     const choice = this.menu.update(this.game.input);
 
     if (choice === GameOverOption.REMATCH) {
-      this.game.changeState(StateId.DUEL);
+      this.game.changeState(StateId.DUEL, this.params.duelParams);
     } else if (choice === GameOverOption.MENU) {
       this.game.changeState(StateId.MENU);
     }
