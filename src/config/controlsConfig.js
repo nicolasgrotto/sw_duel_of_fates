@@ -10,6 +10,7 @@ export const Action = Object.freeze({
   PAUSE: 'pause',
   QUIT: 'quit',
   TOGGLE_DEBUG: 'toggleDebug',
+  CYCLE_DUMMY: 'cycleDummy',
 });
 
 export const keyBindings = {
@@ -24,4 +25,5 @@ export const keyBindings = {
   [Action.PAUSE]: ['Escape', 'KeyP'],
   [Action.QUIT]: ['KeyQ'],
   [Action.TOGGLE_DEBUG]: ['F3'],
+  [Action.CYCLE_DUMMY]: ['F4'],
 };

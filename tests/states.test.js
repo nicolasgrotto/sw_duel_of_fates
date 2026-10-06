@@ -11,6 +11,7 @@ function createFakeGame() {
   const pressed = new Set();
   const game = {
     states: new StateMachine(),
+    debug: { enabled: false },
     input: {
       wasPressed: (action) => pressed.has(action),
       isDown: () => false,
@@ -72,6 +73,43 @@ describe('state flow', () => {
     game.step(Action.QUIT);
 
     assert.deepEqual(game.stateNames(), ['MenuState']);
+  });
+
+  it('ends the duel when a fighter dies and goes back to the menu after the result', () => {
+    const game = createFakeGame();
+    game.changeState(StateId.DUEL);
+    const duel = game.states.current;
+    const [player, opponent] = duel.fighters;
+    opponent.x = player.x + 110;
+    opponent.health = 1;
+
+    game.step(Action.LIGHT_ATTACK);
+    for (let i = 0; i < 30; i += 1) {
+      game.step();
+    }
+    assert.equal(duel.outcome.winner, player);
+
+    game.step(Action.CONFIRM);
+    assert.deepEqual(game.stateNames(), ['DuelState']);
+
+    for (let i = 0; i < 90; i += 1) {
+      game.step();
+    }
+    game.step(Action.CONFIRM);
+    assert.deepEqual(game.stateNames(), ['MenuState']);
+  });
+
+  it('cycles the training dummy only when debug is enabled', () => {
+    const game = createFakeGame();
+    game.changeState(StateId.DUEL);
+    const duel = game.states.current;
+
+    game.step(Action.CYCLE_DUMMY);
+    assert.equal(duel.dummy.behavior, 'idle');
+
+    game.debug.enabled = true;
+    game.step(Action.CYCLE_DUMMY);
+    assert.equal(duel.dummy.behavior, 'block');
   });
 
   it('throws for an unknown state id', () => {

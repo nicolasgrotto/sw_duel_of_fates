@@ -1,8 +1,10 @@
 import { createFighter } from '../characters/characterFactory.js';
+import { CombatEvent } from '../combat/combatEvents.js';
 import { Action } from '../config/controlsConfig.js';
 import { animation as animationStyle } from '../config/fighterVisualConfig.js';
 import { gameConfig } from '../config/gameConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
+import { DummyController } from '../controllers/DummyController.js';
 import { PlayerController } from '../controllers/PlayerController.js';
 import { DuelRenderer } from '../rendering/DuelRenderer.js';
 import { DuelSimulation } from '../simulation/DuelSimulation.js';
@@ -20,6 +22,8 @@ function createArenaBounds({ canvas, arena }) {
 export class DuelState extends GameState {
   enter() {
     this.duelTime = 0;
+    this.outcome = null;
+    this.dummy = new DummyController(gameConfig.duel.dummy);
     this.arena = createArenaBounds(gameConfig);
     this.participants = this.createParticipants();
     this.fighters = this.participants.map((participant) => participant.fighter);
@@ -44,7 +48,7 @@ export class DuelState extends GameState {
       },
       {
         fighter: createFighter(opponentCharacter, { x: centerX + spawnDistance / 2, y: floorY, facing: -1 }),
-        controller: null,
+        controller: this.dummy,
       },
     ];
   }
@@ -55,24 +59,76 @@ export class DuelState extends GameState {
       return;
     }
 
-    this.duelTime += dt;
-    this.updateIntents();
+    if (this.game.debug.enabled && this.game.input.wasPressed(Action.CYCLE_DUMMY)) {
+      this.dummy.cycleBehavior();
+    }
+
+    if (this.outcome) {
+      this.outcome.time += dt;
+      if (this.isResultVisible() && this.game.input.wasPressed(Action.CONFIRM)) {
+        this.game.changeState(StateId.MENU);
+        return;
+      }
+    } else {
+      this.duelTime += dt;
+      this.updateIntents(dt);
+    }
+
     this.simulation.step(dt);
+    this.checkForDeath();
   }
 
-  updateIntents() {
+  updateIntents(dt) {
     for (const { fighter, controller } of this.participants) {
-      if (controller) {
-        controller.updateIntent(fighter.intent);
-      } else {
-        fighter.clearIntent();
+      controller.updateIntent(fighter.intent, dt);
+    }
+  }
+
+  checkForDeath() {
+    if (this.outcome) {
+      return;
+    }
+
+    for (const event of this.simulation.events) {
+      if (event.type === CombatEvent.DEATH) {
+        this.outcome = { winner: event.attacker, loser: event.defender, time: 0 };
+        this.clearAllIntents();
+        return;
       }
     }
   }
 
+  clearAllIntents() {
+    for (const fighter of this.fighters) {
+      fighter.clearIntent();
+    }
+  }
+
+  isResultVisible() {
+    return this.outcome !== null && this.outcome.time >= gameConfig.duel.resultDelay;
+  }
+
+  get player() {
+    return this.participants[0].fighter;
+  }
+
   render(renderer) {
     this.view.render(renderer, this.arena, this.fighters);
-    renderer.text('Esc  pausar', renderer.width / 2, renderer.height - 40, textStyles.hint);
+
+    if (this.isResultVisible()) {
+      this.renderResult(renderer);
+    } else {
+      renderer.text('Esc  pausar', renderer.width / 2, renderer.height - 40, textStyles.hint);
+    }
+  }
+
+  renderResult(renderer) {
+    const centerX = renderer.width / 2;
+    const centerY = renderer.height / 2;
+    const title = this.outcome.winner === this.player ? 'VITÓRIA' : 'DERROTA';
+
+    renderer.text(title, centerX, centerY - 120, textStyles.heading);
+    renderer.text('Enter  voltar ao menu', centerX, centerY - 60, textStyles.hint);
   }
 
   renderDebug(renderer) {
@@ -82,7 +138,7 @@ export class DuelState extends GameState {
   }
 
   getDebugInfo() {
-    const lines = [`duel time: ${this.duelTime.toFixed(2)}s`];
+    const lines = [`duel time: ${this.duelTime.toFixed(2)}s`, `dummy (F4): ${this.dummy.behavior}`];
 
     for (const fighter of this.fighters) {
       lines.push(
