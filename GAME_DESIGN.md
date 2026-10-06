@@ -150,7 +150,7 @@ O `CombatSystem` emite eventos (`hit`, `block`, `guardBreak`, `clash`, `death`).
 
 ### Boneco de treino
 
-Até a IA existir (Fase 5), o oponente é um boneco de treino. Com o debug ligado, `F4` alterna o comportamento: parado → bloqueando → atacando.
+No modo **Treino** (menu), o oponente é um boneco em vez da IA. Com o debug ligado, `F4` alterna o comportamento: parado → bloqueando → atacando.
 
 ---
 
@@ -189,24 +189,47 @@ A lâmina também possui uma área de colisão própria, usada para detectar cho
 
 ## 7. IA
 
-Perfis de comportamento:
+A IA controla o oponente pelo mesmo `intent` do jogador. Ela só **solicita** ações. Nunca altera vida, stamina, posição ou estado diretamente.
 
-- **Aggressive**: ataca com frequência.
-- **Defensive**: prioriza bloqueio e contra-ataque.
-- **Balanced**: combina ataque, defesa e movimentação.
+### Como a IA pensa
 
-A IA decide com base em:
+- A IA não reage a cada frame. Ela "pensa" em intervalos (`reactionTime` da dificuldade). Entre um pensamento e outro, segue o plano atual (andar, segurar bloqueio...). Isso simula tempo de reação humano e deixa espaço para o jogador enganar a IA.
+- A cada pensamento, ela lê:
+  - distância até o jogador (espaço entre os corpos)
+  - estado do jogador (atacando, em recovery, atordoado...) e a fase do ataque dele
+  - a própria vida e stamina
+  - cooldown entre os próprios ataques
+- E escolhe, em ordem de prioridade:
+  1. **Defender**: se o jogador está começando um golpe que alcança, bloqueia ou esquiva (chance depende do perfil e da dificuldade).
+  2. **Punir**: se o jogador está em recovery, atingido ou atordoado e está no alcance, contra-ataca (ataque forte se houver stamina e o jogador estiver atordoado).
+  3. **Recuperar**: com pouca stamina, recua até uma distância segura.
+  4. **Atacar**: no alcance e sem cooldown, ataca com uma chance do perfil (rápido ou forte).
+  5. **Posicionar**: fora do alcance, aproxima. Perto demais (para o perfil), recua um pouco ou espera.
+- Cada pensamento tem uma chance de **erro** (hesitar, não defender), que depende da dificuldade.
 
-- distância do jogador
-- vida
-- stamina
-- estado atual do jogador
-- próprio estado
-- cooldowns
-- dificuldade
-- probabilidade
+### Perfis
 
-A IA só **solicita** ações. Ela nunca altera vida, stamina ou outros valores de combate diretamente.
+| Perfil | Comportamento |
+| --- | --- |
+| **Agressivo** | ataca muito, usa mais ataques fortes, defende pouco, fica perto |
+| **Defensivo** | bloqueia e esquiva muito, prefere contra-atacar, mantém distância |
+| **Equilibrado** | meio-termo |
+
+O perfil vem do personagem (`characterData.aiProfile`). A Sombra é agressiva.
+
+### Dificuldade
+
+| Dificuldade | Reação | Defesa | Erros |
+| --- | --- | --- | --- |
+| **Fácil** | lenta | rara | frequentes |
+| **Normal** | média | às vezes | alguns |
+| **Difícil** | rápida | frequente | raros |
+
+A dificuldade é escolhida no menu. Os valores ficam em `src/config/aiConfig.js`.
+
+### Aleatoriedade
+
+A IA usa o mesmo RNG com seed dos efeitos. Nos testes, a seed é fixa, então o comportamento é reproduzível.
 
 ---
 

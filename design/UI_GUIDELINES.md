@@ -34,7 +34,8 @@ Todos os textos ficam em `src/config/uiConfig.js` (`texts`). Para trocar o nome 
 ### Menu
 
 - Título centralizado, em maiúsculas.
-- Opções: **Duelar**, **Controles**. (A Fase 5 adiciona a dificuldade.)
+- Opções: **Duelar** (contra a IA), **Treino** (contra o boneco), **Dificuldade: <nível>**, **Controles**.
+- Na opção de dificuldade, `Enter` troca o nível (Fácil → Normal → Difícil → Fácil). A escolha vale até fechar o jogo.
 - Linha discreta no rodapé com a navegação (`↑ ↓  escolher · Enter  confirmar`).
 
 ### Controles
