@@ -1,8 +1,9 @@
 import { createFighter } from '../characters/characterFactory.js';
 import { Action } from '../config/controlsConfig.js';
 import { gameConfig } from '../config/gameConfig.js';
-import { colors, textStyles } from '../config/themeConfig.js';
+import { textStyles } from '../config/themeConfig.js';
 import { PlayerController } from '../controllers/PlayerController.js';
+import { DuelRenderer } from '../rendering/DuelRenderer.js';
 import { CollisionSystem } from '../systems/CollisionSystem.js';
 import { MovementSystem } from '../systems/MovementSystem.js';
 import { PhysicsSystem } from '../systems/PhysicsSystem.js';
@@ -26,6 +27,7 @@ export class DuelState extends GameState {
     this.collision = new CollisionSystem(this.arena);
     this.participants = this.createParticipants();
     this.fighters = this.participants.map((participant) => participant.fighter);
+    this.view = new DuelRenderer();
   }
 
   createParticipants() {
@@ -75,22 +77,8 @@ export class DuelState extends GameState {
   }
 
   render(renderer) {
-    this.renderArena(renderer);
-
-    for (const fighter of this.fighters) {
-      renderer.fillRect(fighter.left, fighter.top, fighter.width, fighter.height, fighter.appearance.cloakColor);
-    }
-
+    this.view.render(renderer, this.arena, this.fighters);
     renderer.text('Esc  pausar', renderer.width / 2, renderer.height - 40, textStyles.hint);
-  }
-
-  renderArena(renderer) {
-    const { left, right, floorY } = this.arena;
-
-    renderer.fillRect(0, floorY, renderer.width, renderer.height - floorY, colors.floor);
-    renderer.line(0, floorY, renderer.width, floorY, colors.floorEdge, 2);
-    renderer.line(left, 0, left, floorY, colors.wall, 2);
-    renderer.line(right, 0, right, floorY, colors.wall, 2);
   }
 
   getDebugInfo() {

@@ -10,8 +10,12 @@ export const colors = {
   textMuted: '#8a94ab',
   accent: '#9fb4d9',
   overlay: 'rgba(0, 0, 0, 0.65)',
+  saberHilt: '#b9bec9',
+  saberCore: '#ffffff',
+  groundShadow: 'rgba(0, 0, 0, 0.45)',
   debug: '#7cfc00',
   debugBackground: 'rgba(0, 0, 0, 0.55)',
+  debugBody: 'rgba(124, 252, 0, 0.8)',
 };
 
 export const textStyles = {

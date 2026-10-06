@@ -37,10 +37,73 @@ export class Renderer {
   line(fromX, fromY, toX, toY, color, lineWidth = 1) {
     this.context.strokeStyle = color;
     this.context.lineWidth = lineWidth;
+    this.context.lineCap = 'round';
     this.context.beginPath();
     this.context.moveTo(fromX, fromY);
     this.context.lineTo(toX, toY);
     this.context.stroke();
+  }
+
+  polyline(points, color, lineWidth = 1) {
+    this.context.strokeStyle = color;
+    this.context.lineWidth = lineWidth;
+    this.context.lineCap = 'round';
+    this.context.lineJoin = 'round';
+    this.tracePath(points);
+    this.context.stroke();
+  }
+
+  fillPolygon(points, color) {
+    this.context.fillStyle = color;
+    this.tracePath(points);
+    this.context.closePath();
+    this.context.fill();
+  }
+
+  fillCircle(x, y, radius, color) {
+    this.context.fillStyle = color;
+    this.context.beginPath();
+    this.context.arc(x, y, radius, 0, Math.PI * 2);
+    this.context.fill();
+  }
+
+  fillEllipse(x, y, radiusX, radiusY, color) {
+    this.context.fillStyle = color;
+    this.context.beginPath();
+    this.context.ellipse(x, y, radiusX, radiusY, 0, 0, Math.PI * 2);
+    this.context.fill();
+  }
+
+  tracePath(points) {
+    this.context.beginPath();
+    this.context.moveTo(points[0], points[1]);
+    for (let i = 2; i < points.length; i += 2) {
+      this.context.lineTo(points[i], points[i + 1]);
+    }
+  }
+
+  save() {
+    this.context.save();
+  }
+
+  restore() {
+    this.context.restore();
+  }
+
+  translate(x, y) {
+    this.context.translate(x, y);
+  }
+
+  scale(x, y) {
+    this.context.scale(x, y);
+  }
+
+  setAlpha(alpha) {
+    this.context.globalAlpha = alpha;
+  }
+
+  setBlendMode(mode) {
+    this.context.globalCompositeOperation = mode;
   }
 
   text(content, x, y, style) {
