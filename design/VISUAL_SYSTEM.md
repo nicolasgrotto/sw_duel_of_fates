@@ -107,6 +107,11 @@ Cores compartilhadas (em `themeConfig`):
 | `debugBody` | `rgba(124, 252, 0, 0.8)` | hurtbox (caixa do corpo) no debug |
 | `debugInvulnerable` | `rgba(124, 252, 0, 0.25)` | hurtbox durante a invulnerabilidade |
 | `debugHitbox` | `rgba(255, 80, 80, 0.9)` | hitbox ativa no debug |
+| `hudHealth` | `#e8ecf5` | barra de vida |
+| `hudDanger` | `#e5484d` | barra de vida abaixo de 25% |
+| `hudGhost` | `rgba(232, 236, 245, 0.3)` | parte da vida perdida há pouco (barra fantasma) |
+| `hudStamina` | `#8a94ab` | barra de stamina |
+| `hudTrack` | `rgba(255, 255, 255, 0.08)` | fundo das barras |
 
 ## Sabre
 
