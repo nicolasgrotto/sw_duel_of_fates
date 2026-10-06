@@ -11,7 +11,6 @@ export const Action = Object.freeze({
   MENU_UP: 'menuUp',
   MENU_DOWN: 'menuDown',
   PAUSE: 'pause',
-  QUIT: 'quit',
   TOGGLE_DEBUG: 'toggleDebug',
   CYCLE_DUMMY: 'cycleDummy',
 });
@@ -29,7 +28,6 @@ export const keyBindings = {
   [Action.MENU_UP]: ['ArrowUp', 'KeyW'],
   [Action.MENU_DOWN]: ['ArrowDown', 'KeyS'],
   [Action.PAUSE]: ['Escape', 'KeyP'],
-  [Action.QUIT]: ['KeyQ'],
   [Action.TOGGLE_DEBUG]: ['F3'],
   [Action.CYCLE_DUMMY]: ['F4'],
 };

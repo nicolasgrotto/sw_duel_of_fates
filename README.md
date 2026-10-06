@@ -49,9 +49,10 @@ Os testes cobrem apenas módulos de lógica. Por isso, módulos de lógica não 
 | Ataque forte | `K` |
 | Bloquear | `L` |
 | Esquivar | `Shift` |
+| Navegar nos menus | `W` / `S` ou setas |
 | Confirmar | `Enter` |
+| Voltar | `Esc` ou `Backspace` |
 | Pausar / voltar ao jogo | `Esc` ou `P` |
-| Sair para o menu (na pausa) | `Q` |
 | Debug | `F3` |
 | Comportamento do boneco de treino (com debug ligado) | `F4` |
 

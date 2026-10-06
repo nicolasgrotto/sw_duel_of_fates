@@ -94,7 +94,9 @@ describe('state flow', () => {
     game.changeState(StateId.DUEL);
 
     game.step(Action.PAUSE);
-    game.step(Action.QUIT);
+    game.step(Action.MENU_DOWN);
+    game.step(Action.MENU_DOWN);
+    game.step(Action.CONFIRM);
 
     assert.deepEqual(game.stateNames(), ['MenuState']);
   });
@@ -169,6 +171,32 @@ describe('state flow', () => {
     skipIntro(game);
     game.step(Action.LIGHT_ATTACK);
     assert.equal(player.state, 'ATTACKING');
+  });
+
+  it('restarts the duel from the pause menu', () => {
+    const game = createFakeGame();
+    game.changeState(StateId.DUEL);
+    const firstDuel = game.states.current;
+
+    game.step(Action.PAUSE);
+    game.step(Action.MENU_DOWN);
+    game.step(Action.CONFIRM);
+
+    assert.deepEqual(game.stateNames(), ['DuelState']);
+    assert.notEqual(game.states.current, firstDuel);
+  });
+
+  it('resumes the duel with the back key or the first option', () => {
+    const game = createFakeGame();
+    game.changeState(StateId.DUEL);
+
+    game.step(Action.PAUSE);
+    game.step(Action.BACK);
+    assert.deepEqual(game.stateNames(), ['DuelState']);
+
+    game.step(Action.PAUSE);
+    game.step(Action.CONFIRM);
+    assert.deepEqual(game.stateNames(), ['DuelState']);
   });
 
   it('throws for an unknown state id', () => {
