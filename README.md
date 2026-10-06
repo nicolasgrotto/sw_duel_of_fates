@@ -1,8 +1,10 @@
-# Star Wars — Duel of Fates
+# Duel of Fates — Star Wars 2D Duel
 
-Jogo 2D de duelo de sabres de luz feito com HTML5, CSS3, JavaScript puro (ES Modules) e Canvas 2D. Sem frameworks, sem engine e sem bundler.
+**Academic Project / Prototype**
 
-> Projeto de estudo, inspirado no universo Star Wars. Não é um produto oficial. Antes de qualquer distribuição pública, substitua nomes, artes e sons por material original ou licenciado.
+Jogo 2D de duelo de sabres de luz para navegador, feito com HTML5, CSS3, JavaScript puro (ES Modules) e Canvas 2D. Sem frameworks, sem engine e sem bundler.
+
+> Projeto acadêmico, sem fins comerciais, inspirado nos duelos de sabre de Star Wars. Não é um produto oficial e não tem afiliação com a Lucasfilm ou a Disney. O código usa termos neutros e não inclui assets oficiais, para que o jogo possa receber uma identidade própria no futuro (ver [DESIGN.md](DESIGN.md#propriedade-intelectual)).
 
 ## Requisitos
 
@@ -58,7 +60,15 @@ Os controles ficam em [src/config/controlsConfig.js](src/config/controlsConfig.j
 
 | Arquivo | Conteúdo |
 | --- | --- |
-| [GAME_DESIGN.md](GAME_DESIGN.md) | O que o jogo é e como deve funcionar |
+| [DESIGN.md](DESIGN.md) | Briefing: conceito, sensação, pilares e o que não fazer |
+| [design/ART_DIRECTION.md](design/ART_DIRECTION.md) | Identidade visual |
+| [design/VISUAL_SYSTEM.md](design/VISUAL_SYSTEM.md) | Cores, tipografia, camadas e regras de renderização |
+| [design/UI_GUIDELINES.md](design/UI_GUIDELINES.md) | Interface e HUD |
+| [design/VFX_GUIDELINES.md](design/VFX_GUIDELINES.md) | Efeitos visuais |
+| [design/REFERENCES.md](design/REFERENCES.md) | Referências |
+| [GAME_DESIGN.md](GAME_DESIGN.md) | Regras de gameplay |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Como o código é organizado e como os módulos se comunicam |
 | [TASKS.md](TASKS.md) | Roadmap e progresso |
-| [AGENTS.md](AGENTS.md) | Regras para agentes de código (Claude Code, Codex) |
+| [AGENTS.md](AGENTS.md) | Regras para agentes de IA (Claude Code, Codex, GPT) |
+| [CREDITS.md](CREDITS.md) | Créditos e aviso de marca |
+| [ASSETS.md](ASSETS.md) | Origem e licença de cada asset |
