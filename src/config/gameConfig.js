@@ -39,7 +39,7 @@ export const gameConfig = {
     enabled: false,
     fpsSampleWindow: 0.5,
     x: 12,
-    y: 12,
+    y: 84,
     width: 360,
     padding: 10,
     lineHeight: 18,

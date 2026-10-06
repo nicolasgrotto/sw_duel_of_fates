@@ -1,17 +1,21 @@
 import { createFighter } from '../characters/characterFactory.js';
 import { CombatEvent } from '../combat/combatEvents.js';
 import { createBox, getAttackHitbox, isAttackActive, isInvulnerable } from '../combat/hitboxes.js';
-import { Action } from '../config/controlsConfig.js';
+import { Action, keyBindings } from '../config/controlsConfig.js';
 import { effectsConfig } from '../config/effectsConfig.js';
 import { animation as animationStyle } from '../config/fighterVisualConfig.js';
 import { gameConfig } from '../config/gameConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
+import { layout, texts } from '../config/uiConfig.js';
 import { DummyController } from '../controllers/DummyController.js';
 import { Camera } from '../core/Camera.js';
 import { PlayerController } from '../controllers/PlayerController.js';
 import { DuelRenderer } from '../rendering/DuelRenderer.js';
 import { DuelSimulation } from '../simulation/DuelSimulation.js';
 import { EffectsSystem } from '../systems/EffectsSystem.js';
+import { formatText } from '../ui/formatText.js';
+import { Hud } from '../ui/Hud.js';
+import { formatActionKeys } from '../ui/keyLabels.js';
 import { createRandom, createRandomSeed } from '../utils/random.js';
 import { GameState } from './GameState.js';
 import { StateId } from './stateIds.js';
@@ -46,6 +50,8 @@ export class DuelState extends GameState {
     this.camera = new Camera(effectsConfig, random);
     this.effects = new EffectsSystem(effectsConfig, this.camera, random);
     this.view = new DuelRenderer();
+    this.hud = new Hud(this.fighters[0], this.fighters[1]);
+    this.pauseHint = formatText(texts.duel.pauseHint, { pause: formatActionKeys(keyBindings, Action.PAUSE) });
   }
 
   createParticipants() {
@@ -90,6 +96,7 @@ export class DuelState extends GameState {
     this.effects.handleEvents(this.simulation.events);
     this.effects.update(dt);
     this.camera.update(dt);
+    this.hud.update(dt);
     this.rememberLastEvent();
     this.checkForDeath();
   }
@@ -138,11 +145,12 @@ export class DuelState extends GameState {
 
   render(renderer) {
     this.view.render(renderer, this.arena, this.fighters, this.effects, this.camera);
+    this.hud.render(renderer);
 
     if (this.isResultVisible()) {
       this.renderResult(renderer);
     } else {
-      renderer.text('Esc  pausar', renderer.width / 2, renderer.height - 40, textStyles.hint);
+      renderer.text(this.pauseHint, renderer.width / 2, layout.hud.pauseHintY, textStyles.hint);
     }
   }
 

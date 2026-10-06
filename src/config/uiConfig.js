@@ -95,6 +95,7 @@ export const layout = {
     ghostSpeed: 0.6,
     lowHealthRatio: 0.25,
     lowHealthBlinkPeriod: 0.8,
+    lowHealthDimAlpha: 0.45,
     pauseHintY: 690,
   },
   messages: {
