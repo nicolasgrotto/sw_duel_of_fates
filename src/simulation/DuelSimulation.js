@@ -33,6 +33,7 @@ export class DuelSimulation {
     this.physics.update(fighters, dt);
     this.collision.update(fighters);
     this.movement.updateStates(fighters);
+    this.combat.resolveHits(fighters);
     this.stamina.update(fighters, dt);
     this.animator.update(fighters, dt);
   }

@@ -91,6 +91,11 @@ export class Fighter {
     this.stateTime = 0;
   }
 
+  restartState(state) {
+    this.state = state;
+    this.stateTime = 0;
+  }
+
   clearAttack() {
     this.combat.attack = null;
     this.combat.attackType = null;
