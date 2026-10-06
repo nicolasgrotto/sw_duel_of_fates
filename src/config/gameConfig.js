@@ -12,6 +12,16 @@ export const gameConfig = {
     floorY: 600,
     wallPadding: 40,
   },
+  physics: {
+    gravity: 2400,
+    maxFallSpeed: 1400,
+    restingSpeed: 5,
+  },
+  duel: {
+    playerCharacter: 'guardian',
+    opponentCharacter: 'shadow',
+    spawnDistance: 440,
+  },
   debug: {
     enabled: false,
     fpsSampleWindow: 0.5,
