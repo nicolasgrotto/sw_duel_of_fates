@@ -31,6 +31,17 @@ export class Fighter {
     this.state = FighterState.IDLE;
     this.stateTime = 0;
 
+    this.combat = {
+      attack: null,
+      attackType: null,
+      hasHit: false,
+      lungeApplied: false,
+      stunDuration: 0,
+      blockstun: 0,
+      dodgeDirection: 0,
+      staminaRegenDelay: 0,
+    };
+
     this.intent = createIntent();
     this.animation = {
       time: 0,
@@ -64,12 +75,27 @@ export class Fighter {
     return LOCOMOTION_STATES.has(this.state);
   }
 
+  get canAct() {
+    return this.grounded && (this.state === FighterState.IDLE || this.state === FighterState.WALKING);
+  }
+
+  get isAlive() {
+    return this.state !== FighterState.DEAD;
+  }
+
   setState(state) {
     if (this.state === state) {
       return;
     }
     this.state = state;
     this.stateTime = 0;
+  }
+
+  clearAttack() {
+    this.combat.attack = null;
+    this.combat.attackType = null;
+    this.combat.hasHit = false;
+    this.combat.lungeApplied = false;
   }
 
   advanceStateTime(dt) {

@@ -16,6 +16,7 @@ export const gameConfig = {
     gravity: 2400,
     maxFallSpeed: 1400,
     restingSpeed: 5,
+    actionFriction: 1400,
   },
   duel: {
     playerCharacter: 'guardian',

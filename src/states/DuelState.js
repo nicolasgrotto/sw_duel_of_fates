@@ -5,10 +5,7 @@ import { gameConfig } from '../config/gameConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
 import { PlayerController } from '../controllers/PlayerController.js';
 import { DuelRenderer } from '../rendering/DuelRenderer.js';
-import { AnimationSystem } from '../systems/AnimationSystem.js';
-import { CollisionSystem } from '../systems/CollisionSystem.js';
-import { MovementSystem } from '../systems/MovementSystem.js';
-import { PhysicsSystem } from '../systems/PhysicsSystem.js';
+import { DuelSimulation } from '../simulation/DuelSimulation.js';
 import { GameState } from './GameState.js';
 import { StateId } from './stateIds.js';
 
@@ -24,12 +21,14 @@ export class DuelState extends GameState {
   enter() {
     this.duelTime = 0;
     this.arena = createArenaBounds(gameConfig);
-    this.movement = new MovementSystem(gameConfig.physics);
-    this.physics = new PhysicsSystem(gameConfig.physics, this.arena);
-    this.collision = new CollisionSystem(this.arena);
-    this.animator = new AnimationSystem(animationStyle);
     this.participants = this.createParticipants();
     this.fighters = this.participants.map((participant) => participant.fighter);
+    this.simulation = new DuelSimulation({
+      arena: this.arena,
+      fighters: this.fighters,
+      physicsConfig: gameConfig.physics,
+      animationConfig: animationStyle,
+    });
     this.view = new DuelRenderer();
   }
 
@@ -58,16 +57,7 @@ export class DuelState extends GameState {
 
     this.duelTime += dt;
     this.updateIntents();
-
-    for (const fighter of this.fighters) {
-      fighter.advanceStateTime(dt);
-    }
-
-    this.movement.applyIntents(this.fighters, dt);
-    this.physics.update(this.fighters, dt);
-    this.collision.update(this.fighters);
-    this.movement.updateStates(this.fighters);
-    this.animator.update(this.fighters, dt);
+    this.simulation.step(dt);
   }
 
   updateIntents() {
@@ -96,7 +86,7 @@ export class DuelState extends GameState {
 
     for (const fighter of this.fighters) {
       lines.push(
-        `${fighter.id}: ${fighter.state}`,
+        `${fighter.id}: ${fighter.state}  hp ${fighter.health.toFixed(0)}  st ${fighter.stamina.toFixed(0)}`,
         `  pos ${fighter.x.toFixed(0)}, ${fighter.y.toFixed(0)}  vel ${fighter.vx.toFixed(0)}, ${fighter.vy.toFixed(0)}`,
       );
     }

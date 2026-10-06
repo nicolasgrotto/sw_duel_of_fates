@@ -11,13 +11,15 @@ function findOpponent(fighter, fighters) {
 }
 
 export class MovementSystem {
-  constructor({ restingSpeed }) {
+  constructor({ restingSpeed, actionFriction }) {
     this.restingSpeed = restingSpeed;
+    this.actionFriction = actionFriction;
   }
 
   applyIntents(fighters, dt) {
     for (const fighter of fighters) {
       if (!fighter.canMove) {
+        this.applyActionFriction(fighter, dt);
         continue;
       }
       this.faceOpponent(fighter, findOpponent(fighter, fighters));
@@ -33,6 +35,13 @@ export class MovementSystem {
       }
       fighter.setState(this.resolveLocomotionState(fighter));
     }
+  }
+
+  applyActionFriction(fighter, dt) {
+    if (fighter.state === FighterState.DODGING) {
+      return;
+    }
+    fighter.vx = approach(fighter.vx, 0, this.actionFriction * dt);
   }
 
   faceOpponent(fighter, opponent) {
