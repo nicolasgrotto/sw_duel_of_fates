@@ -59,6 +59,10 @@ export class DebugOverlay {
       return;
     }
 
+    for (const state of stateMachine.stack) {
+      state.renderDebug(renderer);
+    }
+
     const { x, y, padding, lineHeight, width } = this.layout;
     const lines = this.collectLines(stateMachine);
     const height = lines.length * lineHeight + padding * 2;

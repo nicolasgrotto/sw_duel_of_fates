@@ -17,6 +17,8 @@ export class GameState {
 
   render() {}
 
+  renderDebug() {}
+
   getDebugInfo() {
     return NO_DEBUG_INFO;
   }

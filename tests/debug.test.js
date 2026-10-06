@@ -51,12 +51,28 @@ describe('DebugOverlay', () => {
   it('shows the state stack and the debug info of each state when enabled', () => {
     const overlay = new DebugOverlay(layout, () => 0);
     const renderer = createFakeRenderer();
-    const duel = { name: 'DuelState', getDebugInfo: () => ['duel time: 1.00s'] };
-    const pause = { name: 'PauseState', getDebugInfo: () => [] };
+    const duel = { name: 'DuelState', renderDebug: () => {}, getDebugInfo: () => ['duel time: 1.00s'] };
+    const pause = { name: 'PauseState', renderDebug: () => {}, getDebugInfo: () => [] };
 
     overlay.toggle();
     overlay.render(renderer, createFakeStates(duel, pause));
 
     assert.deepEqual(renderer.texts, ['fps: 0', 'states: DuelState > PauseState', 'duel time: 1.00s']);
+  });
+
+  it('lets every state draw its debug shapes only when enabled', () => {
+    const overlay = new DebugOverlay(layout, () => 0);
+    const renderer = createFakeRenderer();
+    const drawn = [];
+    const duel = { name: 'DuelState', renderDebug: () => drawn.push('duel'), getDebugInfo: () => [] };
+    const pause = { name: 'PauseState', renderDebug: () => drawn.push('pause'), getDebugInfo: () => [] };
+    const states = createFakeStates(duel, pause);
+
+    overlay.render(renderer, states);
+    assert.deepEqual(drawn, []);
+
+    overlay.toggle();
+    overlay.render(renderer, states);
+    assert.deepEqual(drawn, ['duel', 'pause']);
   });
 });

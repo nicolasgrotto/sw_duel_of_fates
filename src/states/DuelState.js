@@ -2,7 +2,7 @@ import { createFighter } from '../characters/characterFactory.js';
 import { Action } from '../config/controlsConfig.js';
 import { animation as animationStyle } from '../config/fighterVisualConfig.js';
 import { gameConfig } from '../config/gameConfig.js';
-import { textStyles } from '../config/themeConfig.js';
+import { colors, textStyles } from '../config/themeConfig.js';
 import { PlayerController } from '../controllers/PlayerController.js';
 import { DuelRenderer } from '../rendering/DuelRenderer.js';
 import { AnimationSystem } from '../systems/AnimationSystem.js';
@@ -83,6 +83,12 @@ export class DuelState extends GameState {
   render(renderer) {
     this.view.render(renderer, this.arena, this.fighters);
     renderer.text('Esc  pausar', renderer.width / 2, renderer.height - 40, textStyles.hint);
+  }
+
+  renderDebug(renderer) {
+    for (const fighter of this.fighters) {
+      renderer.strokeRect(fighter.left, fighter.top, fighter.width, fighter.height, colors.debugBody);
+    }
   }
 
   getDebugInfo() {
