@@ -29,6 +29,45 @@ function updateBladeGeometry(fighter, pose) {
   return blade;
 }
 
+function toWorldX(fighter, pose, localX, localY) {
+  const rotatedX = localX * Math.cos(pose.bodyRotation) - localY * Math.sin(pose.bodyRotation);
+  return fighter.x + fighter.facing * rotatedX;
+}
+
+function toWorldY(fighter, pose, localX, localY) {
+  const rotatedY = localX * Math.sin(pose.bodyRotation) + localY * Math.cos(pose.bodyRotation);
+  return fighter.y + rotatedY - pose.bodyLift;
+}
+
+export function getBladeWorldPoints(fighter, pose, out) {
+  updateBladeGeometry(fighter, pose);
+  out.baseX = toWorldX(fighter, pose, blade.baseX, blade.baseY);
+  out.baseY = toWorldY(fighter, pose, blade.baseX, blade.baseY);
+  out.tipX = toWorldX(fighter, pose, blade.tipX, blade.tipY);
+  out.tipY = toWorldY(fighter, pose, blade.tipX, blade.tipY);
+  return out;
+}
+
+const worldBlade = { baseX: 0, baseY: 0, tipX: 0, tipY: 0 };
+
+export function drawSaberBodyLight(renderer, fighter, pose) {
+  if (!pose.bladeVisible) {
+    return;
+  }
+  getBladeWorldPoints(fighter, pose, worldBlade);
+
+  renderer.save();
+  renderer.setBlendMode('lighter');
+  renderer.drawGlow(
+    (worldBlade.baseX + worldBlade.tipX) / 2,
+    (worldBlade.baseY + worldBlade.tipY) / 2,
+    saberStyle.bodyLightRadius,
+    fighter.appearance.saberColor,
+    saberStyle.bodyLightAlpha,
+  );
+  renderer.restore();
+}
+
 export function drawSaberFloorLight(renderer, fighter, pose, floorY) {
   if (!pose.bladeVisible) {
     return;

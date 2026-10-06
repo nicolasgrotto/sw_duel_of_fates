@@ -97,4 +97,12 @@ export const saberStyle = {
   floorLightAlpha: 0.12,
   floorLightRadiusX: 70,
   floorLightRadiusY: 10,
+  bodyLightRadius: 120,
+  bodyLightAlpha: 0.14,
+};
+
+export const saberTrail = {
+  maxSamples: 8,
+  duration: 0.12,
+  alpha: 0.35,
 };
