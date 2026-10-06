@@ -121,6 +121,16 @@ Em guarda (sem golpe), o sabre balança levemente com a respiração. A luz da l
 
 Para os glows, use `globalCompositeOperation = 'lighter'`. Evite `shadowBlur` por frame em muitos objetos, porque é caro. Se a performance cair, pré-renderize o glow em um canvas offscreen e reutilize.
 
+### Trail
+
+- Durante a fase active de um ataque, o renderer guarda as últimas posições da lâmina (base e ponta) e desenha faixas entre elas.
+- A faixa usa a cor do sabre, blend aditivo e some em ~0,12 s.
+- O histórico usa o tempo da simulação (pausa congela o trail) e buffers fixos, sem alocar por frame.
+
+### Luz do sabre no corpo
+
+Um brilho suave (sprite radial pré-renderizado por cor) no meio da lâmina, com blend aditivo, ilumina o corpo e o chão por perto. O sprite é criado uma vez por cor e reaproveitado.
+
 ## Efeitos
 
 VFX **não** são implementados dentro de `Fighter` nem de `CombatSystem`.

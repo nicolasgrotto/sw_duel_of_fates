@@ -20,17 +20,36 @@ Renderer      → desenha partículas e flashes
 
 ## Catálogo
 
-Os valores abaixo são o ponto de partida. Os valores reais ficam em `src/config/` (planejado: `effectsConfig.js`).
+Os valores reais ficam em `src/config/effectsConfig.js`.
 
-| Efeito | Quando | Elementos | Intensidade |
-| --- | --- | --- | --- |
-| `saber-trail` | durante o arco de um ataque | rastro da lâmina | — |
-| `hit-spark` | golpe acerta o corpo | 6–10 faíscas, flash pequeno | 0.4 |
-| `block-spark` | golpe é bloqueado | 10–16 faíscas, flash médio | 0.6 |
-| `heavy-impact` | ataque forte acerta | faíscas, flash, shake leve, hit stop | 0.8 |
-| `saber-clash` | duas lâminas se chocam | muitas faíscas, flash forte, luz na cena, shake | 1.0 |
-| `dodge-afterimage` | esquiva | 2–3 silhuetas transparentes | 0.3 |
-| `final-blow` | golpe que zera a vida | câmera lenta curta, flash, shake | 1.0 |
+| Efeito | Evento | Elementos | Shake | Flash |
+| --- | --- | --- | --- | --- |
+| `saber-trail` | (render) fase active do ataque | rastro da lâmina | — | — |
+| `saber-light` | (render) sempre | luz da lâmina no chão e no corpo | — | — |
+| `hit-spark` | `hit` com ataque rápido | 6–10 faíscas, luz pequena | — | — |
+| `heavy-impact` | `hit` com ataque forte | 12–16 faíscas, luz média | leve | fraco |
+| `block-spark` | `block` | 10–16 faíscas, luz média | muito leve | — |
+| `guard-break` | `guardBreak` | 18–24 faíscas, luz forte | médio | fraco |
+| `saber-clash` | `clash` | 24–32 faíscas, luz forte nas duas cores | forte | médio |
+| `final-blow` | `death` | flash e shake (somados ao efeito do hit) | máximo | máximo |
+| `dodge-afterimage` | — | 2–3 silhuetas transparentes | — | — |
+
+`dodge-afterimage` ainda não está implementado (precisa de um evento de esquiva). Câmera lenta no golpe final e hit stop ficam para a Fase 7.
+
+### Faíscas
+
+- Saem do ponto de contato, na direção do golpe (para longe do atacante), em um leque inclinado para cima.
+- Caem com gravidade e perdem velocidade com atrito.
+- São desenhadas como riscos curtos na direção do movimento, com blend aditivo.
+- Cores: branco e amarelo claro. A luz do impacto usa a cor do sabre do atacante (no clash, as duas cores).
+
+### Luz de impacto
+
+Brilho circular, aditivo, no ponto de contato. Começa forte e some rápido. É a "alteração temporária de iluminação" da ART_DIRECTION.
+
+### Flash
+
+Camada de cor sobre a cena inteira (abaixo da UI), com blend aditivo e alpha que cai a zero.
 
 ## Limites
 

@@ -116,6 +116,14 @@ Os valores reais ficam em `src/config/fightersConfig.js`, por arquétipo.
 - Golpe bloqueado: sem dano de vida, o defensor perde stamina, é empurrado um pouco e fica preso no bloqueio por um instante (blockstun).
 - **Quebra de guarda**: se o defensor não tiver stamina para o bloqueio, a stamina zera e ele fica `STUNNED`.
 
+**Clash (choque de sabres)**
+
+- Acontece quando os dois lutadores estão na fase active ao mesmo tempo e as hitboxes dos dois se encostam.
+- O clash tem prioridade sobre o hit: ninguém leva dano.
+- Os dois ataques são cancelados, os dois são empurrados para trás e ficam um instante em recuo (`HIT`, sem dano).
+- Emite o evento `clash`.
+- Valores em `gameConfig.combat.clash`.
+
 **Esquiva**
 
 - Dash rápido para a direção segurada. Sem direção, esquiva para trás.
@@ -137,7 +145,7 @@ Os valores reais ficam em `src/config/fightersConfig.js`, por arquétipo.
 
 **Eventos de combate**
 
-O `CombatSystem` emite eventos (`hit`, `block`, `guardBreak`, `death`). Efeitos, câmera e som (fases futuras) reagem a eventos, nunca ao contrário.
+O `CombatSystem` emite eventos (`hit`, `block`, `guardBreak`, `clash`, `death`). Efeitos, câmera e som (fases futuras) reagem a eventos, nunca ao contrário.
 
 ### Boneco de treino
 
