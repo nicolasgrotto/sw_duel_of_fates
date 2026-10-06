@@ -67,14 +67,14 @@ Atualize este arquivo ao terminar cada tarefa.
 
 - [x] Renderizar sabre em guarda (glows e núcleo)
 - [x] Luz do sabre no chão
-- [ ] Trail do sabre durante golpes
-- [ ] Arco de ataque
-- [ ] Hitbox da lâmina
-- [ ] Clash de sabres (evento `clash`)
-- [ ] EffectsSystem com pool de partículas
-- [ ] Sparks e flash
-- [ ] Camera com screen shake
-- [ ] Luz do sabre no personagem (rim light)
+- [x] Trail do sabre durante golpes
+- [x] Arco de ataque (poses da Fase 3 + trail)
+- [x] Clash de sabres (evento `clash`, hitbox × hitbox; sem entidade Saber, ver ARCHITECTURE)
+- [x] EffectsSystem com pool de partículas
+- [x] Sparks, luz de impacto e flash por evento (hit, heavy, block, guardBreak, clash, death)
+- [x] Camera com screen shake (com limites)
+- [x] Luz do sabre no personagem
+- [ ] Afterimage na esquiva (precisa de evento de esquiva)
 
 ## Fase 5 — IA
 
@@ -100,6 +100,7 @@ Atualize este arquivo ao terminar cada tarefa.
 - [ ] Sons
 - [ ] Música
 - [ ] Hit stop
+- [ ] Câmera lenta no golpe final
 - [ ] Pós-processamento
 - [ ] Opção para reduzir efeitos (flash e shake)
 - [ ] Ajustes de balanceamento

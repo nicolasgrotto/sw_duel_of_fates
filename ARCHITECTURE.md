@@ -26,7 +26,7 @@ src/
     Input.js                ✅ teclado → ações
     Renderer.js             ✅ canvas e primitivas de desenho
     StateMachine.js         ✅ pilha de estados
-    Camera.js               ⏳ enquadramento e screen shake
+    Camera.js               ✅ screen shake (com limites)
     AssetManager.js         ⏳
     AudioManager.js         ⏳
   states/                   ✅ telas do jogo
@@ -46,14 +46,14 @@ src/
   entities/                 ✅ objetos do jogo
     Fighter.js              ✅ posição, velocidade, estado, intent, animação
     fighterStates.js        ✅ estados do lutador
-    Saber.js                ⏳ lâmina com hitbox (Fase 4)
   systems/                  ✅ processam entidades
     MovementSystem.js       ✅ intent → velocidade, pulo, direção, estado de locomoção
     PhysicsSystem.js        ✅ gravidade, chão, limites da arena
     CollisionSystem.js      ✅ corpos não se atravessam
     AnimationSystem.js      ✅ tempo, ciclo de passos, blends
     StaminaSystem.js        ✅ regeneração e gasto de stamina
-    EffectsSystem.js        ⏳
+    EffectsSystem.js        ✅ eventos de combate → faíscas, luzes de impacto, flash, shake
+    ParticlePool.js         ✅ pool fixo de partículas
   combat/                   ✅ regras de combate
     CombatSystem.js         ✅ ações, timers, hits, bloqueio, quebra de guarda, morte, eventos
     attackPhases.js         ✅ tipos de ataque e fases (startup, active, recovery)
@@ -67,19 +67,21 @@ src/
     arenaRenderer.js        ✅ chão e limites
     fighterPose.js          ✅ calcula a pose a partir do estado e da animação
     fighterRenderer.js      ✅ silhueta do lutador e sombra
-    saberRenderer.js        ✅ cabo, glows, núcleo e luz no chão
+    saberRenderer.js        ✅ cabo, glows, núcleo, luz no chão e no corpo
+    SaberTrail.js           ✅ rastro da lâmina na fase active
+    effectsRenderer.js      ✅ partículas, luzes de impacto e flash
   config/                   ✅ valores e ajustes
     gameConfig.js           ✅ canvas, loop, arena, física, duelo, debug
     themeConfig.js          ✅ cores, estilos de texto, animação de UI
     controlsConfig.js       ✅ ações e teclas
     fightersConfig.js       ✅ atributos por arquétipo (vida, stamina, corpo, movimento, ataques, esquiva)
     fighterVisualConfig.js  ✅ proporções, animação, poses de combate, sombra e estilo do sabre
-    effectsConfig.js        ⏳ parâmetros de VFX
+    effectsConfig.js        ✅ limites e receitas de VFX
   utils/
     debug.js                ✅ overlay de debug
     math.js                 ✅ clamp, lerp, approach, smoothTowards
     easing.js               ✅ curvas de easing para poses
-    random.js               ⏳
+    random.js               ✅ RNG com seed (testes determinísticos)
 tools/
   server.js                 ✅ servidor estático para desenvolvimento
 tests/                      ✅ testes com node --test
@@ -90,7 +92,8 @@ Não crie arquivos vazios "para depois". Arquivo vazio tende a ser preenchido se
 Decisões sobre nomes:
 
 - `Player` e `Enemy` **não** são subclasses com lógica duplicada. Ambos são `Fighter`. O que muda é quem controla: o jogador (via `Input`) ou a IA (via `EnemyAI`). Os dois produzem as mesmas ações.
-- A lâmina é `Saber`, não `Lightsaber`. Termos neutros facilitam trocar a identidade do jogo no futuro.
+- A lâmina se chama `saber` no código, não `lightsaber`. Termos neutros facilitam trocar a identidade do jogo no futuro.
+- Não existe entidade `Saber`. A hitbox do golpe é um retângulo definido pelo ataque (`combat/hitboxes.js`) e o clash usa a sobreposição de duas hitboxes. A geometria da lâmina existe só no render. Criar uma entidade `Saber` só se a lâmina precisar de regras próprias (ex.: lâmina que pode ser arremessada ou desligada em jogo).
 - Nenhum arquivo, classe ou variável usa nome de personagem da franquia (ex.: nada de `DarthVader.js`). Personagens são dados em `characters/`.
 - O estado de combate (`IDLE`, `ATTACKING`...) pertence ao `Fighter`. Não criar um `CombatState.js` separado sem motivo.
 - Dano faz parte do `CombatSystem`. Só separar em `DamageSystem` se o arquivo crescer demais.
@@ -169,7 +172,7 @@ main.js
             └─ render(alpha) → renderer.clear() → states.render() → debug.render()
 ```
 
-`DuelState.update`: pausa → controllers preenchem os intents → `DuelSimulation.step(dt)` → verifica eventos de morte.
+`DuelState.update`: pausa → controllers preenchem os intents → `DuelSimulation.step(dt)` → `EffectsSystem` consome os eventos → efeitos e `Camera` atualizam → verifica eventos de morte.
 
 Ordem dentro de `DuelSimulation.step` ([src/simulation/DuelSimulation.js](src/simulation/DuelSimulation.js)):
 
@@ -183,18 +186,20 @@ MovementSystem.updateStates → IDLE / WALKING / JUMPING                        
 CombatSystem.resolveHits    → hitbox × hurtbox, bloqueio, dano, knockback → eventos        ✅
 StaminaSystem               → regeneração                                                  ✅
 AnimationSystem             → tempo, ciclo de passos, blends                               ✅
-EffectsSystem               → consome eventos → partículas, flash, pedido de shake         ⏳
-Camera                      → enquadramento e shake                                        ⏳
 ```
 
-A `DuelSimulation` não conhece input, tela nem renderer. Os testes de combate usam a mesma classe, então a ordem testada é a ordem do jogo.
+Efeitos e câmera são só visuais e ficam fora da `DuelSimulation`, no `DuelState`. A `DuelSimulation` não conhece input, tela, renderer nem efeitos. Os testes de combate usam a mesma classe, então a ordem testada é a ordem do jogo.
 
 `MovementSystem` só controla a locomoção de lutadores com `canMove`. Nos outros estados aplica atrito (`physics.actionFriction`), exceto na esquiva, que mantém a velocidade do dash.
 
 Ordem do `DuelRenderer.render` (camadas do VISUAL_SYSTEM):
 
 ```
-arena → luz dos sabres no chão → corpos (sombra, capa, pernas, túnica, cabeça, braços) → sabres
+[câmera: translate(offset do shake)]
+  arena → luz dos sabres no chão → corpos (sombra, capa, pernas, túnica, cabeça, braços)
+  → luz dos sabres nos corpos → trails → sabres → luzes de impacto → faíscas
+[fim da câmera]
+flash (tela inteira, sem shake)
 ```
 
 A pose de cada lutador é calculada por `computePose` a partir do estado, da fase do ataque e da animação (valores em `fighterVisualConfig.combatPoses`), em coordenadas locais (origem nos pés, olhando para a direita). O renderer espelha com `scale(facing, 1)`. Os objetos de pose são reutilizados entre frames.
@@ -280,16 +285,30 @@ Arquivos: [src/combat/](src/combat/). Regras em [GAME_DESIGN.md](GAME_DESIGN.md#
 - `resolveHits`: em duas etapas. Primeiro encontra **todos** os contatos (hitbox × hurtbox), depois aplica. Assim, dois golpes no mesmo frame acertam os dois lados (trade), sem depender da ordem da lista.
 - Bloqueio só vale de frente. Sem stamina para bloquear, a guarda quebra (`STUNNED`).
 - Na morte, escolhe a direção da queda: para trás se houver espaço até a parede, senão para a frente.
-- Não desenha nada e não cria efeitos. Ele **emite eventos** (`hit`, `block`, `guardBreak`, `death`) com atacante, defensor, tipo de ataque e ponto de contato. `events` é limpo a cada passo.
-- Colisão física (corpos) fica no `CollisionSystem`. Colisão entre sabres (clash) é da Fase 4.
+- Não desenha nada e não cria efeitos. Ele **emite eventos** (`hit`, `block`, `guardBreak`, `clash`, `death`) com atacante, defensor, tipo de ataque e ponto de contato. `events` é limpo a cada passo.
+- **Clash**: antes dos hits, se os dois lutadores estão na fase active e as hitboxes se encostam, os dois ataques são cancelados, os dois recuam (`HIT` sem dano, empurrão de `gameConfig.combat.clash`) e é emitido `clash`. O clash tem prioridade sobre o hit.
+- Colisão física (corpos) fica no `CollisionSystem`.
 
 ---
 
-## Effects e Camera (planejado)
+## Effects e Camera
 
-- `EffectsSystem` consome os eventos de combate e cria efeitos com `effects.spawn(type, params)`. Catálogo e limites em [design/VFX_GUIDELINES.md](design/VFX_GUIDELINES.md).
-- Partículas usam pool.
-- `Camera` mantém os dois lutadores visíveis, respeita os limites da arena e aplica screen shake **a pedido do EffectsSystem**.
+Arquivos: [src/systems/EffectsSystem.js](src/systems/EffectsSystem.js), [src/systems/ParticlePool.js](src/systems/ParticlePool.js), [src/core/Camera.js](src/core/Camera.js), [src/config/effectsConfig.js](src/config/effectsConfig.js). Catálogo e limites em [design/VFX_GUIDELINES.md](design/VFX_GUIDELINES.md).
+
+```
+CombatSystem.events → EffectsSystem.handleEvents → spawn(tipo, { x, y, direction, color, secondaryColor })
+                                                     ├─ faíscas (ParticlePool)
+                                                     ├─ luzes de impacto (pool fixo)
+                                                     ├─ flash
+                                                     └─ camera.shake(amplitude, duração)
+```
+
+- `EffectsSystem.spawn(type, params)` é a única porta de entrada. Tipos em `EffectType`, receitas em `effectsConfig.recipes`.
+- Tudo é pré-alocado: partículas e luzes vêm de pools fixos. Pool cheio = a faísca é descartada.
+- Limites (`maxParticles`, `maxShakeAmplitude`, `maxShakeDuration`, `maxFlashAlpha`) são aplicados no código, não só na receita.
+- `Camera` guarda o shake mais forte e produz `offsetX/offsetY`. Hoje a arena cabe inteira na tela, então a câmera não precisa seguir os lutadores. Enquadramento e zoom entram quando houver arenas maiores.
+- RNG com seed (`utils/random.js`) é injetado. Os testes usam seed fixa e são determinísticos.
+- O trail e a luz do sabre no corpo são só do render (`SaberTrail`, `drawSaberBodyLight`). O trail usa o tempo da simulação (`fighter.animation.time`), então a pausa congela o rastro.
 
 ---
 
@@ -332,7 +351,7 @@ Testes rodam em Node (`npm test`), sem navegador. Por isso:
 - Quando um módulo do core precisa do navegador (`Input`, `GameLoop`), a dependência é injetada.
 - `computePose` é uma função pura e também é testada.
 
-Testes atuais: `gameLoop`, `input`, `stateMachine`, `states` (fluxo de telas, fim do duelo, boneco, debug de hitbox), `debug`, `math`, `fighter`, `playerController`, `dummyController`, `movement`, `physics` (inclui colisão), `animation` (inclui poses de combate), `combatActions` (ações, timers, stamina) e `combatHits` (hits, bloqueio, quebra de guarda, esquiva, morte, trade). Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
+Testes atuais: `gameLoop`, `input`, `stateMachine`, `states` (fluxo de telas, fim do duelo, boneco, debug de hitbox), `debug`, `math`, `fighter`, `playerController`, `dummyController`, `movement`, `physics` (inclui colisão), `animation` (inclui poses de combate), `combatActions` (ações, timers, stamina) e `combatHits` (hits, bloqueio, quebra de guarda, esquiva, morte, trade, clash), `effects` (RNG, pool, câmera, efeitos por evento, limites) e `saberTrail`. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
 
 ---
 
@@ -342,6 +361,7 @@ Testes atuais: `gameLoop`, `input`, `stateMachine`, `states` (fluxo de telas, fi
 core/Game     → core, states/stateFactory, config, utils
 states        → states/stateIds, simulation, combat, ai, controllers, characters, entities, rendering, config
 simulation    → systems, combat
+systems/EffectsSystem → combat (tipos de evento), core/Camera (via construtor), config, utils
 characters    → entities, config
 controllers   → config
 systems / combat / ai → entities, config, utils (combat também usa StaminaSystem)
