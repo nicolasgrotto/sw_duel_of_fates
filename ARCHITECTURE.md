@@ -2,9 +2,9 @@
 
 ## Objetivo
 
-Manter o projeto modular, para que novos personagens, ataques, arenas e comportamentos de IA possam ser adicionados sem reescrever o núcleo do jogo.
+Manter o projeto modular, para que novos personagens, ataques, arenas e comportamentos de IA possam ser adicionados sem reescrever o núcleo do jogo, e para que a identidade visual possa ser trocada sem mexer no combate.
 
-Para **o que** o jogo faz, veja [GAME_DESIGN.md](GAME_DESIGN.md).
+Este documento está abaixo de [DESIGN.md](DESIGN.md), dos documentos em [design/](design/) e de [GAME_DESIGN.md](GAME_DESIGN.md) na hierarquia (ver DESIGN.md). Ele diz **como** o código implementa o que esses documentos definem.
 
 ---
 
@@ -16,7 +16,8 @@ Legenda: ✅ existe · ⏳ planejado (criar só quando a tarefa pedir)
 index.html                  ✅ página com o canvas
 styles/
   main.css                  ✅ layout da página e do canvas
-  hud.css / menu.css        ⏳ só se houver UI em DOM
+design/                     ✅ direção de arte, sistema visual, UI, VFX, referências
+assets/                     ⏳ ver ASSETS.md (characters, backgrounds, effects, ui, audio, fonts, generated)
 src/
   main.js                   ✅ ponto de entrada
   core/                     ✅ infraestrutura do jogo
@@ -25,36 +26,46 @@ src/
     Input.js                ✅ teclado → ações
     Renderer.js             ✅ canvas e primitivas de desenho
     StateMachine.js         ✅ pilha de estados
+    Camera.js               ⏳ enquadramento e screen shake
     AssetManager.js         ⏳
     AudioManager.js         ⏳
   states/                   ✅ telas do jogo
     GameState.js            ✅ classe base
+    stateIds.js             ✅ ids dos estados
+    stateFactory.js         ✅ cria estados a partir do id
     MenuState.js            ✅
     DuelState.js            ✅
     PauseState.js           ✅
     GameOverState.js        ⏳
-  entities/                 ⏳ Fighter, Lightsaber
+  characters/               ⏳ dados e criação de personagens
+    characterData.js        ⏳ lista de personagens (nome, cores, atributos)
+    characterFactory.js     ⏳ cria um Fighter a partir dos dados
+  entities/                 ⏳ Fighter, Saber
   combat/                   ⏳ CombatSystem, Hitbox
-  systems/                  ⏳ Physics, Collision, Animation, Effects
+  systems/                  ⏳ PhysicsSystem, CollisionSystem, AnimationSystem, EffectsSystem
   ai/                       ⏳ EnemyAI
+  rendering/                ⏳ desenho de arena, lutadores, sabres e efeitos
   config/                   ✅ valores e ajustes
-    gameConfig.js           ✅
-    controlsConfig.js       ✅
-    fightersConfig.js       ⏳
+    gameConfig.js           ✅ canvas, loop, arena, debug
+    themeConfig.js          ✅ cores, estilos de texto, animação de UI
+    controlsConfig.js       ✅ ações e teclas
+    fightersConfig.js       ⏳ atributos e ataques
+    effectsConfig.js        ⏳ parâmetros de VFX
   utils/
     debug.js                ✅ overlay de debug
     math.js / random.js     ⏳
 tools/
   server.js                 ✅ servidor estático para desenvolvimento
 tests/                      ✅ testes com node --test
-assets/                     ⏳ imagens, áudio e fontes
 ```
 
 Não crie arquivos vazios "para depois". Arquivo vazio tende a ser preenchido sem necessidade. Crie o arquivo junto com a tarefa que precisa dele e atualize a tabela acima.
 
-Sobre os nomes do plano original:
+Decisões sobre nomes:
 
-- `Player` e `Enemy` **não** devem ser subclasses com lógica duplicada. Ambos são `Fighter`. O que muda é quem controla: o jogador (via `Input`) ou a IA (via `EnemyAI`). Os dois produzem as mesmas ações.
+- `Player` e `Enemy` **não** são subclasses com lógica duplicada. Ambos são `Fighter`. O que muda é quem controla: o jogador (via `Input`) ou a IA (via `EnemyAI`). Os dois produzem as mesmas ações.
+- A lâmina é `Saber`, não `Lightsaber`. Termos neutros facilitam trocar a identidade do jogo no futuro.
+- Nenhum arquivo, classe ou variável usa nome de personagem da franquia (ex.: nada de `DarthVader.js`). Personagens são dados em `characters/`.
 - O estado de combate (`IDLE`, `ATTACKING`...) pertence ao `Fighter`. Não criar um `CombatState.js` separado sem motivo.
 - Dano faz parte do `CombatSystem`. Só separar em `DamageSystem` se o arquivo crescer demais.
 
@@ -64,27 +75,37 @@ Sobre os nomes do plano original:
 
 ### Core
 
-Infraestrutura: loop, input, renderização, estados e assets.
+Infraestrutura: loop, input, renderização, estados, câmera e assets.
 
 Core **não** conhece detalhes de personagens, ataques ou IA.
 
 ### States
 
-Controlam a tela atual (Menu, Duelo, Pausa, Game Over). Cada estado tem `enter()`, `exit()`, `update(dt)` e `render(renderer)`.
+Controlam a tela atual (Menu, Duelo, Pausa, Game Over). Cada estado tem `enter()`, `exit()`, `update(dt)`, `render(renderer)` e `getDebugInfo()`.
 
 O `DuelState` é dono do duelo: cria as entidades e chama os sistemas na ordem certa.
 
+### Characters
+
+Personagens são **dados** (nome, cor do sabre, silhueta, atributos, conjunto de ataques). `characterFactory` transforma esses dados em um `Fighter`.
+
+Trocar todos os personagens (ex.: versão com identidade própria) deve exigir apenas mudar dados e assets, nunca o combate.
+
 ### Entities
 
-Objetos do jogo (`Fighter`, `Lightsaber`). Guardam dados e estado, mas não controlam o jogo inteiro e não desenham a si mesmos.
+Objetos do jogo (`Fighter`, `Saber`). Guardam dados e estado, mas não controlam o jogo inteiro e não desenham a si mesmos.
 
 ### Systems / Combat / AI
 
-Processam entidades. Exemplo: `PhysicsSystem` aplica gravidade, `CombatSystem` resolve golpes, `EnemyAI` escolhe ações.
+Processam entidades. Exemplo: `PhysicsSystem` aplica gravidade, `CombatSystem` resolve golpes, `EnemyAI` escolhe ações, `EffectsSystem` cria efeitos.
+
+### Rendering
+
+Desenha o estado atual seguindo as camadas de [design/VISUAL_SYSTEM.md](design/VISUAL_SYSTEM.md). Só lê dados.
 
 ### Config
 
-Todos os números de balanceamento e ajustes.
+Todos os números de balanceamento, cores, textos e ajustes.
 
 ---
 
@@ -95,11 +116,11 @@ main.js
   └─ new Game(canvas)
        ├─ Renderer
        ├─ Input
-       ├─ StateMachine ── MenuState / DuelState / PauseState
+       ├─ StateMachine ── createState(StateId) → MenuState / DuelState / PauseState
        ├─ DebugOverlay
        └─ GameLoop
-            ├─ update(step)  → states.update(step) → input.endFrame()
-            └─ render(alpha) → renderer.clear() → states.render() → debug
+            ├─ update(step)  → debug toggle → states.update(step) → input.endFrame()
+            └─ render(alpha) → renderer.clear() → states.render() → debug.render()
 ```
 
 Ordem planejada dentro do `DuelState.update` (a partir da Fase 2):
@@ -108,8 +129,9 @@ Ordem planejada dentro do `DuelState.update` (a partir da Fase 2):
 Input / EnemyAI  → intenções (ações)
 Fighter          → aceita ou recusa a ação conforme o estado atual
 PhysicsSystem    → movimento, gravidade, limites da arena
-CombatSystem     → hitboxes, bloqueio, dano, knockback, stun
-EffectsSystem    → partículas, screen shake
+CombatSystem     → hitboxes, bloqueio, dano, knockback, stun → emite eventos
+EffectsSystem    → consome eventos → partículas, flash, pedido de shake
+Camera           → enquadramento e shake
 ```
 
 ---
@@ -125,7 +147,7 @@ Arquivo: [src/core/GameLoop.js](src/core/GameLoop.js)
 
 Por que timestep fixo: startup, active e recovery dos ataques precisam se comportar igual em 60 Hz e 144 Hz. Também torna o combate testável e reproduzível.
 
-O loop recebe `now` e `schedule` como opções. Isso permite testar sem navegador.
+O loop recebe `now`, `schedule` e `cancel` como opções. Isso permite testar sem navegador.
 
 ---
 
@@ -133,18 +155,19 @@ O loop recebe `now` e `schedule` como opções. Isso permite testar sem navegado
 
 Arquivo: [src/core/Input.js](src/core/Input.js)
 
-- Traduz teclas (`KeyboardEvent.code`) em **ações** (`moveLeft`, `lightAttack`, `pause`...), usando `controlsConfig`.
+- Traduz teclas (`KeyboardEvent.code`) em **ações** (`Action.LIGHT_ATTACK`, `Action.PAUSE`...), usando `controlsConfig`.
 - O resto do jogo só conhece ações, nunca teclas.
 - `isDown(action)`: tecla segurada.
 - `wasPressed(action)`: tecla pressionada desde o último update. É limpo por `endFrame()`, chamado pelo `Game` depois de cada update. Assim, um toque nunca é perdido nem lido duas vezes, mesmo com timestep fixo.
+- Uma tecla pode estar ligada a mais de uma ação. Nesse caso, todas são disparadas.
 - Ao perder o foco da janela, todas as teclas são soltas.
-- O alvo dos eventos é injetável (`window` por padrão), o que permite testes em Node.
+- O alvo dos eventos é injetado (`window` no jogo, `EventTarget` nos testes).
 
 ---
 
 ## Estados (StateMachine)
 
-Arquivo: [src/core/StateMachine.js](src/core/StateMachine.js)
+Arquivos: [src/core/StateMachine.js](src/core/StateMachine.js), [src/states/](src/states/)
 
 Pilha de estados:
 
@@ -154,6 +177,18 @@ Pilha de estados:
 - `update` roda **só no estado do topo**.
 - `render` roda **em todos**, de baixo para cima. Por isso a Pausa aparece por cima do Duelo congelado.
 
+Estados não importam outros estados. Eles pedem a troca pelo id:
+
+```js
+this.game.changeState(StateId.DUEL);
+this.game.pushState(StateId.PAUSE);
+this.game.popState();
+```
+
+`stateFactory.createState(id, game)` é o único lugar que conhece todas as classes de estado. Isso evita importações circulares (Menu → Duelo → Pausa → Menu).
+
+Para adicionar um estado: crie a classe estendendo `GameState`, adicione o id em `stateIds.js` e registre em `stateFactory.js`.
+
 ---
 
 ## Renderer
@@ -161,9 +196,10 @@ Pilha de estados:
 Arquivo: [src/core/Renderer.js](src/core/Renderer.js)
 
 - Dono do canvas e do contexto 2D.
-- Trabalha em **resolução lógica** fixa (`gameConfig.canvas`, 1280×720). Ajusta o tamanho real ao `devicePixelRatio` para ficar nítido.
-- Expõe primitivas (`fillRect`, `line`, `text`, `overlay`...).
-- Desenho específico de entidades (lutador, sabre) deve receber a entidade como **dado** e só ler dela.
+- Trabalha em **resolução lógica** fixa (`gameConfig.canvas`, 1280×720). `fitToDisplay` ajusta o tamanho real ao tamanho exibido e ao `devicePixelRatio`, para ficar nítido. Um `ResizeObserver` no `Game` chama esse método.
+- Expõe primitivas (`clear`, `overlay`, `fillRect`, `strokeRect`, `line`, `text`, `measureText`).
+- Estilos de texto vêm de `themeConfig.textStyles`, objetos criados uma vez (sem alocar por frame).
+- Desenho específico (arena, lutador, sabre, efeitos) vai para `src/rendering/`, recebe a entidade como **dado** e só lê dela.
 
 Renderer **não** decide dano, vitória, derrota, colisões ou comportamento da IA.
 
@@ -173,9 +209,17 @@ Renderer **não** decide dano, vitória, derrota, colisões ou comportamento da 
 
 `CombatSystem` é responsável por ataques, bloqueios, colisões de ataque, dano, stun, knockback e transições de combate.
 
-`CombatSystem` não desenha nada.
+- Não desenha nada.
+- Não cria efeitos nem mexe na câmera. Ele **emite eventos** (`hit`, `block`, `clash`, `death`) com posição, intensidade e envolvidos.
+- Separar: colisão física, hitbox, hurtbox, detecção de ataque e colisão entre sabres.
 
-Separar: colisão física, hitbox, hurtbox, detecção de ataque e colisão entre sabres.
+---
+
+## Effects e Camera (planejado)
+
+- `EffectsSystem` consome os eventos de combate e cria efeitos com `effects.spawn(type, params)`. Catálogo e limites em [design/VFX_GUIDELINES.md](design/VFX_GUIDELINES.md).
+- Partículas usam pool.
+- `Camera` mantém os dois lutadores visíveis, respeita os limites da arena e aplica screen shake **a pedido do EffectsSystem**.
 
 ---
 
@@ -184,7 +228,7 @@ Separar: colisão física, hitbox, hurtbox, detecção de ataque e colisão entr
 `EnemyAI` decide a próxima ação e a entrega ao `Fighter`, do mesmo jeito que o `Input` faz para o jogador.
 
 ```
-EnemyAI → "lightAttack" → Fighter → CombatSystem executa
+EnemyAI → Action.LIGHT_ATTACK → Fighter → CombatSystem executa
 ```
 
 `EnemyAI` nunca altera HP, stamina ou outros valores diretamente.
@@ -195,17 +239,17 @@ EnemyAI → "lightAttack" → Fighter → CombatSystem executa
 
 Arquivo: [src/utils/debug.js](src/utils/debug.js)
 
-- Ligado/desligado com `F3` ou com `gameConfig.debug.enabled`.
-- Mostra FPS e o estado atual.
-- Futuro: hitboxes, hurtboxes, posição, velocidade, estado do lutador e decisões da IA. Cada estado pode fornecer linhas extras via `getDebugInfo()`.
+- Liga e desliga com `F3`. O valor inicial vem de `gameConfig.debug.enabled`.
+- Mostra FPS, a pilha de estados e as linhas de `getDebugInfo()` de cada estado.
+- Futuro: hitboxes, hurtboxes, posição, velocidade, estado do lutador e decisões da IA.
 
 ---
 
 ## Configuração
 
-Balanceamento e ajustes ficam em `src/config/`. Nada de números mágicos espalhados.
-
-Arquivos de config exportam objetos simples (sem lógica).
+- Balanceamento e ajustes ficam em `src/config/`. Nada de números mágicos espalhados.
+- Cores e estilos de texto ficam em `themeConfig.js` e espelham [design/VISUAL_SYSTEM.md](design/VISUAL_SYSTEM.md).
+- Arquivos de config exportam objetos simples, sem lógica.
 
 ---
 
@@ -213,22 +257,26 @@ Arquivos de config exportam objetos simples (sem lógica).
 
 Testes rodam em Node (`npm test`), sem navegador. Por isso:
 
-- Módulos de lógica (`entities/`, `combat/`, `systems/`, `ai/`, `config/`, `utils/math.js`) **não** acessam `window`, `document` ou canvas.
-- Quando um módulo do core precisa do navegador (`Input`, `GameLoop`), a dependência é injetada por parâmetro.
+- Módulos de lógica (`states/`, `characters/`, `entities/`, `combat/`, `systems/`, `ai/`, `config/`, `utils/`) **não** acessam `window`, `document` ou canvas. Estados desenham só pela API do `Renderer` recebido em `render`.
+- Quando um módulo do core precisa do navegador (`Input`, `GameLoop`), a dependência é injetada.
+
+Testes atuais: `gameLoop`, `input`, `stateMachine`, `states` (fluxo Menu → Duelo → Pausa → Menu) e `debug`.
 
 ---
 
 ## Dependências entre módulos
 
 ```
-states → core, systems, combat, ai, entities, config
+core/Game     → core, states/stateFactory, config, utils
+states        → states/stateIds, systems, combat, ai, characters, entities, rendering, config
+characters    → entities, config
 systems / combat / ai → entities, config, utils
-entities → config, utils
-core → config, utils
+rendering     → config
+entities      → config, utils
+core (resto)  → config
 ```
 
-- `core` não importa `states` específicos, com exceção de `Game.js`, que escolhe o estado inicial.
-- Evitar dependências circulares.
+Evitar dependências circulares.
 
 ---
 
