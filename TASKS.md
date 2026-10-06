@@ -78,14 +78,17 @@ Atualize este arquivo ao terminar cada tarefa.
 
 ## Fase 5 — IA
 
-- [ ] IA básica
-- [ ] Percepção de distância
-- [ ] Ataque
-- [ ] Defesa
-- [ ] Esquiva
-- [ ] Contra-ataque
-- [ ] Perfis (Aggressive, Defensive, Balanced)
-- [ ] Diferentes dificuldades
+- [x] IA básica (controller que só escreve o intent)
+- [x] Percepção (distância, ameaça, chance de punir)
+- [x] Tempo de reação (pensa em intervalos)
+- [x] Ataque (rápido e forte, com cooldown)
+- [x] Defesa (bloqueio)
+- [x] Esquiva
+- [x] Contra-ataque (punir recovery, hit e stun)
+- [x] Recuar para recuperar stamina
+- [x] Perfis (agressivo, defensivo, equilibrado)
+- [x] Diferentes dificuldades (fácil, normal, difícil) escolhidas no menu
+- [x] Modo treino com o boneco
 
 ## Fase 6 — UI
 

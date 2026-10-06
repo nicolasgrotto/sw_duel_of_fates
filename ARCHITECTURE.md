@@ -32,6 +32,7 @@ src/
   states/                   ✅ telas do jogo
     GameState.js            ✅ classe base
     stateIds.js             ✅ ids dos estados
+    duelModes.js            ✅ modos do duelo (versus, treino)
     stateFactory.js         ✅ cria estados a partir do id
     MenuState.js            ✅ título + opções (MenuList)
     ControlsState.js        ✅ tabela de controles gerada do controlsConfig
@@ -39,7 +40,7 @@ src/
     PauseState.js           ✅ continuar, reiniciar, sair
     GameOverState.js        ✅ vitória/derrota, estatísticas, revanche
   characters/               ✅ dados e criação de personagens
-    characterData.js        ✅ personagens: nome, arquétipo, aparência
+    characterData.js        ✅ personagens: nome, arquétipo, perfil de IA, aparência
     characterFactory.js     ✅ cria um Fighter a partir dos dados
   controllers/              ✅ quem controla um lutador
     PlayerController.js     ✅ Input → intent
@@ -62,7 +63,9 @@ src/
     combatEvents.js         ✅ tipos e criação de eventos de combate
   simulation/               ✅
     DuelSimulation.js       ✅ ordem dos sistemas em um passo do duelo
-  ai/                       ⏳ EnemyAI
+  ai/                       ✅ inteligência do oponente
+    EnemyAI.js              ✅ controller da IA: pensa em intervalos e preenche o intent
+    perception.js           ✅ leitura pura dos lutadores (distância, ameaça, chance de punir)
   rendering/                ✅ desenho (só lê dados)
     DuelRenderer.js         ✅ ordem das camadas do duelo
     arenaRenderer.js        ✅ chão e limites
@@ -82,6 +85,7 @@ src/
     themeConfig.js          ✅ cores, estilos de texto, animação de UI
     controlsConfig.js       ✅ ações e teclas
     uiConfig.js             ✅ textos da interface e layout das telas
+    aiConfig.js             ✅ perfis, dificuldades e percepção da IA
     fightersConfig.js       ✅ atributos por arquétipo (vida, stamina, corpo, movimento, ataques, esquiva)
     fighterVisualConfig.js  ✅ proporções, animação, poses de combate, sombra e estilo do sabre
     effectsConfig.js        ✅ limites e receitas de VFX
@@ -120,7 +124,7 @@ Core **não** conhece detalhes de personagens, ataques ou IA.
 
 Controlam a tela atual (Menu, Duelo, Pausa, Game Over). Cada estado tem `enter()`, `exit()`, `update(dt)`, `render(renderer)`, `renderDebug(renderer)` e `getDebugInfo()`.
 
-O `DuelState` é dono do duelo: cria os lutadores, os controllers, a `DuelSimulation` e o `DuelRenderer`. Também cuida da pausa, do fim do duelo (resultado + `Enter` para o menu) e do boneco de treino (`F4` com debug ligado).
+O `DuelState` é dono do duelo: cria os lutadores, os controllers (IA no modo versus, boneco no modo treino, via `params.mode`), a `DuelSimulation` e o `DuelRenderer`. Também cuida da pausa, do fim do duelo (resultado + `Enter` para o menu) e do boneco de treino (`F4` com debug ligado).
 
 ### Characters
 
@@ -137,8 +141,8 @@ Trocar todos os personagens (ex.: versão com identidade própria) deve exigir a
 Um controller escreve no `fighter.intent` o que o lutador **quer** fazer (`moveX`, `jump`, `lightAttack`, `heavyAttack`, `block`, `dodge`). Ele nunca altera posição, vida ou estado.
 
 - `PlayerController`: lê o `Input`.
-- `DummyController`: boneco de treino até a IA existir.
-- `EnemyAI` (Fase 5): vai preencher o mesmo `intent`.
+- `EnemyAI`: oponente no modo versus (ver seção AI).
+- `DummyController`: boneco do modo treino.
 
 Todo controller tem `updateIntent(intent, dt)`. O `DuelState` guarda pares `{ fighter, controller }` em `participants`. Depois que o duelo termina, os controllers param e os intents ficam zerados.
 
@@ -270,7 +274,7 @@ Estados podem receber parâmetros: `game.pushState(StateId.GAME_OVER, { playerWo
 Fluxo de telas:
 
 ```
-MenuState ──Duelar──▶ DuelState ──Esc──▶ PauseState (push) ──Continuar──▶ volta
+MenuState ──Duelar / Treino──▶ DuelState({ mode }) ──Esc──▶ PauseState (push) ──Continuar──▶ volta
     │                     │                    ├─ Reiniciar ──▶ novo DuelState
     └─Controles─▶ ControlsState (push)        └─ Sair ──▶ MenuState
                           │
@@ -279,6 +283,10 @@ MenuState ──Duelar──▶ DuelState ──Esc──▶ PauseState (push) �
                    GameOverState (push) ──Revanche──▶ novo DuelState
                                         └─Menu principal──▶ MenuState
 ```
+
+Pausa e resultado recebem `duelParams` e os repassam ao reiniciar, então "Reiniciar" e "Revanche" mantêm o modo.
+
+`Game.settings` guarda escolhas que valem até fechar o jogo (hoje: `difficulty`, alterada no menu).
 
 Para adicionar um estado: crie a classe estendendo `GameState`, adicione o id em `stateIds.js` e registre em `stateFactory.js`.
 
@@ -345,15 +353,26 @@ CombatSystem.events → EffectsSystem.handleEvents → spawn(tipo, { x, y, direc
 
 ---
 
-## AI (planejado)
+## AI
 
-`EnemyAI` decide a próxima ação e a entrega ao `Fighter`, do mesmo jeito que o `Input` faz para o jogador.
+Arquivos: [src/ai/](src/ai/), [src/config/aiConfig.js](src/config/aiConfig.js). Regras em [GAME_DESIGN.md](GAME_DESIGN.md#7-ia).
 
 ```
-EnemyAI → Action.LIGHT_ATTACK → Fighter → CombatSystem executa
+DuelState.updateIntents → EnemyAI.updateIntent(intent, dt)
+                             ├─ a cada reactionTime: think() → decision + plano
+                             │     defender > punir > recuperar stamina > atacar > posicionar
+                             └─ todo frame: plano → intent (moveX, block, ação pontual)
+DuelSimulation → CombatSystem executa (igual ao jogador)
 ```
 
-`EnemyAI` nunca altera HP, stamina ou outros valores diretamente.
+- `EnemyAI` é um controller como o `PlayerController`: `updateIntent(intent, dt)`. Ela recebe `self` e `opponent` só para **ler**.
+- `perception.js` tem funções puras (`getGap`, `canReach`, `isThreatening`, `isPunishable`).
+- O plano guarda direção, tempo de bloqueio e uma ação pontual (`pendingAction`), que vira intent por um frame só.
+- Perfil (`aiConfig.profiles`) vem de `characterData.aiProfile`. Dificuldade (`aiConfig.difficulties`) vem de `game.settings.difficulty`.
+- O RNG é injetado (o mesmo dos efeitos no jogo, seed fixa nos testes).
+- `decision` fica exposta para o debug (`ai: <decisão> (<dificuldade>)`).
+
+**Garantia testada:** a IA roda com os lutadores congelados (`Object.freeze`) sem erro, ou seja, ela nunca altera HP, stamina, posição ou estado.
 
 ---
 
@@ -385,7 +404,7 @@ Testes rodam em Node (`npm test`), sem navegador. Por isso:
 - Quando um módulo do core precisa do navegador (`Input`, `GameLoop`), a dependência é injetada.
 - `computePose` é uma função pura e também é testada.
 
-Testes atuais: `gameLoop`, `input`, `stateMachine`, `states` (fluxo de telas, fim do duelo, boneco, debug de hitbox), `debug`, `math`, `fighter`, `playerController`, `dummyController`, `movement`, `physics` (inclui colisão), `animation` (inclui poses de combate), `combatActions` (ações, timers, stamina) e `combatHits` (hits, bloqueio, quebra de guarda, esquiva, morte, trade, clash), `effects` (RNG, pool, câmera, efeitos por evento, limites), `saberTrail`, `ui` (MenuList, nomes de teclas, textos), `hud` e `combatMessage`. O teste `states` cobre também controles, intro, pausa (continuar, reiniciar, sair), resultado e revanche. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
+Testes atuais: `gameLoop`, `input`, `stateMachine`, `states` (fluxo de telas, fim do duelo, boneco, debug de hitbox), `debug`, `math`, `fighter`, `playerController`, `dummyController`, `movement`, `physics` (inclui colisão), `animation` (inclui poses de combate), `combatActions` (ações, timers, stamina) e `combatHits` (hits, bloqueio, quebra de guarda, esquiva, morte, trade, clash), `effects` (RNG, pool, câmera, efeitos por evento, limites), `saberTrail`, `ui` (MenuList, nomes de teclas, textos), `hud`, `combatMessage` e `ai` (percepção, cada decisão, tempo de reação, dificuldade, IA não altera lutadores, IA vence um oponente parado na simulação real). O teste `states` cobre também controles, intro, pausa (continuar, reiniciar, sair), resultado e revanche. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
 
 ---
 
@@ -395,6 +414,7 @@ Testes atuais: `gameLoop`, `input`, `stateMachine`, `states` (fluxo de telas, fi
 core/Game     → core, states/stateFactory, config, utils
 states        → states/stateIds, simulation, combat, ai, controllers, characters, entities, rendering, ui, config
 ui            → config, utils
+ai            → combat (fases), entities (estados), systems/StaminaSystem (canAfford), config
 simulation    → systems, combat
 systems/EffectsSystem → combat (tipos de evento), core/Camera (via construtor), config, utils
 characters    → entities, config

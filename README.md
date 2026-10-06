@@ -54,7 +54,7 @@ Os testes cobrem apenas módulos de lógica. Por isso, módulos de lógica não 
 | Voltar | `Esc` ou `Backspace` |
 | Pausar / voltar ao jogo | `Esc` ou `P` |
 | Debug | `F3` |
-| Comportamento do boneco de treino (com debug ligado) | `F4` |
+| Comportamento do boneco (modo Treino, com debug ligado) | `F4` |
 
 Os controles ficam em [src/config/controlsConfig.js](src/config/controlsConfig.js).
 
