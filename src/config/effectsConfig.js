@@ -5,6 +5,10 @@ export const effectsConfig = {
   maxShakeDuration: 0.3,
   maxFlashAlpha: 0.35,
   flashColor: '#ffffff',
+  reduced: {
+    shakeScale: 0.25,
+    flashScale: 0,
+  },
   sparkColors: ['#ffffff', '#ffe9a8', '#fff4d6'],
   particle: {
     gravity: 900,
@@ -22,6 +26,8 @@ export const effectsConfig = {
       light: { radius: 70, alpha: 0.45, duration: 0.12 },
       shake: null,
       flash: null,
+      hitStop: 0.04,
+      slowMotion: null,
     },
     heavyImpact: {
       count: [12, 16],
@@ -33,6 +39,8 @@ export const effectsConfig = {
       light: { radius: 110, alpha: 0.6, duration: 0.18 },
       shake: { amplitude: 5, duration: 0.15 },
       flash: { alpha: 0.1, duration: 0.1 },
+      hitStop: 0.08,
+      slowMotion: null,
     },
     blockSpark: {
       count: [10, 16],
@@ -44,6 +52,8 @@ export const effectsConfig = {
       light: { radius: 90, alpha: 0.55, duration: 0.14 },
       shake: { amplitude: 2.5, duration: 0.08 },
       flash: null,
+      hitStop: 0.03,
+      slowMotion: null,
     },
     guardBreak: {
       count: [18, 24],
@@ -55,6 +65,8 @@ export const effectsConfig = {
       light: { radius: 130, alpha: 0.7, duration: 0.22 },
       shake: { amplitude: 8, duration: 0.22 },
       flash: { alpha: 0.15, duration: 0.12 },
+      hitStop: 0.1,
+      slowMotion: null,
     },
     saberClash: {
       count: [24, 32],
@@ -66,6 +78,8 @@ export const effectsConfig = {
       light: { radius: 150, alpha: 0.8, duration: 0.25 },
       shake: { amplitude: 10, duration: 0.25 },
       flash: { alpha: 0.25, duration: 0.14 },
+      hitStop: 0.1,
+      slowMotion: null,
     },
     finalBlow: {
       count: [0, 0],
@@ -77,6 +91,8 @@ export const effectsConfig = {
       light: null,
       shake: { amplitude: 12, duration: 0.3 },
       flash: { alpha: 0.35, duration: 0.2 },
+      hitStop: 0,
+      slowMotion: { duration: 0.8, scale: 0.3 },
     },
   },
 };

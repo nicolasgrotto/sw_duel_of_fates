@@ -5,14 +5,16 @@ import { effectsConfig } from '../src/config/effectsConfig.js';
 import { Camera } from '../src/core/Camera.js';
 import { EffectType, EffectsSystem } from '../src/systems/EffectsSystem.js';
 import { ParticlePool } from '../src/systems/ParticlePool.js';
+import { TimeControl } from '../src/systems/TimeControl.js';
 import { createRandom, randomInt } from '../src/utils/random.js';
 import { STEP, repeat, spawnFighter } from './helpers.js';
 
 function createEffects() {
   const random = createRandom(42);
   const camera = new Camera(effectsConfig, random);
-  const effects = new EffectsSystem(effectsConfig, camera, random);
-  return { camera, effects };
+  const timeControl = new TimeControl();
+  const effects = new EffectsSystem(effectsConfig, camera, random, timeControl);
+  return { camera, effects, timeControl };
 }
 
 function createEvent(type, attackType = 'light') {
@@ -159,6 +161,26 @@ describe('EffectsSystem', () => {
 
     assert.equal(effects.particles.activeCount, 0);
     assert.equal(activeLights(effects).length, 0);
+    assert.equal(effects.flash.alpha, 0);
+  });
+
+  it('asks for a hit stop on impacts and slow motion on the final blow', () => {
+    const { effects, timeControl } = createEffects();
+
+    effects.handleEvents([createEvent(CombatEvent.HIT, 'heavy')]);
+    assert.equal(timeControl.hitStopTime, effectsConfig.recipes.heavyImpact.hitStop);
+
+    effects.handleEvents([createEvent(CombatEvent.DEATH)]);
+    assert.equal(timeControl.slowMotionScale, effectsConfig.recipes.finalBlow.slowMotion.scale);
+  });
+
+  it('reduces the shake and turns the flash off with reduced effects', () => {
+    const { effects, camera } = createEffects();
+    effects.setReduced(true);
+
+    effects.handleEvents([createEvent(CombatEvent.DEATH)]);
+
+    assert.equal(camera.shakeAmplitude, effectsConfig.recipes.finalBlow.shake.amplitude * effectsConfig.reduced.shakeScale);
     assert.equal(effects.flash.alpha, 0);
   });
 

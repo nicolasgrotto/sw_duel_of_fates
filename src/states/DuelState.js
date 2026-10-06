@@ -16,6 +16,7 @@ import { PlayerController } from '../controllers/PlayerController.js';
 import { DuelRenderer } from '../rendering/DuelRenderer.js';
 import { DuelSimulation } from '../simulation/DuelSimulation.js';
 import { EffectsSystem } from '../systems/EffectsSystem.js';
+import { TimeControl } from '../systems/TimeControl.js';
 import { CombatMessage } from '../ui/CombatMessage.js';
 import { formatText } from '../ui/formatText.js';
 import { Hud } from '../ui/Hud.js';
@@ -56,7 +57,9 @@ export class DuelState extends GameState {
       animationConfig: animationStyle,
     });
     this.camera = new Camera(effectsConfig, this.random);
-    this.effects = new EffectsSystem(effectsConfig, this.camera, this.random);
+    this.timeControl = new TimeControl();
+    this.effects = new EffectsSystem(effectsConfig, this.camera, this.random, this.timeControl);
+    this.effects.setReduced(this.game.settings.reducedEffects);
     this.view = new DuelRenderer();
     this.hud = new Hud(this.fighters[0], this.fighters[1]);
     this.message = new CombatMessage();
@@ -116,17 +119,27 @@ export class DuelState extends GameState {
     } else if (this.isIntroPlaying()) {
       this.introTime += dt;
       this.clearAllIntents();
-    } else {
+    }
+
+    const simulationDt = this.timeControl.scale(dt);
+    if (simulationDt > 0) {
+      this.stepSimulation(simulationDt);
+    }
+
+    this.effects.update(simulationDt > 0 ? simulationDt : dt);
+    this.camera.update(dt);
+    this.hud.update(dt);
+    this.message.update(dt);
+  }
+
+  stepSimulation(dt) {
+    if (!this.outcome && !this.isIntroPlaying()) {
       this.duelTime += dt;
       this.updateIntents(dt);
     }
 
     this.simulation.step(dt);
     this.effects.handleEvents(this.simulation.events);
-    this.effects.update(dt);
-    this.camera.update(dt);
-    this.hud.update(dt);
-    this.message.update(dt);
     this.rememberLastEvent();
     this.countPlayerStats();
     this.checkForDeath();

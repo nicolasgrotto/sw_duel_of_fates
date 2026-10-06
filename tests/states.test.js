@@ -15,7 +15,7 @@ function createFakeGame() {
   const game = {
     states: new StateMachine(),
     debug: { enabled: false },
-    settings: { difficulty: 'normal' },
+    settings: { difficulty: 'normal', reducedEffects: false },
     input: {
       wasPressed: (action) => pressed.has(action),
       isDown: () => false,
@@ -274,6 +274,25 @@ describe('state flow', () => {
 
     game.step(Action.CONFIRM);
     assert.deepEqual(game.stateNames(), ['DuelState']);
+  });
+
+  it('freezes the fighters for a moment when a hit lands', () => {
+    const game = createFakeGame();
+    game.changeState(StateId.DUEL, { mode: DuelMode.TRAINING });
+    const duel = game.states.current;
+    const [player, opponent] = duel.fighters;
+    opponent.x = player.x + 110;
+    skipIntro(game);
+
+    game.step(Action.LIGHT_ATTACK);
+    while (opponent.state !== 'HIT') {
+      game.step();
+    }
+    const frozenTime = opponent.stateTime;
+    game.step();
+
+    assert.equal(duel.timeControl.isFrozen, true);
+    assert.equal(opponent.stateTime, frozenTime);
   });
 
   it('throws for an unknown state id', () => {

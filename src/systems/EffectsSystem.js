@@ -28,10 +28,13 @@ function createLight() {
 }
 
 export class EffectsSystem {
-  constructor(config, camera, random) {
+  constructor(config, camera, random, timeControl) {
     this.config = config;
     this.camera = camera;
     this.random = random;
+    this.timeControl = timeControl;
+    this.shakeScale = 1;
+    this.flashScale = 1;
     this.particles = new ParticlePool(config.maxParticles);
     this.lights = Array.from({ length: config.maxLights }, createLight);
     this.flash = {
@@ -41,6 +44,11 @@ export class EffectsSystem {
       time: 0,
       duration: 0,
     };
+  }
+
+  setReduced(reduced) {
+    this.shakeScale = reduced ? this.config.reduced.shakeScale : 1;
+    this.flashScale = reduced ? this.config.reduced.flashScale : 1;
   }
 
   handleEvents(events) {
@@ -91,11 +99,17 @@ export class EffectsSystem {
         this.spawnLight(recipe.light, x, y, secondaryColor);
       }
     }
-    if (recipe.shake) {
-      this.camera.shake(recipe.shake.amplitude, recipe.shake.duration);
+    if (recipe.shake && this.shakeScale > 0) {
+      this.camera.shake(recipe.shake.amplitude * this.shakeScale, recipe.shake.duration);
     }
-    if (recipe.flash) {
-      this.startFlash(recipe.flash);
+    if (recipe.flash && this.flashScale > 0) {
+      this.startFlash(recipe.flash.alpha * this.flashScale, recipe.flash.duration);
+    }
+    if (recipe.hitStop > 0) {
+      this.timeControl.hitStop(recipe.hitStop);
+    }
+    if (recipe.slowMotion) {
+      this.timeControl.slowMotion(recipe.slowMotion.duration, recipe.slowMotion.scale);
     }
   }
 
@@ -150,7 +164,7 @@ export class EffectsSystem {
     return oldest;
   }
 
-  startFlash({ alpha, duration }) {
+  startFlash(alpha, duration) {
     const limitedAlpha = Math.min(alpha, this.config.maxFlashAlpha);
     if (limitedAlpha < this.flash.alpha) {
       return;
