@@ -115,13 +115,18 @@ describe('state flow', () => {
       game.step();
     }
     assert.equal(duel.outcome.winner, player);
-
-    game.step(Action.CONFIRM);
     assert.deepEqual(game.stateNames(), ['DuelState']);
 
     for (let i = 0; i < 90; i += 1) {
       game.step();
     }
+    assert.deepEqual(game.stateNames(), ['DuelState', 'GameOverState']);
+    const result = game.states.current;
+    assert.equal(result.params.playerWon, true);
+    assert.equal(result.params.stats.hits, 1);
+    assert.equal(result.title, 'VITÓRIA');
+
+    game.step(Action.MENU_DOWN);
     game.step(Action.CONFIRM);
     assert.deepEqual(game.stateNames(), ['MenuState']);
   });
@@ -195,6 +200,23 @@ describe('state flow', () => {
     assert.deepEqual(game.stateNames(), ['DuelState']);
 
     game.step(Action.PAUSE);
+    game.step(Action.CONFIRM);
+    assert.deepEqual(game.stateNames(), ['DuelState']);
+  });
+
+  it('starts a new duel with the rematch option', () => {
+    const game = createFakeGame();
+    game.changeState(StateId.GAME_OVER, {
+      playerWon: false,
+      winnerName: 'Sombra',
+      stats: { time: 12.34, hits: 3, blocks: 2 },
+    });
+    const result = game.states.current;
+
+    assert.equal(result.title, 'DERROTA');
+    assert.equal(result.winnerLine, 'Sombra venceu o duelo');
+    assert.ok(result.statsLine.includes('12,3'));
+
     game.step(Action.CONFIRM);
     assert.deepEqual(game.stateNames(), ['DuelState']);
   });

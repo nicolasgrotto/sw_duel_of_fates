@@ -19,3 +19,11 @@ describe('CombatMessage', () => {
     assert.equal(message.alpha, 0);
   });
 });
+
+describe('result timing', () => {
+  it('shows the result only after the knockout message is gone', async () => {
+    const { gameConfig } = await import('../src/config/gameConfig.js');
+
+    assert.ok(gameConfig.duel.resultDelay > layout.messages.knockoutDuration);
+  });
+});

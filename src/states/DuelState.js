@@ -35,6 +35,7 @@ export class DuelState extends GameState {
     this.duelTime = 0;
     this.introTime = 0;
     this.outcome = null;
+    this.stats = { hits: 0, blocks: 0 };
     this.lastEvent = 'none';
     this.debugBox = createBox();
     this.dummy = new DummyController(gameConfig.duel.dummy);
@@ -87,8 +88,8 @@ export class DuelState extends GameState {
 
     if (this.outcome) {
       this.outcome.time += dt;
-      if (this.isResultVisible() && this.game.input.wasPressed(Action.CONFIRM)) {
-        this.game.changeState(StateId.MENU);
+      if (this.outcome.time >= gameConfig.duel.resultDelay) {
+        this.showResult();
         return;
       }
     } else if (this.isIntroPlaying()) {
@@ -106,6 +107,7 @@ export class DuelState extends GameState {
     this.hud.update(dt);
     this.message.update(dt);
     this.rememberLastEvent();
+    this.countPlayerStats();
     this.checkForDeath();
   }
 
@@ -121,6 +123,24 @@ export class DuelState extends GameState {
       const event = events[events.length - 1];
       this.lastEvent = `${event.type} (${event.attacker.id} → ${event.defender.id})`;
     }
+  }
+
+  countPlayerStats() {
+    for (const event of this.simulation.events) {
+      if (event.type === CombatEvent.HIT && event.attacker === this.player) {
+        this.stats.hits += 1;
+      } else if (event.type === CombatEvent.BLOCK && event.defender === this.player) {
+        this.stats.blocks += 1;
+      }
+    }
+  }
+
+  showResult() {
+    this.game.pushState(StateId.GAME_OVER, {
+      playerWon: this.outcome.winner === this.player,
+      winnerName: this.outcome.winner.name,
+      stats: { time: this.duelTime, hits: this.stats.hits, blocks: this.stats.blocks },
+    });
   }
 
   checkForDeath() {
@@ -148,10 +168,6 @@ export class DuelState extends GameState {
     return this.introTime < layout.messages.introDuration;
   }
 
-  isResultVisible() {
-    return this.outcome !== null && this.outcome.time >= gameConfig.duel.resultDelay;
-  }
-
   get player() {
     return this.participants[0].fighter;
   }
@@ -161,20 +177,9 @@ export class DuelState extends GameState {
     this.hud.render(renderer);
     this.message.render(renderer);
 
-    if (this.isResultVisible()) {
-      this.renderResult(renderer);
-    } else {
+    if (!this.outcome) {
       renderer.text(this.pauseHint, renderer.width / 2, layout.hud.pauseHintY, textStyles.hint);
     }
-  }
-
-  renderResult(renderer) {
-    const centerX = renderer.width / 2;
-    const centerY = renderer.height / 2;
-    const title = this.outcome.winner === this.player ? 'VITÓRIA' : 'DERROTA';
-
-    renderer.text(title, centerX, centerY - 120, textStyles.heading);
-    renderer.text('Enter  voltar ao menu', centerX, centerY - 60, textStyles.hint);
   }
 
   renderDebug(renderer) {

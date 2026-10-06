@@ -30,7 +30,7 @@ export const gameConfig = {
     playerCharacter: 'guardian',
     opponentCharacter: 'shadow',
     spawnDistance: 440,
-    resultDelay: 1.2,
+    resultDelay: 1.5,
     dummy: {
       attackInterval: 1.4,
     },
