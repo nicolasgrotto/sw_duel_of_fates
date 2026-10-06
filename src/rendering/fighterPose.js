@@ -1,5 +1,5 @@
-import { proportions } from '../config/fighterVisualConfig.js';
-import { degreesToRadians } from '../utils/math.js';
+import { animation as animationStyle, proportions } from '../config/fighterVisualConfig.js';
+import { TAU, clamp, degreesToRadians, lerp } from '../utils/math.js';
 
 export function createPose() {
   return {
@@ -25,6 +25,21 @@ export function createPose() {
   };
 }
 
+function placeFeet(pose, fighter) {
+  const { height, animation } = fighter;
+  const { walkPhase, walkBlend, airBlend } = animation;
+  const stanceWidth = height * proportions.stanceWidth;
+  const stepOffset = Math.sin(walkPhase) * height * animationStyle.stepLength * walkBlend;
+  const stepLift = height * animationStyle.stepLift * walkBlend;
+  const tuck = height * animationStyle.airLegTuck * airBlend;
+  const tuckedStance = stanceWidth * (1 - animationStyle.airFootPull);
+
+  pose.frontFootX = lerp(stanceWidth + stepOffset, tuckedStance, airBlend);
+  pose.frontFootY = -Math.max(0, Math.cos(walkPhase)) * stepLift - tuck;
+  pose.backFootX = lerp(-stanceWidth - stepOffset, -tuckedStance, airBlend);
+  pose.backFootY = -Math.max(0, -Math.cos(walkPhase)) * stepLift - tuck;
+}
+
 function placeKnees(pose, kneeBend) {
   pose.frontKneeX = (pose.hipX + pose.frontFootX) / 2 + kneeBend;
   pose.frontKneeY = (pose.hipY + pose.frontFootY) / 2;
@@ -33,31 +48,33 @@ function placeKnees(pose, kneeBend) {
 }
 
 export function computePose(fighter, pose) {
-  const { height, appearance } = fighter;
+  const { height, appearance, animation } = fighter;
+  const { time, walkPhase, walkBlend, airBlend } = animation;
   const lean = degreesToRadians(appearance.torsoLeanDegrees);
   const torsoLength = height * proportions.torsoLength;
-  const stanceWidth = height * proportions.stanceWidth;
+  const breathWave = Math.sin((time * TAU) / animationStyle.breathPeriod);
+  const breath = breathWave * animationStyle.breathAmplitude * (1 - walkBlend * animationStyle.walkBreathDamping);
+  const walkBob = Math.abs(Math.sin(walkPhase)) * animationStyle.walkBob * walkBlend;
 
   pose.hipX = 0;
-  pose.hipY = -height * proportions.legLength;
+  pose.hipY = -height * proportions.legLength + walkBob;
   pose.shoulderX = pose.hipX + Math.sin(lean) * torsoLength;
-  pose.shoulderY = pose.hipY - Math.cos(lean) * torsoLength;
+  pose.shoulderY = pose.hipY - Math.cos(lean) * torsoLength - breath;
 
   pose.headRadius = height * proportions.headRadius;
   const neckLength = pose.headRadius + height * proportions.neckGap;
   pose.headX = pose.shoulderX + Math.sin(lean) * neckLength;
   pose.headY = pose.shoulderY - Math.cos(lean) * neckLength;
 
-  pose.frontFootX = stanceWidth;
-  pose.frontFootY = 0;
-  pose.backFootX = -stanceWidth;
-  pose.backFootY = 0;
-  placeKnees(pose, height * proportions.kneeBend);
+  placeFeet(pose, fighter);
+  placeKnees(pose, height * proportions.kneeBend * (1 + airBlend));
 
   pose.handX = pose.shoulderX + height * proportions.handForward;
-  pose.handY = pose.hipY - height * proportions.handHeight;
-  pose.bladeAngle = degreesToRadians(appearance.guardAngleDegrees);
-  pose.clothSway = 0;
+  pose.handY = pose.hipY - height * proportions.handHeight - breath / 2;
+  pose.bladeAngle = degreesToRadians(appearance.guardAngleDegrees + breathWave * animationStyle.saberSwayDegrees);
+
+  const forwardSpeed = fighter.vx * fighter.facing;
+  pose.clothSway = clamp(forwardSpeed * animationStyle.clothDrag, -animationStyle.maxClothSway, animationStyle.maxClothSway);
 
   return pose;
 }

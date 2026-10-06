@@ -16,6 +16,23 @@ export const proportions = {
   hiltLength: 0.09,
 };
 
+export const animation = {
+  breathPeriod: 3.2,
+  breathAmplitude: 1.5,
+  saberSwayDegrees: 2.5,
+  strideLength: 34,
+  stepLength: 0.09,
+  stepLift: 0.05,
+  walkBob: 2.5,
+  walkBreathDamping: 0.5,
+  clothDrag: 0.03,
+  maxClothSway: 10,
+  walkBlendRate: 10,
+  airBlendRate: 14,
+  airLegTuck: 0.12,
+  airFootPull: 0.4,
+};
+
 export const groundShadow = {
   radiusXRatio: 0.8,
   radiusY: 6,

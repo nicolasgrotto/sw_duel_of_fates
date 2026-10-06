@@ -1,9 +1,11 @@
 import { createFighter } from '../characters/characterFactory.js';
 import { Action } from '../config/controlsConfig.js';
+import { animation as animationStyle } from '../config/fighterVisualConfig.js';
 import { gameConfig } from '../config/gameConfig.js';
 import { textStyles } from '../config/themeConfig.js';
 import { PlayerController } from '../controllers/PlayerController.js';
 import { DuelRenderer } from '../rendering/DuelRenderer.js';
+import { AnimationSystem } from '../systems/AnimationSystem.js';
 import { CollisionSystem } from '../systems/CollisionSystem.js';
 import { MovementSystem } from '../systems/MovementSystem.js';
 import { PhysicsSystem } from '../systems/PhysicsSystem.js';
@@ -25,6 +27,7 @@ export class DuelState extends GameState {
     this.movement = new MovementSystem(gameConfig.physics);
     this.physics = new PhysicsSystem(gameConfig.physics, this.arena);
     this.collision = new CollisionSystem(this.arena);
+    this.animator = new AnimationSystem(animationStyle);
     this.participants = this.createParticipants();
     this.fighters = this.participants.map((participant) => participant.fighter);
     this.view = new DuelRenderer();
@@ -64,6 +67,7 @@ export class DuelState extends GameState {
     this.physics.update(this.fighters, dt);
     this.collision.update(this.fighters);
     this.movement.updateStates(this.fighters);
+    this.animator.update(this.fighters, dt);
   }
 
   updateIntents() {
