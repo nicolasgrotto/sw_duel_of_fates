@@ -2,13 +2,17 @@ import { createFighter } from '../characters/characterFactory.js';
 import { CombatEvent } from '../combat/combatEvents.js';
 import { createBox, getAttackHitbox, isAttackActive, isInvulnerable } from '../combat/hitboxes.js';
 import { Action } from '../config/controlsConfig.js';
+import { effectsConfig } from '../config/effectsConfig.js';
 import { animation as animationStyle } from '../config/fighterVisualConfig.js';
 import { gameConfig } from '../config/gameConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
 import { DummyController } from '../controllers/DummyController.js';
+import { Camera } from '../core/Camera.js';
 import { PlayerController } from '../controllers/PlayerController.js';
 import { DuelRenderer } from '../rendering/DuelRenderer.js';
 import { DuelSimulation } from '../simulation/DuelSimulation.js';
+import { EffectsSystem } from '../systems/EffectsSystem.js';
+import { createRandom, createRandomSeed } from '../utils/random.js';
 import { GameState } from './GameState.js';
 import { StateId } from './stateIds.js';
 
@@ -37,6 +41,9 @@ export class DuelState extends GameState {
       combatConfig: gameConfig.combat,
       animationConfig: animationStyle,
     });
+    const random = createRandom(createRandomSeed());
+    this.camera = new Camera(effectsConfig, random);
+    this.effects = new EffectsSystem(effectsConfig, this.camera, random);
     this.view = new DuelRenderer();
   }
 
@@ -79,6 +86,9 @@ export class DuelState extends GameState {
     }
 
     this.simulation.step(dt);
+    this.effects.handleEvents(this.simulation.events);
+    this.effects.update(dt);
+    this.camera.update(dt);
     this.rememberLastEvent();
     this.checkForDeath();
   }
