@@ -1,6 +1,9 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { animation as animationStyle } from '../src/config/fighterVisualConfig.js';
+import { getAttackDuration } from '../src/combat/attackPhases.js';
+import { animation as animationStyle, combatPoses } from '../src/config/fighterVisualConfig.js';
+import { FighterState } from '../src/entities/fighterStates.js';
+import { degreesToRadians } from '../src/utils/math.js';
 import { computePose, createPose } from '../src/rendering/fighterPose.js';
 import { AnimationSystem } from '../src/systems/AnimationSystem.js';
 import { STEP, repeat, spawnFighter } from './helpers.js';
@@ -106,5 +109,68 @@ describe('fighterPose', () => {
     left.vx = -50;
 
     assert.deepEqual(computePose(right, createPose()), computePose(left, createPose()));
+  });
+});
+
+describe('fighterPose in combat', () => {
+  function poseAt(fighter, state, time) {
+    fighter.restartState(state);
+    fighter.stateTime = time;
+    return computePose(fighter, createPose());
+  }
+
+  function startAttack(fighter, attackType) {
+    fighter.combat.attack = fighter.stats.attacks[attackType];
+    fighter.combat.attackType = attackType;
+    return fighter.combat.attack;
+  }
+
+  it('raises the blade back in the startup and strikes forward in the active phase', () => {
+    const fighter = spawnFighter(400);
+    const attack = startAttack(fighter, 'light');
+    const style = combatPoses.attacks.light;
+
+    const windup = poseAt(fighter, FighterState.ATTACKING, attack.startup - 0.001);
+    const strike = poseAt(fighter, FighterState.ATTACKING, attack.startup + attack.active - 0.001);
+
+    assert.ok(Math.abs(windup.bladeAngle - degreesToRadians(style.windupDegrees)) < 0.1);
+    assert.ok(Math.abs(strike.bladeAngle - degreesToRadians(style.strikeDegrees)) < 0.1);
+  });
+
+  it('returns the blade to the guard at the end of the recovery', () => {
+    const fighter = spawnFighter(400);
+    const attack = startAttack(fighter, 'heavy');
+
+    const end = poseAt(fighter, FighterState.HEAVY_ATTACK, getAttackDuration(attack) - 0.0001);
+
+    assert.ok(Math.abs(end.bladeAngle - degreesToRadians(fighter.appearance.guardAngleDegrees)) < 0.1);
+  });
+
+  it('holds the blade up in front of the body while blocking', () => {
+    const fighter = spawnFighter(400);
+
+    const pose = poseAt(fighter, FighterState.BLOCKING, 0);
+
+    assert.ok(Math.abs(pose.bladeAngle - degreesToRadians(combatPoses.block.bladeDegrees)) < 0.1);
+  });
+
+  it('falls backward, lies on the floor and turns the blade off when dead', () => {
+    const fighter = spawnFighter(400);
+    fighter.combat.fallDirection = -fighter.facing;
+
+    const pose = poseAt(fighter, FighterState.DEAD, combatPoses.dead.fallDuration);
+
+    assert.equal(pose.bladeVisible, false);
+    assert.equal(pose.bodyRotation, degreesToRadians(-combatPoses.dead.fallDegrees));
+    assert.ok(pose.bodyLift > 0);
+  });
+
+  it('falls forward when the fall direction is forward', () => {
+    const fighter = spawnFighter(400);
+    fighter.combat.fallDirection = fighter.facing;
+
+    const pose = poseAt(fighter, FighterState.DEAD, combatPoses.dead.fallDuration);
+
+    assert.equal(pose.bodyRotation, degreesToRadians(combatPoses.dead.fallDegrees));
   });
 });

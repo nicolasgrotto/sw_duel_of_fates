@@ -9,7 +9,7 @@ export class DuelSimulation {
   constructor({ arena, fighters, physicsConfig, animationConfig }) {
     this.arena = arena;
     this.fighters = fighters;
-    this.combat = new CombatSystem();
+    this.combat = new CombatSystem(arena, physicsConfig);
     this.movement = new MovementSystem(physicsConfig);
     this.physics = new PhysicsSystem(physicsConfig, arena);
     this.collision = new CollisionSystem(arena);

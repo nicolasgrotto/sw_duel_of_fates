@@ -30,6 +30,9 @@ function updateBladeGeometry(fighter, pose) {
 }
 
 export function drawSaberFloorLight(renderer, fighter, pose, floorY) {
+  if (!pose.bladeVisible) {
+    return;
+  }
   updateBladeGeometry(fighter, pose);
   const centerX = fighter.x + (fighter.facing * (blade.baseX + blade.tipX)) / 2;
 
@@ -47,8 +50,15 @@ export function drawSaber(renderer, fighter, pose) {
   renderer.save();
   renderer.translate(fighter.x, fighter.y);
   renderer.scale(fighter.facing, 1);
+  renderer.translate(0, -pose.bodyLift);
+  renderer.rotate(pose.bodyRotation);
 
   renderer.line(blade.hiltStartX, blade.hiltStartY, blade.baseX, blade.baseY, colors.saberHilt, saberStyle.hiltWidth);
+
+  if (!pose.bladeVisible) {
+    renderer.restore();
+    return;
+  }
 
   renderer.setBlendMode('lighter');
   renderer.setAlpha(saberStyle.outerGlowAlpha);

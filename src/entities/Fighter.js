@@ -39,6 +39,7 @@ export class Fighter {
       stunDuration: 0,
       blockstun: 0,
       dodgeDirection: 0,
+      fallDirection: 0,
       staminaRegenDelay: 0,
     };
 

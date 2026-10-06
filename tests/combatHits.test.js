@@ -4,7 +4,7 @@ import { getAttackDuration } from '../src/combat/attackPhases.js';
 import { CombatEvent } from '../src/combat/combatEvents.js';
 import { boxesOverlap, createBox, getAttackHitbox, getHurtbox } from '../src/combat/hitboxes.js';
 import { FighterState } from '../src/entities/fighterStates.js';
-import { STEP, createSimulation, repeat, spawnFighter } from './helpers.js';
+import { STEP, arena, createSimulation, repeat, spawnFighter } from './helpers.js';
 
 const CLOSE_DISTANCE = 110;
 
@@ -183,6 +183,20 @@ describe('CombatSystem hits', () => {
     assert.equal(duel.opponent.health, 0);
     assert.equal(duel.opponent.state, FighterState.DEAD);
     assert.deepEqual(eventTypes(duel.events), [CombatEvent.HIT, CombatEvent.DEATH]);
+  });
+
+  it('falls backward when there is room and forward when a wall is behind', () => {
+    const open = createDuel();
+    open.opponent.health = 1;
+    runAttack(open, 'light');
+    assert.equal(open.opponent.combat.fallDirection, 1);
+
+    const cornered = createDuel();
+    cornered.player.x = arena.right - 200;
+    cornered.opponent.x = arena.right - 90;
+    cornered.opponent.health = 1;
+    runAttack(cornered, 'light');
+    assert.equal(cornered.opponent.combat.fallDirection, -1);
   });
 
   it('ignores dead fighters', () => {

@@ -33,6 +33,53 @@ export const animation = {
   airFootPull: 0.4,
 };
 
+export const combatPoses = {
+  attacks: {
+    light: {
+      windupDegrees: -115,
+      strikeDegrees: 30,
+      windupLean: -3,
+      strikeLean: 6,
+      windupLift: 0.08,
+      strikeReach: 0.08,
+    },
+    heavy: {
+      windupDegrees: -160,
+      strikeDegrees: 55,
+      windupLean: -6,
+      strikeLean: 12,
+      windupLift: 0.14,
+      strikeReach: 0.12,
+    },
+  },
+  block: {
+    bladeDegrees: -95,
+    reach: 0.05,
+    lift: 0.06,
+    crouch: 6,
+  },
+  dodge: {
+    lean: 14,
+    crouch: 14,
+  },
+  hit: {
+    lean: -14,
+    bladeDropDegrees: 35,
+  },
+  stunned: {
+    lean: 18,
+    crouch: 10,
+    bladeDegrees: 70,
+    swayDegrees: 6,
+    swaySpeed: 3,
+  },
+  dead: {
+    fallDuration: 0.45,
+    fallDegrees: 88,
+    lift: 0.2,
+  },
+};
+
 export const groundShadow = {
   radiusXRatio: 0.8,
   radiusY: 6,

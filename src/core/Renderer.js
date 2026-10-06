@@ -98,6 +98,10 @@ export class Renderer {
     this.context.scale(x, y);
   }
 
+  rotate(angle) {
+    this.context.rotate(angle);
+  }
+
   setAlpha(alpha) {
     this.context.globalAlpha = alpha;
   }

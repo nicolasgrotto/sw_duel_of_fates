@@ -12,8 +12,17 @@ function isBlockingAttack(defender, attacker) {
   return attackerSide === 0 || attackerSide === defender.facing;
 }
 
+function chooseFallDirection(fighter, arena, roomMargin) {
+  const backwardX = -fighter.facing;
+  const wallX = backwardX > 0 ? arena.right : arena.left;
+  const roomBehind = Math.abs(wallX - fighter.x);
+  return roomBehind >= fighter.height + roomMargin ? backwardX : -backwardX;
+}
+
 export class CombatSystem {
-  constructor() {
+  constructor(arena, { fallRoomMargin }) {
+    this.arena = arena;
+    this.fallRoomMargin = fallRoomMargin;
     this.events = [];
     this.hitbox = createBox();
     this.hurtbox = createBox();
@@ -198,6 +207,7 @@ export class CombatSystem {
     this.emit(CombatEvent.HIT, contact);
 
     if (defender.health === 0) {
+      defender.combat.fallDirection = chooseFallDirection(defender, this.arena, this.fallRoomMargin);
       defender.restartState(FighterState.DEAD);
       this.emit(CombatEvent.DEATH, contact);
       return;

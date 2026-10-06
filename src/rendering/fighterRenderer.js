@@ -106,6 +106,8 @@ export function drawFighterBody(renderer, fighter, pose, floorY) {
   renderer.save();
   renderer.translate(fighter.x, fighter.y);
   renderer.scale(fighter.facing, 1);
+  renderer.translate(0, -pose.bodyLift);
+  renderer.rotate(pose.bodyRotation);
 
   if (appearance.longCape) {
     drawCape(renderer, fighter, pose, shoulderWidth, flare);

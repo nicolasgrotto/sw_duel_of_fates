@@ -15,6 +15,7 @@ export const physicsConfig = {
   maxFallSpeed: 1400,
   restingSpeed: 5,
   actionFriction: 1400,
+  fallRoomMargin: 60,
 };
 
 export function spawnFighter(x, facing = 1, characterId = 'guardian') {
