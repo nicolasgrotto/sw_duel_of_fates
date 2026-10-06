@@ -44,17 +44,24 @@ Atualize este arquivo ao terminar cada tarefa.
 
 ## Fase 3 — Combate
 
-- [ ] Ataque rápido
-- [ ] Ataque forte
-- [ ] Block
-- [ ] Dodge
-- [ ] Hit detection (hitbox / hurtbox)
-- [ ] Damage
-- [ ] Knockback
-- [ ] Stun
-- [ ] Death
-- [ ] Eventos de combate (hit, block, clash, death)
-- [ ] Debug: hitboxes e hurtboxes
+- [x] Dados de ataque por arquétipo (startup, active, recovery, dano, custo, hitbox, knockback)
+- [x] Ataque rápido
+- [x] Ataque forte
+- [x] Block (de frente, blockstun, custo de stamina)
+- [x] Quebra de guarda (STUNNED)
+- [x] Dodge (dash com invulnerabilidade)
+- [x] Stamina (gasto, atraso, regeneração)
+- [x] Hit detection (hitbox / hurtbox, trade no mesmo frame)
+- [x] Damage
+- [x] Knockback
+- [x] Stun (hitstun)
+- [x] Death (queda para trás ou para a frente)
+- [x] Fim do duelo (VITÓRIA / DERROTA, Enter volta ao menu)
+- [x] Eventos de combate (hit, block, guardBreak, death)
+- [x] Poses de combate (ataques, bloqueio, esquiva, hit, stun, morte)
+- [x] Boneco de treino (F4: parado, bloqueando, atacando)
+- [x] DuelSimulation compartilhada entre jogo e testes
+- [x] Debug: hitboxes, hurtboxes e último evento
 
 ## Fase 4 — Sabres e efeitos
 
@@ -63,7 +70,7 @@ Atualize este arquivo ao terminar cada tarefa.
 - [ ] Trail do sabre durante golpes
 - [ ] Arco de ataque
 - [ ] Hitbox da lâmina
-- [ ] Clash de sabres
+- [ ] Clash de sabres (evento `clash`)
 - [ ] EffectsSystem com pool de partículas
 - [ ] Sparks e flash
 - [ ] Camera com screen shake
