@@ -1,6 +1,8 @@
 export const texts = {
   menu: {
     duel: 'Duelar',
+    training: 'Treino',
+    difficulty: 'Dificuldade: {level}',
     controls: 'Controles',
     navigation: '{up}  e  {down}  escolher   ·   {confirm}  confirmar',
   },
@@ -40,6 +42,12 @@ export const texts = {
   },
 };
 
+export const difficultyNames = {
+  easy: 'Fácil',
+  normal: 'Normal',
+  hard: 'Difícil',
+};
+
 export const controlsScreenActions = [
   'moveLeft',
   'moveRight',
@@ -54,8 +62,8 @@ export const controlsScreenActions = [
 
 export const layout = {
   menu: {
-    titleY: 250,
-    firstItemY: 400,
+    titleY: 230,
+    firstItemY: 370,
     itemSpacing: 52,
     footerY: 660,
   },

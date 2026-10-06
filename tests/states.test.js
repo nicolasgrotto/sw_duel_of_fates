@@ -55,13 +55,44 @@ describe('state flow', () => {
     const game = createFakeGame();
     game.changeState(StateId.MENU);
 
-    game.step(Action.MENU_DOWN);
+    game.step(Action.MENU_UP);
     game.step(Action.CONFIRM);
     assert.deepEqual(game.stateNames(), ['MenuState', 'ControlsState']);
 
     game.step(Action.BACK);
     assert.deepEqual(game.stateNames(), ['MenuState']);
     assert.equal(game.states.current.menu.selected.id, 'controls');
+  });
+
+  it('starts a training duel from the menu', () => {
+    const game = createFakeGame();
+    game.changeState(StateId.MENU);
+
+    game.step(Action.MENU_DOWN);
+    game.step(Action.CONFIRM);
+
+    assert.equal(game.states.current.mode, DuelMode.TRAINING);
+  });
+
+  it('cycles the difficulty from the menu and uses it in the next duel', () => {
+    const game = createFakeGame();
+    game.changeState(StateId.MENU);
+    const menu = game.states.current;
+
+    game.step(Action.MENU_DOWN);
+    game.step(Action.MENU_DOWN);
+    game.step(Action.CONFIRM);
+    assert.equal(game.settings.difficulty, 'hard');
+    assert.equal(menu.difficultyItem.label, 'Dificuldade: Difícil');
+
+    game.step(Action.CONFIRM);
+    assert.equal(game.settings.difficulty, 'easy');
+
+    game.step(Action.MENU_UP);
+    game.step(Action.MENU_UP);
+    game.step(Action.CONFIRM);
+    assert.equal(game.states.current.mode, DuelMode.VERSUS);
+    assert.equal(game.states.current.opponentController.difficulty.reactionTime, 0.45);
   });
 
   it('pauses the duel and resumes it', () => {
