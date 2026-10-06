@@ -141,7 +141,8 @@ Os valores reais ficam em `src/config/fightersConfig.js`, por arquétipo.
 
 **Fim do duelo**
 
-- Quando um lutador morre, os controles param, o resultado aparece ("VITÓRIA" ou "DERROTA") e `Enter` volta ao menu. A tela de resultado completa é da Fase 6.
+- O duelo começa com uma intro curta ("DUELO") com os controles travados.
+- Quando um lutador morre, os controles param, aparece "K.O." e, depois da queda, a tela de resultado (VITÓRIA ou DERROTA, vencedor, estatísticas, Revanche ou Menu principal).
 
 **Eventos de combate**
 
@@ -261,15 +262,21 @@ Quando a vida de um personagem chega a zero:
 ## 12. Fluxo de telas
 
 ```
-Menu → Duelo ⇄ Pausa
-          ↓
-      Game Over → Menu
+Menu ──▶ Duelo ⇄ Pausa
+ │         │
+ │         ▼
+ │      Resultado ──▶ Duelo (revanche) ou Menu
+ ▼
+Controles
 ```
 
-- **Menu**: tela inicial. `Enter` inicia o duelo.
-- **Duelo**: gameplay. `Esc` ou `P` pausa.
-- **Pausa**: sobreposta ao duelo, que fica congelado. `Esc` ou `P` volta, `Q` sai para o menu.
-- **Game Over**: resultado do duelo (Fase 6).
+- **Menu**: opções Duelar e Controles.
+- **Controles**: tabela de ações e teclas.
+- **Duelo**: intro, gameplay e K.O. `Esc` ou `P` pausa.
+- **Pausa**: sobreposta ao duelo congelado. Continuar, Reiniciar duelo, Sair para o menu.
+- **Resultado**: VITÓRIA ou DERROTA, vencedor e estatísticas. Revanche ou Menu principal.
+
+Detalhes visuais em [design/UI_GUIDELINES.md](design/UI_GUIDELINES.md).
 
 ---
 

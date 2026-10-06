@@ -89,11 +89,15 @@ Atualize este arquivo ao terminar cada tarefa.
 
 ## Fase 6 — UI
 
-- [ ] Menu final
-- [ ] HUD (seguir UI_GUIDELINES)
-- [ ] Pause final
-- [ ] Vitória
-- [ ] Derrota
+- [x] Menu final (Duelar, Controles)
+- [x] Tela de controles (gerada do controlsConfig)
+- [x] HUD (nomes, vida com barra fantasma, vida baixa piscando, stamina)
+- [x] Intro "DUELO" e mensagem "K.O."
+- [x] Pause final (Continuar, Reiniciar, Sair)
+- [x] Vitória
+- [x] Derrota
+- [x] Estatísticas do duelo e revanche
+- [x] Textos e layout centralizados em uiConfig
 
 ## Fase 7 — Polish
 

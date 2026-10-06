@@ -33,10 +33,11 @@ src/
     GameState.js            ✅ classe base
     stateIds.js             ✅ ids dos estados
     stateFactory.js         ✅ cria estados a partir do id
-    MenuState.js            ✅
-    DuelState.js            ✅
-    PauseState.js           ✅
-    GameOverState.js        ⏳
+    MenuState.js            ✅ título + opções (MenuList)
+    ControlsState.js        ✅ tabela de controles gerada do controlsConfig
+    DuelState.js            ✅ duelo: intro, simulação, efeitos, HUD, fim do duelo
+    PauseState.js           ✅ continuar, reiniciar, sair
+    GameOverState.js        ✅ vitória/derrota, estatísticas, revanche
   characters/               ✅ dados e criação de personagens
     characterData.js        ✅ personagens: nome, arquétipo, aparência
     characterFactory.js     ✅ cria um Fighter a partir dos dados
@@ -70,10 +71,17 @@ src/
     saberRenderer.js        ✅ cabo, glows, núcleo, luz no chão e no corpo
     SaberTrail.js           ✅ rastro da lâmina na fase active
     effectsRenderer.js      ✅ partículas, luzes de impacto e flash
+  ui/                       ✅ peças de interface desenhadas no canvas
+    MenuList.js             ✅ lista de opções navegável
+    Hud.js                  ✅ nomes, barras de vida (com fantasma) e stamina
+    CombatMessage.js        ✅ mensagens curtas (DUELO, K.O.) com fade
+    keyLabels.js            ✅ nomes de teclas a partir do controlsConfig
+    formatText.js           ✅ textos com {placeholders}
   config/                   ✅ valores e ajustes
     gameConfig.js           ✅ canvas, loop, arena, física, duelo, debug
     themeConfig.js          ✅ cores, estilos de texto, animação de UI
     controlsConfig.js       ✅ ações e teclas
+    uiConfig.js             ✅ textos da interface e layout das telas
     fightersConfig.js       ✅ atributos por arquétipo (vida, stamina, corpo, movimento, ataques, esquiva)
     fighterVisualConfig.js  ✅ proporções, animação, poses de combate, sombra e estilo do sabre
     effectsConfig.js        ✅ limites e receitas de VFX
@@ -257,7 +265,32 @@ this.game.popState();
 
 `stateFactory.createState(id, game)` é o único lugar que conhece todas as classes de estado. Isso evita importações circulares (Menu → Duelo → Pausa → Menu).
 
+Estados podem receber parâmetros: `game.pushState(StateId.GAME_OVER, { playerWon, winnerName, stats })`. Eles ficam em `this.params`.
+
+Fluxo de telas:
+
+```
+MenuState ──Duelar──▶ DuelState ──Esc──▶ PauseState (push) ──Continuar──▶ volta
+    │                     │                    ├─ Reiniciar ──▶ novo DuelState
+    └─Controles─▶ ControlsState (push)        └─ Sair ──▶ MenuState
+                          │
+                   K.O. + resultDelay
+                          ▼
+                   GameOverState (push) ──Revanche──▶ novo DuelState
+                                        └─Menu principal──▶ MenuState
+```
+
 Para adicionar um estado: crie a classe estendendo `GameState`, adicione o id em `stateIds.js` e registre em `stateFactory.js`.
+
+## UI
+
+Arquivos: [src/ui/](src/ui/), [src/config/uiConfig.js](src/config/uiConfig.js). Regras em [design/UI_GUIDELINES.md](design/UI_GUIDELINES.md).
+
+- Todos os textos da interface ficam em `uiConfig.texts` (com `{placeholders}` preenchidos por `formatText`). Posições e medidas ficam em `uiConfig.layout`.
+- Nomes de teclas nunca são escritos à mão: `keyLabels.formatActionKeys(keyBindings, action)`.
+- `MenuList` é reutilizado no menu, na pausa e no resultado. `update(input)` devolve o id escolhido no `Enter` (ou `null`).
+- `Hud` só lê os lutadores. A barra fantasma é estado visual do próprio `Hud`.
+- `DuelState`: intro de `layout.messages.introDuration` com controles travados ("DUELO"), depois o duelo. No golpe final mostra "K.O." e, depois de `gameConfig.duel.resultDelay`, empilha o `GameOverState` com as estatísticas do jogador (tempo, golpes acertados, defesas), contadas a partir dos eventos de combate.
 
 ---
 
@@ -338,6 +371,7 @@ Arquivo: [src/utils/debug.js](src/utils/debug.js)
 ## Configuração
 
 - Balanceamento e ajustes ficam em `src/config/`. Nada de números mágicos espalhados.
+- Textos e layout da interface ficam em `uiConfig.js`.
 - Cores e estilos de texto ficam em `themeConfig.js` e espelham [design/VISUAL_SYSTEM.md](design/VISUAL_SYSTEM.md).
 - Arquivos de config exportam objetos simples, sem lógica.
 
@@ -351,7 +385,7 @@ Testes rodam em Node (`npm test`), sem navegador. Por isso:
 - Quando um módulo do core precisa do navegador (`Input`, `GameLoop`), a dependência é injetada.
 - `computePose` é uma função pura e também é testada.
 
-Testes atuais: `gameLoop`, `input`, `stateMachine`, `states` (fluxo de telas, fim do duelo, boneco, debug de hitbox), `debug`, `math`, `fighter`, `playerController`, `dummyController`, `movement`, `physics` (inclui colisão), `animation` (inclui poses de combate), `combatActions` (ações, timers, stamina) e `combatHits` (hits, bloqueio, quebra de guarda, esquiva, morte, trade, clash), `effects` (RNG, pool, câmera, efeitos por evento, limites) e `saberTrail`. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
+Testes atuais: `gameLoop`, `input`, `stateMachine`, `states` (fluxo de telas, fim do duelo, boneco, debug de hitbox), `debug`, `math`, `fighter`, `playerController`, `dummyController`, `movement`, `physics` (inclui colisão), `animation` (inclui poses de combate), `combatActions` (ações, timers, stamina) e `combatHits` (hits, bloqueio, quebra de guarda, esquiva, morte, trade, clash), `effects` (RNG, pool, câmera, efeitos por evento, limites), `saberTrail`, `ui` (MenuList, nomes de teclas, textos), `hud` e `combatMessage`. O teste `states` cobre também controles, intro, pausa (continuar, reiniciar, sair), resultado e revanche. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
 
 ---
 
@@ -359,7 +393,8 @@ Testes atuais: `gameLoop`, `input`, `stateMachine`, `states` (fluxo de telas, fi
 
 ```
 core/Game     → core, states/stateFactory, config, utils
-states        → states/stateIds, simulation, combat, ai, controllers, characters, entities, rendering, config
+states        → states/stateIds, simulation, combat, ai, controllers, characters, entities, rendering, ui, config
+ui            → config, utils
 simulation    → systems, combat
 systems/EffectsSystem → combat (tipos de evento), core/Camera (via construtor), config, utils
 characters    → entities, config
