@@ -71,6 +71,41 @@ Cada personagem é desenhado em partes, nesta ordem:
 
 O personagem não desenha a si mesmo. O código de render recebe a entidade e apenas lê seus dados.
 
+Com dois lutadores, todos os corpos são desenhados antes de todos os sabres (camadas 4 e 5), para a lâmina nunca ficar escondida atrás do corpo do oponente.
+
+### Silhueta desenhada por código
+
+Enquanto não houver sprites, o personagem é feito de formas simples, em coordenadas locais (origem nos pés, olhando para a direita, espelhado com `scale(-1, 1)` quando olha para a esquerda).
+
+| Parte | Proporção (da altura do corpo) | Forma |
+| --- | --- | --- |
+| Pernas | 0,45 | linhas grossas, quadril → joelho → pé |
+| Tronco | 0,33 | polígono da túnica/capa |
+| Cabeça | raio 0,075 | círculo, com capuz opcional |
+| Braços | — | linhas do ombro até as mãos no cabo |
+
+- Base de luta: pé da frente adiantado, pé de trás atrás, joelhos levemente dobrados.
+- Partes variáveis por personagem (`characterData.appearance`): capuz levantado ou não, capa longa ou túnica, ângulo de guarda do sabre, inclinação do tronco.
+- Sombra no chão: elipse escura que diminui quando o personagem sobe.
+
+### Cores de personagem
+
+Cores de personagem são **dados do personagem** e ficam em `src/characters/characterData.js`. É a única exceção à regra de cores no `themeConfig`.
+
+| Personagem | Túnica / capa | Corpo | Sabre |
+| --- | --- | --- | --- |
+| Guardião | `#6b5a48` | `#2e2925` | azul `#3fa9ff` |
+| Sombra | `#1f2029` | `#121319` | vermelho `#ff3b3b` |
+
+Cores compartilhadas (em `themeConfig`):
+
+| Token | Valor | Uso |
+| --- | --- | --- |
+| `saberHilt` | `#b9bec9` | cabo do sabre |
+| `saberCore` | `#ffffff` | núcleo da lâmina |
+| `groundShadow` | `rgba(0, 0, 0, 0.45)` | sombra no chão |
+| `debugBody` | `rgba(124, 252, 0, 0.8)` | caixa do corpo no debug |
+
 ## Sabre
 
 Renderizado em múltiplas camadas:
@@ -79,6 +114,8 @@ Renderizado em múltiplas camadas:
 2. outer glow (largo, transparente)
 3. colored glow (médio, cor do sabre)
 4. white core (fino, branco)
+
+Em guarda (sem golpe), o sabre balança levemente com a respiração. A luz da lâmina projeta uma mancha suave da cor do sabre no chão.
 
 Para os glows, use `globalCompositeOperation = 'lighter'`. Evite `shadowBlur` por frame em muitos objetos, porque é caro. Se a performance cair, pré-renderize o glow em um canvas offscreen e reutilize.
 

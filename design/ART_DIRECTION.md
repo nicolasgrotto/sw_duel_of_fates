@@ -21,6 +21,18 @@ O jogo deve transmitir:
 - Evitar aparência genérica de jogo mobile.
 - Evitar excesso de elementos na tela.
 
+## Silhuetas dos arquétipos
+
+| | Guardião | Sombra |
+| --- | --- | --- |
+| Roupa | túnica até os joelhos, tom terroso | capa longa até o chão, quase preta |
+| Cabeça | capuz abaixado | capuz levantado e pontudo |
+| Postura | ereta, controlada | inclinada para a frente, predatória |
+| Guarda | alta: lâmina para cima e para a frente | baixa: lâmina para baixo e para a frente |
+| Sabre | azul | vermelho |
+
+As duas silhuetas devem ser diferentes mesmo pintadas de preto: capuz, comprimento da roupa e ângulo da lâmina resolvem isso.
+
 ## Paleta
 
 ### Ambiente
@@ -94,3 +106,10 @@ Evitar:
 - transições instantâneas entre poses
 
 Usar easing nas transições e um pequeno exagero (antecipação e follow-through).
+
+### Idle e caminhada
+
+- **Idle**: respiração lenta (o tronco sobe e desce 1 a 2 px) e o sabre balança levemente. O personagem nunca fica totalmente parado.
+- **Caminhada**: passos curtos de base de luta (os pés não se cruzam), corpo sobe e desce a cada passo, roupa arrasta levemente para trás do movimento.
+- **Pulo**: pernas recolhidas no ar.
+- A troca entre idle, caminhada e pulo é suavizada (blend), nunca instantânea.

@@ -40,6 +40,17 @@ O jogador pode:
 - sofrer dano
 - morrer
 
+### Movimento
+
+- No chão, o lutador sempre vira de frente para o oponente.
+- Andar para trás é mais lento que andar para a frente.
+- Movimento com aceleração e desaceleração, para transmitir peso. No ar, o controle é reduzido.
+- Pulo com altura fixa. Sem pulo duplo.
+- Os corpos dos lutadores não se atravessam: ao encostar, eles se empurram.
+- Ninguém sai dos limites laterais da arena.
+
+Valores em `src/config/fightersConfig.js` (por arquétipo) e `src/config/gameConfig.js` (gravidade).
+
 ---
 
 ## 4. Combate
