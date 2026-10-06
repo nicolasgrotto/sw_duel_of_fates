@@ -13,6 +13,7 @@ import { PlayerController } from '../controllers/PlayerController.js';
 import { DuelRenderer } from '../rendering/DuelRenderer.js';
 import { DuelSimulation } from '../simulation/DuelSimulation.js';
 import { EffectsSystem } from '../systems/EffectsSystem.js';
+import { CombatMessage } from '../ui/CombatMessage.js';
 import { formatText } from '../ui/formatText.js';
 import { Hud } from '../ui/Hud.js';
 import { formatActionKeys } from '../ui/keyLabels.js';
@@ -32,6 +33,7 @@ function createArenaBounds({ canvas, arena }) {
 export class DuelState extends GameState {
   enter() {
     this.duelTime = 0;
+    this.introTime = 0;
     this.outcome = null;
     this.lastEvent = 'none';
     this.debugBox = createBox();
@@ -51,6 +53,8 @@ export class DuelState extends GameState {
     this.effects = new EffectsSystem(effectsConfig, this.camera, random);
     this.view = new DuelRenderer();
     this.hud = new Hud(this.fighters[0], this.fighters[1]);
+    this.message = new CombatMessage();
+    this.message.show(texts.duel.intro, layout.messages.introDuration);
     this.pauseHint = formatText(texts.duel.pauseHint, { pause: formatActionKeys(keyBindings, Action.PAUSE) });
   }
 
@@ -87,6 +91,9 @@ export class DuelState extends GameState {
         this.game.changeState(StateId.MENU);
         return;
       }
+    } else if (this.isIntroPlaying()) {
+      this.introTime += dt;
+      this.clearAllIntents();
     } else {
       this.duelTime += dt;
       this.updateIntents(dt);
@@ -97,6 +104,7 @@ export class DuelState extends GameState {
     this.effects.update(dt);
     this.camera.update(dt);
     this.hud.update(dt);
+    this.message.update(dt);
     this.rememberLastEvent();
     this.checkForDeath();
   }
@@ -124,6 +132,7 @@ export class DuelState extends GameState {
       if (event.type === CombatEvent.DEATH) {
         this.outcome = { winner: event.attacker, loser: event.defender, time: 0 };
         this.clearAllIntents();
+        this.message.show(texts.duel.knockout, layout.messages.knockoutDuration);
         return;
       }
     }
@@ -133,6 +142,10 @@ export class DuelState extends GameState {
     for (const fighter of this.fighters) {
       fighter.clearIntent();
     }
+  }
+
+  isIntroPlaying() {
+    return this.introTime < layout.messages.introDuration;
   }
 
   isResultVisible() {
@@ -146,6 +159,7 @@ export class DuelState extends GameState {
   render(renderer) {
     this.view.render(renderer, this.arena, this.fighters, this.effects, this.camera);
     this.hud.render(renderer);
+    this.message.render(renderer);
 
     if (this.isResultVisible()) {
       this.renderResult(renderer);

@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { Action } from '../src/config/controlsConfig.js';
 import { colors } from '../src/config/themeConfig.js';
+import { layout } from '../src/config/uiConfig.js';
 import { StateMachine } from '../src/core/StateMachine.js';
 import { createState } from '../src/states/stateFactory.js';
 import { StateId } from '../src/states/stateIds.js';
@@ -28,6 +29,12 @@ function createFakeGame() {
     },
   };
   return game;
+}
+
+function skipIntro(game) {
+  for (let time = 0; time <= layout.messages.introDuration; time += STEP) {
+    game.step();
+  }
 }
 
 describe('state flow', () => {
@@ -70,13 +77,16 @@ describe('state flow', () => {
     const game = createFakeGame();
     game.changeState(StateId.DUEL);
     const duel = game.states.current;
-
+    skipIntro(game);
     game.step();
+    const timeBeforePause = duel.duelTime;
+
     game.step(Action.PAUSE);
     game.step();
     game.step();
 
-    assert.equal(duel.duelTime, STEP);
+    assert.ok(timeBeforePause > 0);
+    assert.equal(duel.duelTime, timeBeforePause);
   });
 
   it('quits from the pause to the menu', () => {
@@ -96,6 +106,7 @@ describe('state flow', () => {
     const [player, opponent] = duel.fighters;
     opponent.x = player.x + 110;
     opponent.health = 1;
+    skipIntro(game);
 
     game.step(Action.LIGHT_ATTACK);
     for (let i = 0; i < 30; i += 1) {
@@ -139,11 +150,25 @@ describe('state flow', () => {
 
     assert.deepEqual(drawnColors(), [colors.debugBody, colors.debugBody]);
 
+    skipIntro(game);
     game.step(Action.LIGHT_ATTACK);
     while (player.stateTime < player.stats.attacks.light.startup) {
       game.step();
     }
     assert.ok(drawnColors().includes(colors.debugHitbox));
+  });
+
+  it('locks the controls during the intro', () => {
+    const game = createFakeGame();
+    game.changeState(StateId.DUEL);
+    const [player] = game.states.current.fighters;
+
+    game.step(Action.LIGHT_ATTACK);
+    assert.equal(player.state, 'IDLE');
+
+    skipIntro(game);
+    game.step(Action.LIGHT_ATTACK);
+    assert.equal(player.state, 'ATTACKING');
   });
 
   it('throws for an unknown state id', () => {
