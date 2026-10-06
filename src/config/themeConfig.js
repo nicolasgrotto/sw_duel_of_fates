@@ -21,6 +21,12 @@ export const textStyles = {
     align: 'center',
     baseline: 'middle',
   },
+  heading: {
+    font: `bold 48px ${FONT_FAMILY}`,
+    color: colors.text,
+    align: 'center',
+    baseline: 'middle',
+  },
   subtitle: {
     font: `28px ${FONT_FAMILY}`,
     color: colors.text,
@@ -39,4 +45,9 @@ export const textStyles = {
     align: 'left',
     baseline: 'top',
   },
+};
+
+export const animation = {
+  promptBlinkPeriod: 1.2,
+  promptVisibleRatio: 0.65,
 };
