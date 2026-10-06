@@ -8,7 +8,7 @@ export const colors = {
   wall: '#1b2233',
   text: '#e8ecf5',
   textMuted: '#8a94ab',
-  accent: '#ffe81f',
+  accent: '#9fb4d9',
   overlay: 'rgba(0, 0, 0, 0.65)',
   debug: '#7cfc00',
   debugBackground: 'rgba(0, 0, 0, 0.55)',
@@ -17,7 +17,7 @@ export const colors = {
 export const textStyles = {
   title: {
     font: `bold 72px ${FONT_FAMILY}`,
-    color: colors.accent,
+    color: colors.text,
     align: 'center',
     baseline: 'middle',
   },
@@ -29,7 +29,7 @@ export const textStyles = {
   },
   subtitle: {
     font: `28px ${FONT_FAMILY}`,
-    color: colors.text,
+    color: colors.accent,
     align: 'center',
     baseline: 'middle',
   },
