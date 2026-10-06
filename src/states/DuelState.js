@@ -21,6 +21,7 @@ function createArenaBounds({ canvas, arena }) {
     left: arena.wallPadding,
     right: canvas.width - arena.wallPadding,
     floorY: arena.floorY,
+    overscan: arena.overscan,
   };
 }
 
@@ -136,7 +137,7 @@ export class DuelState extends GameState {
   }
 
   render(renderer) {
-    this.view.render(renderer, this.arena, this.fighters);
+    this.view.render(renderer, this.arena, this.fighters, this.effects, this.camera);
 
     if (this.isResultVisible()) {
       this.renderResult(renderer);

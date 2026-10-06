@@ -1,4 +1,6 @@
+import { effectsConfig } from '../config/effectsConfig.js';
 import { drawArena } from './arenaRenderer.js';
+import { drawFlash, drawImpactLights, drawParticles } from './effectsRenderer.js';
 import { computePose, createPose } from './fighterPose.js';
 import { drawFighterBody } from './fighterRenderer.js';
 import { drawSaber, drawSaberFloorLight } from './saberRenderer.js';
@@ -17,7 +19,10 @@ export class DuelRenderer {
     return pose;
   }
 
-  render(renderer, arena, fighters) {
+  render(renderer, arena, fighters, effects, camera) {
+    renderer.save();
+    renderer.translate(camera.offsetX, camera.offsetY);
+
     drawArena(renderer, arena);
 
     for (const fighter of fighters) {
@@ -32,5 +37,12 @@ export class DuelRenderer {
     for (const fighter of fighters) {
       drawSaber(renderer, fighter, this.getPose(fighter));
     }
+
+    drawImpactLights(renderer, effects.lights);
+    drawParticles(renderer, effects.particles.particles, effectsConfig.particle.streakTime);
+
+    renderer.restore();
+
+    drawFlash(renderer, effects.flash);
   }
 }

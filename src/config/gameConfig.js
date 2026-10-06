@@ -11,6 +11,7 @@ export const gameConfig = {
   arena: {
     floorY: 600,
     wallPadding: 40,
+    overscan: 32,
   },
   physics: {
     gravity: 2400,

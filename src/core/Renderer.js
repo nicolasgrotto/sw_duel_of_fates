@@ -1,9 +1,46 @@
+const GLOW_SPRITE_SIZE = 128;
+
+function toTransparent(hexColor) {
+  const value = Number.parseInt(hexColor.slice(1), 16);
+  return `rgba(${(value >> 16) & 255}, ${(value >> 8) & 255}, ${value & 255}, 0)`;
+}
+
+function createGlowSprite(color) {
+  const sprite = document.createElement('canvas');
+  sprite.width = GLOW_SPRITE_SIZE;
+  sprite.height = GLOW_SPRITE_SIZE;
+
+  const context = sprite.getContext('2d');
+  const center = GLOW_SPRITE_SIZE / 2;
+  const gradient = context.createRadialGradient(center, center, 0, center, center, center);
+  gradient.addColorStop(0, color);
+  gradient.addColorStop(1, toTransparent(color));
+  context.fillStyle = gradient;
+  context.fillRect(0, 0, GLOW_SPRITE_SIZE, GLOW_SPRITE_SIZE);
+  return sprite;
+}
+
 export class Renderer {
   constructor(canvas, { width, height }) {
     this.canvas = canvas;
     this.context = canvas.getContext('2d');
     this.width = width;
     this.height = height;
+    this.glowSprites = new Map();
+  }
+
+  getGlowSprite(color) {
+    let sprite = this.glowSprites.get(color);
+    if (!sprite) {
+      sprite = createGlowSprite(color);
+      this.glowSprites.set(color, sprite);
+    }
+    return sprite;
+  }
+
+  drawGlow(x, y, radius, color, alpha) {
+    this.context.globalAlpha = alpha;
+    this.context.drawImage(this.getGlowSprite(color), x - radius, y - radius, radius * 2, radius * 2);
   }
 
   fitToDisplay(pixelRatio) {
