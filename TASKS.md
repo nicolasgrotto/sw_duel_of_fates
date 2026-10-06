@@ -26,17 +26,21 @@ Atualize este arquivo ao terminar cada tarefa.
 
 ## Fase 2 — Personagem
 
-- [ ] Criar Fighter
-- [ ] Criar characterData e characterFactory
-- [ ] Criar fightersConfig
-- [ ] Movimento horizontal
-- [ ] Gravidade
-- [ ] Pulo
-- [ ] Limites da arena
-- [ ] Silhueta do personagem desenhada por código (seguir ART_DIRECTION)
-- [ ] Animação idle
-- [ ] Animação walk
-- [ ] Debug: posição, velocidade e estado do lutador
+- [x] Criar Fighter
+- [x] Criar characterData e characterFactory
+- [x] Criar fightersConfig
+- [x] PlayerController (Input → intent)
+- [x] Movimento horizontal com aceleração (para trás mais lento)
+- [x] Lutadores viram de frente um para o outro
+- [x] Gravidade
+- [x] Pulo
+- [x] Limites da arena
+- [x] Corpos não se atravessam (empurrão)
+- [x] Silhueta do personagem desenhada por código (seguir ART_DIRECTION)
+- [x] Animação idle (respiração, sabre balançando)
+- [x] Animação walk (passos, balanço do corpo, roupa arrastando)
+- [x] Pose de pulo (pernas recolhidas)
+- [x] Debug: posição, velocidade, estado e caixa do corpo
 
 ## Fase 3 — Combate
 
@@ -54,14 +58,16 @@ Atualize este arquivo ao terminar cada tarefa.
 
 ## Fase 4 — Sabres e efeitos
 
-- [ ] Renderizar sabre em camadas (trail, glows, núcleo)
+- [x] Renderizar sabre em guarda (glows e núcleo)
+- [x] Luz do sabre no chão
+- [ ] Trail do sabre durante golpes
 - [ ] Arco de ataque
 - [ ] Hitbox da lâmina
 - [ ] Clash de sabres
 - [ ] EffectsSystem com pool de partículas
 - [ ] Sparks e flash
 - [ ] Camera com screen shake
-- [ ] Luz do sabre no chão e no personagem
+- [ ] Luz do sabre no personagem (rim light)
 
 ## Fase 5 — IA
 

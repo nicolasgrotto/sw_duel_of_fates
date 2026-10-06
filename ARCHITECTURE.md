@@ -37,23 +37,40 @@ src/
     DuelState.js            ✅
     PauseState.js           ✅
     GameOverState.js        ⏳
-  characters/               ⏳ dados e criação de personagens
-    characterData.js        ⏳ lista de personagens (nome, cores, atributos)
-    characterFactory.js     ⏳ cria um Fighter a partir dos dados
-  entities/                 ⏳ Fighter, Saber
+  characters/               ✅ dados e criação de personagens
+    characterData.js        ✅ personagens: nome, arquétipo, aparência
+    characterFactory.js     ✅ cria um Fighter a partir dos dados
+  controllers/              ✅ quem controla um lutador
+    PlayerController.js     ✅ Input → intent
+  entities/                 ✅ objetos do jogo
+    Fighter.js              ✅ posição, velocidade, estado, intent, animação
+    fighterStates.js        ✅ estados do lutador
+    Saber.js                ⏳ lâmina com hitbox (Fase 4)
+  systems/                  ✅ processam entidades
+    MovementSystem.js       ✅ intent → velocidade, pulo, direção, estado de locomoção
+    PhysicsSystem.js        ✅ gravidade, chão, limites da arena
+    CollisionSystem.js      ✅ corpos não se atravessam
+    AnimationSystem.js      ✅ tempo, ciclo de passos, blends
+    EffectsSystem.js        ⏳
   combat/                   ⏳ CombatSystem, Hitbox
-  systems/                  ⏳ PhysicsSystem, CollisionSystem, AnimationSystem, EffectsSystem
   ai/                       ⏳ EnemyAI
-  rendering/                ⏳ desenho de arena, lutadores, sabres e efeitos
+  rendering/                ✅ desenho (só lê dados)
+    DuelRenderer.js         ✅ ordem das camadas do duelo
+    arenaRenderer.js        ✅ chão e limites
+    fighterPose.js          ✅ calcula a pose a partir do estado e da animação
+    fighterRenderer.js      ✅ silhueta do lutador e sombra
+    saberRenderer.js        ✅ cabo, glows, núcleo e luz no chão
   config/                   ✅ valores e ajustes
-    gameConfig.js           ✅ canvas, loop, arena, debug
+    gameConfig.js           ✅ canvas, loop, arena, física, duelo, debug
     themeConfig.js          ✅ cores, estilos de texto, animação de UI
     controlsConfig.js       ✅ ações e teclas
-    fightersConfig.js       ⏳ atributos e ataques
+    fightersConfig.js       ✅ atributos por arquétipo (vida, stamina, corpo, movimento)
+    fighterVisualConfig.js  ✅ proporções, animação, sombra e estilo do sabre
     effectsConfig.js        ⏳ parâmetros de VFX
   utils/
     debug.js                ✅ overlay de debug
-    math.js / random.js     ⏳
+    math.js                 ✅ clamp, lerp, approach, smoothTowards
+    random.js               ⏳
 tools/
   server.js                 ✅ servidor estático para desenvolvimento
 tests/                      ✅ testes com node --test
@@ -81,19 +98,35 @@ Core **não** conhece detalhes de personagens, ataques ou IA.
 
 ### States
 
-Controlam a tela atual (Menu, Duelo, Pausa, Game Over). Cada estado tem `enter()`, `exit()`, `update(dt)`, `render(renderer)` e `getDebugInfo()`.
+Controlam a tela atual (Menu, Duelo, Pausa, Game Over). Cada estado tem `enter()`, `exit()`, `update(dt)`, `render(renderer)`, `renderDebug(renderer)` e `getDebugInfo()`.
 
-O `DuelState` é dono do duelo: cria as entidades e chama os sistemas na ordem certa.
+O `DuelState` é dono do duelo: cria as entidades, os sistemas e o `DuelRenderer`, e chama tudo na ordem certa.
 
 ### Characters
 
-Personagens são **dados** (nome, cor do sabre, silhueta, atributos, conjunto de ataques). `characterFactory` transforma esses dados em um `Fighter`.
+Personagens são **dados**:
 
-Trocar todos os personagens (ex.: versão com identidade própria) deve exigir apenas mudar dados e assets, nunca o combate.
+- `characterData.js`: id, nome, arquétipo e aparência (cores, capuz, capa, ângulo de guarda, tamanho da lâmina).
+- `fightersConfig.js`: atributos de cada arquétipo (vida, stamina, tamanho do corpo, movimento).
+- `characterFactory.createFighter(id, spawn)` junta os dois e cria um `Fighter`.
+
+Trocar todos os personagens (ex.: versão com identidade própria) deve exigir apenas mudar dados e assets, nunca o combate. Para adicionar um personagem: adicione uma entrada em `characterData.js` e, se precisar de atributos novos, um arquétipo em `fightersConfig.js`.
+
+### Controllers
+
+Um controller escreve no `fighter.intent` o que o lutador **quer** fazer (`moveX`, `jump`, `lightAttack`, `heavyAttack`, `block`, `dodge`). Ele nunca altera posição, vida ou estado.
+
+- `PlayerController`: lê o `Input`.
+- `EnemyAI` (Fase 5): vai preencher o mesmo `intent`.
+- Lutador sem controller: intent zerado a cada update.
+
+O `DuelState` guarda pares `{ fighter, controller }` em `participants`.
 
 ### Entities
 
 Objetos do jogo (`Fighter`, `Saber`). Guardam dados e estado, mas não controlam o jogo inteiro e não desenham a si mesmos.
+
+`Fighter` guarda posição (`x`, `y` nos **pés**, centro horizontal), velocidade, `facing` (1 = direita, -1 = esquerda), `grounded`, vida, stamina, estado (`FighterState`), `stateTime`, `intent` e `animation`. `canMove` diz se o estado atual aceita locomoção.
 
 ### Systems / Combat / AI
 
@@ -123,16 +156,30 @@ main.js
             └─ render(alpha) → renderer.clear() → states.render() → debug.render()
 ```
 
-Ordem planejada dentro do `DuelState.update` (a partir da Fase 2):
+Ordem dentro do `DuelState.update`:
 
 ```
-Input / EnemyAI  → intenções (ações)
-Fighter          → aceita ou recusa a ação conforme o estado atual
-PhysicsSystem    → movimento, gravidade, limites da arena
-CombatSystem     → hitboxes, bloqueio, dano, knockback, stun → emite eventos
-EffectsSystem    → consome eventos → partículas, flash, pedido de shake
-Camera           → enquadramento e shake
+controllers                 → fighter.intent                         ✅
+fighter.advanceStateTime    → tempo no estado atual                  ✅
+MovementSystem.applyIntents → direção, pulo, aceleração horizontal   ✅
+PhysicsSystem               → gravidade, integração, chão, paredes   ✅
+CollisionSystem             → separa corpos sobrepostos              ✅
+MovementSystem.updateStates → IDLE / WALKING / JUMPING               ✅
+AnimationSystem             → tempo, ciclo de passos, blends         ✅
+CombatSystem                → hitboxes, bloqueio, dano, knockback, stun → emite eventos   ⏳
+EffectsSystem               → consome eventos → partículas, flash, pedido de shake        ⏳
+Camera                      → enquadramento e shake                                       ⏳
 ```
+
+`MovementSystem` só mexe em lutadores com `canMove`. Estados de combate (ataque, stun...) vão bloquear a locomoção automaticamente.
+
+Ordem do `DuelRenderer.render` (camadas do VISUAL_SYSTEM):
+
+```
+arena → luz dos sabres no chão → corpos (sombra, capa, pernas, túnica, cabeça, braços) → sabres
+```
+
+A pose de cada lutador é calculada por `computePose` a partir do estado e da animação, em coordenadas locais (origem nos pés, olhando para a direita). O renderer espelha com `scale(facing, 1)`. Os objetos de pose são reutilizados entre frames.
 
 ---
 
@@ -241,7 +288,8 @@ Arquivo: [src/utils/debug.js](src/utils/debug.js)
 
 - Liga e desliga com `F3`. O valor inicial vem de `gameConfig.debug.enabled`.
 - Mostra FPS, a pilha de estados e as linhas de `getDebugInfo()` de cada estado.
-- Futuro: hitboxes, hurtboxes, posição, velocidade, estado do lutador e decisões da IA.
+- Chama `renderDebug(renderer)` de cada estado para desenhos de debug. O `DuelState` desenha a caixa do corpo de cada lutador e mostra estado, posição e velocidade.
+- Futuro: hitboxes, hurtboxes e decisões da IA.
 
 ---
 
@@ -257,10 +305,11 @@ Arquivo: [src/utils/debug.js](src/utils/debug.js)
 
 Testes rodam em Node (`npm test`), sem navegador. Por isso:
 
-- Módulos de lógica (`states/`, `characters/`, `entities/`, `combat/`, `systems/`, `ai/`, `config/`, `utils/`) **não** acessam `window`, `document` ou canvas. Estados desenham só pela API do `Renderer` recebido em `render`.
+- Módulos de lógica (`states/`, `characters/`, `controllers/`, `entities/`, `combat/`, `systems/`, `ai/`, `config/`, `utils/`) **não** acessam `window`, `document` ou canvas. Estados e `rendering/` desenham só pela API do `Renderer` recebido.
 - Quando um módulo do core precisa do navegador (`Input`, `GameLoop`), a dependência é injetada.
+- `computePose` é uma função pura e também é testada.
 
-Testes atuais: `gameLoop`, `input`, `stateMachine`, `states` (fluxo Menu → Duelo → Pausa → Menu) e `debug`.
+Testes atuais: `gameLoop`, `input`, `stateMachine`, `states` (fluxo Menu → Duelo → Pausa → Menu), `debug`, `math`, `fighter`, `playerController`, `movement`, `physics` (inclui colisão) e `animation` (inclui pose). Utilitários compartilhados ficam em `tests/helpers.js`.
 
 ---
 
@@ -268,10 +317,11 @@ Testes atuais: `gameLoop`, `input`, `stateMachine`, `states` (fluxo Menu → Due
 
 ```
 core/Game     → core, states/stateFactory, config, utils
-states        → states/stateIds, systems, combat, ai, characters, entities, rendering, config
+states        → states/stateIds, systems, combat, ai, controllers, characters, entities, rendering, config
 characters    → entities, config
+controllers   → config
 systems / combat / ai → entities, config, utils
-rendering     → config
+rendering     → config, utils
 entities      → config, utils
 core (resto)  → config
 ```
