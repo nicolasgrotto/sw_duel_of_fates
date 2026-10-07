@@ -19,7 +19,7 @@ export class Game {
     this.input = new Input({ bindings: keyBindings, target: window, getGamepads: () => navigator.getGamepads?.() ?? [] });
     this.states = new StateMachine();
     this.settings = loadSettings(
-      { keyboardPreset: 'classic', difficulty: aiConfig.defaultDifficulty, reducedEffects: false, sound: true, music: true },
+      { keyboardPreset: 'classic', difficulty: aiConfig.defaultDifficulty, reducedEffects: false, sound: true, music: true, parryChallengeBest: 0 },
       globalThis.localStorage,
       gameConfig.settingsStorageKey,
       { difficulty: aiConfig.difficultyOrder, keyboardPreset: keyboardPresetOrder },

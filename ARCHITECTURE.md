@@ -49,10 +49,13 @@ src/
   characters/               ✅ dados e criação de personagens
     characterData.js        ✅ personagens: nome, arquétipo, perfil de IA, aparência
     characterFactory.js     ✅ cria um Fighter a partir dos dados
+  modes/                    ✅ regras de modos de jogo, puras e testáveis (sem render)
+    TutorialDirector.js     ✅ passos do tutorial: objetivo, progresso e comportamento do boneco
+    ParryChallenge.js       ✅ desafio de parry: tempo, pontos e resumo
   controllers/              ✅ quem controla um lutador
     PlayerController.js     ✅ Input → intent
     IntentRecorder.js       ✅ buffer Uint16 fixo: grava intents e reproduz movimento relativo
-    DummyController.js      ✅ boneco de treino (parado, bloqueando, atacando)
+    DummyController.js      ✅ boneco (parado, bloqueando, rápidos, fortes em intervalos aleatórios); se aproxima ao atacar
   entities/                 ✅ objetos do jogo
     Fighter.js              ✅ posição, velocidade, estado, intent, animação
     fighterStates.js        ✅ estados do lutador
@@ -98,6 +101,7 @@ src/
     Hud.js                  ✅ nomes, barras de vida (com fantasma) e stamina
     CombatMessage.js        ✅ mensagens curtas (ROUND 1/2/FINAL, K.O.) com fade
     Letterbox.js            ✅ barras cinematográficas (alvo suave + pulso curto)
+    ModeBanner.js           ✅ instrução e progresso do tutorial, tempo e pontos do desafio
     keyLabels.js            ✅ nomes de teclas a partir do controlsConfig
     formatText.js           ✅ textos com {placeholders}
     moveList.js             ✅ monta a lista de golpes a partir dos dados do personagem e das teclas ativas
@@ -106,6 +110,7 @@ src/
     themeConfig.js          ✅ cores, estilos de texto, animação de UI
     controlsConfig.js       ✅ ações e teclas
     uiConfig.js             ✅ textos da interface e layout das telas
+    tutorialConfig.js       ✅ passos do tutorial (objetivo, contagem, boneco) e regras do desafio de parry
     aiConfig.js             ✅ perfis, dificuldades e percepção da IA
     audioConfig.js          ✅ volumes, receitas de som, zumbido e música
     movesConfig.js          ✅ golpes por personagem: base de atributos, tipo, pose e cancelsInto
@@ -349,6 +354,8 @@ Arquivos: [src/ui/](src/ui/), [src/config/uiConfig.js](src/config/uiConfig.js). 
 - `DuelState`: intro de `layout.messages.introDuration` com controles travados (ROUND 1/2/FINAL). `roundWins` guarda o placar do melhor de 3 (`roundsToWin = 2`) e alimenta os quadrados espelhados da HUD. No K.O., soma a vitória uma vez e espera `resultDelay`: reinicia o round ou empilha o resultado. `Fighter.resetForRound(x, facing)` restaura posição, vida, stamina, combate, intent e animação, preservando as referências dos dados. Controllers de IA e feedback visual são renovados; o Treino mantém o comportamento do boneco e reinicia sem limite. As estatísticas somam todos os rounds e são contadas para os dois lutadores (`fighterStats`, com `stats` = jogador): golpes, dano (o evento `hit` carrega `damage`), defesas, parries comuns e perfeitos, quebras de guarda, empurrões e a maior sequência (passo do golpe `lightN` que acertou). O resultado mostra uma tabela com uma coluna por lutador e a duração. A pausa tem "Lista de golpes", que empilha o `MoveListState` com o personagem do jogador (`duelParams.playerCharacter`). Se um trade matar ambos, nenhum ponto é somado e começa outro round.
 
 ---
+
+Modos com boneco (`duelModes.usesDummy`: Treino, Tutorial e Desafio de parry) não têm limite de rounds (`hasRoundLimit`). Tutorial e desafio criam um **diretor** em `DuelState.createDirector()`: `TutorialDirector` ou `ParryChallenge`. O diretor só lê eventos (`handleEvents(events, player)`) e o jogador (`update(dt, player)`), e expõe `dummyBehavior` (o `DuelState` repassa ao `DummyController`) e `isFinished`. Enquanto há diretor, o `DuelState` devolve a vida dos dois ao máximo depois de cada passo. Quando o diretor termina, o `DuelState` empilha o `GameOverState` em modo resumo (`summary`, `title`, `subtitle`, `rematchLabel`, `rematchParams`), sem tabela. O recorde do desafio fica em `settings.parryChallengeBest`. Os objetivos dos passos são dados (`tutorialConfig.steps[].goal`: andar, ou eventos com papel do jogador, tipos de golpe e passo mínimo de sequência via `getChainStep`). O avanço da Vespa emite também `attackStart` com o tipo `special`, para o passo da habilidade valer para todos.
 
 Identidade no duelo: o `Letterbox` fica fechado (alvo 1) na intro e depois do K.O. e abre quando o round está em jogo; o parry perfeito pede um pulso curto. É desenhado depois do mundo e da vinheta e antes da HUD. A ignição é só visual: `DuelState.getBladeExtension()` vai de 0 a 1 durante a intro (`layout.ignition`), o `DuelRenderer` copia o valor para `pose.bladeExtension` e o `saberRenderer` escala o comprimento da lâmina e as luzes por ele. O som `ignite` toca uma vez por round, quando a ignição começa.
 

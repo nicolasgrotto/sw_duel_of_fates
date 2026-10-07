@@ -8,6 +8,8 @@ export const texts = {
   menu: {
     tagline: 'UM DUELO DE LÂMINAS DE ENERGIA',
     duel: 'Duelar',
+    tutorial: 'Tutorial',
+    challenge: 'Desafio de parry',
     training: 'Treino',
     options: 'Opções',
     controls: 'Controles',
@@ -82,6 +84,30 @@ export const texts = {
       counter: 'contra-atacado',
     },
   },
+  tutorial: {
+    steps: {
+      move: 'Ande para a frente e para trás ({left} e {right})',
+      light: 'Ataque rápido: {light}. Acerte o boneco',
+      chain: 'Sequência: aperte {light} de novo quando o primeiro golpe acertar',
+      heavy: 'Ataque forte: {heavy}. Lento, mas pesado',
+      block: 'Segure {block} para bloquear os ataques',
+      parry: 'Toque {block} na hora em que o golpe forte chegar',
+      riposte: 'Depois de aparar, {light} vira a riposta',
+      shove: 'O boneco só defende: segure {block} e aperte {light} para empurrar',
+      special: 'Use a habilidade do seu personagem: {special}',
+    },
+    progress: 'Passo {step} de {steps}   ·   {done} / {count}',
+    doneTitle: 'TUTORIAL CONCLUÍDO',
+    doneSubtitle: 'Agora teste o seu tempo de parry',
+    goToChallenge: 'Desafio de parry',
+    challengeTitle: 'Toque {block} na hora de cada golpe forte',
+    challengeStatus: 'Tempo  {time} s   ·   Pontos  {score}',
+    challengeDoneTitle: 'DESAFIO DE PARRY',
+    score: '{score} pontos   ·   Recorde  {best}',
+    newRecord: '{score} pontos   ·   NOVO RECORDE',
+    challengeSummary: 'Parries  {parries}   ·   Perfeitos  {perfectParries}   ·   Golpes recebidos  {hitsTaken}',
+    tryAgain: 'Tentar de novo',
+  },
   moveList: {
     title: 'GOLPES · {name}',
     moves: {
@@ -154,11 +180,15 @@ export const keyComboSeparator = '  +  ';
 
 export const layout = {
   menu: {
-    titleY: 210,
-    taglineY: 278,
-    firstItemY: 370,
-    itemSpacing: 52,
-    footerY: 660,
+    titleY: 180,
+    taglineY: 246,
+    firstItemY: 330,
+    itemSpacing: 44,
+    footerY: 670,
+  },
+  banner: {
+    titleY: 120,
+    detailY: 152,
   },
   characterSelect: {
     titleY: 110,

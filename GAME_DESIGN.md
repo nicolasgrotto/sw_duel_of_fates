@@ -443,13 +443,33 @@ Armadura: durante o startup (e o active, quando indicado) o golpe aguenta N acer
 
 Custos, tempos e números ficam em `src/config/movesConfig.js` e `fightersConfig.js`.
 
-## 16. Modos e progressão planejados
+## 16. Tutorial e desafio de parry
+
+**Tutorial** (menu → Tutorial): duelo contra o boneco de treino, sem rounds e sem morte (a vida dos dois volta ao máximo). Uma instrução curta aparece no topo, com as teclas do preset ativo e o progresso. Cada passo termina sozinho quando o jogador faz a ação; o boneco muda de comportamento conforme o passo.
+
+| Passo | O que fazer | Boneco |
+| --- | --- | --- |
+| Andar | andar para a frente e para trás | parado |
+| Ataque rápido | acertar 2 rápidos | parado |
+| Sequência | acertar o 2º golpe de uma sequência | parado |
+| Ataque forte | acertar 1 forte | parado |
+| Bloquear | bloquear 2 golpes | ataca com rápidos |
+| Aparar | aparar 2 fortes | ataca com fortes |
+| Riposta | acertar 1 riposta | ataca com fortes |
+| Empurrão | empurrar 1 vez | bloqueia |
+| Habilidade | usar a habilidade (`I`) 1 vez | parado |
+
+No fim, a tela de resultado oferece o desafio de parry.
+
+**Desafio de parry** (menu → Desafio de parry, ou depois do tutorial): 45 segundos contra o boneco, que se aproxima e lança **só ataques fortes** (que dá para aparar por reação) em intervalos aleatórios. Parry vale 1 ponto, parry perfeito vale 2. Golpes recebidos não tiram pontos, mas aparecem no resumo. O recorde fica salvo no navegador (`settings.parryChallengeBest`).
+
+## 17. Modos e progressão planejados
 
 | Modo | Situação |
 | --- | --- |
 | Versus contra a IA | existe |
 | Treino | existe; ganha dados de frame, boneco que grava e reproduz, hitboxes visíveis |
-| Tutorial / desafio de parry | planejado (alta prioridade) |
+| Tutorial / desafio de parry | existe |
 | Arcade (6 lutas + chefe) | planejado |
 | 2P local | planejado (depende do gamepad) |
 | Sobrevivência | depois do Arcade |

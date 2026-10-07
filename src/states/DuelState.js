@@ -4,7 +4,7 @@ import { EnemyAI } from '../ai/EnemyAI.js';
 import { DuelAudio } from '../audio/DuelAudio.js';
 import { characters } from '../characters/characterData.js';
 import { createFighter } from '../characters/characterFactory.js';
-import { isStrongAttack } from '../combat/attackPhases.js';
+import { getChainStep, isStrongAttack } from '../combat/attackPhases.js';
 import { getFrameAdvantage } from '../combat/frameData.js';
 import { CombatEvent } from '../combat/combatEvents.js';
 import { createBox, getAttackHitbox, isAttackActive, isInvulnerable } from '../combat/hitboxes.js';
@@ -19,6 +19,10 @@ import { layout, texts } from '../config/uiConfig.js';
 import { ENCODED_INTENT_RANGE, IntentRecorder, encodeIntent } from '../controllers/IntentRecorder.js';
 import { formatIntent } from '../ui/trainingInputs.js';
 import { DummyController } from '../controllers/DummyController.js';
+import { tutorialConfig } from '../config/tutorialConfig.js';
+import { ParryChallenge } from '../modes/ParryChallenge.js';
+import { TutorialDirector } from '../modes/TutorialDirector.js';
+import { BannerKind, ModeBanner } from '../ui/ModeBanner.js';
 import { Camera } from '../core/Camera.js';
 import { PlayerController } from '../controllers/PlayerController.js';
 import { DuelRenderer } from '../rendering/DuelRenderer.js';
@@ -34,18 +38,11 @@ import { clamp } from '../utils/math.js';
 import { formatActionKeys } from '../ui/keyLabels.js';
 import { createRandom, createRandomSeed } from '../utils/random.js';
 import { GameState } from './GameState.js';
-import { DuelMode } from './duelModes.js';
+import { DuelMode, hasRoundLimit, usesDummy } from './duelModes.js';
 import { StateId } from './stateIds.js';
 
 function createFighterStats() {
   return { hits: 0, damage: 0, blocks: 0, parries: 0, perfectParries: 0, guardBreaks: 0, shoves: 0, longestChain: 0 };
-}
-
-function getChainStep(attackType) {
-  if (attackType === 'light') {
-    return 1;
-  }
-  return attackType?.startsWith('light') ? Number(attackType.slice('light'.length)) : 0;
 }
 
 export class DuelState extends GameState {
@@ -100,23 +97,102 @@ export class DuelState extends GameState {
     this.message = new CombatMessage();
     this.letterbox = new Letterbox(layout.letterbox);
     this.ignited = false;
+    this.createDirector();
     this.showRoundIntro();
     this.pauseHint = formatText(texts.duel.pauseHint, { pause: formatActionKeys(this.game.input.bindings ?? keyBindings, Action.PAUSE) });
   }
 
+  createDirector() {
+    this.director = null;
+    this.banner = null;
+    this.modeFinished = false;
+    const bindings = this.game.input.bindings ?? keyBindings;
+    if (this.mode === DuelMode.TUTORIAL) {
+      this.director = new TutorialDirector(tutorialConfig.steps);
+      this.banner = new ModeBanner(BannerKind.TUTORIAL, this.director, bindings);
+    } else if (this.mode === DuelMode.CHALLENGE) {
+      this.director = new ParryChallenge(tutorialConfig.challenge);
+      this.banner = new ModeBanner(BannerKind.CHALLENGE, this.director, bindings);
+    }
+    this.applyDummyBehavior();
+  }
+
+  applyDummyBehavior() {
+    if (this.director) {
+      this.opponentController.setBehavior(this.director.dummyBehavior);
+    }
+  }
+
+  updateDirector(dt) {
+    if (!this.director || !this.isPlaying()) {
+      return;
+    }
+    this.director.update(dt, this.player);
+    this.applyDummyBehavior();
+    this.banner.update();
+    if (this.director.isFinished && !this.modeFinished) {
+      this.modeFinished = true;
+      this.showModeResult();
+    }
+  }
+
+  showModeResult() {
+    if (this.mode === DuelMode.TUTORIAL) {
+      this.game.pushState(StateId.GAME_OVER, {
+        duelParams: this.params,
+        title: texts.tutorial.doneTitle,
+        subtitle: texts.tutorial.doneSubtitle,
+        summary: '',
+        rematchLabel: texts.tutorial.goToChallenge,
+        rematchParams: { mode: DuelMode.CHALLENGE },
+      });
+      return;
+    }
+    const { score, parries, perfectParries, hitsTaken } = this.director;
+    const best = this.game.settings.parryChallengeBest ?? 0;
+    if (score > best) {
+      this.game.settings.parryChallengeBest = score;
+      this.game.saveSettings();
+    }
+    this.game.pushState(StateId.GAME_OVER, {
+      duelParams: this.params,
+      title: texts.tutorial.challengeDoneTitle,
+      subtitle: formatText(score > best ? texts.tutorial.newRecord : texts.tutorial.score, { score, best: Math.max(best, score) }),
+      summary: formatText(texts.tutorial.challengeSummary, { parries, perfectParries, hitsTaken }),
+      rematchLabel: texts.tutorial.tryAgain,
+      rematchParams: this.params,
+    });
+  }
+
+  keepFightersAlive() {
+    for (const fighter of this.fighters) {
+      if (fighter.isAlive) {
+        fighter.health = fighter.stats.maxHealth;
+      }
+    }
+  }
+
+  get usesDummy() {
+    return usesDummy(this.mode);
+  }
+
+  get hasRoundLimit() {
+    return hasRoundLimit(this.mode);
+  }
+
   createHud() {
-    const rounds = this.isTraining ? null : { wins: this.roundWins, roundsToWin: gameConfig.duel.roundsToWin };
+    const rounds = this.hasRoundLimit ? { wins: this.roundWins, roundsToWin: gameConfig.duel.roundsToWin } : null;
     return new Hud(this.fighters[0], this.fighters[1], rounds);
   }
 
   showRoundIntro() {
-    const isFinal = !this.isTraining && this.roundWins.every((wins) => wins === gameConfig.duel.roundsToWin - 1);
+    const isFinal = this.hasRoundLimit && this.roundWins.every((wins) => wins === gameConfig.duel.roundsToWin - 1);
     const text = isFinal ? texts.duel.finalRound : formatText(texts.duel.intro, { number: this.roundNumber });
     this.message.show(text, layout.messages.introDuration);
   }
 
   finishRound() {
-    if (!this.isTraining && this.outcome.winner && this.roundWins.some((wins) => wins >= gameConfig.duel.roundsToWin)) {
+    if (this.hasRoundLimit && this.outcome.winner && this.roundWins.some((wins) => wins >= gameConfig.duel.roundsToWin)) {
       this.showResult();
       return;
     }
@@ -129,7 +205,7 @@ export class DuelState extends GameState {
     this.fighters[0].resetForRound(centerX - half, 1);
     this.fighters[1].resetForRound(centerX + half, -1);
     this.participants[0].controller.clearCapturedInput();
-    if (this.isTraining) {
+    if (this.usesDummy) {
       this.opponentController.attackTimer = 0;
     } else {
       this.opponentController = this.createOpponentController(this.fighters[1], this.player, this.opponentCharacter);
@@ -168,8 +244,10 @@ export class DuelState extends GameState {
   }
 
   createOpponentController(opponent, player, characterId) {
-    if (this.mode === DuelMode.TRAINING) {
-      return new DummyController(gameConfig.duel.dummy);
+    if (this.usesDummy) {
+      const dummy = new DummyController(gameConfig.duel.dummy, this.random);
+      dummy.setFighters(opponent, player);
+      return dummy;
     }
 
     return new EnemyAI({
@@ -230,6 +308,7 @@ export class DuelState extends GameState {
     }
 
     this.updateTrainingStatus();
+    this.updateDirector(dt);
     for (const ambient of this.ambients) {
       ambient.update(dt);
     }
@@ -281,6 +360,10 @@ export class DuelState extends GameState {
       }
     }
     this.hud.handleEvents(this.simulation.events);
+    if (this.director) {
+      this.director.handleEvents(this.simulation.events, this.player);
+      this.keepFightersAlive();
+    }
     this.rememberLastEvent();
     this.countPlayerStats();
     this.updateFrameData();
@@ -416,7 +499,7 @@ export class DuelState extends GameState {
       if (event.type === CombatEvent.DEATH) {
         const winner = this.fighters.every((fighter) => !fighter.isAlive) ? null : event.attacker;
         this.outcome = { winner, loser: event.defender, time: 0 };
-        if (winner && !this.isTraining) {
+        if (winner && this.hasRoundLimit) {
           this.roundWins[this.fighters.indexOf(winner)] += 1;
         }
         this.clearAllIntents();
@@ -459,6 +542,7 @@ export class DuelState extends GameState {
     }
     this.letterbox.render(renderer);
     this.hud.render(renderer);
+    this.banner?.render(renderer);
     this.message.render(renderer);
 
     if (this.isTraining) {
@@ -492,7 +576,7 @@ export class DuelState extends GameState {
     const lines = [
       `round: ${this.roundNumber}  wins: ${this.roundWins.join(" / ")}`,
       `duel time: ${this.duelTime.toFixed(2)}s`,
-      this.isTraining
+      this.usesDummy
         ? `dummy (F4): ${this.opponentController.behavior}`
         : `ai: ${this.opponentController.decision} (${this.game.settings.difficulty})`,
       `last event: ${this.lastEvent}`,

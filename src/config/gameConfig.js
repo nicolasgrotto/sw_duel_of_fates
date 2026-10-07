@@ -39,6 +39,8 @@ export const gameConfig = {
     training: { recordingFrames: 600 },
     dummy: {
       attackInterval: 1.4,
+      heavyInterval: [1.1, 2.1],
+      approachGap: 40,
     },
   },
   debug: {

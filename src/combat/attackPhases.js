@@ -40,6 +40,13 @@ export function isSaberAttack(attackType) {
   return attackType !== null && attackType !== AttackType.SHOVE;
 }
 
+export function getChainStep(attackType) {
+  if (attackType === AttackType.LIGHT) {
+    return 1;
+  }
+  return attackType?.startsWith(AttackType.LIGHT) ? Number(attackType.slice(AttackType.LIGHT.length)) : 0;
+}
+
 export function getAttackDuration(attack) {
   return attack.startup + attack.active + attack.recovery;
 }

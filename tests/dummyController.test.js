@@ -5,7 +5,7 @@ import { STEP, repeat, spawnFighter } from './helpers.js';
 
 describe('DummyController', () => {
   it('cycles idle, block and attack', () => {
-    const dummy = new DummyController({ attackInterval: 1 });
+    const dummy = new DummyController({ attackInterval: 1, heavyInterval: [1, 1], approachGap: 40 });
 
     assert.equal(dummy.behavior, DummyBehavior.IDLE);
     dummy.cycleBehavior();
@@ -13,11 +13,13 @@ describe('DummyController', () => {
     dummy.cycleBehavior();
     assert.equal(dummy.behavior, DummyBehavior.ATTACK);
     dummy.cycleBehavior();
+    assert.equal(dummy.behavior, DummyBehavior.HEAVY);
+    dummy.cycleBehavior();
     assert.equal(dummy.behavior, DummyBehavior.IDLE);
   });
 
   it('holds block in block mode', () => {
-    const dummy = new DummyController({ attackInterval: 1 });
+    const dummy = new DummyController({ attackInterval: 1, heavyInterval: [1, 1], approachGap: 40 });
     const fighter = spawnFighter(400);
     dummy.cycleBehavior();
 
@@ -28,7 +30,7 @@ describe('DummyController', () => {
   });
 
   it('attacks once per interval in attack mode', () => {
-    const dummy = new DummyController({ attackInterval: 0.5 });
+    const dummy = new DummyController({ attackInterval: 0.5, heavyInterval: [1, 1], approachGap: 40 });
     const fighter = spawnFighter(400);
     dummy.cycleBehavior();
     dummy.cycleBehavior();

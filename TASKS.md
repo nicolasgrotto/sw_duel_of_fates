@@ -186,7 +186,7 @@ As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e des
 
 ### v0.5 — Modos
 
-- [ ] Tutorial / desafio de parry
+- [x] Tutorial / desafio de parry (9 passos guiados, desafio de 45 s com recorde salvo)
 - [ ] Arcade (6 lutas + chefe)
 - [ ] 2P local
 - [x] Tela de resultado completa e lista de golpes na pausa (e IA que pune depois de bloquear e guarda ao sair do hitstun)

@@ -83,7 +83,8 @@ describe('state flow', () => {
     game.changeState(StateId.MENU);
 
     game.step(Action.MENU_DOWN);
-    game.step(Action.CONFIRM);
+    game.step(Action.MENU_DOWN);
+    game.step(Action.MENU_DOWN);
     game.step(Action.CONFIRM);
 
     assert.equal(game.states.current.mode, DuelMode.TRAINING);
@@ -93,6 +94,8 @@ describe('state flow', () => {
     const game = createFakeGame();
     game.changeState(StateId.MENU);
 
+    game.step(Action.MENU_DOWN);
+    game.step(Action.MENU_DOWN);
     game.step(Action.MENU_DOWN);
     game.step(Action.MENU_DOWN);
     game.step(Action.CONFIRM);
@@ -119,6 +122,8 @@ describe('state flow', () => {
     assert.equal(game.saved, 5);
 
     game.step(Action.BACK);
+    game.step(Action.MENU_UP);
+    game.step(Action.MENU_UP);
     game.step(Action.MENU_UP);
     game.step(Action.MENU_UP);
     game.step(Action.CONFIRM);
@@ -543,6 +548,52 @@ it('counts the stats of both fighters for the result table', () => {
   assert.equal(duel.fighterStats[1].damage, 10);
   assert.equal(duel.fighterStats[1].longestChain, 3);
   assert.equal(duel.fighterStats[0].shoves, 1);
+});
+
+it('runs the tutorial to the end and offers the parry challenge', () => {
+  const game = createFakeGame();
+  game.changeState(StateId.DUEL, { mode: DuelMode.TUTORIAL });
+  const duel = game.states.current;
+  assert.equal(duel.hud.rounds, null);
+  assert.equal(duel.opponentController.behavior, 'idle');
+
+  skipIntro(game);
+  while (!duel.director.isFinished) {
+    duel.director.advance();
+  }
+  game.step();
+
+  const result = game.states.current;
+  assert.deepEqual(game.stateNames(), ['DuelState', 'GameOverState']);
+  assert.equal(result.title, 'TUTORIAL CONCLUÍDO');
+  game.step(Action.CONFIRM);
+  assert.equal(game.states.current.mode, DuelMode.CHALLENGE);
+});
+
+it('saves the best parry challenge score', () => {
+  const game = createFakeGame();
+  game.settings.parryChallengeBest = 2;
+  game.changeState(StateId.DUEL, { mode: DuelMode.CHALLENGE });
+  const duel = game.states.current;
+  assert.equal(duel.opponentController.behavior, 'heavy');
+
+  skipIntro(game);
+  duel.director.score = 5;
+  duel.director.update(60);
+  game.step();
+
+  assert.equal(game.settings.parryChallengeBest, 5);
+  assert.ok(game.states.current.winnerLine.includes('NOVO RECORDE'));
+});
+
+it('keeps both fighters at full health in the tutorial', () => {
+  const game = createFakeGame();
+  game.changeState(StateId.DUEL, { mode: DuelMode.TUTORIAL });
+  const duel = game.states.current;
+  skipIntro(game);
+  duel.fighters[1].health = 10;
+  game.step();
+  assert.equal(duel.fighters[1].health, duel.fighters[1].stats.maxHealth);
 });
 
 it('goes back from the opponent step to the player step', () => {

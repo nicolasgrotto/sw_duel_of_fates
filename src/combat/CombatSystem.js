@@ -243,6 +243,7 @@ export class CombatSystem {
     }
     spendStamina(fighter, move.staminaCost);
     this.startDodge(fighter, move.dash, fighter.facing, move.dash.passThrough);
+    this.emitAction(CombatEvent.ATTACK_START, fighter, AttackType.SPECIAL);
     return true;
   }
 

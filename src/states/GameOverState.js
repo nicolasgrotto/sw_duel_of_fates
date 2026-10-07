@@ -16,8 +16,31 @@ function formatSeconds(seconds) {
 
 export class GameOverState extends GameState {
   enter() {
-    const { playerWon, winnerName, stats } = this.params;
+    if (this.params.summary !== undefined) {
+      this.enterSummary();
+    } else {
+      this.enterDuelResult();
+    }
+    this.menu = new MenuList(
+      [
+        { id: GameOverOption.REMATCH, label: this.params.rematchLabel ?? texts.result.rematch },
+        { id: GameOverOption.MENU, label: texts.result.menu },
+      ],
+      layout.result,
+      this.game.audio,
+    );
+  }
 
+  enterSummary() {
+    this.title = this.params.title;
+    this.winnerLine = this.params.subtitle;
+    this.statsLine = this.params.summary;
+    this.names = ['', ''];
+    this.rows = [];
+  }
+
+  enterDuelResult() {
+    const { playerWon, winnerName, stats } = this.params;
     this.title = playerWon ? texts.result.victory : texts.result.defeat;
     this.winnerLine = formatText(texts.result.winner, { name: winnerName });
     this.statsLine = formatText(texts.result.time, { time: formatSeconds(stats.time) });
@@ -28,21 +51,13 @@ export class GameOverState extends GameState {
       left: String(Math.round(stats[key] ?? 0)),
       right: String(Math.round(opponentStats[key] ?? 0)),
     }));
-    this.menu = new MenuList(
-      [
-        { id: GameOverOption.REMATCH, label: texts.result.rematch },
-        { id: GameOverOption.MENU, label: texts.result.menu },
-      ],
-      layout.result,
-      this.game.audio,
-    );
   }
 
   update() {
     const choice = this.menu.update(this.game.input);
 
     if (choice === GameOverOption.REMATCH) {
-      this.game.changeState(StateId.DUEL, this.params.duelParams);
+      this.game.changeState(StateId.DUEL, this.params.rematchParams ?? this.params.duelParams);
     } else if (choice === GameOverOption.MENU) {
       this.game.changeState(StateId.MENU);
     }
@@ -61,6 +76,9 @@ export class GameOverState extends GameState {
   }
 
   renderTable(renderer, centerX) {
+    if (this.rows.length === 0) {
+      return;
+    }
     const { tableY, tableRowSpacing, tableColumnGap } = layout.result;
     renderer.text(this.names[0], centerX - tableColumnGap, tableY, textStyles.resultName);
     renderer.text(this.names[1], centerX + tableColumnGap, tableY, textStyles.resultName);

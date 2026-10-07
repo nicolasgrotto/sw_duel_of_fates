@@ -11,6 +11,8 @@ import { StateId } from './stateIds.js';
 
 export const MenuOption = Object.freeze({
   DUEL: 'duel',
+  TUTORIAL: 'tutorial',
+  CHALLENGE: 'challenge',
   TRAINING: 'training',
   OPTIONS: 'options',
   CONTROLS: 'controls',
@@ -21,6 +23,8 @@ export class MenuState extends GameState {
     this.menu = new MenuList(
       [
         { id: MenuOption.DUEL, label: texts.menu.duel },
+        { id: MenuOption.TUTORIAL, label: texts.menu.tutorial },
+        { id: MenuOption.CHALLENGE, label: texts.menu.challenge },
         { id: MenuOption.TRAINING, label: texts.menu.training },
         { id: MenuOption.OPTIONS, label: texts.menu.options },
         { id: MenuOption.CONTROLS, label: texts.menu.controls },
@@ -47,6 +51,12 @@ export class MenuState extends GameState {
     switch (this.menu.update(this.game.input)) {
       case MenuOption.DUEL:
         this.game.changeState(StateId.CHARACTER_SELECT, { mode: DuelMode.VERSUS });
+        break;
+      case MenuOption.TUTORIAL:
+        this.game.changeState(StateId.DUEL, { mode: DuelMode.TUTORIAL });
+        break;
+      case MenuOption.CHALLENGE:
+        this.game.changeState(StateId.DUEL, { mode: DuelMode.CHALLENGE });
         break;
       case MenuOption.TRAINING:
         this.game.changeState(StateId.DUEL, { mode: DuelMode.TRAINING });
