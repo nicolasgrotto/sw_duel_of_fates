@@ -147,3 +147,23 @@ Cada arena descreve camadas estáticas de geometria em tokens da paleta existent
 ### Plataforma de Refino
 
 Três planos de geometria procedural: pilares distantes em wall com alpha 0,25; passarelas e feixes verticais em floorEdge com alpha 0,16; plataforma metálica de 32 px sobre fosso escuro, com segmentos e suportes em wall. Vapor lento atrás dos corpos, alpha máximo 0,06, sem encobrir as silhuetas. A luz existente dos sabres no chão produz o reflexo da superfície. Sem cores novas nem assets externos.
+
+### Santuário Alagado
+
+Templo em ruínas à noite, com uma lâmina d'água rasa no chão.
+
+- **Fundo**: lua grande e fria (glow em `arenaMoon`), colunas de pedra quebradas em alturas diferentes (`arenaStone`), um arco partido e escombros. Nada em contraste alto.
+- **Chão**: água escura (`arenaWater`) com borda clara (`arenaWaterEdge`). Os lutadores e as lâminas **se refletem** na água, de cabeça para baixo e escurecidos (regra de reflexo no VISUAL_SYSTEM).
+- **Ambiente**: anéis de ondulação pequenos e lentos na superfície da água e poeira fina caindo na luz da lua.
+- **Atmosfera**: silêncio e respeito. É a arena mais calma do jogo.
+
+### Mina de Cristal
+
+Caverna escura, com cristais nas paredes.
+
+- **Fundo**: rocha quase preta (`arenaRock`) em camadas de silhuetas irregulares, com estalactites. Cristais angulosos (`arenaCrystal`, borda `arenaCrystalEdge`) espalhados em dois planos.
+- **Assinatura**: os cristais **pegam a cor do sabre mais próximo** (regra de cristais no VISUAL_SYSTEM). A caverna muda de cor conforme os lutadores se movem. É o pilar "o sabre é a fonte de luz" levado ao cenário.
+- **Chão**: rocha (`arenaRock`) com borda em `arenaCrystalEdge`.
+- **Ambiente**: brilhos minúsculos que flutuam devagar.
+
+Elementos interativos (colunas que caem, cristais que estilhaçam) ficam para o futuro: a arena reage a eventos de combate, como o `EffectsSystem`, sem mexer no combate.

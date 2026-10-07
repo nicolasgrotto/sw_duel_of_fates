@@ -134,6 +134,13 @@ Cores compartilhadas (em `themeConfig`):
 | `hitFlash` | `#ffffff` | silhueta branca por 0,06 s ao receber hit |
 | `saberFlare` | `#ffffff` | brilho extra da lâmina de quem aparou |
 | `letterbox` | `#000000` | barras cinematográficas |
+| `arenaStone` | `#1d2430` | pedra do Santuário Alagado |
+| `arenaMoon` | `#9fb7d9` | luz da lua no Santuário |
+| `arenaWater` | `#0a1622` | água do Santuário |
+| `arenaWaterEdge` | `#3b5f80` | borda da água |
+| `arenaRock` | `#110d16` | rocha da Mina de Cristal |
+| `arenaCrystal` | `#2a2140` | corpo dos cristais |
+| `arenaCrystalEdge` | `#4d3d70` | aresta dos cristais e borda do chão da Mina |
 
 ## Sabre
 
@@ -197,6 +204,18 @@ Controlado pela **Camera**, a pedido do `EffectsSystem`. Nunca diretamente pelo 
 - Use pool de partículas, sem criar objetos novos a cada frame.
 - Limite o número de partículas ativas (ver VFX_GUIDELINES).
 - Sempre restaure o estado do contexto (`save`/`restore`) depois de mudar composite, alpha ou transform.
+
+## Arenas
+
+Arenas são dados (`src/arenas/arenaData.js`) com cores sempre por token. Primitivas disponíveis nas camadas: retângulos, linhas, polígonos, círculos e glows. Camadas estáticas são pré-renderizadas.
+
+### Reflexo na água
+
+Quando a arena tem `reflection`, os corpos e as lâminas são desenhados espelhados no eixo do chão, logo depois do chão. Por cima vem uma película da cor da água (`reflection.cover`), que escurece o reflexo por igual, inclusive o brilho das lâminas. O reflexo nunca fica mais forte que os lutadores e não tem sombra no chão.
+
+### Cristais que pegam a cor do sabre
+
+Cada cristal tem um corpo fixo (pré-renderizado) e um brilho dinâmico. A cada frame o brilho usa a cor do sabre do lutador mais próximo, com intensidade que cai com a distância (`crystalGlow.range`) e alpha máximo baixo (`crystalGlow.alpha`). O brilho é aditivo e fica atrás dos corpos.
 
 ## Enquadramento dinâmico
 
