@@ -131,7 +131,7 @@ Plano aprovado depois da análise de game design da v0.1. Cada versão é jogáv
 - [x] Pacote de impacto: hit flash, tremor no hit stop, punch-in da câmera
 - [x] Melhor de 3 rounds (HUD com rounds, intro por round, estatísticas do duelo inteiro)
 - [x] Rebalanceamento "poucos golpes, todos importantes" validado com `npm run simulate`
-- [ ] Dados de frame no modo Treino
+- [x] Dados de frame no modo Treino
 
 Verificação visual: Chrome headless em localhost:8080, Canvas 1280×720. Parry comum e perfeito e empurrão gerados pela DuelSimulation real; anéis, flare e sabres coloridos sobre o mundo dessaturado conferidos com deslocamento máximo de câmera. Controles legíveis, incluindo L + J. Sem correções necessárias.
 

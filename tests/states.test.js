@@ -419,3 +419,23 @@ describe('duel rounds', () => {
     assert.ok(game.states.current.defenseStatsLine.includes('Perfeitos  1'));
   });
 });
+
+it('shows localized frame data only for player contacts in training', () => {
+  const game = createFakeGame();
+  game.changeState(StateId.DUEL, { mode: DuelMode.TRAINING });
+  const duel = game.states.current;
+  const [player, opponent] = duel.fighters;
+  player.combat.attack = player.stats.attacks.heavy;
+  player.stateTime = player.stats.attacks.heavy.startup;
+  opponent.combat.blockstun = 0.28;
+  opponent.restartState('BLOCKING');
+  duel.simulation.events.push({ type: 'block', attackType: 'heavy', attacker: player, defender: opponent });
+  duel.updateFrameData();
+  assert.equal(duel.frameDataLine, 'Forte · bloqueado · −0,26 s');
+  duel.startNextRound();
+  assert.equal(duel.frameDataLine, '');
+  duel.mode = DuelMode.VERSUS;
+  duel.simulation.events.push({ type: 'block', attackType: 'heavy', attacker: player, defender: opponent });
+  duel.updateFrameData();
+  assert.equal(duel.frameDataLine, '');
+});

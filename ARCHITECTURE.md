@@ -62,6 +62,7 @@ src/
   combat/                   ✅ regras de combate
     CombatSystem.js         ✅ ações, timers, hits, bloqueio, quebra de guarda, morte, eventos
     attackPhases.js         ✅ tipos de ataque e fases (startup, active, recovery)
+    frameData.js            ✅ vantagem: travamento restante do defensor menos o do atacante
     actionBuffer.js         ✅ buffer de input: ação apertada fica guardada até o lutador poder agir
     hitboxes.js             ✅ hitbox, hurtbox, sobreposição, invulnerabilidade
     combatEvents.js         ✅ tipos e criação de eventos de combate
@@ -322,6 +323,8 @@ Arquivos: [src/ui/](src/ui/), [src/config/uiConfig.js](src/config/uiConfig.js). 
 - `DuelState`: intro de `layout.messages.introDuration` com controles travados (ROUND 1/2/FINAL). `roundWins` guarda o placar do melhor de 3 (`roundsToWin = 2`) e alimenta os quadrados espelhados da HUD. No K.O., soma a vitória uma vez e espera `resultDelay`: reinicia o round ou empilha o resultado. `Fighter.resetForRound(x, facing)` restaura posição, vida, stamina, combate, intent e animação, preservando as referências dos dados. Controllers de IA e feedback visual são renovados; o Treino mantém o comportamento do boneco e reinicia sem limite. As estatísticas (tempo ativo, hits, bloqueios, parries comuns/perfeitos e quebras de guarda causadas) somam todos os rounds e aparecem em duas linhas no resultado. Se um trade matar ambos, nenhum ponto é somado e começa outro round.
 
 ---
+
+No Treino, `DuelState.updateFrameData` lê os contatos do jogador e usa `combat/frameData.js`, puro e testável, para comparar os tempos de travamento restantes. Ataque em curso usa startup+active+recovery menos stateTime; bloqueio usa blockstun; hit/stun/stagger usam stunDuration menos stateTime. Parry cancelou o ataque: o stagger do atacante produz a desvantagem correta. Contatos de K.O. são ignorados, pois não há próxima ação. Texto em `uiConfig.training`, linha hint acima da pausa, limpa no próximo round.
 
 ## Renderer
 

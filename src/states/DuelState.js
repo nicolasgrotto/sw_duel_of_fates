@@ -2,6 +2,7 @@ import { EnemyAI } from '../ai/EnemyAI.js';
 import { DuelAudio } from '../audio/DuelAudio.js';
 import { characters } from '../characters/characterData.js';
 import { createFighter } from '../characters/characterFactory.js';
+import { getFrameAdvantage } from '../combat/frameData.js';
 import { CombatEvent } from '../combat/combatEvents.js';
 import { createBox, getAttackHitbox, isAttackActive, isInvulnerable } from '../combat/hitboxes.js';
 import { aiConfig } from '../config/aiConfig.js';
@@ -38,6 +39,7 @@ export class DuelState extends GameState {
     this.roundWins = [0, 0];
     this.roundNumber = 1;
     this.lastEvent = 'none';
+    this.frameDataLine = '';
     this.debugBox = createBox();
     this.mode = this.params.mode ?? DuelMode.VERSUS;
     this.random = createRandom(createRandomSeed());
@@ -109,6 +111,7 @@ export class DuelState extends GameState {
     this.hud = this.createHud();
     this.outcome = null;
     this.introTime = 0;
+    this.frameDataLine = '';
     this.roundNumber += 1;
     this.showRoundIntro();
   }
@@ -209,6 +212,7 @@ export class DuelState extends GameState {
     this.hud.handleEvents(this.simulation.events);
     this.rememberLastEvent();
     this.countPlayerStats();
+    this.updateFrameData();
     this.checkForDeath();
   }
 
@@ -240,6 +244,29 @@ export class DuelState extends GameState {
       } else if (event.type === CombatEvent.GUARD_BREAK && event.attacker === this.player) {
         this.stats.guardBreaks += 1;
       }
+    }
+  }
+
+  updateFrameData() {
+    if (!this.isTraining) {
+      return;
+    }
+    for (const event of this.simulation.events) {
+      const result = texts.training.results[event.type];
+      if (event.attacker !== this.player || !result) {
+        continue;
+      }
+      const advantage = getFrameAdvantage(event.attacker, event.defender);
+      if (advantage === null) {
+        continue;
+      }
+      const rounded = Math.round(advantage * 100) / 100;
+      const sign = rounded < 0 ? '−' : '+';
+      this.frameDataLine = formatText(texts.training.frameData, {
+        attack: texts.training.attacks[event.attackType],
+        result,
+        advantage: sign + Math.abs(rounded).toFixed(2).replace('.', ','),
+      });
     }
   }
 
@@ -290,6 +317,9 @@ export class DuelState extends GameState {
     this.hud.render(renderer);
     this.message.render(renderer);
 
+    if (this.isTraining && this.frameDataLine) {
+      renderer.text(this.frameDataLine, renderer.width / 2, layout.hud.frameDataY, textStyles.hint);
+    }
     if (!this.outcome) {
       renderer.text(this.pauseHint, renderer.width / 2, layout.hud.pauseHintY, textStyles.hint);
     }

@@ -44,6 +44,18 @@ export const texts = {
     knockout: 'K.O.',
     pauseHint: '{pause}  pausar',
   },
+  training: {
+    frameData: '{attack} · {result} · {advantage} s',
+    attacks: { light: 'Rápido', heavy: 'Forte', riposte: 'Riposta', shove: 'Empurrão' },
+    results: {
+      hit: 'acertou',
+      block: 'bloqueado',
+      parry: 'aparado',
+      perfectParry: 'aparado perfeitamente',
+      guardBreak: 'quebrou a guarda',
+      shove: 'desequilibrou',
+    },
+  },
   pause: {
     title: 'PAUSADO',
     resume: 'Continuar',
@@ -136,6 +148,7 @@ export const layout = {
     lowHealthDimAlpha: 0.45,
     rejectFlashDuration: 0.3,
     rejectBlinkPeriod: 0.1,
+    frameDataY: 660,
     roundY: 80,
     roundSize: 8,
     roundGap: 6,
