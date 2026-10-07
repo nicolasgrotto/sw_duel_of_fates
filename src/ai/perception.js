@@ -1,4 +1,4 @@
-import { AttackPhase, getAttackPhase } from '../combat/attackPhases.js';
+import { AttackPhase, getAttackDuration, getAttackPhase } from '../combat/attackPhases.js';
 import { FighterState } from '../entities/fighterStates.js';
 
 const PUNISHABLE_STATES = new Set([FighterState.HIT, FighterState.STAGGERED, FighterState.STUNNED]);
@@ -25,6 +25,17 @@ export function isThreatening(attacker, defender, margin) {
   const isComing = phase === AttackPhase.STARTUP || phase === AttackPhase.ACTIVE;
   const isFacing = getDirectionTo(attacker, defender) === attacker.facing;
   return isComing && isFacing && getGap(attacker, defender) < attack.hitbox.reach + margin;
+}
+
+export function getVulnerableTime(fighter) {
+  if (PUNISHABLE_STATES.has(fighter.state)) {
+    return Math.max(0, fighter.combat.stunDuration - fighter.stateTime);
+  }
+  const { attack } = fighter.combat;
+  if (attack !== null && getAttackPhase(attack, fighter.stateTime) === AttackPhase.RECOVERY) {
+    return getAttackDuration(attack) - fighter.stateTime;
+  }
+  return 0;
 }
 
 export function isPunishable(fighter) {

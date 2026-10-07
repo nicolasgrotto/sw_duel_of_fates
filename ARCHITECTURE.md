@@ -81,7 +81,8 @@ src/
     soundNames.js           ✅ nomes dos sons
   ai/                       ✅ inteligência do oponente
     EnemyAI.js              ✅ controller da IA: pensa em intervalos e preenche o intent
-    perception.js           ✅ leitura pura dos lutadores (distância, ameaça, chance de punir)
+    HabitMemory.js          ✅ memória curta dos hábitos do oponente (fortes, rápidos, tempo bloqueando)
+    perception.js           ✅ leitura pura dos lutadores (distância, ameaça, chance de punir, tempo vulnerável)
   rendering/                ✅ desenho (só lê dados)
     DuelRenderer.js         ✅ ordem das camadas do duelo
     arenaRenderer.js        ✅ ArenaRenderer: camadas e chão em cache, partículas ambientes
@@ -453,6 +454,26 @@ Referência v0.2 (300 rounds por cenário, seed 1): o simulador mede um round po
 | Normal | 63,0% | 15,0 s | 13,9 | 8,4 | 50,7% | 8,6 |
 | Difícil | 59,3% | 16,0 s | 13,7 | 8,5 | 53,7% | 8,9 |
 
+Matriz v0.4 (perfil balanced nos dois lados, 120 duelos por par, seed 1, % de vitória da linha contra a coluna):
+
+| Normal | Guardião | Sombra | Bastião | Vespa | Espelho |
+| --- | --- | --- | --- | --- | --- |
+| Guardião | — | 50 | 56 | 78 | 54 |
+| Sombra | 52 | — | 50 | 67 | 55 |
+| Bastião | 53 | 53 | — | 68 | 46 |
+| Vespa | 35 | 27 | 34 | — | 32 |
+| Espelho | 54 | 48 | 53 | 66 | — |
+
+| Difícil | Guardião | Sombra | Bastião | Vespa | Espelho |
+| --- | --- | --- | --- | --- | --- |
+| Guardião | — | 43 | 53 | 50 | 51 |
+| Sombra | 62 | — | 60 | 52 | 59 |
+| Bastião | 44 | 38 | — | 35 | 49 |
+| Vespa | 50 | 48 | 65 | — | 48 |
+| Espelho | 57 | 38 | 60 | 52 | — |
+
+A Vespa é o personagem de execução: rende pouco com a IA Normal (que completa só 60% das sequências) e fica equilibrada no Difícil. Isso é intencional (dificuldade 4 no GAME_DESIGN). Rode a matriz de novo depois de mexer em atributos.
+
 Nenhum timeout nos seis cenários. Com ambos balanced, Difícil vence Normal 98,7% e Normal vence Fácil 99,3%. Os perfis próprios também medem a vantagem tática do perfil equilibrado sobre o agressivo, não apenas atributos.
 - O trail e a luz do sabre no corpo são só do render (`SaberTrail`, `drawSaberBodyLight`). O trail usa o tempo da simulação (`fighter.animation.time`), então a pausa congela o rastro.
 
@@ -484,6 +505,13 @@ DuelSimulation → CombatSystem executa (igual ao jogador)
 - O intervalo entre pensamentos é `reactionTime × (1 + reactionJitter × random)`. Sem a variação, duas IAs com a mesma dificuldade ficavam sincronizadas e sempre viam o ataque do outro no mesmo instante (o simulador media clashes e parries errados).
 - **Parry**: contra um ataque forte ainda no startup, com `difficulty.parryChance`, a IA calcula quanto falta para o golpe ficar ativo e agenda o toque (`plan.parryDelay`) para cair no meio da janela (ou no começo, para o perfeito, com `perfectParryChance`). Se já for tarde, cai para bloqueio/esquiva. A contagem regressiva roda a cada frame em `updateParryTiming`, mas a decisão só nasce no pensamento: a IA continua limitada ao próprio tempo de reação.
 - **Empurrão**: com o oponente em `BLOCKING` no alcance do empurrão, `profile.shoveChance × difficulty.shoveMultiplier`. Contra um empurrão que está vindo, a IA tenta acertar um ataque rápido antes (é o que vence o empurrão).
+- **Comportamento por dificuldade** (`aiConfig.difficulties`):
+  - `attackTell`: o ataque decidido vira `plan.delayedAction` e só sai depois desse tempo, com a IA parada (o "aviso" do Fácil). Punições não esperam. Se a IA for atingida no meio, o golpe é cancelado;
+  - `smartPunish`: na punição, usa o forte quando `getVulnerableTime(oponente)` passa do startup do forte mais `perception.punishMargin`;
+  - `whiffBaitChance`: contra um golpe no startup, recua um passo em vez de defender, para o golpe errar e a recovery ficar punível;
+  - `chainChance`: rolada uma vez por golpe que conectou; continua a sequência de rápidos durante a recovery;
+  - `adaptation`: liga a `HabitMemory`. A cada frame ela observa o oponente (só o que é visível: começo de golpes e tempo em `BLOCKING`, com esquecimento exponencial). Acima dos limiares de `perception.habits.thresholds`, soma `bonuses` à chance de parry (abuso de forte), de empurrão (muito bloqueio) e de guarda (abuso de rápido);
+  - `specialMultiplier` × `profile.specialChance`: uso da habilidade conforme o tipo dela. Postura de contra-golpe contra golpe no startup, armadura contra golpe que não é forte e avanço contra forte no startup (`trySpecialAnswer`).
 
 **Garantia testada:** a IA roda com os lutadores congelados (`Object.freeze`) sem erro, ou seja, ela nunca altera HP, stamina, posição ou estado.
 

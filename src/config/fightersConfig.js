@@ -25,7 +25,7 @@ export const fighterArchetypes = {
         staminaCost: 8,
         startup: 0.1,
         active: 0.1,
-        recovery: 0.22,
+        recovery: 0.2,
         lunge: 120,
         knockback: 160,
         hitstun: 0.28,
@@ -94,7 +94,7 @@ export const fighterArchetypes = {
       duration: 0.28,
       invulnerableTime: 0.18,
     },
-    blockStaminaScale: 0.8,
+    blockStaminaScale: 0.75,
     blockPushbackScale: 1,
     blockWalkSpeed: 0,
     staminaOnHit: 0,
@@ -138,7 +138,7 @@ export const fighterArchetypes = {
         hitbox: { reach: 100, top: 0.75, bottom: 0.3 },
       },
       heavy: {
-        damage: 26,
+        damage: 24,
         staminaCost: 25,
         startup: 0.34,
         active: 0.12,
@@ -200,13 +200,13 @@ export const fighterArchetypes = {
     blockStaminaScale: 1,
     blockPushbackScale: 1,
     blockWalkSpeed: 0,
-    staminaOnHit: 6,
+    staminaOnHit: 4,
     punishDamageScale: 1,
     knockbackScale: 1,
     guardBreakStun: 1,
   },
   bastion: {
-    maxHealth: 112,
+    maxHealth: 118,
     maxStamina: 110,
     body: {
       width: 58,
@@ -229,7 +229,7 @@ export const fighterArchetypes = {
       light: {
         damage: 11,
         staminaCost: 9,
-        startup: 0.13,
+        startup: 0.12,
         active: 0.1,
         recovery: 0.26,
         lunge: 90,
@@ -309,7 +309,7 @@ export const fighterArchetypes = {
     guardBreakStun: 0.8,
   },
   wasp: {
-    maxHealth: 92,
+    maxHealth: 98,
     maxStamina: 100,
     body: {
       width: 42,

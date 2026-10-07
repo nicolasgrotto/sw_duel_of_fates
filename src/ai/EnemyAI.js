@@ -1,7 +1,8 @@
-import { AttackPhase, AttackType, getAttackPhase, isHeavyAttack } from '../combat/attackPhases.js';
+import { AttackPhase, AttackType, getAttackDuration, getAttackPhase, isHeavyAttack } from '../combat/attackPhases.js';
 import { FighterState } from '../entities/fighterStates.js';
 import { canAfford } from '../systems/StaminaSystem.js';
-import { canReach, getDirectionTo, getGap, isPunishable, isThreatening } from './perception.js';
+import { HabitMemory } from './HabitMemory.js';
+import { canReach, getDirectionTo, getGap, getVulnerableTime, isPunishable, isThreatening } from './perception.js';
 
 export const AiDecision = Object.freeze({
   BUSY: 'busy',
@@ -11,6 +12,8 @@ export const AiDecision = Object.freeze({
   DODGE: 'dodge',
   COUNTER: 'counter',
   SHOVE: 'shove',
+  SPECIAL: 'special',
+  BAIT: 'bait',
   GUARD: 'guard',
   RECOVER: 'recover',
   ATTACK: 'attack',
@@ -24,6 +27,7 @@ const PendingAction = Object.freeze({
   LIGHT_ATTACK: 'lightAttack',
   HEAVY_ATTACK: 'heavyAttack',
   SHOVE: 'shove',
+  SPECIAL: 'special',
   PARRY: 'parry',
   DODGE: 'dodge',
 });
@@ -39,11 +43,15 @@ export class EnemyAI {
     this.thinkTimer = 0;
     this.attackCooldown = 0;
     this.decision = AiDecision.WAIT;
+    this.habits = new HabitMemory(perception.habits);
+    this.chainRolledFor = null;
     this.plan = {
       moveX: 0,
       blockTime: 0,
       parryDelay: -1,
       pendingAction: PendingAction.NONE,
+      delayedAction: PendingAction.NONE,
+      actionDelay: 0,
     };
   }
 
@@ -57,8 +65,42 @@ export class EnemyAI {
       this.thinkTimer = this.difficulty.reactionTime * (1 + this.perception.reactionJitter * this.random());
     }
 
+    this.habits.observe(this.opponent, dt);
     this.updateParryTiming(dt);
+    this.updateDelayedAction(dt);
+    this.tryChain();
     this.writeIntent(intent);
+  }
+
+  updateDelayedAction(dt) {
+    const { plan } = this;
+    if (plan.delayedAction === PendingAction.NONE) {
+      return;
+    }
+    if (!this.self.canAct) {
+      plan.delayedAction = PendingAction.NONE;
+      return;
+    }
+    plan.actionDelay -= dt;
+    plan.moveX = 0;
+    if (plan.actionDelay <= 0) {
+      plan.pendingAction = plan.delayedAction;
+      plan.delayedAction = PendingAction.NONE;
+    }
+  }
+
+  tryChain() {
+    const { attack, attackConnected } = this.self.combat;
+    if (!attack || !attackConnected || attack === this.chainRolledFor || attack.cancelsInto.length === 0) {
+      return;
+    }
+    if (getAttackPhase(attack, this.self.stateTime) !== AttackPhase.RECOVERY) {
+      return;
+    }
+    this.chainRolledFor = attack;
+    if (this.random() < this.difficulty.chainChance) {
+      this.plan.pendingAction = PendingAction.LIGHT_ATTACK;
+    }
   }
 
   updateParryTiming(dt) {
@@ -82,7 +124,7 @@ export class EnemyAI {
     intent.jump = false;
     intent.block = plan.blockTime > 0 || shoving;
     intent.blockPressed = plan.pendingAction === PendingAction.PARRY;
-    intent.special = false;
+    intent.special = plan.pendingAction === PendingAction.SPECIAL;
     intent.specialHeld = false;
     intent.lightAttack = plan.pendingAction === PendingAction.LIGHT_ATTACK || shoving;
     intent.heavyAttack = plan.pendingAction === PendingAction.HEAVY_ATTACK;
@@ -111,6 +153,9 @@ export class EnemyAI {
     if (this.plan.parryDelay >= 0) {
       return AiDecision.PARRY;
     }
+    if (this.plan.delayedAction !== PendingAction.NONE) {
+      return AiDecision.ATTACK;
+    }
     if (!self.canAct && self.state !== FighterState.BLOCKING) {
       return AiDecision.BUSY;
     }
@@ -138,8 +183,14 @@ export class EnemyAI {
     if (this.opponent.combat.attackType === AttackType.SHOVE) {
       return this.answerShove();
     }
+    if (this.trySpecialAnswer()) {
+      return AiDecision.SPECIAL;
+    }
     if (this.tryParry()) {
       return AiDecision.PARRY;
+    }
+    if (this.tryWhiffBait()) {
+      return AiDecision.BAIT;
     }
 
     const roll = this.random();
@@ -162,7 +213,7 @@ export class EnemyAI {
     if (!isHeavyAttack(attackType) || getAttackPhase(attack, this.opponent.stateTime) !== AttackPhase.STARTUP) {
       return false;
     }
-    if (this.random() >= this.difficulty.parryChance) {
+    if (this.random() >= this.difficulty.parryChance + this.getHabitBonus(this.habits.heavyRatio, 'heavy')) {
       return false;
     }
 
@@ -176,6 +227,43 @@ export class EnemyAI {
 
     this.plan.blockTime = 0;
     this.plan.parryDelay = delay;
+    return true;
+  }
+
+  getHabitBonus(ratio, habit) {
+    const { thresholds, bonuses } = this.perception.habits;
+    return ratio >= thresholds[habit] ? bonuses[habit] * this.difficulty.adaptation : 0;
+  }
+
+  trySpecialAnswer() {
+    const special = this.self.moves.special;
+    if (!special || !canAfford(this.self, special.staminaCost)) {
+      return false;
+    }
+    const { attack, attackType } = this.opponent.combat;
+    const opponentPhase = getAttackPhase(attack, this.opponent.stateTime);
+    const answers =
+      (special.counter && opponentPhase === AttackPhase.STARTUP) ||
+      (special.armor && !isHeavyAttack(attackType)) ||
+      (special.dash && isHeavyAttack(attackType) && opponentPhase === AttackPhase.STARTUP);
+    if (!answers || this.random() >= this.profile.specialChance * this.difficulty.specialMultiplier) {
+      return false;
+    }
+    this.plan.blockTime = 0;
+    this.plan.pendingAction = PendingAction.SPECIAL;
+    return true;
+  }
+
+  tryWhiffBait() {
+    const { attack } = this.opponent.combat;
+    if (getAttackPhase(attack, this.opponent.stateTime) !== AttackPhase.STARTUP) {
+      return false;
+    }
+    if (this.random() >= this.difficulty.whiffBaitChance) {
+      return false;
+    }
+    this.plan.blockTime = 0;
+    this.plan.moveX = -getDirectionTo(this.self, this.opponent);
     return true;
   }
 
@@ -193,7 +281,8 @@ export class EnemyAI {
     if (!canAfford(this.self, this.self.stats.attacks.shove.staminaCost)) {
       return null;
     }
-    if (this.random() >= this.profile.shoveChance * this.difficulty.shoveMultiplier) {
+    const shoveChance = this.profile.shoveChance * this.difficulty.shoveMultiplier + this.getHabitBonus(this.habits.blockRatio, 'block');
+    if (this.random() >= shoveChance) {
       return null;
     }
 
@@ -211,8 +300,18 @@ export class EnemyAI {
       return null;
     }
 
-    const wantsHeavy = this.opponent.state === FighterState.STUNNED;
-    return this.startAttack(wantsHeavy) ? AiDecision.COUNTER : null;
+    return this.startAttack(this.wantsHeavyPunish(), true) ? AiDecision.COUNTER : null;
+  }
+
+  wantsHeavyPunish() {
+    if (this.opponent.state === FighterState.STUNNED) {
+      return true;
+    }
+    if (!this.difficulty.smartPunish) {
+      return false;
+    }
+    const heavy = this.self.stats.attacks.heavy;
+    return getVulnerableTime(this.opponent) > heavy.startup + this.perception.punishMargin;
   }
 
   tryRecoverStamina() {
@@ -245,7 +344,8 @@ export class EnemyAI {
     if (!canReach(this.opponent, this.self, opponentReach, -this.perception.threatMargin)) {
       return null;
     }
-    if (this.random() >= this.profile.guardChance * this.difficulty.defenseMultiplier) {
+    const guardChance = this.profile.guardChance * this.difficulty.defenseMultiplier + this.getHabitBonus(this.habits.lightRatio, 'light');
+    if (this.random() >= guardChance) {
       return null;
     }
 
@@ -274,7 +374,7 @@ export class EnemyAI {
     return canReach(this.self, this.opponent, attack, this.perception.reachMargin);
   }
 
-  startAttack(wantsHeavy) {
+  startAttack(wantsHeavy, isPunish = false) {
     const { attacks } = this.self.stats;
     const useHeavy = wantsHeavy && canAfford(this.self, attacks.heavy.staminaCost) && this.canReachWith(AttackType.HEAVY);
 
@@ -282,9 +382,15 @@ export class EnemyAI {
       return false;
     }
 
+    const action = useHeavy ? PendingAction.HEAVY_ATTACK : PendingAction.LIGHT_ATTACK;
     this.plan.blockTime = 0;
-    this.plan.pendingAction = useHeavy ? PendingAction.HEAVY_ATTACK : PendingAction.LIGHT_ATTACK;
     this.attackCooldown = this.difficulty.attackCooldown;
+    if (!isPunish && this.difficulty.attackTell > 0) {
+      this.plan.delayedAction = action;
+      this.plan.actionDelay = this.difficulty.attackTell;
+      return true;
+    }
+    this.plan.pendingAction = action;
     return true;
   }
 }

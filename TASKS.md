@@ -181,7 +181,7 @@ As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e des
 - [x] Habilidade exclusiva (`I`): golpe com armadura, postura de contra-golpe e avanço; traços passivos como dados
 - [x] Tela de seleção de personagem (o jogador pode ser qualquer um)
 - [x] Bastião, Vespa e Espelho (com seleção de adversário)
-- [ ] IA com comportamento por dificuldade (punir bloqueio, iscas de whiff, memória curta de hábitos no Difícil)
+- [x] IA com comportamento por dificuldade (aviso no Fácil, punição inteligente, iscas de whiff, sequências, habilidade, memória curta de hábitos no Difícil)
 - [x] Treino: boneco que grava e reproduz, hitboxes visíveis sem F3, display de inputs
 
 ### v0.5 — Modos

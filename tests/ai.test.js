@@ -15,6 +15,12 @@ const PERFECT = {
   parryChance: 0,
   perfectParryChance: 0,
   shoveMultiplier: 1,
+  attackTell: 0,
+  smartPunish: false,
+  whiffBaitChance: 0,
+  adaptation: 0,
+  chainChance: 0,
+  specialMultiplier: 0,
 };
 
 const DEFENSES = new Set([AiDecision.BLOCK, AiDecision.PARRY]);
@@ -278,6 +284,87 @@ describe('EnemyAI decisions', () => {
     };
 
     assert.ok(countBlocks(Difficulty.HARD) > countBlocks(Difficulty.EASY) * 2);
+  });
+});
+
+describe('EnemyAI difficulty behaviors', () => {
+  it('telegraphs an attack before throwing it on easy', () => {
+    const { ai } = createDuel(40, { roll: 0, difficulty: { ...PERFECT, attackTell: 0.2 } });
+
+    let intent = think(ai);
+    assert.equal(ai.decision, AiDecision.ATTACK);
+    assert.equal(intent.lightAttack || intent.heavyAttack, false);
+
+    let thrown = false;
+    repeat(Math.ceil(0.2 / STEP) + 1, () => {
+      intent = think(ai);
+      thrown ||= intent.lightAttack || intent.heavyAttack;
+    });
+    assert.equal(thrown, true);
+  });
+
+  it('punishes a long opening with a heavy attack only when it plays smart', () => {
+    const recoveryStart = (opponent) => {
+      opponent.combat.stunDuration = 0.8;
+      opponent.restartState(FighterState.STAGGERED);
+    };
+    const plain = createDuel(40, { roll: 0 });
+    recoveryStart(plain.opponent);
+    assert.equal(think(plain.ai).heavyAttack, false);
+
+    const smart = createDuel(40, { roll: 0, difficulty: { ...PERFECT, smartPunish: true } });
+    recoveryStart(smart.opponent);
+    assert.equal(think(smart.ai).heavyAttack, true);
+  });
+
+  it('remembers an opponent who abuses heavy attacks and adapts on hard', () => {
+    const { ai, opponent } = createDuel(400, { difficulty: { ...PERFECT, adaptation: 1 } });
+
+    repeat(6, () => {
+      startAttack(opponent, 'heavy');
+      ai.habits.observe(opponent, STEP);
+      opponent.clearAttack();
+      ai.habits.observe(opponent, STEP);
+    });
+
+    assert.ok(ai.habits.heavyRatio > 0.9);
+    assert.ok(ai.getHabitBonus(ai.habits.heavyRatio, 'heavy') > 0);
+
+    const forgetful = createDuel(400, { difficulty: { ...PERFECT, adaptation: 0 } });
+    assert.equal(forgetful.ai.getHabitBonus(1, 'heavy'), 0);
+  });
+
+  it('continues a light chain after its strike connects', () => {
+    const { ai, self } = createDuel(40, { roll: 0, difficulty: { ...PERFECT, chainChance: 1 } });
+    const attack = self.stats.attacks.light;
+    startAttack(self, 'light', attack.startup + attack.active + 0.01);
+    self.combat.attackConnected = true;
+    ai.thinkTimer = 10;
+
+    const intent = think(ai);
+
+    assert.equal(intent.lightAttack, true);
+    assert.equal(think(ai).lightAttack, false);
+  });
+
+  it('answers a heavy startup with its counter stance', () => {
+    const self = spawnFighter(800, -1, 'guardian');
+    const opponent = spawnFighter(0, 1, 'shadow');
+    opponent.x = self.x - (self.width + opponent.width) / 2 - 40;
+    const ai = new EnemyAI({
+      self,
+      opponent,
+      profile: { ...aiConfig.profiles[AiProfile.BALANCED], specialChance: 1 },
+      difficulty: { ...PERFECT, specialMultiplier: 1 },
+      perception: aiConfig.perception,
+      random: () => 0,
+    });
+    startAttack(opponent, 'heavy');
+
+    const intent = think(ai);
+
+    assert.equal(ai.decision, AiDecision.SPECIAL);
+    assert.equal(intent.special, true);
   });
 });
 
