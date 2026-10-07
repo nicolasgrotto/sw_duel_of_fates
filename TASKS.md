@@ -74,7 +74,7 @@ Atualize este arquivo ao terminar cada tarefa.
 - [x] Sparks, luz de impacto e flash por evento (hit, heavy, block, guardBreak, clash, death)
 - [x] Camera com screen shake (com limites)
 - [x] Luz do sabre no personagem
-- [ ] Afterimage na esquiva (precisa de evento de esquiva)
+- [x] Afterimage na esquiva
 
 ## Fase 5 — IA
 
@@ -104,10 +104,22 @@ Atualize este arquivo ao terminar cada tarefa.
 
 ## Fase 7 — Polish
 
-- [ ] Sons
-- [ ] Música
-- [ ] Hit stop
-- [ ] Câmera lenta no golpe final
-- [ ] Pós-processamento
-- [ ] Opção para reduzir efeitos (flash e shake)
-- [ ] Ajustes de balanceamento
+- [x] Eventos de início de ataque e esquiva
+- [x] Sons sintetizados (golpes, hits, bloqueio, clash, quebra de guarda, morte, esquiva, interface)
+- [x] Zumbido dos sabres (pan pela posição, mais forte no golpe)
+- [x] Música ambiente (drone) que abaixa no golpe final
+- [x] Hit stop
+- [x] Câmera lenta no golpe final
+- [x] Pós-processamento (vinheta)
+- [x] Tela de opções (dificuldade, efeitos reduzidos, som, música) salva no navegador
+- [x] Simulador de duelos para balanceamento (npm run simulate)
+- [x] Ajustes de balanceamento (atributos da Sombra, perfis de IA, guarda por antecipação)
+
+## Próximos passos (sugestões)
+
+- [ ] Cenário da arena (fundo em camadas, passarelas, feixes de luz) seguindo DESIGN.md
+- [ ] Escolha de personagem (o jogador também pode ser a Sombra)
+- [ ] Mais personagens / arquétipos
+- [ ] Suporte a gamepad
+- [ ] Ataques aéreos e combos
+- [ ] Identidade própria para a versão de portfólio (nome, personagens, título)

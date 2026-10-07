@@ -4,7 +4,7 @@ Registro de origem e licença de todo asset do projeto (imagens, sprites, áudio
 
 ## Situação atual
 
-Nenhum asset externo. Todos os gráficos são desenhados por código no Canvas e a fonte é a do sistema (`system-ui`).
+Nenhum asset externo. Todos os gráficos são desenhados por código no Canvas, todos os sons e a música são sintetizados com a Web Audio API, e a fonte é a do sistema (`system-ui`).
 
 ## Regras
 

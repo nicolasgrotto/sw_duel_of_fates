@@ -204,7 +204,8 @@ A IA controla o oponente pelo mesmo `intent` do jogador. Ela só **solicita** a�
   2. **Punir**: se o jogador está em recovery, atingido ou atordoado e está no alcance, contra-ataca (ataque forte se houver stamina e o jogador estiver atordoado).
   3. **Recuperar**: com pouca stamina, recua até uma distância segura.
   4. **Atacar**: no alcance e sem cooldown, ataca com uma chance do perfil (rápido ou forte).
-  5. **Posicionar**: fora do alcance, aproxima. Perto demais (para o perfil), recua um pouco ou espera.
+  5. **Guardar**: no alcance do jogador e sem poder atacar, segura o bloqueio por antecipação (ataques rápidos são mais rápidos que a reação da IA).
+  6. **Posicionar**: fora do alcance, aproxima. Perto demais (para o perfil), recua um pouco ou espera.
 - Cada pensamento tem uma chance de **erro** (hesitar, não defender), que depende da dificuldade.
 
 ### Perfis

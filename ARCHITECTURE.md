@@ -27,8 +27,9 @@ src/
     Renderer.js             ✅ canvas e primitivas de desenho
     StateMachine.js         ✅ pilha de estados
     Camera.js               ✅ screen shake (com limites)
-    AssetManager.js         ⏳
-    AudioManager.js         ⏳
+    AudioManager.js         ✅ AudioContext, buses de sfx e música, liberação no primeiro input
+    settingsStorage.js      ✅ carrega e salva as opções (localStorage, tolerante a erro)
+    AssetManager.js         ⏳ só quando houver assets externos
   states/                   ✅ telas do jogo
     GameState.js            ✅ classe base
     stateIds.js             ✅ ids dos estados
@@ -39,6 +40,7 @@ src/
     DuelState.js            ✅ duelo: intro, simulação, efeitos, HUD, fim do duelo
     PauseState.js           ✅ continuar, reiniciar, sair
     GameOverState.js        ✅ vitória/derrota, estatísticas, revanche
+    OptionsState.js         ✅ dificuldade, efeitos, som, música
   characters/               ✅ dados e criação de personagens
     characterData.js        ✅ personagens: nome, arquétipo, perfil de IA, aparência
     characterFactory.js     ✅ cria um Fighter a partir dos dados
@@ -56,6 +58,7 @@ src/
     StaminaSystem.js        ✅ regeneração e gasto de stamina
     EffectsSystem.js        ✅ eventos de combate → faíscas, luzes de impacto, flash, shake
     ParticlePool.js         ✅ pool fixo de partículas
+    TimeControl.js          ✅ hit stop e câmera lenta
   combat/                   ✅ regras de combate
     CombatSystem.js         ✅ ações, timers, hits, bloqueio, quebra de guarda, morte, eventos
     attackPhases.js         ✅ tipos de ataque e fases (startup, active, recovery)
@@ -63,6 +66,11 @@ src/
     combatEvents.js         ✅ tipos e criação de eventos de combate
   simulation/               ✅
     DuelSimulation.js       ✅ ordem dos sistemas em um passo do duelo
+    arenaBounds.js          ✅ limites da arena a partir do gameConfig
+  audio/                    ✅ som sintetizado (Web Audio API, sem arquivos)
+    synth.js                ✅ camadas de som, zumbido do sabre, drone de música
+    DuelAudio.js            ✅ eventos de combate → sons; zumbido por lutador
+    soundNames.js           ✅ nomes dos sons
   ai/                       ✅ inteligência do oponente
     EnemyAI.js              ✅ controller da IA: pensa em intervalos e preenche o intent
     perception.js           ✅ leitura pura dos lutadores (distância, ameaça, chance de punir)
@@ -73,6 +81,7 @@ src/
     fighterRenderer.js      ✅ silhueta do lutador e sombra
     saberRenderer.js        ✅ cabo, glows, núcleo, luz no chão e no corpo
     SaberTrail.js           ✅ rastro da lâmina na fase active
+    DodgeAfterimage.js      ✅ silhuetas transparentes durante a esquiva
     effectsRenderer.js      ✅ partículas, luzes de impacto e flash
   ui/                       ✅ peças de interface desenhadas no canvas
     MenuList.js             ✅ lista de opções navegável
@@ -86,6 +95,7 @@ src/
     controlsConfig.js       ✅ ações e teclas
     uiConfig.js             ✅ textos da interface e layout das telas
     aiConfig.js             ✅ perfis, dificuldades e percepção da IA
+    audioConfig.js          ✅ volumes, receitas de som, zumbido e música
     fightersConfig.js       ✅ atributos por arquétipo (vida, stamina, corpo, movimento, ataques, esquiva)
     fighterVisualConfig.js  ✅ proporções, animação, poses de combate, sombra e estilo do sabre
     effectsConfig.js        ✅ limites e receitas de VFX
@@ -96,6 +106,7 @@ src/
     random.js               ✅ RNG com seed (testes determinísticos)
 tools/
   server.js                 ✅ servidor estático para desenvolvimento
+  simulate.js               ✅ simulador de duelos IA × IA para balanceamento (npm run simulate)
 tests/                      ✅ testes com node --test
 ```
 
@@ -184,7 +195,15 @@ main.js
             └─ render(alpha) → renderer.clear() → states.render() → debug.render()
 ```
 
-`DuelState.update`: pausa → controllers preenchem os intents → `DuelSimulation.step(dt)` → `EffectsSystem` consome os eventos → efeitos e `Camera` atualizam → verifica eventos de morte.
+`DuelState.update(dt)`:
+
+```
+pausa?  → PauseState
+dt da simulação = TimeControl.scale(dt)        0 no hit stop, dt × 0,3 na câmera lenta
+se > 0: controllers → DuelSimulation.step → EffectsSystem.handleEvents → DuelAudio.handleEvents
+        → estatísticas → verifica morte
+EffectsSystem.update, Camera, Hud, CombatMessage, DuelAudio.update (zumbidos)   tempo real
+```
 
 Ordem dentro de `DuelSimulation.step` ([src/simulation/DuelSimulation.js](src/simulation/DuelSimulation.js)):
 
@@ -208,10 +227,10 @@ Ordem do `DuelRenderer.render` (camadas do VISUAL_SYSTEM):
 
 ```
 [câmera: translate(offset do shake)]
-  arena → luz dos sabres no chão → corpos (sombra, capa, pernas, túnica, cabeça, braços)
+  arena → luz dos sabres no chão → afterimages da esquiva → corpos (sombra, capa, pernas, túnica, cabeça, braços)
   → luz dos sabres nos corpos → trails → sabres → luzes de impacto → faíscas
 [fim da câmera]
-flash (tela inteira, sem shake)
+flash (tela inteira, sem shake) → vinheta
 ```
 
 A pose de cada lutador é calculada por `computePose` a partir do estado, da fase do ataque e da animação (valores em `fighterVisualConfig.combatPoses`), em coordenadas locais (origem nos pés, olhando para a direita). O renderer espelha com `scale(facing, 1)`. Os objetos de pose são reutilizados entre frames.
@@ -286,7 +305,7 @@ MenuState ──Duelar / Treino──▶ DuelState({ mode }) ──Esc──▶ 
 
 Pausa e resultado recebem `duelParams` e os repassam ao reiniciar, então "Reiniciar" e "Revanche" mantêm o modo.
 
-`Game.settings` guarda escolhas que valem até fechar o jogo (hoje: `difficulty`, alterada no menu).
+`Game.settings` guarda as opções (`difficulty`, `reducedEffects`, `sound`, `music`). Elas são carregadas do `localStorage` ao abrir o jogo (valores inválidos são ignorados), alteradas na tela de Opções, aplicadas por `game.applySettings()` e salvas por `game.saveSettings()`.
 
 Para adicionar um estado: crie a classe estendendo `GameState`, adicione o id em `stateIds.js` e registre em `stateFactory.js`.
 
@@ -349,6 +368,30 @@ CombatSystem.events → EffectsSystem.handleEvents → spawn(tipo, { x, y, direc
 - Limites (`maxParticles`, `maxShakeAmplitude`, `maxShakeDuration`, `maxFlashAlpha`) são aplicados no código, não só na receita.
 - `Camera` guarda o shake mais forte e produz `offsetX/offsetY`. Hoje a arena cabe inteira na tela, então a câmera não precisa seguir os lutadores. Enquadramento e zoom entram quando houver arenas maiores.
 - RNG com seed (`utils/random.js`) é injetado. Os testes usam seed fixa e são determinísticos.
+- Receitas também pedem **hit stop** e **câmera lenta** ao `TimeControl`. Efeitos reduzidos (`setReduced`) diminuem o shake e desligam o flash.
+- Afterimage da esquiva e vinheta são só do render.
+
+## Audio
+
+Arquivos: [src/core/AudioManager.js](src/core/AudioManager.js), [src/audio/](src/audio/), [src/config/audioConfig.js](src/config/audioConfig.js). Regras em [DESIGN.md](DESIGN.md#áudio).
+
+- Todo som é **sintetizado** (osciladores, ruído e filtros). Cada som é uma lista de camadas em `audioConfig.sounds`, tocada por `synth.playSound`. Para criar um som novo: adicione a receita e o nome em `soundNames.js`.
+- O `AudioContext` só nasce no primeiro `keydown`/`pointerdown` (política de autoplay). Antes disso, e no Node, o `AudioManager` não faz nada, então estados e testes não precisam saber se há áudio.
+- `DuelAudio` só lê eventos e lutadores: toca o som do evento com pan pela posição, mantém um zumbido por lutador (mais forte e agudo na fase active, desligado na morte) e abaixa a música no golpe final.
+- Interface: `MenuList` toca `uiMove` e `uiConfirm` quando recebe o `AudioManager`.
+
+## Balanceamento
+
+`npm run simulate` roda duelos IA × IA na `DuelSimulation` real, sem navegador, alternando os lados, e mostra vitórias, tempo médio, hits, bloqueios, clashes e quebras de guarda.
+
+```bash
+npm run simulate -- --duels 300 --difficulty hard
+npm run simulate -- --profile balanced                     # mesmo perfil nos dois: mede só os atributos
+npm run simulate -- --left shadow --right shadow --leftDifficulty hard --rightDifficulty normal
+npm run simulate -- --set fighters.shadow.maxHealth=120   # testa um valor sem editar arquivos
+```
+
+Referência atual (300 duelos, seed 1): com o mesmo perfil, Guardião × Sombra fica entre 43% e 52% em todas as dificuldades e os duelos duram ~24 s. A dificuldade é monotônica (Difícil vence Normal ~90%, Normal vence Fácil ~98%).
 - O trail e a luz do sabre no corpo são só do render (`SaberTrail`, `drawSaberBodyLight`). O trail usa o tempo da simulação (`fighter.animation.time`), então a pausa congela o rastro.
 
 ---
@@ -366,6 +409,7 @@ DuelSimulation → CombatSystem executa (igual ao jogador)
 ```
 
 - `EnemyAI` é um controller como o `PlayerController`: `updateIntent(intent, dt)`. Ela recebe `self` e `opponent` só para **ler**.
+- Além de defender ataques que estão vindo, a IA pode **guardar por antecipação** (`guardChance`) quando está no alcance do oponente e não pode atacar. É o que permite defender ataques rápidos, cujo startup é menor que o tempo de reação.
 - `perception.js` tem funções puras (`getGap`, `canReach`, `isThreatening`, `isPunishable`).
 - O plano guarda direção, tempo de bloqueio e uma ação pontual (`pendingAction`), que vira intent por um frame só.
 - Perfil (`aiConfig.profiles`) vem de `characterData.aiProfile`. Dificuldade (`aiConfig.difficulties`) vem de `game.settings.difficulty`.
@@ -404,7 +448,7 @@ Testes rodam em Node (`npm test`), sem navegador. Por isso:
 - Quando um módulo do core precisa do navegador (`Input`, `GameLoop`), a dependência é injetada.
 - `computePose` é uma função pura e também é testada.
 
-Testes atuais: `gameLoop`, `input`, `stateMachine`, `states` (fluxo de telas, fim do duelo, boneco, debug de hitbox), `debug`, `math`, `fighter`, `playerController`, `dummyController`, `movement`, `physics` (inclui colisão), `animation` (inclui poses de combate), `combatActions` (ações, timers, stamina) e `combatHits` (hits, bloqueio, quebra de guarda, esquiva, morte, trade, clash), `effects` (RNG, pool, câmera, efeitos por evento, limites), `saberTrail`, `ui` (MenuList, nomes de teclas, textos), `hud`, `combatMessage` e `ai` (percepção, cada decisão, tempo de reação, dificuldade, IA não altera lutadores, IA vence um oponente parado na simulação real). O teste `states` cobre também controles, intro, pausa (continuar, reiniciar, sair), resultado e revanche. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
+Testes atuais: `gameLoop`, `input`, `stateMachine`, `states` (fluxo de telas, fim do duelo, boneco, debug de hitbox), `debug`, `math`, `fighter`, `playerController`, `dummyController`, `movement`, `physics` (inclui colisão), `animation` (inclui poses de combate), `combatActions` (ações, timers, stamina) e `combatHits` (hits, bloqueio, quebra de guarda, esquiva, morte, trade, clash), `effects` (RNG, pool, câmera, efeitos por evento, limites, hit stop, efeitos reduzidos), `timeControl`, `saberTrail`, `afterimage`, `audio` e `duelAudioHum` (mapeamento de sons, pan, zumbido, música), `settingsStorage`, `ui` (MenuList, nomes de teclas, textos), `hud`, `combatMessage` e `ai` (percepção, cada decisão, tempo de reação, dificuldade, IA não altera lutadores, IA vence um oponente parado na simulação real). O teste `states` cobre também controles, intro, pausa (continuar, reiniciar, sair), resultado e revanche. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
 
 ---
 
@@ -415,6 +459,8 @@ core/Game     → core, states/stateFactory, config, utils
 states        → states/stateIds, simulation, combat, ai, controllers, characters, entities, rendering, ui, config
 ui            → config, utils
 ai            → combat (fases), entities (estados), systems/StaminaSystem (canAfford), config
+audio         → combat (eventos, fases), config, utils
+tools/simulate → characters, simulation, ai, config (sem navegador)
 simulation    → systems, combat
 systems/EffectsSystem → combat (tipos de evento), core/Camera (via construtor), config, utils
 characters    → entities, config

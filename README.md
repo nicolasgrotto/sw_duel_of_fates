@@ -39,6 +39,14 @@ Usa o test runner nativo do Node (`node --test`). Não há dependências para in
 
 Os testes cobrem apenas módulos de lógica. Por isso, módulos de lógica não podem acessar DOM nem Canvas diretamente (ver [ARCHITECTURE.md](ARCHITECTURE.md)).
 
+## Balanceamento
+
+```bash
+npm run simulate -- --duels 300 --difficulty normal
+```
+
+Roda duelos IA × IA sem navegador e mostra vitórias e estatísticas. Opções e exemplos em [ARCHITECTURE.md](ARCHITECTURE.md#balanceamento).
+
 ## Controles
 
 | Ação | Teclas |
