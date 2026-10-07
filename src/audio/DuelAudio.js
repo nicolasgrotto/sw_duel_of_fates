@@ -25,6 +25,10 @@ function getSoundForEvent(event) {
       return SoundName.DODGE;
     case CombatEvent.ACTION_REJECTED:
       return SoundName.DENIED;
+    case CombatEvent.PARRY:
+      return SoundName.PARRY;
+    case CombatEvent.PERFECT_PARRY:
+      return SoundName.PERFECT_PARRY;
     default:
       return null;
   }
@@ -44,12 +48,13 @@ function getHumMode(fighter) {
 }
 
 export class DuelAudio {
-  constructor(audio, { arenaWidth, stereoWidth, hum, musicDuckDuration }) {
+  constructor(audio, { arenaWidth, stereoWidth, hum, musicDuckDuration, perfectParryDuckDuration }) {
     this.audio = audio;
     this.arenaWidth = arenaWidth;
     this.stereoWidth = stereoWidth;
     this.humConfig = hum;
     this.musicDuckDuration = musicDuckDuration;
+    this.perfectParryDuckDuration = perfectParryDuckDuration;
     this.playOptions = { pan: 0, intensity: 1 };
     this.hums = null;
   }
@@ -106,6 +111,8 @@ export class DuelAudio {
       }
       if (event.type === CombatEvent.DEATH) {
         this.audio.duckMusic(this.musicDuckDuration);
+      } else if (event.type === CombatEvent.PERFECT_PARRY) {
+        this.audio.duckMusic(this.perfectParryDuckDuration);
       }
     }
   }

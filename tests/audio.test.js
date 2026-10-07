@@ -11,9 +11,12 @@ import { spawnFighter } from './helpers.js';
 
 function createRecordingAudio() {
   const played = [];
+  const ducks = [];
   return {
     played,
+    ducks,
     play: (name, options = {}) => played.push({ name, pan: options.pan }),
+    duckMusic: (duration) => ducks.push(duration),
   };
 }
 
@@ -41,7 +44,7 @@ describe('AudioManager', () => {
 describe('DuelAudio', () => {
   it('maps combat events to sounds', () => {
     const audio = createRecordingAudio();
-    const duelAudio = new DuelAudio(audio, { arenaWidth: 1280, stereoWidth: 0.6 });
+    const duelAudio = new DuelAudio(audio, { arenaWidth: 1280, stereoWidth: 0.6, perfectParryDuckDuration: 0.3 });
 
     duelAudio.handleEvents([
       createEvent(CombatEvent.ATTACK_START, 640, 'light'),
@@ -50,12 +53,28 @@ describe('DuelAudio', () => {
       createEvent(CombatEvent.BLOCK, 640),
       createEvent(CombatEvent.CLASH, 640),
       createEvent(CombatEvent.DODGE, 640, null),
+      createEvent(CombatEvent.PARRY, 640, 'heavy'),
+      createEvent(CombatEvent.PERFECT_PARRY, 640, 'heavy'),
+      createEvent(CombatEvent.HIT, 640, 'riposte'),
+      createEvent(CombatEvent.ACTION_REJECTED, 640, null),
     ]);
 
     assert.deepEqual(
       audio.played.map((sound) => sound.name),
-      [SoundName.SWING_LIGHT, SoundName.SWING_HEAVY, SoundName.HEAVY_HIT, SoundName.BLOCK, SoundName.CLASH, SoundName.DODGE],
+      [
+        SoundName.SWING_LIGHT,
+        SoundName.SWING_HEAVY,
+        SoundName.HEAVY_HIT,
+        SoundName.BLOCK,
+        SoundName.CLASH,
+        SoundName.DODGE,
+        SoundName.PARRY,
+        SoundName.PERFECT_PARRY,
+        SoundName.HEAVY_HIT,
+        SoundName.DENIED,
+      ],
     );
+    assert.deepEqual(audio.ducks, [0.3]);
   });
 
   it('places the sound in stereo by the event position', () => {

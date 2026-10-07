@@ -28,6 +28,7 @@ export const audioConfig = {
     level: 0.6,
     fadeIn: 2,
     duckDuration: 1.6,
+    perfectParryDuckDuration: 0.3,
     duckFade: 0.05,
     returnFade: 0.6,
   },
@@ -76,6 +77,17 @@ export const audioConfig = {
     ],
     denied: [
       { type: 'tone', wave: 'square', from: 150, to: 110, duration: 0.08, attack: 0.002, gain: 0.07, filter: { type: 'lowpass', from: 900, to: 600, q: 1 } },
+    ],
+    parry: [
+      { type: 'tone', wave: 'sine', from: 1800, to: 1750, duration: 0.45, attack: 0.002, gain: 0.16, filter: null },
+      { type: 'tone', wave: 'triangle', from: 2650, to: 2550, duration: 0.3, attack: 0.002, gain: 0.06, filter: null },
+      { type: 'noise', duration: 0.04, attack: 0.001, gain: 0.25, filter: { type: 'bandpass', from: 5000, to: 5000, q: 1 } },
+    ],
+    perfectParry: [
+      { type: 'tone', wave: 'sine', from: 2000, to: 1950, duration: 0.6, attack: 0.002, gain: 0.18, filter: null },
+      { type: 'tone', wave: 'triangle', from: 3000, to: 2900, duration: 0.45, attack: 0.002, gain: 0.07, filter: null },
+      { type: 'noise', duration: 0.05, attack: 0.001, gain: 0.3, filter: { type: 'bandpass', from: 6000, to: 6000, q: 1 } },
+      { type: 'tone', wave: 'sine', from: 80, to: 35, duration: 0.4, attack: 0.002, gain: 0.3, filter: null },
     ],
     uiMove: [
       { type: 'tone', wave: 'sine', from: 880, to: 880, duration: 0.05, attack: 0.002, gain: 0.08, filter: null },

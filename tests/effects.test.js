@@ -132,6 +132,40 @@ describe('EffectsSystem', () => {
     assert.ok(effects.flash.alpha > 0);
   });
 
+  it('marks a parry with a ring and a brighter blade in the defender color', () => {
+    const { effects, timeControl } = createEffects();
+    const event = createEvent(CombatEvent.PARRY);
+
+    effects.handleEvents([event]);
+
+    const ring = effects.rings.find((candidate) => candidate.active);
+    assert.equal(ring.color, event.defender.appearance.saberColor);
+    assert.equal(activeLights(effects)[0].color, event.defender.appearance.saberColor);
+    assert.equal(effects.getSaberFlare(event.defender), 1);
+    assert.equal(effects.getSaberFlare(event.attacker), 0);
+    assert.equal(effects.desaturation.amount, 0);
+    assert.equal(timeControl.hitStopTime, effectsConfig.recipes[EffectType.PARRY_SPARK].hitStop);
+
+    repeat(Math.ceil(effectsConfig.saberFlare.duration / STEP) + 1, () => effects.update(STEP));
+    assert.equal(effects.getSaberFlare(event.defender), 0);
+
+    repeat(Math.ceil(effectsConfig.recipes[EffectType.PARRY_SPARK].ring.duration / STEP), () => effects.update(STEP));
+    assert.equal(effects.rings.some((candidate) => candidate.active), false);
+  });
+
+  it('desaturates the world and slows time on a perfect parry, then recovers', () => {
+    const { effects, timeControl } = createEffects();
+
+    effects.handleEvents([createEvent(CombatEvent.PERFECT_PARRY)]);
+
+    assert.equal(effects.desaturation.amount, 1);
+    assert.ok(effects.desaturation.duration <= effectsConfig.maxDesaturationDuration);
+    assert.ok(timeControl.slowMotionTime > 0);
+
+    repeat(Math.ceil(effectsConfig.maxDesaturationDuration / STEP) + 1, () => effects.update(STEP));
+    assert.equal(effects.desaturation.amount, 0);
+  });
+
   it('lights both saber colors on a clash', () => {
     const { effects } = createEffects();
     const event = createEvent(CombatEvent.CLASH);

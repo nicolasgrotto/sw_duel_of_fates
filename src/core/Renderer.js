@@ -136,6 +136,14 @@ export class Renderer {
     this.context.fill();
   }
 
+  strokeCircle(x, y, radius, color, lineWidth = 1) {
+    this.context.strokeStyle = color;
+    this.context.lineWidth = lineWidth;
+    this.context.beginPath();
+    this.context.arc(x, y, radius, 0, Math.PI * 2);
+    this.context.stroke();
+  }
+
   fillEllipse(x, y, radiusX, radiusY, color) {
     this.context.fillStyle = color;
     this.context.beginPath();

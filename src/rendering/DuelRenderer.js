@@ -2,7 +2,7 @@ import { isAttackActive } from '../combat/hitboxes.js';
 import { effectsConfig } from '../config/effectsConfig.js';
 import { drawArena } from './arenaRenderer.js';
 import { DodgeAfterimage } from './DodgeAfterimage.js';
-import { drawFlash, drawImpactLights, drawParticles } from './effectsRenderer.js';
+import { drawDesaturation, drawFlash, drawImpactLights, drawParticles, drawRings } from './effectsRenderer.js';
 import { computePose, createPose } from './fighterPose.js';
 import { drawFighterBody } from './fighterRenderer.js';
 import { SaberTrail } from './SaberTrail.js';
@@ -62,14 +62,16 @@ export class DuelRenderer {
     for (const fighter of fighters) {
       drawSaberBodyLight(renderer, fighter, this.getPose(fighter));
     }
+    drawDesaturation(renderer, effects.desaturation, effectsConfig.desaturationDim, arena.overscan);
     for (const fighter of fighters) {
       this.getTrail(fighter).draw(renderer, fighter.animation.time, fighter.appearance.saberColor);
     }
     for (const fighter of fighters) {
-      drawSaber(renderer, fighter, this.getPose(fighter));
+      drawSaber(renderer, fighter, this.getPose(fighter), effects.getSaberFlare(fighter));
     }
 
     drawImpactLights(renderer, effects.lights);
+    drawRings(renderer, effects.rings);
     drawParticles(renderer, effects.particles.particles, effectsConfig.particle.streakTime);
 
     renderer.restore();

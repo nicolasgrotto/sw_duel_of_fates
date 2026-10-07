@@ -11,6 +11,8 @@ export const EffectType = Object.freeze({
   GUARD_BREAK: 'guardBreak',
   SABER_CLASH: 'saberClash',
   FINAL_BLOW: 'finalBlow',
+  PARRY_SPARK: 'parrySpark',
+  PERFECT_PARRY: 'perfectParry',
 });
 
 function createLight() {
@@ -27,6 +29,22 @@ function createLight() {
   };
 }
 
+function createRing() {
+  return {
+    active: false,
+    x: 0,
+    y: 0,
+    color: '',
+    startRadius: 0,
+    maxRadius: 0,
+    radius: 0,
+    lineWidth: 0,
+    alpha: 0,
+    time: 0,
+    duration: 0,
+  };
+}
+
 export class EffectsSystem {
   constructor(config, camera, random, timeControl) {
     this.config = config;
@@ -37,6 +55,9 @@ export class EffectsSystem {
     this.flashScale = 1;
     this.particles = new ParticlePool(config.maxParticles);
     this.lights = Array.from({ length: config.maxLights }, createLight);
+    this.rings = Array.from({ length: config.maxRings }, createRing);
+    this.saberFlares = new Map();
+    this.desaturation = { amount: 0, peakAmount: 0, time: 0, duration: 0 };
     this.flash = {
       color: config.flashColor,
       peakAlpha: 0,
@@ -84,9 +105,34 @@ export class EffectsSystem {
       case CombatEvent.DEATH:
         this.spawn(EffectType.FINAL_BLOW, params);
         break;
+      case CombatEvent.PARRY:
+        this.spawnParry(EffectType.PARRY_SPARK, defender, params);
+        break;
+      case CombatEvent.PERFECT_PARRY:
+        this.spawnParry(EffectType.PERFECT_PARRY, defender, params);
+        break;
       default:
         break;
     }
+  }
+
+  spawnParry(type, defender, params) {
+    const recipe = this.config.recipes[type];
+    params.color = defender.appearance.saberColor;
+    params.direction = defender.facing;
+    this.spawn(type, params);
+    this.spawnRing(recipe.ring, params.x, params.y, params.color);
+    if (recipe.saberFlare) {
+      this.saberFlares.set(defender, this.config.saberFlare.duration);
+    }
+    if (recipe.desaturate) {
+      this.startDesaturation(recipe.desaturate);
+    }
+  }
+
+  getSaberFlare(fighter) {
+    const remaining = this.saberFlares.get(fighter) ?? 0;
+    return remaining / this.config.saberFlare.duration;
   }
 
   spawn(type, { x, y, direction, color, secondaryColor }) {
@@ -151,6 +197,38 @@ export class EffectsSystem {
     light.duration = duration;
   }
 
+  spawnRing({ radius, lineWidth, alpha, duration }, x, y, color) {
+    let ring = this.rings[0];
+    for (const candidate of this.rings) {
+      if (!candidate.active) {
+        ring = candidate;
+        break;
+      }
+      if (candidate.time > ring.time) {
+        ring = candidate;
+      }
+    }
+    ring.active = true;
+    ring.x = x;
+    ring.y = y;
+    ring.color = color;
+    ring.startRadius = this.config.ringStartRadius;
+    ring.maxRadius = radius;
+    ring.radius = ring.startRadius;
+    ring.lineWidth = lineWidth;
+    ring.alpha = alpha;
+    ring.time = 0;
+    ring.duration = duration;
+  }
+
+  startDesaturation({ amount, duration }) {
+    const { desaturation } = this;
+    desaturation.peakAmount = Math.min(amount, 1);
+    desaturation.amount = desaturation.peakAmount;
+    desaturation.time = 0;
+    desaturation.duration = Math.min(duration, this.config.maxDesaturationDuration);
+  }
+
   findFreeLight() {
     let oldest = this.lights[0];
     for (const light of this.lights) {
@@ -179,6 +257,44 @@ export class EffectsSystem {
     this.particles.update(dt, this.config.particle);
     this.updateLights(dt);
     this.updateFlash(dt);
+    this.updateRings(dt);
+    this.updateSaberFlares(dt);
+    this.updateDesaturation(dt);
+  }
+
+  updateRings(dt) {
+    for (const ring of this.rings) {
+      if (!ring.active) {
+        continue;
+      }
+      ring.time += dt;
+      if (ring.time >= ring.duration) {
+        ring.active = false;
+        continue;
+      }
+      const progress = ring.time / ring.duration;
+      ring.radius = ring.startRadius + (ring.maxRadius - ring.startRadius) * (1 - (1 - progress) * (1 - progress));
+    }
+  }
+
+  updateSaberFlares(dt) {
+    for (const [fighter, remaining] of this.saberFlares) {
+      if (remaining <= dt) {
+        this.saberFlares.delete(fighter);
+      } else {
+        this.saberFlares.set(fighter, remaining - dt);
+      }
+    }
+  }
+
+  updateDesaturation(dt) {
+    const { desaturation } = this;
+    if (desaturation.amount <= 0) {
+      return;
+    }
+    desaturation.time += dt;
+    desaturation.amount =
+      desaturation.time >= desaturation.duration ? 0 : desaturation.peakAmount * (1 - desaturation.time / desaturation.duration);
   }
 
   updateLights(dt) {

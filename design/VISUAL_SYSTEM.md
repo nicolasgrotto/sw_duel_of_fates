@@ -113,6 +113,9 @@ Cores compartilhadas (em `themeConfig`):
 | `hudGhost` | `rgba(232, 236, 245, 0.3)` | parte da vida perdida há pouco (barra fantasma) |
 | `hudStamina` | `#8a94ab` | barra de stamina |
 | `hudTrack` | `rgba(255, 255, 255, 0.08)` | fundo das barras |
+| `desaturateGray` | `#808080` | cor neutra do passo de dessaturação (parry perfeito) |
+| `desaturateDim` | `#000000` | escurecimento junto da dessaturação |
+| `saberFlare` | `#ffffff` | brilho extra da lâmina de quem aparou |
 
 ## Sabre
 
@@ -140,6 +143,15 @@ Um brilho suave (sprite radial pré-renderizado por cor) no meio da lâmina, com
 ### Afterimage da esquiva
 
 Durante a esquiva, o renderer guarda 3 cópias da pose (a cada 0,05 s de simulação) e desenha a silhueta com alpha baixo (0,3 → 0), sem o sabre.
+
+### Parry na lâmina
+
+- Quem apara: um glow branco largo (`saberFlare`) por cima do glow colorido, que some em 0,12 s.
+- Quem foi aparado (`STAGGERED`): os glows oscilam (`saberStyle.staggerFlickerSpeed`, mínimo `staggerFlickerMin`). O núcleo continua aceso.
+
+### Dessaturação
+
+Desenhada depois da luz dos sabres nos corpos e antes dos trails: `saturation` com `desaturateGray` e depois `desaturateDim` com alpha baixo. Trails, sabres, faíscas e anéis vêm depois, então continuam com cor.
 
 ### Vinheta
 

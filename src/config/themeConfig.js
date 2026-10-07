@@ -23,6 +23,9 @@ export const colors = {
   hudGhost: 'rgba(232, 236, 245, 0.3)',
   hudStamina: '#8a94ab',
   hudTrack: 'rgba(255, 255, 255, 0.08)',
+  desaturateGray: '#808080',
+  desaturateDim: '#000000',
+  saberFlare: '#ffffff',
 };
 
 export const textStyles = {

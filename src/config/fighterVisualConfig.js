@@ -78,7 +78,6 @@ export const combatPoses = {
     lean: -12,
     crouch: 4,
     bladeDegrees: -150,
-    bladeFlickerSpeed: 22,
   },
   stunned: {
     lean: 18,
@@ -113,6 +112,10 @@ export const saberStyle = {
   floorLightRadiusY: 10,
   bodyLightRadius: 120,
   bodyLightAlpha: 0.14,
+  flareWidth: 22,
+  flareAlpha: 0.5,
+  staggerFlickerSpeed: 22,
+  staggerFlickerMin: 0.35,
 };
 
 export const afterimage = {

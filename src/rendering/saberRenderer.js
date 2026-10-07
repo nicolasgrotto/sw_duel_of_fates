@@ -1,5 +1,6 @@
 import { proportions, saberStyle } from '../config/fighterVisualConfig.js';
 import { colors } from '../config/themeConfig.js';
+import { FighterState } from '../entities/fighterStates.js';
 
 const HILT_BEHIND_HAND = 0.4;
 const HILT_IN_FRONT_OF_HAND = 0.6;
@@ -82,7 +83,15 @@ export function drawSaberFloorLight(renderer, fighter, pose, floorY) {
   renderer.restore();
 }
 
-export function drawSaber(renderer, fighter, pose) {
+function getGlowStrength(fighter) {
+  if (fighter.state !== FighterState.STAGGERED) {
+    return 1;
+  }
+  const wave = Math.abs(Math.sin(fighter.animation.time * saberStyle.staggerFlickerSpeed));
+  return saberStyle.staggerFlickerMin + (1 - saberStyle.staggerFlickerMin) * wave;
+}
+
+export function drawSaber(renderer, fighter, pose, flare = 0) {
   updateBladeGeometry(fighter, pose);
   const { saberColor } = fighter.appearance;
 
@@ -99,10 +108,15 @@ export function drawSaber(renderer, fighter, pose) {
     return;
   }
 
+  const glowStrength = getGlowStrength(fighter);
   renderer.setBlendMode('lighter');
-  renderer.setAlpha(saberStyle.outerGlowAlpha);
+  renderer.setAlpha(saberStyle.outerGlowAlpha * glowStrength);
   renderer.line(blade.baseX, blade.baseY, blade.tipX, blade.tipY, saberColor, saberStyle.outerGlowWidth);
-  renderer.setAlpha(saberStyle.glowAlpha);
+  if (flare > 0) {
+    renderer.setAlpha(saberStyle.flareAlpha * flare);
+    renderer.line(blade.baseX, blade.baseY, blade.tipX, blade.tipY, colors.saberFlare, saberStyle.flareWidth);
+  }
+  renderer.setAlpha(saberStyle.glowAlpha * glowStrength);
   renderer.line(blade.baseX, blade.baseY, blade.tipX, blade.tipY, saberColor, saberStyle.glowWidth);
   renderer.setAlpha(1);
   renderer.line(blade.baseX, blade.baseY, blade.tipX, blade.tipY, colors.saberCore, saberStyle.coreWidth);

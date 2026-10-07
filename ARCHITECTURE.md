@@ -229,7 +229,7 @@ Ordem do `DuelRenderer.render` (camadas do VISUAL_SYSTEM):
 ```
 [câmera: translate(offset do shake)]
   arena → luz dos sabres no chão → afterimages da esquiva → corpos (sombra, capa, pernas, túnica, cabeça, braços)
-  → luz dos sabres nos corpos → trails → sabres → luzes de impacto → faíscas
+  → luz dos sabres nos corpos → dessaturação (parry perfeito) → trails → sabres (com flare) → luzes de impacto → anéis → faíscas
 [fim da câmera]
 flash (tela inteira, sem shake) → vinheta
 ```
@@ -374,6 +374,7 @@ CombatSystem.events → EffectsSystem.handleEvents → spawn(tipo, { x, y, direc
 - RNG com seed (`utils/random.js`) é injetado. Os testes usam seed fixa e são determinísticos.
 - Receitas também pedem **hit stop** e **câmera lenta** ao `TimeControl`. Efeitos reduzidos (`setReduced`) diminuem o shake e desligam o flash.
 - Afterimage da esquiva e vinheta são só do render.
+- **Parry**: `parry`/`perfectParry` usam a cor e a direção do **defensor**. Além de faíscas, luz, shake e hit stop, criam um anel (pool fixo `rings`), marcam o flare da lâmina do defensor (`saberFlares`, lido por `getSaberFlare(fighter)` no render) e, no perfeito, pedem dessaturação (`desaturation`) e câmera lenta. `DuelAudio` abaixa a música por 0,3 s no parry perfeito.
 
 ## Audio
 

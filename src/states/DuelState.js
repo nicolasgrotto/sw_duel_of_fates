@@ -60,6 +60,7 @@ export class DuelState extends GameState {
       stereoWidth: audioConfig.stereoWidth,
       hum: audioConfig.hum,
       musicDuckDuration: audioConfig.music.duckDuration,
+      perfectParryDuckDuration: audioConfig.music.perfectParryDuckDuration,
     });
     this.hud = new Hud(this.fighters[0], this.fighters[1]);
     this.message = new CombatMessage();

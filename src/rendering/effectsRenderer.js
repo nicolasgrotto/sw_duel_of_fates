@@ -1,3 +1,5 @@
+import { colors } from '../config/themeConfig.js';
+
 export function drawImpactLights(renderer, lights) {
   renderer.save();
   renderer.setBlendMode('lighter');
@@ -26,6 +28,38 @@ export function drawParticles(renderer, particles, streakTime) {
       particle.size,
     );
   }
+  renderer.restore();
+}
+
+export function drawRings(renderer, rings) {
+  renderer.save();
+  renderer.setBlendMode('lighter');
+  for (const ring of rings) {
+    if (!ring.active) {
+      continue;
+    }
+    renderer.setAlpha(ring.alpha * (1 - ring.time / ring.duration));
+    renderer.strokeCircle(ring.x, ring.y, ring.radius, ring.color, ring.lineWidth);
+  }
+  renderer.restore();
+}
+
+export function drawDesaturation(renderer, desaturation, dim, padding) {
+  if (desaturation.amount <= 0) {
+    return;
+  }
+  const x = -padding;
+  const y = -padding;
+  const width = renderer.width + padding * 2;
+  const height = renderer.height + padding * 2;
+
+  renderer.save();
+  renderer.setBlendMode('saturation');
+  renderer.setAlpha(desaturation.amount);
+  renderer.fillRect(x, y, width, height, colors.desaturateGray);
+  renderer.setBlendMode('source-over');
+  renderer.setAlpha(desaturation.amount * dim);
+  renderer.fillRect(x, y, width, height, colors.desaturateDim);
   renderer.restore();
 }
 
