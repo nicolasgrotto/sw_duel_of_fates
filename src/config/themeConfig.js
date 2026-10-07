@@ -84,6 +84,10 @@ export const textStyles = {
     align: 'right',
     baseline: 'middle',
   },
+  trainingStatus: {
+    font: `18px ${FONT_FAMILY}`,
+    color: colors.textMuted, align: 'left', baseline: 'middle',
+  },
   tableLabel: {
     font: `22px ${FONT_FAMILY}`,
     color: colors.textMuted,

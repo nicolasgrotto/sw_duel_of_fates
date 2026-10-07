@@ -174,7 +174,7 @@ Os itens de identidade (nome, fonte, letterbox, ignição e paleta de sabres) pe
 - [x] Tela de seleção de personagem (o jogador pode ser qualquer um)
 - [ ] Bastião, Vespa e Espelho
 - [ ] IA com comportamento por dificuldade (punir bloqueio, iscas de whiff, memória curta de hábitos no Difícil)
-- [ ] Treino: boneco que grava e reproduz, hitboxes visíveis sem F3, display de inputs
+- [x] Treino: boneco que grava e reproduz, hitboxes visíveis sem F3, display de inputs
 
 ### v0.5 — Modos
 

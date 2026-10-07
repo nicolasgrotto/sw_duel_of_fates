@@ -13,6 +13,9 @@ export const Action = Object.freeze({
   PAUSE: 'pause',
   TOGGLE_DEBUG: 'toggleDebug',
   CYCLE_DUMMY: 'cycleDummy',
+  RECORD_DUMMY: 'recordDummy',
+  PLAY_DUMMY: 'playDummy',
+  TRAINING_HITBOXES: 'trainingHitboxes',
 });
 
 export const keyBindings = {
@@ -30,6 +33,9 @@ export const keyBindings = {
   [Action.PAUSE]: ['Escape', 'KeyP'],
   [Action.TOGGLE_DEBUG]: ['F3'],
   [Action.CYCLE_DUMMY]: ['F4'],
+  [Action.RECORD_DUMMY]: ['F5'],
+  [Action.PLAY_DUMMY]: ['F6'],
+  [Action.TRAINING_HITBOXES]: ['F7'],
 };
 
 export const gamepadConfig = {

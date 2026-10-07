@@ -35,6 +35,7 @@ export const gameConfig = {
     spawnDistance: 440,
     roundsToWin: 2,
     resultDelay: 1.5,
+    training: { recordingFrames: 600 },
     dummy: {
       attackInterval: 1.4,
     },

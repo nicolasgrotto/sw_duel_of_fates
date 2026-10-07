@@ -200,6 +200,7 @@ O `CombatSystem` emite eventos (`hit`, `block`, `guardBreak`, `clash`, `death`, 
 
 No modo **Treino** (menu), o oponente é um boneco em vez da IA. Com o debug ligado, `F4` alterna o comportamento: parado → bloqueando → atacando.
 
+- F5 grava até 10 s de inputs do jogador; F6 reproduz no boneco em loop. Movimento é relativo à direção de guarda. F4 volta ao comportamento manual e para a reprodução. F7 alterna hitboxes/hurtboxes sem exigir F3. Inputs e estado de gravação aparecem no rodapé.
 - O treino não tem limite de rounds: depois de um K.O., começa outro round.
 - **Dados de frame**: a cada golpe do jogador que acerta ou é bloqueado, a HUD do treino mostra o golpe, o resultado e a vantagem em segundos (ex.: `Forte · bloqueado · −0,30 s`). Vantagem negativa significa que o oponente age primeiro. O valor é o tempo restante de travamento do defensor menos o do atacante: usa recovery se o ataque continua e stagger se foi aparado (−0,30 s no parry, −0,50 s no perfeito). O dado fica visível até o próximo contato ou round, sem contar hit stop ou câmera lenta.
 

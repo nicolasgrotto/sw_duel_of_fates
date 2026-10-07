@@ -486,3 +486,31 @@ it('returns from character selection to the menu without starting a duel', () =>
   game.step(Action.BACK);
   assert.deepEqual(game.stateNames(), ['MenuState']);
 });
+
+it('records the player and replays through dummy intents only in training', () => {
+  const game = createFakeGame();
+  game.changeState(StateId.DUEL, { mode: DuelMode.TRAINING });
+  const duel = game.states.current;
+  skipIntro(game);
+  game.step(Action.RECORD_DUMMY, Action.LIGHT_ATTACK);
+  game.step();
+  game.step(Action.RECORD_DUMMY);
+  assert.ok(duel.recorder.length >= 2);
+  game.step(Action.PLAY_DUMMY);
+  assert.equal(duel.recorder.mode, 'playing');
+  assert.equal(duel.fighters[1].combat.attackType, 'light');
+  game.step(Action.TRAINING_HITBOXES);
+  assert.equal(duel.trainingHitboxes, true);
+  game.step(Action.PAUSE);
+  const count = duel.recorder.length;
+  game.step();
+  assert.equal(duel.recorder.length, count);
+});
+
+it('does not activate recording tools outside training', () => {
+  const game = createFakeGame();
+  game.changeState(StateId.DUEL);
+  game.step(Action.RECORD_DUMMY, Action.TRAINING_HITBOXES);
+  assert.equal(game.states.current.recorder.mode, 'idle');
+  assert.equal(game.states.current.trainingHitboxes, false);
+});

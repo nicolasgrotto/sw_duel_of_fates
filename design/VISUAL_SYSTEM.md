@@ -184,3 +184,5 @@ Controlado pela **Camera**, a pedido do `EffectsSystem`. Nunca diretamente pelo 
 ## Enquadramento dinâmico
 
 O centro acompanha suavemente o ponto médio dos corpos, respeitando os limites horizontais do mundo. Zoom adicional de enquadramento de até 4%, reduzido quando os lutadores se afastam; margem de 160 px para as lâminas. O chão é a âncora vertical. O punch-in de impacto se soma ao enquadramento, com foco no contato, e a UI continua fixa.
+
+O estilo trainingStatus usa system-ui 18 px, textMuted, alinhado à esquerda; status de gravação na borda inferior do Treino.

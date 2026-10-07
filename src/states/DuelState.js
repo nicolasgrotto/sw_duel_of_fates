@@ -16,6 +16,8 @@ import { animation as animationStyle } from '../config/fighterVisualConfig.js';
 import { gameConfig } from '../config/gameConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
 import { layout, texts } from '../config/uiConfig.js';
+import { IntentRecorder, encodeIntent } from '../controllers/IntentRecorder.js';
+import { formatIntent } from '../ui/trainingInputs.js';
 import { DummyController } from '../controllers/DummyController.js';
 import { Camera } from '../core/Camera.js';
 import { PlayerController } from '../controllers/PlayerController.js';
@@ -43,6 +45,12 @@ export class DuelState extends GameState {
     this.roundNumber = 1;
     this.lastEvent = 'none';
     this.frameDataLine = '';
+    this.inputsLine = '';
+    this.inputSignature = -1;
+    this.recorderSignature = '';
+    this.recorderLine = '';
+    this.trainingHitboxes = false;
+    this.recorder = new IntentRecorder(gameConfig.duel.training.recordingFrames);
     this.debugBox = createBox();
     this.mode = this.params.mode ?? DuelMode.VERSUS;
     this.playerCharacter = this.params.playerCharacter ?? gameConfig.duel.playerCharacter;
@@ -118,6 +126,9 @@ export class DuelState extends GameState {
     this.outcome = null;
     this.introTime = 0;
     this.frameDataLine = '';
+    this.recorder.rewind();
+    this.inputsLine = '';
+    this.inputSignature = '';
     this.roundNumber += 1;
     this.showRoundIntro();
   }
@@ -164,6 +175,19 @@ export class DuelState extends GameState {
 
     if (this.isTraining && this.game.debug.enabled && this.game.input.wasPressed(Action.CYCLE_DUMMY)) {
       this.opponentController.cycleBehavior();
+      this.recorder.stop();
+    }
+
+    if (this.isTraining) {
+      if (this.game.input.wasPressed(Action.RECORD_DUMMY)) {
+        this.recorder.toggleRecording();
+      }
+      if (this.game.input.wasPressed(Action.PLAY_DUMMY)) {
+        this.recorder.startPlayback();
+      }
+      if (this.game.input.wasPressed(Action.TRAINING_HITBOXES)) {
+        this.trainingHitboxes = !this.trainingHitboxes;
+      }
     }
 
     if (this.outcome) {
@@ -186,6 +210,7 @@ export class DuelState extends GameState {
       this.stepSimulation(simulationDt);
     }
 
+    this.updateTrainingStatus();
     this.ambient.update(dt);
     this.effects.update(dt);
     this.camera.frame(
@@ -219,6 +244,9 @@ export class DuelState extends GameState {
       this.updateIntents(dt);
     }
 
+    if (this.isPlaying()) {
+      this.updateTrainingInputs();
+    }
     this.simulation.step(dt);
     this.effects.handleEvents(this.simulation.events);
     this.duelAudio.handleEvents(this.simulation.events);
@@ -235,7 +263,39 @@ export class DuelState extends GameState {
 
   updateIntents(dt) {
     for (const { fighter, controller } of this.participants) {
+      if (this.isTraining && fighter !== this.player && this.recorder.play(fighter.intent, fighter.facing)) {
+        continue;
+      }
       controller.updateIntent(fighter.intent, dt);
+    }
+  }
+
+  updateTrainingInputs() {
+    if (!this.isTraining) {
+      return;
+    }
+    this.recorder.record(this.player.intent, this.player.facing);
+    const [player, dummy] = this.fighters;
+    const signature = encodeIntent(player.intent, 1) * 256 + encodeIntent(dummy.intent, 1);
+    if (signature !== this.inputSignature) {
+      this.inputSignature = signature;
+      this.inputsLine = formatText(texts.training.inputs, {
+        player: formatIntent(player.intent),
+        dummy: formatIntent(dummy.intent),
+      });
+    }
+  }
+
+  updateTrainingStatus() {
+    if (!this.isTraining) {
+      return;
+    }
+    const signature = this.recorder.mode + this.recorder.length;
+    if (signature !== this.recorderSignature) {
+      this.recorderSignature = signature;
+      this.recorderLine = formatText(texts.training.recorder, {
+        mode: texts.training.recorderModes[this.recorder.mode], seconds: (this.recorder.length * gameConfig.loop.fixedStep).toFixed(1).replace('.', ','),
+      });
     }
   }
 
@@ -331,9 +391,16 @@ export class DuelState extends GameState {
 
   render(renderer) {
     this.view.render(renderer, this.arena, this.fighters, this.effects, this.camera, this.ambient);
+    if (this.isTraining && this.trainingHitboxes && !this.game.debug.enabled) {
+      this.renderDebug(renderer);
+    }
     this.hud.render(renderer);
     this.message.render(renderer);
 
+    if (this.isTraining) {
+      renderer.text(this.inputsLine, renderer.width / 2, layout.hud.inputsY, textStyles.hint);
+      renderer.text(this.recorderLine, layout.hud.margin, layout.hud.recorderY, textStyles.trainingStatus);
+    }
     if (this.isTraining && this.frameDataLine) {
       renderer.text(this.frameDataLine, renderer.width / 2, layout.hud.frameDataY, textStyles.hint);
     }

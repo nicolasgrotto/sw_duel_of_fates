@@ -43,6 +43,9 @@ export const texts = {
       dodge: 'Esquivar',
       pause: 'Pausar',
       toggleDebug: 'Debug',
+      recordDummy: 'Treino: gravar inputs',
+      playDummy: 'Treino: reproduzir no boneco',
+      trainingHitboxes: 'Treino: hitboxes',
     },
   },
   duel: {
@@ -56,6 +59,10 @@ export const texts = {
     footer: '{up}  e  {down}  escolher · {confirm}  confirmar · {back}  voltar',
   },
   training: {
+    inputs: 'Jogador: {player}   ·   Boneco: {dummy}',
+    recorder: '{mode} · {seconds} s',
+    recorderModes: { idle: 'Gravação parada', recording: 'Gravando', playing: 'Reproduzindo' },
+    inputNames: { idle: '—', left: '←', right: '→', jump: 'pulo', lightAttack: 'rápido', heavyAttack: 'forte', block: 'guarda', dodge: 'esquiva' },
     frameData: '{attack} · {result} · {advantage} s',
     attacks: { air: 'Aéreo', forwardHeavy: 'Forte de avanço', light: 'Rápido', light2: 'Rápido 2', light3: 'Rápido 3', heavy: 'Forte', riposte: 'Riposta', shove: 'Empurrão' },
     results: {
@@ -105,6 +112,9 @@ export const controlsScreenRows = [
   { label: 'dodge', actions: ['dodge'] },
   { label: 'pause', actions: ['pause'] },
   { label: 'toggleDebug', actions: ['toggleDebug'] },
+  { label: 'recordDummy', actions: ['recordDummy'] },
+  { label: 'playDummy', actions: ['playDummy'] },
+  { label: 'trainingHitboxes', actions: ['trainingHitboxes'] },
 ];
 
 export const keyComboSeparator = '  +  ';
@@ -131,8 +141,8 @@ export const layout = {
   },
   controls: {
     titleY: 110,
-    firstRowY: 160,
-    rowSpacing: 32,
+    firstRowY: 150,
+    rowSpacing: 27,
     columnGap: 16,
     gamepadY: 624,
     footerY: 670,
@@ -165,6 +175,8 @@ export const layout = {
     lowHealthDimAlpha: 0.45,
     rejectFlashDuration: 0.3,
     rejectBlinkPeriod: 0.1,
+    inputsY: 634,
+    recorderY: 690,
     frameDataY: 660,
     roundY: 80,
     roundSize: 8,

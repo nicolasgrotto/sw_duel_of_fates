@@ -105,3 +105,7 @@ NOME ESQUERDA                                         NOME DIREITA
 ### Seleção de personagem
 
 Duelar e Treino abrem uma lista vertical de nomes, com a mesma navegação e marcador do MenuList. A silhueta do personagem selecionado aparece abaixo da lista, em guarda, com o sabre aceso. Título ESCOLHA SEU LUTADOR e dica de confirmar/voltar nas bordas. Por enquanto escolhe Guardião ou Sombra; o adversário é o outro personagem. A seleção acompanha pausa, reinício e revanche.
+
+### Ferramentas do Treino
+
+Inputs do jogador e do boneco aparecem em uma linha hint no rodapé (acima dos dados de frame), usando nomes de ações. F5 alterna gravação dos intents do jogador; F6 reproduz a gravação no boneco em loop, espelhando movimento pela direção de guarda. Estado e duração da gravação ficam na borda inferior esquerda. Hitboxes podem ser ligadas por F7 sem ligar todo o debug. As três teclas constam em Controles. Sem painel DOM ou elementos no centro da luta.

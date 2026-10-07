@@ -49,6 +49,7 @@ src/
     characterFactory.js     ✅ cria um Fighter a partir dos dados
   controllers/              ✅ quem controla um lutador
     PlayerController.js     ✅ Input → intent
+    IntentRecorder.js       ✅ buffer Uint16 fixo: grava intents e reproduz movimento relativo
     DummyController.js      ✅ boneco de treino (parado, bloqueando, atacando)
   entities/                 ✅ objetos do jogo
     Fighter.js              ✅ posição, velocidade, estado, intent, animação
@@ -338,6 +339,8 @@ Arquivos: [src/ui/](src/ui/), [src/config/uiConfig.js](src/config/uiConfig.js). 
 ---
 
 No Treino, `DuelState.updateFrameData` lê os contatos do jogador e usa `combat/frameData.js`, puro e testável, para comparar os tempos de travamento restantes. Ataque em curso usa startup+active+recovery menos stateTime; bloqueio usa blockstun; hit/stun/stagger usam stunDuration menos stateTime. Parry cancelou o ataque: o stagger do atacante produz a desvantagem correta. Contatos de K.O. são ignorados, pois não há próxima ação. Texto em `uiConfig.training`, linha hint acima da pausa, limpa no próximo round.
+
+Treino: `IntentRecorder` guarda até 600 frames de intent em Uint16Array (10 s de simulação), sem objetos por frame. F5 grava; F6 reproduz no boneco em loop, movimento relativo ao facing; F4 para playback e volta ao boneco manual. Entre rounds a gravação fica e o cursor volta ao início. `trainingInputs` formata nomes de ações; a linha é atualizada quando a assinatura muda. F7 desenha hitboxes/hurtboxes sem exigir F3, usando a mesma transformação da câmera.
 
 ## Renderer
 
