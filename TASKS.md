@@ -2,6 +2,16 @@
 
 Atualize este arquivo ao terminar cada tarefa.
 
+## Ponto de continuidade
+
+- Os cinco itens abertos da v0.2 foram implementados e verificados no Chrome headless local. O alvo de 6–9 é medido pelos hits recebidos pelo derrotado até K.O.; o total dos dois lados continua explícito no simulador.
+- v0.3: arenas como dados, Plataforma de Refino, câmera dinâmica, gamepad/vibração e preset alternativo prontos. Nome/fonte/letterbox/ignição e paleta ficam pendentes para o Opus, conforme a divisão autorizada.
+- v0.4: catálogo de moves, sequências confirmadas, aéreo/avanço, seleção de jogador e gravação/reprodução/inputs/hitboxes do Treino prontos.
+- Próximo item de implementação: IA da v0.4 (punição de bloqueio, iscas de whiff e memória curta no Difícil). Habilidades exclusivas e Bastião/Vespa/Espelho permanecem pendentes para o Opus.
+- v0.5 a v0.7 continuam abertas; nenhum desses modos ou sistemas foi marcado como concluído.
+- Validação atual: 264 testes; simulações de 300 rounds nas três dificuldades, com perfis próprios e balanced. Gamepad foi testado por API injetada; vibração física ainda requer um controle conectado.
+
+
 ## Projeto e publicação
 
 - [x] Documentação de design (DESIGN.md e design/)
