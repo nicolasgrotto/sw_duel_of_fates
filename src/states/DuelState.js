@@ -73,7 +73,7 @@ export class DuelState extends GameState {
     this.hud = this.createHud();
     this.message = new CombatMessage();
     this.showRoundIntro();
-    this.pauseHint = formatText(texts.duel.pauseHint, { pause: formatActionKeys(keyBindings, Action.PAUSE) });
+    this.pauseHint = formatText(texts.duel.pauseHint, { pause: formatActionKeys(this.game.input.bindings ?? keyBindings, Action.PAUSE) });
   }
 
   createHud() {

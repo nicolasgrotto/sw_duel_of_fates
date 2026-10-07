@@ -159,7 +159,9 @@ As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e des
 - [ ] Nome próprio do jogo, fonte display OFL, letterbox, ignição dos sabres na intro
 - [ ] Paleta de sabres sem codificação herói/vilão
 - [x] Gamepad (Gamepad API dentro do `Input`), vibração em impactos
-- [ ] Segundo preset de teclado (setas + Z X C V)
+- [x] Segundo preset de teclado (setas + Z X C V)
+
+Os itens de identidade (nome, fonte, letterbox, ignição e paleta de sabres) permanecem pendentes para trabalho visual do Opus, conforme a opção de divisão autorizada no pedido.
 
 ### v0.4 — Personagens I
 

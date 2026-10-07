@@ -1,7 +1,7 @@
 import { aiConfig } from '../config/aiConfig.js';
 import { audioConfig } from '../config/audioConfig.js';
 import { loadSettings, saveSettings } from './settingsStorage.js';
-import { Action, keyBindings } from '../config/controlsConfig.js';
+import { Action, keyBindings, keyboardPresets, keyboardPresetOrder } from '../config/controlsConfig.js';
 import { gameConfig } from '../config/gameConfig.js';
 import { colors } from '../config/themeConfig.js';
 import { createState } from '../states/stateFactory.js';
@@ -19,10 +19,10 @@ export class Game {
     this.input = new Input({ bindings: keyBindings, target: window, getGamepads: () => navigator.getGamepads?.() ?? [] });
     this.states = new StateMachine();
     this.settings = loadSettings(
-      { difficulty: aiConfig.defaultDifficulty, reducedEffects: false, sound: true, music: true },
+      { keyboardPreset: 'classic', difficulty: aiConfig.defaultDifficulty, reducedEffects: false, sound: true, music: true },
       globalThis.localStorage,
       gameConfig.settingsStorageKey,
-      { difficulty: aiConfig.difficultyOrder },
+      { difficulty: aiConfig.difficultyOrder, keyboardPreset: keyboardPresetOrder },
     );
     this.audio = new AudioManager(audioConfig);
     this.applySettings();
@@ -47,6 +47,7 @@ export class Game {
   }
 
   applySettings() {
+    this.input.setBindings(keyboardPresets[this.settings.keyboardPreset]);
     this.audio.setSfxEnabled(this.settings.sound);
     this.audio.setMusicEnabled(this.settings.music);
   }

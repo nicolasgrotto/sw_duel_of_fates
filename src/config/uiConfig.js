@@ -9,6 +9,8 @@ export const texts = {
   },
   options: {
     title: 'OPÇÕES',
+    keyboard: 'Teclado: {preset}',
+    keyboardPresets: { classic: 'A/D + J/K/L/Shift', arrows: 'Setas + Z/X/C/V' },
     difficulty: 'Dificuldade: {level}',
     effects: 'Efeitos: {value}',
     sound: 'Som: {value}',

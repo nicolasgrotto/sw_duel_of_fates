@@ -24,6 +24,7 @@ export class Input {
     this.nextPadActions = new Set();
     this.gamepad = null;
     this.focused = true;
+    this.bindings = bindings;
     this.codesByAction = new Map(Object.entries(bindings));
     this.actionsByCode = mapActionsByCode(bindings);
     this.downCodes = new Set();
@@ -38,6 +39,17 @@ export class Input {
     target.addEventListener('keyup', this.handleKeyUp);
     target.addEventListener('blur', this.handleBlur);
     target.addEventListener('focus', this.handleFocus);
+  }
+
+  setBindings(bindings) {
+    if (this.bindings === bindings) {
+      return;
+    }
+    this.bindings = bindings;
+    this.codesByAction = new Map(Object.entries(bindings));
+    this.actionsByCode = mapActionsByCode(bindings);
+    this.downCodes.clear();
+    this.pressedActions.clear();
   }
 
   handleKeyDown(event) {

@@ -38,7 +38,7 @@ Todos os textos ficam em `src/config/uiConfig.js` (`texts`). Para trocar o nome 
 
 ### Opções
 
-- Lista: **Dificuldade: <nível>**, **Efeitos: Completos/Reduzidos**, **Som: Ligado/Desligado**, **Música: Ligada/Desligada**, **Voltar**.
+- Lista: **Dificuldade: <nível>**, **Efeitos: Completos/Reduzidos**, **Som: Ligado/Desligado**, **Música: Ligada/Desligada**, **Teclado: A/D + J/K/L/Shift ou Setas + Z/X/C/V**, **Voltar**.
 - `Enter` troca o valor da opção selecionada. `Esc` volta.
 - As escolhas ficam salvas no navegador (`localStorage`) e voltam na próxima vez.
 - Linha discreta no rodapé com a navegação (`↑ ↓  escolher · Enter  confirmar`).

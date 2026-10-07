@@ -67,6 +67,8 @@ Roda duelos IA × IA sem navegador e mostra vitórias e estatísticas. Opções 
 | Debug | `F3` |
 | Comportamento do boneco (modo Treino, com debug ligado) | `F4` |
 
+O preset alternativo, selecionável em Opções, usa setas para mover/pular e Z/X/C/V para rápido/forte/guarda/esquiva. A escolha é salva no navegador e a tela de Controles acompanha o preset. Gamepad padrão: stick/direcional para mover, A pular/confirmar, X rápido, Y forte, LB/LT guarda, B esquiva/voltar e Start pausa.
+
 Os controles ficam em [src/config/controlsConfig.js](src/config/controlsConfig.js).
 
 ## Documentação

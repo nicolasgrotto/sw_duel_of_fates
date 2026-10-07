@@ -9,9 +9,9 @@ export class ControlsState extends GameState {
   enter() {
     this.rows = controlsScreenRows.map(({ label, actions }) => ({
       label: texts.controls.actions[label],
-      keys: actions.map((action) => formatActionKeys(keyBindings, action)).join(keyComboSeparator),
+      keys: actions.map((action) => formatActionKeys(this.game.input.bindings ?? keyBindings, action)).join(keyComboSeparator),
     }));
-    this.footer = formatText(texts.controls.back, { back: formatActionKeys(keyBindings, Action.BACK) });
+    this.footer = formatText(texts.controls.back, { back: formatActionKeys(this.game.input.bindings ?? keyBindings, Action.BACK) });
   }
 
   update() {

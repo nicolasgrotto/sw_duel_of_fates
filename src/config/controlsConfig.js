@@ -65,3 +65,21 @@ export const gamepadConfig = {
     shove: { duration: 40, strongMagnitude: 0.2, weakMagnitude: 0.1 },
   },
 };
+
+export const keyboardPresetOrder = ['classic', 'arrows'];
+
+export const keyboardPresets = {
+  classic: keyBindings,
+  arrows: {
+    ...keyBindings,
+    [Action.MOVE_LEFT]: ['ArrowLeft'],
+    [Action.MOVE_RIGHT]: ['ArrowRight'],
+    [Action.JUMP]: ['ArrowUp', 'Space'],
+    [Action.LIGHT_ATTACK]: ['KeyZ'],
+    [Action.HEAVY_ATTACK]: ['KeyX'],
+    [Action.BLOCK]: ['KeyC'],
+    [Action.DODGE]: ['KeyV'],
+    [Action.MENU_UP]: ['ArrowUp'],
+    [Action.MENU_DOWN]: ['ArrowDown'],
+  },
+};

@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { Action } from '../src/config/controlsConfig.js';
+import { Action, keyboardPresets } from '../src/config/controlsConfig.js';
 import { colors } from '../src/config/themeConfig.js';
 import { layout } from '../src/config/uiConfig.js';
 import { aiConfig } from '../src/config/aiConfig.js';
@@ -438,4 +438,19 @@ it('shows localized frame data only for player contacts in training', () => {
   duel.simulation.events.push({ type: 'block', attackType: 'heavy', attacker: player, defender: opponent });
   duel.updateFrameData();
   assert.equal(duel.frameDataLine, '');
+});
+
+it('selects the alternative keyboard preset and shows its guard combination', () => {
+  const game = createFakeGame();
+  game.changeState(StateId.OPTIONS);
+  const options = game.states.current;
+  options.toggle('keyboard');
+  assert.equal(game.settings.keyboardPreset, 'arrows');
+  assert.equal(game.saved, 1);
+  assert.equal(options.items.keyboard.label, 'Teclado: Setas + Z/X/C/V');
+  game.input.bindings = keyboardPresets.arrows;
+  game.changeState(StateId.CONTROLS);
+  const controls = game.states.current;
+  assert.equal(controls.rows.find(row => row.label.startsWith('Empurrar')).keys, 'C  +  Z');
+  assert.equal(controls.rows.find(row => row.label === 'Ataque forte').keys, 'X');
 });

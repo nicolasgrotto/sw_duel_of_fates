@@ -273,6 +273,8 @@ Arquivo: [src/core/Input.js](src/core/Input.js)
 
 `Input.pollGamepads()` roda antes de cada update do Game e lê o primeiro controle conectado com mapping standard, por API injetada. Converte botões/eixos em ações com deadzone; guarda bordas de toque separadas do teclado e libera tudo ao desconectar/perder foco. Gamepad e teclado podem coexistir. `Input.rumble` recebe somente um tipo de impacto do DuelState, com receita em controlsConfig, e tolera hardware sem atuador. Efeitos reduzidos diminuem vibração a 25%. Nenhum módulo de gameplay acessa navigator.
 
+`keyboardPresets` em controlsConfig oferece classic e arrows (setas + Z/X/C/V). `Game.settings.keyboardPreset` é validado e salvo no localStorage; aplicar opções chama `Input.setBindings`, que troca os mapas de teclas e limpa teclas/toques anteriores. Controles, dicas do duelo e rodapé do menu leem o mapa ativo. Opções permite alternar o preset. Gamepad não depende dessa seleção.
+
 ## Estados (StateMachine)
 
 Arquivos: [src/core/StateMachine.js](src/core/StateMachine.js), [src/states/](src/states/)

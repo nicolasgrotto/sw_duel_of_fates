@@ -1,5 +1,6 @@
 import { beforeEach, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { keyboardPresets } from '../src/config/controlsConfig.js';
 import { Input } from '../src/core/Input.js';
 
 const bindings = {
@@ -177,4 +178,21 @@ describe('gamepad input', () => {
     delete pad.vibrationActuator;
     assert.doesNotThrow(() => input.rumble('hit'));
   });
+});
+
+it('switches keyboard presets and releases keys from the previous mapping', () => {
+  const target = new EventTarget();
+  const input = new Input({ bindings: keyboardPresets.classic, target });
+  target.dispatchEvent(keyEvent('keydown', 'KeyJ'));
+  assert.equal(input.wasPressed('lightAttack'), true);
+  input.setBindings(keyboardPresets.arrows);
+  assert.equal(input.isDown('lightAttack'), false);
+  assert.equal(input.wasPressed('lightAttack'), false);
+  target.dispatchEvent(keyEvent('keydown', 'KeyJ'));
+  assert.equal(input.isDown('lightAttack'), false);
+  target.dispatchEvent(keyEvent('keydown', 'KeyZ'));
+  assert.equal(input.isDown('lightAttack'), true);
+  target.dispatchEvent(keyEvent('keydown', 'KeyC'));
+  assert.equal(input.isDown('block'), true);
+  assert.equal(input.wasPressed('block'), true);
 });

@@ -28,14 +28,22 @@ export class MenuState extends GameState {
       layout.menu,
       this.game.audio,
     );
+    this.refreshFooter();
+  }
+
+  refreshFooter() {
+    this.bindings = this.game.input.bindings ?? keyBindings;
     this.footer = formatText(texts.menu.navigation, {
-      up: formatActionKeys(keyBindings, Action.MENU_UP),
-      down: formatActionKeys(keyBindings, Action.MENU_DOWN),
-      confirm: formatActionKeys(keyBindings, Action.CONFIRM),
+      up: formatActionKeys(this.game.input.bindings ?? keyBindings, Action.MENU_UP),
+      down: formatActionKeys(this.game.input.bindings ?? keyBindings, Action.MENU_DOWN),
+      confirm: formatActionKeys(this.game.input.bindings ?? keyBindings, Action.CONFIRM),
     });
   }
 
   update() {
+    if (this.bindings !== (this.game.input.bindings ?? keyBindings)) {
+      this.refreshFooter();
+    }
     switch (this.menu.update(this.game.input)) {
       case MenuOption.DUEL:
         this.game.changeState(StateId.DUEL, { mode: DuelMode.VERSUS });
