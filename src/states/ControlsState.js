@@ -35,6 +35,7 @@ export class ControlsState extends GameState {
       renderer.text(row.keys, centerX + columnGap, y, textStyles.tableValue);
     }
 
+    renderer.text(texts.controls.gamepad, centerX, layout.controls.gamepadY, textStyles.hint);
     renderer.text(this.footer, centerX, footerY, textStyles.hint);
   }
 }

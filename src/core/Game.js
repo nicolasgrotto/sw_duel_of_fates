@@ -16,7 +16,7 @@ import { StateMachine } from './StateMachine.js';
 export class Game {
   constructor(canvas) {
     this.renderer = new Renderer(canvas, gameConfig.canvas);
-    this.input = new Input({ bindings: keyBindings, target: window });
+    this.input = new Input({ bindings: keyBindings, target: window, getGamepads: () => navigator.getGamepads?.() ?? [] });
     this.states = new StateMachine();
     this.settings = loadSettings(
       { difficulty: aiConfig.defaultDifficulty, reducedEffects: false, sound: true, music: true },
@@ -72,6 +72,7 @@ export class Game {
   }
 
   update(dt) {
+    this.input.pollGamepads();
     if (this.input.wasPressed(Action.TOGGLE_DEBUG)) {
       this.debug.toggle();
     }

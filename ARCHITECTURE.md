@@ -271,6 +271,8 @@ Arquivo: [src/core/Input.js](src/core/Input.js)
 
 ---
 
+`Input.pollGamepads()` roda antes de cada update do Game e lê o primeiro controle conectado com mapping standard, por API injetada. Converte botões/eixos em ações com deadzone; guarda bordas de toque separadas do teclado e libera tudo ao desconectar/perder foco. Gamepad e teclado podem coexistir. `Input.rumble` recebe somente um tipo de impacto do DuelState, com receita em controlsConfig, e tolera hardware sem atuador. Efeitos reduzidos diminuem vibração a 25%. Nenhum módulo de gameplay acessa navigator.
+
 ## Estados (StateMachine)
 
 Arquivos: [src/core/StateMachine.js](src/core/StateMachine.js), [src/states/](src/states/)

@@ -31,3 +31,37 @@ export const keyBindings = {
   [Action.TOGGLE_DEBUG]: ['F3'],
   [Action.CYCLE_DUMMY]: ['F4'],
 };
+
+export const gamepadConfig = {
+  deadzone: 0.35,
+  buttons: {
+    0: [Action.JUMP, Action.CONFIRM],
+    1: [Action.DODGE, Action.BACK],
+    2: [Action.LIGHT_ATTACK],
+    3: [Action.HEAVY_ATTACK],
+    4: [Action.BLOCK],
+    6: [Action.BLOCK],
+    8: [Action.BACK],
+    9: [Action.PAUSE, Action.CONFIRM],
+    12: [Action.MENU_UP],
+    13: [Action.MENU_DOWN],
+    14: [Action.MOVE_LEFT],
+    15: [Action.MOVE_RIGHT],
+  },
+  axes: [
+    { index: 0, negative: Action.MOVE_LEFT, positive: Action.MOVE_RIGHT },
+    { index: 1, negative: Action.MENU_UP, positive: Action.MENU_DOWN },
+  ],
+  reducedRumbleScale: 0.25,
+  rumble: {
+    hit: { duration: 50, strongMagnitude: 0.2, weakMagnitude: 0.3 },
+    heavyHit: { duration: 100, strongMagnitude: 0.5, weakMagnitude: 0.5 },
+    block: { duration: 40, strongMagnitude: 0.1, weakMagnitude: 0.2 },
+    parry: { duration: 70, strongMagnitude: 0.2, weakMagnitude: 0.4 },
+    perfectParry: { duration: 100, strongMagnitude: 0.4, weakMagnitude: 0.6 },
+    guardBreak: { duration: 120, strongMagnitude: 0.6, weakMagnitude: 0.5 },
+    clash: { duration: 100, strongMagnitude: 0.5, weakMagnitude: 0.6 },
+    death: { duration: 160, strongMagnitude: 0.7, weakMagnitude: 0.7 },
+    shove: { duration: 40, strongMagnitude: 0.2, weakMagnitude: 0.1 },
+  },
+};

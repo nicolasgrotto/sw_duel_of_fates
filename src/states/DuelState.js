@@ -4,6 +4,7 @@ import { EnemyAI } from '../ai/EnemyAI.js';
 import { DuelAudio } from '../audio/DuelAudio.js';
 import { characters } from '../characters/characterData.js';
 import { createFighter } from '../characters/characterFactory.js';
+import { isStrongAttack } from '../combat/attackPhases.js';
 import { getFrameAdvantage } from '../combat/frameData.js';
 import { CombatEvent } from '../combat/combatEvents.js';
 import { createBox, getAttackHitbox, isAttackActive, isInvulnerable } from '../combat/hitboxes.js';
@@ -218,6 +219,10 @@ export class DuelState extends GameState {
     this.simulation.step(dt);
     this.effects.handleEvents(this.simulation.events);
     this.duelAudio.handleEvents(this.simulation.events);
+    for (const event of this.simulation.events) {
+      const type = event.type === CombatEvent.HIT && isStrongAttack(event.attackType) ? 'heavyHit' : event.type;
+      this.game.input.rumble?.(type, this.game.settings.reducedEffects);
+    }
     this.hud.handleEvents(this.simulation.events);
     this.rememberLastEvent();
     this.countPlayerStats();

@@ -24,6 +24,7 @@ export const texts = {
   controls: {
     title: 'CONTROLES',
     back: '{back}  voltar',
+    gamepad: 'Controle: direcional mover · A pular · X rápido · Y forte · LB/LT guarda · B esquiva · Start pausa · A confirmar',
     actions: {
       moveLeft: 'Mover para a esquerda',
       moveRight: 'Mover para a direita',
@@ -119,7 +120,8 @@ export const layout = {
     firstRowY: 180,
     rowSpacing: 36,
     columnGap: 16,
-    footerY: 660,
+    gamepadY: 624,
+    footerY: 670,
   },
   pause: {
     titleY: 250,

@@ -49,6 +49,7 @@ Todos os textos ficam em `src/config/uiConfig.js` (`texts`). Para trocar o nome 
 - As teclas vêm de `controlsConfig` (formatadas por `ui/keyLabels.js`). Se a tecla mudar, a tela muda junto.
 - Combinações aparecem com `+` (ex.: empurrar `L  +  J`). Ações que usam a mesma tecla de outro jeito (aparar = tocar `L`) ganham linha própria com a explicação curta entre parênteses.
 - `Esc` ou `Enter` volta.
+- Uma linha hint no rodapé mostra os botões do gamepad padrão (A pular, X rápido, Y forte, LB/LT guarda, B esquiva, Start pausa); o direcional e A/Start também navegam/confirmam menus.
 
 ### Duelo (HUD)
 
