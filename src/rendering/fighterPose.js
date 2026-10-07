@@ -122,6 +122,14 @@ function resolveCombatPose(fighter, guardDegrees) {
       combatPose.bladeDegrees = guardDegrees + hit.bladeDropDegrees * recovery;
       break;
     }
+    case FighterState.STAGGERED: {
+      const { staggered } = combatPoses;
+      const recovery = 1 - easeInOutSine(clamp(fighter.stateTime / fighter.combat.stunDuration, 0, 1));
+      combatPose.leanDegrees = staggered.lean * recovery;
+      combatPose.crouch = staggered.crouch * recovery;
+      combatPose.bladeDegrees = lerp(guardDegrees, staggered.bladeDegrees, recovery);
+      break;
+    }
     case FighterState.STUNNED:
       applyStunnedPose(fighter);
       break;

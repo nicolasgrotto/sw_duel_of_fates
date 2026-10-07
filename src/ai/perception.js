@@ -1,7 +1,7 @@
 import { AttackPhase, getAttackPhase } from '../combat/attackPhases.js';
 import { FighterState } from '../entities/fighterStates.js';
 
-const PUNISHABLE_STATES = new Set([FighterState.HIT, FighterState.STUNNED]);
+const PUNISHABLE_STATES = new Set([FighterState.HIT, FighterState.STAGGERED, FighterState.STUNNED]);
 
 export function getGap(a, b) {
   return Math.abs(b.x - a.x) - (a.width + b.width) / 2;

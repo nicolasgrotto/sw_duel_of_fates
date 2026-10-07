@@ -7,6 +7,7 @@ function createIntent() {
     lightAttack: false,
     heavyAttack: false,
     block: false,
+    blockPressed: false,
     dodge: false,
   };
 }
@@ -44,6 +45,10 @@ export class Fighter {
       staminaRegenDelay: 0,
       bufferedAction: null,
       bufferTime: 0,
+      parryArmed: false,
+      parryTime: 0,
+      parryLockout: 0,
+      riposteTime: 0,
     };
 
     this.intent = createIntent();
@@ -118,6 +123,7 @@ export class Fighter {
     intent.lightAttack = false;
     intent.heavyAttack = false;
     intent.block = false;
+    intent.blockPressed = false;
     intent.dodge = false;
   }
 }

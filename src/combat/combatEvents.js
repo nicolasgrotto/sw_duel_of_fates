@@ -7,6 +7,8 @@ export const CombatEvent = Object.freeze({
   ATTACK_START: 'attackStart',
   DODGE: 'dodge',
   ACTION_REJECTED: 'actionRejected',
+  PARRY: 'parry',
+  PERFECT_PARRY: 'perfectParry',
 });
 
 const CONTACT_EVENTS = new Set([
@@ -15,6 +17,8 @@ const CONTACT_EVENTS = new Set([
   CombatEvent.GUARD_BREAK,
   CombatEvent.CLASH,
   CombatEvent.DEATH,
+  CombatEvent.PARRY,
+  CombatEvent.PERFECT_PARRY,
 ]);
 
 export function isContactEvent(event) {

@@ -122,8 +122,8 @@ Plano aprovado depois da análise de game design da v0.1. Cada versão é jogáv
 ### v0.2 — Combate técnico
 
 - [x] Buffer de input (0,15 s) e aviso de ação recusada por falta de stamina (barra pisca, som seco)
-- [ ] Parry por timing, parry perfeito, parry falho e estado `STAGGERED`
-- [ ] Riposta depois do parry
+- [x] Parry por timing, parry perfeito, parry falho e estado `STAGGERED`
+- [x] Riposta depois do parry
 - [ ] Efeitos e sons do parry (anel, lâmina clareando, dessaturação e câmera lenta no perfeito)
 - [ ] Empurrão (bloqueio + ataque rápido)
 - [ ] IA usando parry (contra fortes) e empurrão, com chances por dificuldade

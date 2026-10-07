@@ -1,4 +1,4 @@
-import { AttackType } from '../combat/attackPhases.js';
+import { isStrongAttack } from '../combat/attackPhases.js';
 import { CombatEvent } from '../combat/combatEvents.js';
 import { degreesToRadians } from '../utils/math.js';
 import { pick, randomInt, randomRange } from '../utils/random.js';
@@ -69,7 +69,7 @@ export class EffectsSystem {
 
     switch (event.type) {
       case CombatEvent.HIT:
-        this.spawn(event.attackType === AttackType.HEAVY ? EffectType.HEAVY_IMPACT : EffectType.HIT_SPARK, params);
+        this.spawn(isStrongAttack(event.attackType) ? EffectType.HEAVY_IMPACT : EffectType.HIT_SPARK, params);
         break;
       case CombatEvent.BLOCK:
         this.spawn(EffectType.BLOCK_SPARK, params);

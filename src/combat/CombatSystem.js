@@ -47,6 +47,9 @@ export class CombatSystem {
   updateTimers(fighter, dt) {
     const { combat, stats } = fighter;
 
+    this.updateParryTimers(fighter, dt);
+    combat.riposteTime = Math.max(0, combat.riposteTime - dt);
+
     switch (fighter.state) {
       case FighterState.ATTACKING:
       case FighterState.HEAVY_ATTACK:
@@ -61,6 +64,7 @@ export class CombatSystem {
         }
         break;
       case FighterState.HIT:
+      case FighterState.STAGGERED:
       case FighterState.STUNNED:
         if (fighter.stateTime >= combat.stunDuration) {
           fighter.setState(FighterState.IDLE);
@@ -68,7 +72,7 @@ export class CombatSystem {
         break;
       case FighterState.BLOCKING:
         combat.blockstun = Math.max(0, combat.blockstun - dt);
-        if (combat.blockstun === 0 && !fighter.intent.block) {
+        if (combat.blockstun === 0 && !fighter.intent.block && !combat.parryArmed) {
           fighter.setState(FighterState.IDLE);
         }
         break;
@@ -77,7 +81,25 @@ export class CombatSystem {
     }
   }
 
+  updateParryTimers(fighter, dt) {
+    const { combat } = fighter;
+    combat.parryLockout = Math.max(0, combat.parryLockout - dt);
+    if (!combat.parryArmed) {
+      return;
+    }
+
+    combat.parryTime += dt;
+    if (combat.parryTime >= fighter.stats.parry.window || fighter.state !== FighterState.BLOCKING) {
+      combat.parryArmed = false;
+      combat.parryLockout = fighter.stats.parry.lockout;
+    }
+  }
+
   startActions(fighter) {
+    if (fighter.state === FighterState.BLOCKING && fighter.combat.bufferedAction === CombatAction.PARRY) {
+      clearActionBuffer(fighter);
+      this.armParry(fighter);
+    }
     if (!fighter.canAct) {
       return;
     }
@@ -107,10 +129,28 @@ export class CombatSystem {
       case CombatAction.HEAVY_ATTACK:
         return this.tryAttack(fighter, AttackType.HEAVY);
       case CombatAction.LIGHT_ATTACK:
-        return this.tryAttack(fighter, AttackType.LIGHT);
+        return this.tryAttack(fighter, fighter.combat.riposteTime > 0 ? AttackType.RIPOSTE : AttackType.LIGHT);
+      case CombatAction.PARRY:
+        return this.startParry(fighter);
       default:
         return false;
     }
+  }
+
+  startParry(fighter) {
+    fighter.combat.blockstun = 0;
+    fighter.setState(FighterState.BLOCKING);
+    this.armParry(fighter);
+    return true;
+  }
+
+  armParry(fighter) {
+    const { combat } = fighter;
+    if (combat.parryLockout > 0 || combat.parryArmed) {
+      return;
+    }
+    combat.parryArmed = true;
+    combat.parryTime = 0;
   }
 
   tryAttack(fighter, attackType) {
@@ -120,6 +160,7 @@ export class CombatSystem {
     }
 
     spendStamina(fighter, attack.staminaCost);
+    fighter.combat.riposteTime = 0;
     fighter.clearAttack();
     fighter.combat.attack = attack;
     fighter.combat.attackType = attackType;
@@ -242,11 +283,38 @@ export class CombatSystem {
     if (!contact.defender.isAlive) {
       return;
     }
-    if (isBlockingAttack(contact.defender, contact.attacker)) {
-      this.resolveBlock(contact);
-    } else {
+    if (!isBlockingAttack(contact.defender, contact.attacker)) {
       this.applyHit(contact);
+    } else if (contact.defender.combat.parryArmed) {
+      this.resolveParry(contact);
+    } else {
+      this.resolveBlock(contact);
     }
+  }
+
+  resolveParry(contact) {
+    const { attacker, defender, attack } = contact;
+    const { parry } = defender.stats;
+    const perfect = defender.combat.parryTime < parry.perfectWindow;
+    const stagger = perfect ? parry.perfectStagger : parry.stagger;
+    const staminaDamage = attack.blockStaminaCost * (perfect ? parry.perfectStaminaDamageMultiplier : 1);
+
+    spendStamina(attacker, staminaDamage);
+    attacker.clearAttack();
+    attacker.vx = -attacker.facing * parry.attackerRecoil;
+    attacker.combat.stunDuration = stagger;
+    attacker.restartState(FighterState.STAGGERED);
+
+    defender.combat.parryArmed = false;
+    defender.combat.blockstun = 0;
+    defender.combat.riposteTime = stagger;
+    defender.vx = 0;
+    if (perfect) {
+      defender.stamina = Math.min(defender.stats.maxStamina, defender.stamina + parry.perfectStaminaGain);
+    }
+    defender.setState(FighterState.IDLE);
+
+    this.emit(perfect ? CombatEvent.PERFECT_PARRY : CombatEvent.PARRY, contact);
   }
 
   resolveBlock(contact) {

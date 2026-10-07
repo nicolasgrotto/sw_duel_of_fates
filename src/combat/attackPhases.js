@@ -3,6 +3,7 @@ import { FighterState } from '../entities/fighterStates.js';
 export const AttackType = Object.freeze({
   LIGHT: 'light',
   HEAVY: 'heavy',
+  RIPOSTE: 'riposte',
 });
 
 export const AttackPhase = Object.freeze({
@@ -15,7 +16,14 @@ export const AttackPhase = Object.freeze({
 export const ATTACK_STATES = Object.freeze({
   [AttackType.LIGHT]: FighterState.ATTACKING,
   [AttackType.HEAVY]: FighterState.HEAVY_ATTACK,
+  [AttackType.RIPOSTE]: FighterState.ATTACKING,
 });
+
+const STRONG_ATTACKS = new Set([AttackType.HEAVY, AttackType.RIPOSTE]);
+
+export function isStrongAttack(attackType) {
+  return STRONG_ATTACKS.has(attackType);
+}
 
 export function getAttackDuration(attack) {
   return attack.startup + attack.active + attack.recovery;

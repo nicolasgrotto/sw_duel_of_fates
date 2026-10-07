@@ -264,6 +264,7 @@ export class DuelState extends GameState {
       lines.push(
         `${fighter.id}: ${fighter.state}  hp ${fighter.health.toFixed(0)}  st ${fighter.stamina.toFixed(0)}`,
         `  pos ${fighter.x.toFixed(0)}, ${fighter.y.toFixed(0)}  vel ${fighter.vx.toFixed(0)}, ${fighter.vy.toFixed(0)}`,
+        `  parry ${fighter.combat.parryArmed ? fighter.combat.parryTime.toFixed(2) : '-'}  lockout ${fighter.combat.parryLockout.toFixed(2)}  buffer ${fighter.combat.bufferedAction ?? '-'}`,
       );
     }
 

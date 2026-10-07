@@ -254,3 +254,115 @@ describe('CombatSystem hits', () => {
     assert.equal(hit.attackType, 'light');
   });
 });
+
+function stepsUntilActive(attack) {
+  return Math.ceil(attack.startup / STEP - 1e-9);
+}
+
+function parryHeavy(duel, leadSeconds, { hold = true, extraSteps = 0 } = {}) {
+  const attack = duel.opponent.stats.attacks.heavy;
+  const contactStep = stepsUntilActive(attack);
+  const pressStep = contactStep - Math.round(leadSeconds / STEP);
+
+  duel.step({}, { heavyAttack: true });
+  for (let step = 1; step <= contactStep + extraSteps; step += 1) {
+    const pressed = step === pressStep;
+    duel.step({ block: pressed || (hold && step > pressStep), blockPressed: pressed });
+  }
+}
+
+describe('parry', () => {
+  it('parries an attack that arrives inside the window', () => {
+    const duel = createDuel();
+    const { player, opponent } = duel;
+
+    parryHeavy(duel, 0.14);
+
+    assert.deepEqual(eventTypes(duel.events), [CombatEvent.PARRY]);
+    assert.equal(player.health, player.stats.maxHealth);
+    assert.equal(player.stamina, player.stats.maxStamina);
+    assert.equal(player.state, FighterState.IDLE);
+    assert.equal(opponent.state, FighterState.STAGGERED);
+    assert.equal(opponent.combat.stunDuration, player.stats.parry.stagger);
+    assert.equal(opponent.combat.attack, null);
+  });
+
+  it('gives a perfect parry at the start of the window', () => {
+    const duel = createDuel();
+    const { player, opponent } = duel;
+    const heavy = opponent.stats.attacks.heavy;
+    const { parry } = player.stats;
+    player.stamina = 50;
+
+    parryHeavy(duel, 0.03);
+
+    assert.deepEqual(eventTypes(duel.events), [CombatEvent.PERFECT_PARRY]);
+    assert.equal(opponent.combat.stunDuration, parry.perfectStagger);
+    assert.ok(player.stamina >= 50 + parry.perfectStaminaGain);
+    const expectedStamina = opponent.stats.maxStamina - heavy.staminaCost - heavy.blockStaminaCost * parry.perfectStaminaDamageMultiplier;
+    assert.ok(Math.abs(opponent.stamina - expectedStamina) < 1e-9);
+  });
+
+  it('falls back to a normal block when the window is over', () => {
+    const duel = createDuel();
+
+    parryHeavy(duel, 0.3);
+
+    assert.deepEqual(eventTypes(duel.events), [CombatEvent.BLOCK]);
+    assert.ok(duel.player.combat.parryLockout > 0);
+  });
+
+  it('does not open a window when the block is only held', () => {
+    const duel = createDuel();
+    const attack = duel.opponent.stats.attacks.heavy;
+
+    duel.step({ block: true }, { heavyAttack: true });
+    repeat(stepsUntilActive(attack), () => duel.step({ block: true }));
+
+    assert.deepEqual(eventTypes(duel.events), [CombatEvent.BLOCK]);
+  });
+
+  it('keeps a tapped guard up until the window ends, then lets go', () => {
+    const duel = createDuel(400);
+    const { player } = duel;
+
+    duel.step({ block: true, blockPressed: true });
+    repeat(Math.floor(player.stats.parry.window / STEP) - 2, () => duel.step());
+    assert.equal(player.state, FighterState.BLOCKING);
+
+    repeat(3, () => duel.step());
+    assert.equal(player.state, FighterState.IDLE);
+    assert.equal(player.combat.parryArmed, false);
+  });
+
+  it('locks the window out for a moment after a missed parry', () => {
+    const duel = createDuel(400);
+    const { player } = duel;
+
+    duel.step({ block: true, blockPressed: true });
+    repeat(Math.ceil(player.stats.parry.window / STEP) + 2, () => duel.step());
+    duel.step({ block: true, blockPressed: true });
+
+    assert.equal(player.state, FighterState.BLOCKING);
+    assert.equal(player.combat.parryArmed, false);
+
+    repeat(Math.ceil(player.stats.parry.lockout / STEP), () => duel.step());
+    duel.step({ block: true, blockPressed: true });
+    assert.equal(player.combat.parryArmed, true);
+  });
+
+  it('turns the next light attack into a riposte while the attacker is staggered', () => {
+    const duel = createDuel();
+    const { player, opponent } = duel;
+    const riposte = player.stats.attacks.riposte;
+
+    parryHeavy(duel, 0.14, { hold: false });
+    duel.step({ lightAttack: true });
+
+    assert.equal(player.combat.attackType, 'riposte');
+    repeat(Math.ceil((riposte.startup + riposte.active) / STEP), () => duel.step());
+
+    assert.equal(opponent.health, opponent.stats.maxHealth - riposte.damage);
+    assert.deepEqual(eventTypes(duel.events), [CombatEvent.PARRY, CombatEvent.HIT]);
+  });
+});

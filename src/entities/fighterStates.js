@@ -7,6 +7,7 @@ export const FighterState = Object.freeze({
   BLOCKING: 'BLOCKING',
   DODGING: 'DODGING',
   HIT: 'HIT',
+  STAGGERED: 'STAGGERED',
   STUNNED: 'STUNNED',
   DEAD: 'DEAD',
 });

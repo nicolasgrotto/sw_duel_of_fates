@@ -61,6 +61,7 @@ export class EnemyAI {
     intent.moveX = plan.moveX;
     intent.jump = false;
     intent.block = plan.blockTime > 0;
+    intent.blockPressed = false;
     intent.lightAttack = plan.pendingAction === PendingAction.LIGHT_ATTACK;
     intent.heavyAttack = plan.pendingAction === PendingAction.HEAVY_ATTACK;
     intent.dodge = plan.pendingAction === PendingAction.DODGE;

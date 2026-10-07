@@ -51,6 +51,14 @@ export const combatPoses = {
       windupLift: 0.14,
       strikeReach: 0.12,
     },
+    riposte: {
+      windupDegrees: -70,
+      strikeDegrees: 40,
+      windupLean: -2,
+      strikeLean: 14,
+      windupLift: 0.04,
+      strikeReach: 0.15,
+    },
   },
   block: {
     bladeDegrees: -95,
@@ -65,6 +73,12 @@ export const combatPoses = {
   hit: {
     lean: -14,
     bladeDropDegrees: 35,
+  },
+  staggered: {
+    lean: -12,
+    crouch: 4,
+    bladeDegrees: -150,
+    bladeFlickerSpeed: 22,
   },
   stunned: {
     lean: 18,
