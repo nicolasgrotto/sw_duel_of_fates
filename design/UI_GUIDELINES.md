@@ -101,3 +101,7 @@ NOME ESQUERDA                                         NOME DIREITA
 - Botões coloridos, gradientes chamativos e ícones cartunescos.
 - Barras grossas ou HUD ocupando mais de ~10% da altura da tela.
 - Mais de uma fonte.
+
+### Seleção de personagem
+
+Duelar e Treino abrem uma lista vertical de nomes, com a mesma navegação e marcador do MenuList. A silhueta do personagem selecionado aparece abaixo da lista, em guarda, com o sabre aceso. Título ESCOLHA SEU LUTADOR e dica de confirmar/voltar nas bordas. Por enquanto escolhe Guardião ou Sombra; o adversário é o outro personagem. A seleção acompanha pausa, reinício e revanche.

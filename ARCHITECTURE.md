@@ -36,6 +36,7 @@ src/
     duelModes.js            ✅ modos do duelo (versus, treino)
     stateFactory.js         ✅ cria estados a partir do id
     MenuState.js            ✅ título + opções (MenuList)
+    CharacterSelectState.js ✅ escolhe o jogador e mantém seleção nos parâmetros do duelo
     ControlsState.js        ✅ tabela de controles gerada do controlsConfig
     DuelState.js            ✅ duelo: intro, simulação, efeitos, HUD, fim do duelo
     PauseState.js           ✅ continuar, reiniciar, sair
@@ -320,6 +321,8 @@ Pausa e resultado recebem `duelParams` e os repassam ao reiniciar, então "Reini
 `Game.settings` guarda as opções (`difficulty`, `reducedEffects`, `sound`, `music`). Elas são carregadas do `localStorage` ao abrir o jogo (valores inválidos são ignorados), alteradas na tela de Opções, aplicadas por `game.applySettings()` e salvas por `game.saveSettings()`.
 
 Para adicionar um estado: crie a classe estendendo `GameState`, adicione o id em `stateIds.js` e registre em `stateFactory.js`.
+
+Menu → CharacterSelectState → DuelState: a seleção usa MenuList e previews de Fighter, com animação atualizada fora do render. Escolhe o jogador entre os dados existentes e passa playerCharacter/opponentCharacter no params, preservados pela pausa e revanche. DuelState usa esses ids na factory inicial e na recriação do controller entre rounds.
 
 ## UI
 

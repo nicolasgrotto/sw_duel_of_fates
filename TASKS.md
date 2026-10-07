@@ -163,7 +163,7 @@ As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e des
 - [x] Gamepad (Gamepad API dentro do `Input`), vibração em impactos
 - [x] Segundo preset de teclado (setas + Z X C V)
 
-Os itens de identidade (nome, fonte, letterbox, ignição e paleta de sabres) permanecem pendentes para trabalho visual do Opus, conforme a opção de divisão autorizada no pedido.
+Os itens de identidade (nome, fonte, letterbox, ignição e paleta de sabres) permanecem pendentes para trabalho visual do Opus, conforme a opção de divisão autorizada no pedido. Habilidades exclusivas e novos personagens também ficam para essa etapa de design/elenco, sem placeholders no código.
 
 ### v0.4 — Personagens I
 
@@ -171,7 +171,7 @@ Os itens de identidade (nome, fonte, letterbox, ignição e paleta de sabres) pe
 - [x] Sequências de ataques rápidos (encadeiam só no acerto ou no bloqueio)
 - [x] Ataque aéreo e forte de avanço
 - [ ] Habilidade exclusiva (`I`)
-- [ ] Tela de seleção de personagem (o jogador pode ser qualquer um)
+- [x] Tela de seleção de personagem (o jogador pode ser qualquer um)
 - [ ] Bastião, Vespa e Espelho
 - [ ] IA com comportamento por dificuldade (punir bloqueio, iscas de whiff, memória curta de hábitos no Difícil)
 - [ ] Treino: boneco que grava e reproduz, hitboxes visíveis sem F3, display de inputs

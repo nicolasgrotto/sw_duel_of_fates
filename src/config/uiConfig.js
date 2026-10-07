@@ -51,6 +51,10 @@ export const texts = {
     knockout: 'K.O.',
     pauseHint: '{pause}  pausar',
   },
+  characterSelect: {
+    title: 'ESCOLHA SEU LUTADOR',
+    footer: '{up}  e  {down}  escolher · {confirm}  confirmar · {back}  voltar',
+  },
   training: {
     frameData: '{attack} · {result} · {advantage} s',
     attacks: { air: 'Aéreo', forwardHeavy: 'Forte de avanço', light: 'Rápido', light2: 'Rápido 2', light3: 'Rápido 3', heavy: 'Forte', riposte: 'Riposta', shove: 'Empurrão' },
@@ -111,6 +115,9 @@ export const layout = {
     firstItemY: 370,
     itemSpacing: 52,
     footerY: 660,
+  },
+  characterSelect: {
+    titleY: 160, firstItemY: 270, itemSpacing: 52, previewY: 560, previewScale: 1.3, footerY: 660,
   },
   menuList: {
     markerWidth: 18,

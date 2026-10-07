@@ -57,6 +57,8 @@ describe('state flow', () => {
     assert.deepEqual(game.stateNames(), ['MenuState']);
 
     game.step(Action.CONFIRM);
+    assert.deepEqual(game.stateNames(), ['CharacterSelectState']);
+    game.step(Action.CONFIRM);
     assert.deepEqual(game.stateNames(), ['DuelState']);
   });
 
@@ -78,6 +80,7 @@ describe('state flow', () => {
     game.changeState(StateId.MENU);
 
     game.step(Action.MENU_DOWN);
+    game.step(Action.CONFIRM);
     game.step(Action.CONFIRM);
 
     assert.equal(game.states.current.mode, DuelMode.TRAINING);
@@ -115,6 +118,7 @@ describe('state flow', () => {
     game.step(Action.BACK);
     game.step(Action.MENU_UP);
     game.step(Action.MENU_UP);
+    game.step(Action.CONFIRM);
     game.step(Action.CONFIRM);
     const duel = game.states.current;
     assert.equal(duel.mode, DuelMode.VERSUS);
@@ -453,4 +457,32 @@ it('selects the alternative keyboard preset and shows its guard combination', ()
   const controls = game.states.current;
   assert.equal(controls.rows.find(row => row.label.startsWith('Empurrar')).keys, 'C  +  Z');
   assert.equal(controls.rows.find(row => row.label === 'Ataque forte').keys, 'X');
+});
+
+it('lets the player select Shadow and keeps the choice after restart and between rounds', () => {
+  const game = createFakeGame();
+  game.changeState(StateId.MENU);
+  game.step(Action.CONFIRM);
+  game.step(Action.MENU_DOWN);
+  game.step(Action.CONFIRM);
+  let duel = game.states.current;
+  assert.equal(duel.player.id, 'shadow');
+  assert.equal(duel.fighters[1].id, 'guardian');
+  assert.equal(duel.opponentController.profile, aiConfig.profiles.balanced);
+  duel.startNextRound();
+  assert.equal(duel.player.id, 'shadow');
+  assert.equal(duel.opponentController.profile, aiConfig.profiles.balanced);
+  game.step(Action.PAUSE);
+  game.step(Action.MENU_DOWN);
+  game.step(Action.CONFIRM);
+  duel = game.states.current;
+  assert.equal(duel.player.id, 'shadow');
+  assert.equal(duel.fighters[1].id, 'guardian');
+});
+
+it('returns from character selection to the menu without starting a duel', () => {
+  const game = createFakeGame();
+  game.changeState(StateId.CHARACTER_SELECT);
+  game.step(Action.BACK);
+  assert.deepEqual(game.stateNames(), ['MenuState']);
 });

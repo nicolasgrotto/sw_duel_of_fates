@@ -46,7 +46,7 @@ export class MenuState extends GameState {
     }
     switch (this.menu.update(this.game.input)) {
       case MenuOption.DUEL:
-        this.game.changeState(StateId.DUEL, { mode: DuelMode.VERSUS });
+        this.game.changeState(StateId.CHARACTER_SELECT, { mode: DuelMode.VERSUS });
         break;
       case MenuOption.TRAINING:
         this.game.changeState(StateId.DUEL, { mode: DuelMode.TRAINING });

@@ -1,3 +1,4 @@
+import { CharacterSelectState } from './CharacterSelectState.js';
 import { ControlsState } from './ControlsState.js';
 import { DuelState } from './DuelState.js';
 import { GameOverState } from './GameOverState.js';
@@ -8,6 +9,7 @@ import { StateId } from './stateIds.js';
 
 const stateClasses = {
   [StateId.MENU]: MenuState,
+  [StateId.CHARACTER_SELECT]: CharacterSelectState,
   [StateId.DUEL]: DuelState,
   [StateId.PAUSE]: PauseState,
   [StateId.CONTROLS]: ControlsState,

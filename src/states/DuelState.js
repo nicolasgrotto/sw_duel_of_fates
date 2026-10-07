@@ -45,6 +45,8 @@ export class DuelState extends GameState {
     this.frameDataLine = '';
     this.debugBox = createBox();
     this.mode = this.params.mode ?? DuelMode.VERSUS;
+    this.playerCharacter = this.params.playerCharacter ?? gameConfig.duel.playerCharacter;
+    this.opponentCharacter = this.params.opponentCharacter ?? gameConfig.duel.opponentCharacter;
     this.random = createRandom(createRandomSeed());
     this.arena = createArenaBounds(gameConfig);
     this.ambient = new AmbientSystem(arenas[gameConfig.duel.arena].ambient, this.arena, createRandom(createRandomSeed()));
@@ -104,7 +106,7 @@ export class DuelState extends GameState {
     if (this.isTraining) {
       this.opponentController.attackTimer = 0;
     } else {
-      this.opponentController = this.createOpponentController(this.fighters[1], this.player, gameConfig.duel.opponentCharacter);
+      this.opponentController = this.createOpponentController(this.fighters[1], this.player, this.opponentCharacter);
       this.participants[1].controller = this.opponentController;
     }
     this.camera = new Camera(effectsConfig, this.random);
@@ -121,7 +123,8 @@ export class DuelState extends GameState {
   }
 
   createParticipants() {
-    const { playerCharacter, opponentCharacter, spawnDistance } = gameConfig.duel;
+    const { spawnDistance } = gameConfig.duel;
+    const { playerCharacter, opponentCharacter } = this;
     const centerX = (this.arena.left + this.arena.right) / 2;
     const { floorY } = this.arena;
 
