@@ -127,10 +127,25 @@ Plano aprovado depois da análise de game design da v0.1. Cada versão é jogáv
 - [x] Efeitos e sons do parry (anel, lâmina clareando, dessaturação e câmera lenta no perfeito)
 - [x] Empurrão (bloqueio + ataque rápido)
 - [x] IA usando parry (contra fortes) e empurrão, com chances por dificuldade
+- [ ] Verificar no navegador (`npm start`) o parry, o perfeito (dessaturação, anel, flare), o empurrão e a tela de Controles
 - [ ] Pacote de impacto: hit flash, tremor no hit stop, punch-in da câmera
 - [ ] Melhor de 3 rounds (HUD com rounds, intro por round, estatísticas do duelo inteiro)
 - [ ] Rebalanceamento "poucos golpes, todos importantes" validado com `npm run simulate`
 - [ ] Dados de frame no modo Treino
+
+#### Notas para quem continuar a v0.2
+
+As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e design/UI_GUIDELINES.md. Implemente o que está lá; não é preciso redesenhar.
+
+- **Verificação no navegador**: os efeitos do parry só foram testados em Node (estado e dados), nunca vistos rodando. Confira se o passo `saturation` em `drawDesaturation` (`rendering/effectsRenderer.js`) cobre a tela inteira com a câmera e se os sabres continuam coloridos por cima. Treino + F3 mostra `parry`, `lockout` e `buffer` de cada lutador.
+- **Pacote de impacto** (VFX_GUIDELINES: `hit-flash`, tremor no hit stop, punch-in):
+  - Hit flash: guardar um timer por lutador no `EffectsSystem` (como `saberFlares`) no evento `hit`; `drawFighterBody` precisa aceitar cores substitutas (hoje lê `appearance.cloakColor/bodyColor` direto) para desenhar a silhueta em branco por cima. Desligado com efeitos reduzidos.
+  - Tremor: enquanto `timeControl.isFrozen`, o defensor do último `hit`/`parry`/`perfectParry` ganha deslocamento horizontal de 2–3 px alternado, calculado no `EffectsSystem.update` e só lido pelo render.
+  - Punch-in: `Camera.punch(zoom, duration)` + campo `punch` nas receitas (forte 3%, quebra de guarda 4%, parry perfeito 5%, golpe final 6%). O `DuelRenderer` aplica `translate(foco) scale(zoom) translate(-foco)` junto do shake. Limite de 6% e escala de efeitos reduzidos (25%).
+- **Rounds**: `gameConfig.duel.roundsToWin = 2` (no Treino, sem limite). Falta um `Fighter.resetForRound(x, facing)` (vida, stamina, estado, `combat`, intent) e, no `DuelState`, depois do `resultDelay`, ou começa o próximo round (intro "ROUND 2"/"ROUND FINAL") ou empilha o `GameOverState`. Textos em `uiConfig`. A HUD desenha os quadrados de round (UI_GUIDELINES). Estatísticas somam o duelo inteiro e ganham parries, parries perfeitos e quebras de guarda causadas (duas linhas no resultado).
+- **Rebalanceamento**: alvo de 6–9 golpes por round (ver "Ritmo" no GAME_DESIGN): leve ~10, forte ~24, `heavy.blockStaminaCost` ~32. Valide nas três dificuldades com `npm run simulate -- --duels 300 --difficulty <nível>` e com `--profile balanced` (mesmo perfil nos dois) para medir só os atributos. Referência atual, antes do rebalanceamento (200 duelos, seed 1): Normal ≈ 17,5 golpes, 3,6 bloqueios, 0,9 parry + 0,1 perfeito, 0,26 empurrão por duelo; Difícil ≈ 2,3 parries + 1,1 perfeito, 0,55 quebra de guarda; o Guardião vence ~55–66% contra a Sombra agressiva. Os clashes caíram para ~0,2 por duelo depois da variação no tempo de reação da IA: antes eram um artefato das duas IAs sincronizadas. Atualize a referência em ARCHITECTURE.md ("Balanceamento").
+- **Dados de frame no Treino**: no `DuelState`, a cada `hit`/`block`/`parry` em que o atacante é o jogador, calcule a vantagem = tempo de travamento restante do defensor (hitstun, blockstun ou stagger) − tempo restante do golpe do atacante (`getAttackDuration(attack) - stateTime`). Mostre `Golpe · resultado · ±0,00 s` numa linha `hint` acima da dica de pausa, só no Treino. Textos em `uiConfig`.
+- Ao terminar cada item: `npm test`, marcar aqui, atualizar ARCHITECTURE.md e commitar (regras de commit no AGENTS.md).
 
 ### v0.3 — Arena e identidade
 
