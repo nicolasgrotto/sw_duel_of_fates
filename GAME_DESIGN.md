@@ -238,7 +238,7 @@ A IA controla o oponente pelo mesmo `intent` do jogador. Ela só **solicita** a�
 
 ### Como a IA pensa
 
-- A IA não reage a cada frame. Ela "pensa" em intervalos (`reactionTime` da dificuldade). Entre um pensamento e outro, segue o plano atual (andar, segurar bloqueio...). Isso simula tempo de reação humano e deixa espaço para o jogador enganar a IA.
+- A IA não reage a cada frame. Ela "pensa" em intervalos (`reactionTime` da dificuldade, com uma variação aleatória de até +40% para não ficar mecânica; nunca mais rápido que o `reactionTime`). Entre um pensamento e outro, segue o plano atual (andar, segurar bloqueio...). Isso simula tempo de reação humano e deixa espaço para o jogador enganar a IA.
 - A cada pensamento, ela lê:
   - distância até o jogador (espaço entre os corpos)
   - estado do jogador (atacando, em recovery, atordoado...) e a fase do ataque dele

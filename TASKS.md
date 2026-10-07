@@ -126,7 +126,7 @@ Plano aprovado depois da análise de game design da v0.1. Cada versão é jogáv
 - [x] Riposta depois do parry
 - [x] Efeitos e sons do parry (anel, lâmina clareando, dessaturação e câmera lenta no perfeito)
 - [x] Empurrão (bloqueio + ataque rápido)
-- [ ] IA usando parry (contra fortes) e empurrão, com chances por dificuldade
+- [x] IA usando parry (contra fortes) e empurrão, com chances por dificuldade
 - [ ] Pacote de impacto: hit flash, tremor no hit stop, punch-in da câmera
 - [ ] Melhor de 3 rounds (HUD com rounds, intro por round, estatísticas do duelo inteiro)
 - [ ] Rebalanceamento "poucos golpes, todos importantes" validado com `npm run simulate`

@@ -1,4 +1,4 @@
-import { AttackType } from '../combat/attackPhases.js';
+import { AttackPhase, AttackType, getAttackPhase } from '../combat/attackPhases.js';
 import { FighterState } from '../entities/fighterStates.js';
 import { canAfford } from '../systems/StaminaSystem.js';
 import { canReach, getDirectionTo, getGap, isPunishable, isThreatening } from './perception.js';
@@ -7,8 +7,10 @@ export const AiDecision = Object.freeze({
   BUSY: 'busy',
   HESITATE: 'hesitate',
   BLOCK: 'block',
+  PARRY: 'parry',
   DODGE: 'dodge',
   COUNTER: 'counter',
+  SHOVE: 'shove',
   GUARD: 'guard',
   RECOVER: 'recover',
   ATTACK: 'attack',
@@ -21,6 +23,8 @@ const PendingAction = Object.freeze({
   NONE: null,
   LIGHT_ATTACK: 'lightAttack',
   HEAVY_ATTACK: 'heavyAttack',
+  SHOVE: 'shove',
+  PARRY: 'parry',
   DODGE: 'dodge',
 });
 
@@ -38,6 +42,7 @@ export class EnemyAI {
     this.plan = {
       moveX: 0,
       blockTime: 0,
+      parryDelay: -1,
       pendingAction: PendingAction.NONE,
     };
   }
@@ -49,20 +54,35 @@ export class EnemyAI {
 
     if (this.thinkTimer <= 0) {
       this.think();
-      this.thinkTimer = this.difficulty.reactionTime;
+      this.thinkTimer = this.difficulty.reactionTime * (1 + this.perception.reactionJitter * this.random());
     }
 
+    this.updateParryTiming(dt);
     this.writeIntent(intent);
+  }
+
+  updateParryTiming(dt) {
+    const { plan } = this;
+    if (plan.parryDelay < 0) {
+      return;
+    }
+    plan.parryDelay -= dt;
+    if (plan.parryDelay <= 0) {
+      plan.parryDelay = -1;
+      plan.pendingAction = PendingAction.PARRY;
+      plan.blockTime = this.perception.blockHoldTime;
+    }
   }
 
   writeIntent(intent) {
     const { plan } = this;
+    const shoving = plan.pendingAction === PendingAction.SHOVE;
 
     intent.moveX = plan.moveX;
     intent.jump = false;
-    intent.block = plan.blockTime > 0;
-    intent.blockPressed = false;
-    intent.lightAttack = plan.pendingAction === PendingAction.LIGHT_ATTACK;
+    intent.block = plan.blockTime > 0 || shoving;
+    intent.blockPressed = plan.pendingAction === PendingAction.PARRY;
+    intent.lightAttack = plan.pendingAction === PendingAction.LIGHT_ATTACK || shoving;
     intent.heavyAttack = plan.pendingAction === PendingAction.HEAVY_ATTACK;
     intent.dodge = plan.pendingAction === PendingAction.DODGE;
     plan.pendingAction = PendingAction.NONE;
@@ -83,7 +103,11 @@ export class EnemyAI {
 
     if (!self.isAlive || !opponent.isAlive) {
       this.plan.blockTime = 0;
+      this.plan.parryDelay = -1;
       return AiDecision.WAIT;
+    }
+    if (this.plan.parryDelay >= 0) {
+      return AiDecision.PARRY;
     }
     if (!self.canAct && self.state !== FighterState.BLOCKING) {
       return AiDecision.BUSY;
@@ -95,6 +119,7 @@ export class EnemyAI {
     return (
       this.tryDefend() ??
       this.tryCounter() ??
+      this.tryShove() ??
       this.tryRecoverStamina() ??
       this.tryAttack() ??
       this.tryGuard() ??
@@ -106,6 +131,13 @@ export class EnemyAI {
     if (!isThreatening(this.opponent, this.self, this.perception.threatMargin)) {
       this.plan.blockTime = 0;
       return null;
+    }
+
+    if (this.opponent.combat.attackType === AttackType.SHOVE) {
+      return this.answerShove();
+    }
+    if (this.tryParry()) {
+      return AiDecision.PARRY;
     }
 
     const roll = this.random();
@@ -121,6 +153,52 @@ export class EnemyAI {
       return AiDecision.DODGE;
     }
     return null;
+  }
+
+  tryParry() {
+    const { attack, attackType } = this.opponent.combat;
+    if (attackType !== AttackType.HEAVY || getAttackPhase(attack, this.opponent.stateTime) !== AttackPhase.STARTUP) {
+      return false;
+    }
+    if (this.random() >= this.difficulty.parryChance) {
+      return false;
+    }
+
+    const { perfectWindow, window } = this.self.stats.parry;
+    const aimsPerfect = this.random() < this.difficulty.perfectParryChance;
+    const lead = aimsPerfect ? perfectWindow / 2 : (perfectWindow + window) / 2;
+    const delay = attack.startup - this.opponent.stateTime - lead;
+    if (delay < 0) {
+      return false;
+    }
+
+    this.plan.blockTime = 0;
+    this.plan.parryDelay = delay;
+    return true;
+  }
+
+  answerShove() {
+    if (this.canReachWith(AttackType.LIGHT) && this.random() < this.profile.blockChance * this.difficulty.defenseMultiplier) {
+      return this.startAttack(false) ? AiDecision.COUNTER : null;
+    }
+    return null;
+  }
+
+  tryShove() {
+    if (this.opponent.state !== FighterState.BLOCKING || this.attackCooldown > 0 || !this.canReachWith(AttackType.SHOVE)) {
+      return null;
+    }
+    if (!canAfford(this.self, this.self.stats.attacks.shove.staminaCost)) {
+      return null;
+    }
+    if (this.random() >= this.profile.shoveChance * this.difficulty.shoveMultiplier) {
+      return null;
+    }
+
+    this.plan.blockTime = 0;
+    this.plan.pendingAction = PendingAction.SHOVE;
+    this.attackCooldown = this.difficulty.attackCooldown;
+    return AiDecision.SHOVE;
   }
 
   tryCounter() {

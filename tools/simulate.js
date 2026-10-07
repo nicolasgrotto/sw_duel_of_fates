@@ -90,7 +90,7 @@ function runDuel(leftSetup, rightSetup, random) {
     combatConfig: gameConfig.combat,
     animationConfig: animationStyle,
   });
-  const counts = { hits: 0, blocks: 0, clashes: 0, guardBreaks: 0 };
+  const counts = { hits: 0, blocks: 0, clashes: 0, guardBreaks: 0, parries: 0, perfectParries: 0, shoves: 0 };
 
   let time = 0;
   while (time < MAX_DUEL_SECONDS && left.isAlive && right.isAlive) {
@@ -103,6 +103,9 @@ function runDuel(leftSetup, rightSetup, random) {
       if (event.type === CombatEvent.BLOCK) counts.blocks += 1;
       if (event.type === CombatEvent.CLASH) counts.clashes += 1;
       if (event.type === CombatEvent.GUARD_BREAK) counts.guardBreaks += 1;
+      if (event.type === CombatEvent.PARRY) counts.parries += 1;
+      if (event.type === CombatEvent.PERFECT_PARRY) counts.perfectParries += 1;
+      if (event.type === CombatEvent.SHOVE) counts.shoves += 1;
     }
     time += STEP;
   }
@@ -152,6 +155,8 @@ function main() {
   console.log(`avg blocks: ${average(results.map((result) => result.counts.blocks)).toFixed(1)}`);
   console.log(`avg clash : ${average(results.map((result) => result.counts.clashes)).toFixed(2)}`);
   console.log(`avg guard breaks: ${average(results.map((result) => result.counts.guardBreaks)).toFixed(2)}`);
+  console.log(`avg parries: ${average(results.map((result) => result.counts.parries)).toFixed(2)}  perfect: ${average(results.map((result) => result.counts.perfectParries)).toFixed(2)}`);
+  console.log(`avg shoves : ${average(results.map((result) => result.counts.shoves)).toFixed(2)}`);
 }
 
 main();

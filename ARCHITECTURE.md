@@ -389,7 +389,7 @@ Arquivos: [src/core/AudioManager.js](src/core/AudioManager.js), [src/audio/](src
 
 ## Balanceamento
 
-`npm run simulate` roda duelos IA × IA na `DuelSimulation` real, sem navegador, alternando os lados, e mostra vitórias, tempo médio, hits, bloqueios, clashes e quebras de guarda.
+`npm run simulate` roda duelos IA × IA na `DuelSimulation` real, sem navegador, alternando os lados, e mostra vitórias, tempo médio, hits, bloqueios, clashes, quebras de guarda, parries (comuns e perfeitos) e empurrões.
 
 ```bash
 npm run simulate -- --duels 300 --difficulty hard
@@ -409,8 +409,8 @@ Arquivos: [src/ai/](src/ai/), [src/config/aiConfig.js](src/config/aiConfig.js). 
 
 ```
 DuelState.updateIntents → EnemyAI.updateIntent(intent, dt)
-                             ├─ a cada reactionTime: think() → decision + plano
-                             │     defender > punir > recuperar stamina > atacar > posicionar
+                             ├─ a cada reactionTime (+ variação): think() → decision + plano
+                             │     defender (parry/bloqueio/esquiva) > punir > empurrar > recuperar stamina > atacar > guardar > posicionar
                              └─ todo frame: plano → intent (moveX, block, ação pontual)
 DuelSimulation → CombatSystem executa (igual ao jogador)
 ```
@@ -422,6 +422,9 @@ DuelSimulation → CombatSystem executa (igual ao jogador)
 - Perfil (`aiConfig.profiles`) vem de `characterData.aiProfile`. Dificuldade (`aiConfig.difficulties`) vem de `game.settings.difficulty`.
 - O RNG é injetado (o mesmo dos efeitos no jogo, seed fixa nos testes).
 - `decision` fica exposta para o debug (`ai: <decisão> (<dificuldade>)`).
+- O intervalo entre pensamentos é `reactionTime × (1 + reactionJitter × random)`. Sem a variação, duas IAs com a mesma dificuldade ficavam sincronizadas e sempre viam o ataque do outro no mesmo instante (o simulador media clashes e parries errados).
+- **Parry**: contra um ataque forte ainda no startup, com `difficulty.parryChance`, a IA calcula quanto falta para o golpe ficar ativo e agenda o toque (`plan.parryDelay`) para cair no meio da janela (ou no começo, para o perfeito, com `perfectParryChance`). Se já for tarde, cai para bloqueio/esquiva. A contagem regressiva roda a cada frame em `updateParryTiming`, mas a decisão só nasce no pensamento: a IA continua limitada ao próprio tempo de reação.
+- **Empurrão**: com o oponente em `BLOCKING` no alcance do empurrão, `profile.shoveChance × difficulty.shoveMultiplier`. Contra um empurrão que está vindo, a IA tenta acertar um ataque rápido antes (é o que vence o empurrão).
 
 **Garantia testada:** a IA roda com os lutadores congelados (`Object.freeze`) sem erro, ou seja, ela nunca altera HP, stamina, posição ou estado.
 

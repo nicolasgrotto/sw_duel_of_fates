@@ -7,7 +7,17 @@ import { FighterState } from '../src/entities/fighterStates.js';
 import { createRandom } from '../src/utils/random.js';
 import { STEP, createSimulation, repeat, spawnFighter } from './helpers.js';
 
-const PERFECT = { reactionTime: 0.1, defenseMultiplier: 1, mistakeChance: 0, attackCooldown: 0.5 };
+const PERFECT = {
+  reactionTime: 0.1,
+  defenseMultiplier: 1,
+  mistakeChance: 0,
+  attackCooldown: 0.5,
+  parryChance: 0,
+  perfectParryChance: 0,
+  shoveMultiplier: 1,
+};
+
+const DEFENSES = new Set([AiDecision.BLOCK, AiDecision.PARRY]);
 
 function startAttack(fighter, attackType, time = 0) {
   fighter.combat.attack = fighter.stats.attacks[attackType];
@@ -196,6 +206,51 @@ describe('EnemyAI decisions', () => {
     assert.equal(ai.decision, AiDecision.BLOCK);
   });
 
+  it('times a parry against a heavy attack it can read', () => {
+    const { ai, opponent, self } = createDuel(40, { roll: 0, difficulty: { ...PERFECT, parryChance: 1, perfectParryChance: 1 } });
+    const attack = opponent.stats.attacks.heavy;
+    startAttack(opponent, 'heavy');
+
+    let intent = think(ai);
+    assert.equal(ai.decision, AiDecision.PARRY);
+    assert.equal(intent.blockPressed, false);
+
+    const expectedDelay = attack.startup - self.stats.parry.perfectWindow / 2;
+    let pressedAt = null;
+    for (let time = STEP; time < attack.startup + STEP; time += STEP) {
+      opponent.stateTime += STEP;
+      intent = think(ai);
+      if (intent.blockPressed) {
+        pressedAt = time;
+        break;
+      }
+    }
+
+    assert.ok(pressedAt !== null);
+    assert.ok(Math.abs(pressedAt - expectedDelay) <= STEP * 1.5);
+    assert.equal(intent.block, true);
+  });
+
+  it('never tries to parry a light attack', () => {
+    const { ai, opponent } = createDuel(40, { roll: 0, difficulty: { ...PERFECT, parryChance: 1 } });
+    startAttack(opponent, 'light');
+
+    think(ai);
+
+    assert.notEqual(ai.decision, AiDecision.PARRY);
+  });
+
+  it('shoves an opponent that keeps blocking up close', () => {
+    const { ai, opponent } = createDuel(20, { roll: 0 });
+    opponent.restartState(FighterState.BLOCKING);
+
+    const intent = think(ai);
+
+    assert.equal(ai.decision, AiDecision.SHOVE);
+    assert.equal(intent.block, true);
+    assert.equal(intent.lightAttack, true);
+  });
+
   it('only writes the intent and never changes the fighters', () => {
     const { ai, self, opponent } = createDuel(40, { roll: 0 });
     const intent = self.intent;
@@ -217,7 +272,7 @@ describe('EnemyAI decisions', () => {
         ai.random = random;
         startAttack(opponent, 'heavy');
         think(ai);
-        blocks += ai.decision === AiDecision.BLOCK ? 1 : 0;
+        blocks += DEFENSES.has(ai.decision) ? 1 : 0;
       });
       return blocks;
     };
