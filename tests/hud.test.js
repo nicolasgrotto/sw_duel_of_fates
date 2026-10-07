@@ -85,3 +85,20 @@ describe('Hud', () => {
     assert.equal(hud.getStaminaColor(leftState), colors.hudStamina);
   });
 });
+
+it('mirrors round markers and fills only the won rounds', () => {
+  const left = spawnFighter(300, 1);
+  const right = spawnFighter(900, -1, 'shadow');
+  const hud = new Hud(left, right, { wins: [1, 0], roundsToWin: 2 });
+  const marks = [];
+  const renderer = {
+    width: 1280,
+    fillRect: (x, y, width, height, color) => marks.push({ x, filled: true, color }),
+    strokeRect: (x, y, width, height, color) => marks.push({ x, filled: false, color }),
+  };
+  hud.renderRounds(renderer, true);
+  hud.renderRounds(renderer, false);
+  assert.deepEqual(marks.map(mark => mark.filled), [true, false, false, false]);
+  assert.equal(marks[0].x, layout.hud.margin);
+  assert.equal(marks[2].x + layout.hud.roundSize, 1280 - layout.hud.margin);
+});

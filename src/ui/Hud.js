@@ -20,9 +20,10 @@ function createSideState(fighter, side) {
 }
 
 export class Hud {
-  constructor(leftFighter, rightFighter) {
+  constructor(leftFighter, rightFighter, rounds = null) {
     this.sides = [createSideState(leftFighter, Side.LEFT), createSideState(rightFighter, Side.RIGHT)];
     this.time = 0;
+    this.rounds = rounds;
   }
 
   update(dt) {
@@ -108,8 +109,26 @@ export class Hud {
 
     renderer.fillRect(barX, staminaY, healthWidth, staminaHeight, colors.hudTrack);
     this.fillBar(renderer, barX, staminaY, healthWidth, staminaHeight, fighter.stamina / maxStamina, isLeft, this.getStaminaColor(state));
+    this.renderRounds(renderer, isLeft);
     if (state.rejectTime > 0) {
       renderer.strokeRect(barX, staminaY, healthWidth, staminaHeight, this.getStaminaColor(state));
+    }
+  }
+
+  renderRounds(renderer, isLeft) {
+    if (!this.rounds) {
+      return;
+    }
+    const { margin, roundY, roundSize, roundGap } = layout.hud;
+    const won = this.rounds.wins[isLeft ? 0 : 1];
+    for (let index = 0; index < this.rounds.roundsToWin; index += 1) {
+      const offset = index * (roundSize + roundGap);
+      const x = isLeft ? margin + offset : renderer.width - margin - roundSize - offset;
+      if (index < won) {
+        renderer.fillRect(x, roundY, roundSize, roundSize, colors.hudHealth);
+      } else {
+        renderer.strokeRect(x, roundY, roundSize, roundSize, colors.hudTrack);
+      }
     }
   }
 

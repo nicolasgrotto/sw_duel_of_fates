@@ -161,10 +161,12 @@ describe('state flow', () => {
     assert.deepEqual(game.stateNames(), ['MenuState']);
   });
 
-  it('ends the duel when a fighter dies and goes back to the menu after the result', () => {
+  it('ends the match after the deciding round and goes back to the menu after the result', () => {
     const game = createFakeGame();
-    game.changeState(StateId.DUEL, { mode: DuelMode.TRAINING });
+    game.changeState(StateId.DUEL);
     const duel = game.states.current;
+    duel.roundWins[0] = 1;
+    duel.participants[1].controller = { updateIntent: () => {} };
     const [player, opponent] = duel.fighters;
     opponent.x = player.x + 110;
     opponent.health = 1;
@@ -324,5 +326,96 @@ describe('state flow', () => {
 
   it('throws for an unknown state id', () => {
     assert.throws(() => createState('credits', createFakeGame()), /Unknown state/);
+  });
+});
+
+describe('duel rounds', () => {
+  function winRound(game) {
+    const duel = game.states.current;
+    skipIntro(game);
+    duel.participants[1].controller = { updateIntent: (intent) => { intent.lightAttack = false; } };
+    const [player, opponent] = duel.fighters;
+    player.clearIntent();
+    opponent.clearIntent();
+    opponent.x = player.x + 110;
+    opponent.health = 1;
+    game.step(Action.LIGHT_ATTACK);
+    for (let i = 0; i < 60 && !duel.outcome; i += 1) {
+      game.step();
+    }
+    assert.equal(duel.outcome.winner, player);
+    for (let i = 0; i < 100 && duel.outcome && game.states.current === duel; i += 1) {
+      game.step();
+    }
+  }
+
+  it('restores both fighters after the first win and accumulates match statistics', () => {
+    const game = createFakeGame();
+    game.changeState(StateId.DUEL);
+    const duel = game.states.current;
+    winRound(game);
+    assert.equal(game.states.current, duel);
+    assert.deepEqual(duel.roundWins, [1, 0]);
+    assert.equal(duel.roundNumber, 2);
+    assert.equal(duel.isIntroPlaying(), true);
+    for (const fighter of duel.fighters) {
+      assert.equal(fighter.health, fighter.stats.maxHealth);
+      assert.equal(fighter.stamina, fighter.stats.maxStamina);
+      assert.equal(fighter.state, 'IDLE');
+      assert.equal(fighter.combat.bufferedAction, null);
+    }
+    assert.equal(duel.timeControl.isFrozen, false);
+    assert.equal(duel.camera.zoom, 1);
+    assert.equal(duel.stats.hits, 1);
+    const firstRoundTime = duel.duelTime;
+    winRound(game);
+    assert.deepEqual(duel.roundWins, [2, 0]);
+    assert.equal(game.states.current.name, 'GameOverState');
+    assert.equal(game.states.current.params.stats.hits, 2);
+    assert.ok(game.states.current.params.stats.time > firstRoundTime);
+  });
+
+  it('shows the final round only when each side has one win', () => {
+    const game = createFakeGame();
+    game.changeState(StateId.DUEL);
+    const duel = game.states.current;
+    duel.roundWins[1] = 1;
+    winRound(game);
+    assert.deepEqual(duel.roundWins, [1, 1]);
+    assert.equal(duel.message.text, 'ROUND FINAL');
+  });
+
+  it('keeps training running after multiple knockouts and preserves dummy behavior', () => {
+    const game = createFakeGame();
+    game.changeState(StateId.DUEL, { mode: DuelMode.TRAINING });
+    const duel = game.states.current;
+    duel.opponentController.cycleBehavior();
+    winRound(game);
+    assert.equal(duel.opponentController.behavior, 'block');
+    winRound(game);
+    winRound(game);
+    assert.equal(game.states.current, duel);
+    assert.equal(duel.roundNumber, 4);
+    assert.deepEqual(duel.roundWins, [0, 0]);
+    assert.equal(duel.stats.hits, 3);
+  });
+
+  it('counts parries and guard breaks across rounds in the result', () => {
+    const game = createFakeGame();
+    game.changeState(StateId.DUEL);
+    const duel = game.states.current;
+    const [player, opponent] = duel.fighters;
+    duel.simulation.events.push(
+      { type: 'parry', attacker: opponent, defender: player },
+      { type: 'perfectParry', attacker: opponent, defender: player },
+      { type: 'guardBreak', attacker: player, defender: opponent },
+    );
+    duel.countPlayerStats();
+    winRound(game);
+    winRound(game);
+    assert.equal(game.states.current.params.stats.parries, 1);
+    assert.equal(game.states.current.params.stats.perfectParries, 1);
+    assert.equal(game.states.current.params.stats.guardBreaks, 1);
+    assert.ok(game.states.current.defenseStatsLine.includes('Perfeitos  1'));
   });
 });

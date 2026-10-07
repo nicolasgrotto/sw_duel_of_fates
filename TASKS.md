@@ -129,7 +129,7 @@ Plano aprovado depois da análise de game design da v0.1. Cada versão é jogáv
 - [x] IA usando parry (contra fortes) e empurrão, com chances por dificuldade
 - [x] Verificar no navegador (`npm start`) o parry, o perfeito (dessaturação, anel, flare), o empurrão e a tela de Controles
 - [x] Pacote de impacto: hit flash, tremor no hit stop, punch-in da câmera
-- [ ] Melhor de 3 rounds (HUD com rounds, intro por round, estatísticas do duelo inteiro)
+- [x] Melhor de 3 rounds (HUD com rounds, intro por round, estatísticas do duelo inteiro)
 - [ ] Rebalanceamento "poucos golpes, todos importantes" validado com `npm run simulate`
 - [ ] Dados de frame no modo Treino
 

@@ -87,7 +87,7 @@ src/
   ui/                       ✅ peças de interface desenhadas no canvas
     MenuList.js             ✅ lista de opções navegável
     Hud.js                  ✅ nomes, barras de vida (com fantasma) e stamina
-    CombatMessage.js        ✅ mensagens curtas (DUELO, K.O.) com fade
+    CombatMessage.js        ✅ mensagens curtas (ROUND 1/2/FINAL, K.O.) com fade
     keyLabels.js            ✅ nomes de teclas a partir do controlsConfig
     formatText.js           ✅ textos com {placeholders}
   config/                   ✅ valores e ajustes
@@ -319,7 +319,7 @@ Arquivos: [src/ui/](src/ui/), [src/config/uiConfig.js](src/config/uiConfig.js). 
 - A tela de Controles é gerada de `uiConfig.controlsScreenRows`: cada linha tem um texto e uma lista de ações (combinações como o empurrão aparecem como `L  +  J`).
 - `MenuList` é reutilizado no menu, na pausa e no resultado. `update(input)` devolve o id escolhido no `Enter` (ou `null`).
 - `Hud` só lê os lutadores. A barra fantasma é estado visual do próprio `Hud`.
-- `DuelState`: intro de `layout.messages.introDuration` com controles travados ("DUELO"), depois o duelo. No golpe final mostra "K.O." e, depois de `gameConfig.duel.resultDelay`, empilha o `GameOverState` com as estatísticas do jogador (tempo, golpes acertados, defesas), contadas a partir dos eventos de combate.
+- `DuelState`: intro de `layout.messages.introDuration` com controles travados (ROUND 1/2/FINAL). `roundWins` guarda o placar do melhor de 3 (`roundsToWin = 2`) e alimenta os quadrados espelhados da HUD. No K.O., soma a vitória uma vez e espera `resultDelay`: reinicia o round ou empilha o resultado. `Fighter.resetForRound(x, facing)` restaura posição, vida, stamina, combate, intent e animação, preservando as referências dos dados. Controllers de IA e feedback visual são renovados; o Treino mantém o comportamento do boneco e reinicia sem limite. As estatísticas (tempo ativo, hits, bloqueios, parries comuns/perfeitos e quebras de guarda causadas) somam todos os rounds e aparecem em duas linhas no resultado. Se um trade matar ambos, nenhum ponto é somado e começa outro round.
 
 ---
 

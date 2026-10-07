@@ -25,6 +25,11 @@ export class GameOverState extends GameState {
       hits: stats.hits,
       blocks: stats.blocks,
     });
+    this.defenseStatsLine = formatText(texts.result.defenseStats, {
+      parries: stats.parries ?? 0,
+      perfectParries: stats.perfectParries ?? 0,
+      guardBreaks: stats.guardBreaks ?? 0,
+    });
     this.menu = new MenuList(
       [
         { id: GameOverOption.REMATCH, label: texts.result.rematch },
@@ -47,12 +52,13 @@ export class GameOverState extends GameState {
 
   render(renderer) {
     const centerX = renderer.width / 2;
-    const { titleY, winnerY, statsY } = layout.result;
+    const { titleY, winnerY, statsY, defenseStatsY } = layout.result;
 
     renderer.overlay(colors.overlay);
     renderer.text(this.title, centerX, titleY, textStyles.title);
     renderer.text(this.winnerLine, centerX, winnerY, textStyles.subtitle);
     renderer.text(this.statsLine, centerX, statsY, textStyles.hint);
+    renderer.text(this.defenseStatsLine, centerX, defenseStatsY, textStyles.hint);
     this.menu.render(renderer, centerX);
   }
 }

@@ -12,28 +12,8 @@ function createIntent() {
   };
 }
 
-export class Fighter {
-  constructor({ id, name, stats, appearance, sound = null, x, y, facing }) {
-    this.id = id;
-    this.name = name;
-    this.stats = stats;
-    this.appearance = appearance;
-    this.sound = sound;
-
-    this.x = x;
-    this.y = y;
-    this.vx = 0;
-    this.vy = 0;
-    this.facing = facing;
-    this.grounded = true;
-
-    this.health = stats.maxHealth;
-    this.stamina = stats.maxStamina;
-
-    this.state = FighterState.IDLE;
-    this.stateTime = 0;
-
-    this.combat = {
+function createCombat() {
+  return {
       attack: null,
       attackType: null,
       hasHit: false,
@@ -49,7 +29,32 @@ export class Fighter {
       parryTime: 0,
       parryLockout: 0,
       riposteTime: 0,
-    };
+  };
+}
+
+export class Fighter {
+  constructor({ id, name, stats, appearance, sound = null, x, y, facing }) {
+    this.id = id;
+    this.name = name;
+    this.stats = stats;
+    this.appearance = appearance;
+    this.sound = sound;
+
+    this.x = x;
+    this.y = y;
+    this.floorY = y;
+    this.vx = 0;
+    this.vy = 0;
+    this.facing = facing;
+    this.grounded = true;
+
+    this.health = stats.maxHealth;
+    this.stamina = stats.maxStamina;
+
+    this.state = FighterState.IDLE;
+    this.stateTime = 0;
+
+    this.combat = createCombat();
 
     this.intent = createIntent();
     this.animation = {
@@ -58,6 +63,24 @@ export class Fighter {
       walkBlend: 0,
       airBlend: 0,
     };
+  }
+
+  resetForRound(x, facing) {
+    this.x = x;
+    this.y = this.floorY;
+    this.vx = 0;
+    this.vy = 0;
+    this.facing = facing;
+    this.grounded = true;
+    this.health = this.stats.maxHealth;
+    this.stamina = this.stats.maxStamina;
+    this.restartState(FighterState.IDLE);
+    Object.assign(this.combat, createCombat());
+    this.clearIntent();
+    this.animation.time = 0;
+    this.animation.walkPhase = 0;
+    this.animation.walkBlend = 0;
+    this.animation.airBlend = 0;
   }
 
   get width() {
