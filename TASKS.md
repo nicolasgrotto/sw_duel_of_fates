@@ -130,10 +130,12 @@ Plano aprovado depois da análise de game design da v0.1. Cada versão é jogáv
 - [x] Verificar no navegador (`npm start`) o parry, o perfeito (dessaturação, anel, flare), o empurrão e a tela de Controles
 - [x] Pacote de impacto: hit flash, tremor no hit stop, punch-in da câmera
 - [x] Melhor de 3 rounds (HUD com rounds, intro por round, estatísticas do duelo inteiro)
-- [ ] Rebalanceamento "poucos golpes, todos importantes" validado com `npm run simulate`
+- [x] Rebalanceamento "poucos golpes, todos importantes" validado com `npm run simulate`
 - [ ] Dados de frame no modo Treino
 
 Verificação visual: Chrome headless em localhost:8080, Canvas 1280×720. Parry comum e perfeito e empurrão gerados pela DuelSimulation real; anéis, flare e sabres coloridos sobre o mundo dessaturado conferidos com deslocamento máximo de câmera. Controles legíveis, incluindo L + J. Sem correções necessárias.
+
+Balanceamento validado em 300 rounds por dificuldade, seed 1, com perfis próprios e com ambos balanced. Hits até K.O.: 7,5/8,4/8,5 (Fácil/Normal/Difícil); com balanced: 7,8/8,6/8,9. O simulador distingue essa contagem dos hits totais dos dois lados. Tabela completa em ARCHITECTURE.md.
 
 #### Notas para quem continuar a v0.2
 

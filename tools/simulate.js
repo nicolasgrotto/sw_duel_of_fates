@@ -92,6 +92,7 @@ function runDuel(leftSetup, rightSetup, random) {
   });
   const counts = { hits: 0, blocks: 0, clashes: 0, guardBreaks: 0, parries: 0, perfectParries: 0, shoves: 0 };
 
+  const hitsReceived = new Map([[left, 0], [right, 0]]);
   let time = 0;
   while (time < MAX_DUEL_SECONDS && left.isAlive && right.isAlive) {
     for (let i = 0; i < fighters.length; i += 1) {
@@ -99,7 +100,10 @@ function runDuel(leftSetup, rightSetup, random) {
     }
     simulation.step(STEP);
     for (const event of simulation.events) {
-      if (event.type === CombatEvent.HIT) counts.hits += 1;
+      if (event.type === CombatEvent.HIT) {
+        counts.hits += 1;
+        hitsReceived.set(event.defender, hitsReceived.get(event.defender) + 1);
+      }
       if (event.type === CombatEvent.BLOCK) counts.blocks += 1;
       if (event.type === CombatEvent.CLASH) counts.clashes += 1;
       if (event.type === CombatEvent.GUARD_BREAK) counts.guardBreaks += 1;
@@ -112,7 +116,7 @@ function runDuel(leftSetup, rightSetup, random) {
 
   const winner = left.isAlive && !right.isAlive ? left : right.isAlive && !left.isAlive ? right : null;
   const winnerSetup = winner === left ? leftSetup : winner === right ? rightSetup : null;
-  return { winnerSide: winnerSetup?.side ?? null, time, counts };
+  return { winnerSide: winnerSetup?.side ?? null, time, counts, hitsToKnockout: winner ? hitsReceived.get(winner === left ? right : left) : null };
 }
 
 function average(values) {
@@ -152,6 +156,7 @@ function main() {
   console.log(`timeouts  : ${String(timeouts).padStart(4)}  (${percent(timeouts)})`);
   console.log(`avg time  : ${average(results.map((result) => result.time)).toFixed(1)} s`);
   console.log(`avg hits  : ${average(results.map((result) => result.counts.hits)).toFixed(1)}`);
+  console.log(`avg hits to KO: ${average(results.filter((result) => result.hitsToKnockout !== null).map((result) => result.hitsToKnockout)).toFixed(1)}`);
   console.log(`avg blocks: ${average(results.map((result) => result.counts.blocks)).toFixed(1)}`);
   console.log(`avg clash : ${average(results.map((result) => result.counts.clashes)).toFixed(2)}`);
   console.log(`avg guard breaks: ${average(results.map((result) => result.counts.guardBreaks)).toFixed(2)}`);

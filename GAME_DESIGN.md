@@ -170,7 +170,7 @@ O parry é a defesa ativa. Usa o mesmo botão do bloqueio: **tocar** abre a jane
 
 **Ritmo: poucos golpes, todos importantes**
 
-- Alvo de balanceamento: um round termina com **6 a 9 golpes** limpos. Ataque rápido ~10 de dano, forte ~24, riposta ~16, com 100 de vida.
+- Alvo de balanceamento: o derrotado recebe em média **6 a 9 golpes** limpos até o K.O. O total do round soma também os golpes recebidos pelo vencedor e é informado separadamente pelo simulador. Ataque rápido ~10 de dano, forte ~24, riposta ~16, com 100 de vida.
 - Bloquear um ataque forte custa caro (~32 de stamina): quem só defende tem a guarda quebrada.
 
 **Stamina**

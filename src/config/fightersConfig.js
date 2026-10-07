@@ -21,7 +21,7 @@ export const fighterArchetypes = {
     },
     attacks: {
       light: {
-        damage: 8,
+        damage: 10,
         staminaCost: 8,
         startup: 0.1,
         active: 0.1,
@@ -35,7 +35,7 @@ export const fighterArchetypes = {
         hitbox: { reach: 100, top: 0.8, bottom: 0.35 },
       },
       heavy: {
-        damage: 20,
+        damage: 24,
         staminaCost: 24,
         startup: 0.32,
         active: 0.12,
@@ -44,7 +44,7 @@ export const fighterArchetypes = {
         knockback: 360,
         hitstun: 0.5,
         blockstun: 0.24,
-        blockStaminaCost: 22,
+        blockStaminaCost: 30,
         blockPushback: 220,
         hitbox: { reach: 115, top: 0.9, bottom: 0.25 },
       },
@@ -97,7 +97,7 @@ export const fighterArchetypes = {
     guardBreakStun: 0.9,
   },
   shadow: {
-    maxHealth: 108,
+    maxHealth: 100,
     maxStamina: 100,
     body: {
       width: 48,
@@ -118,7 +118,7 @@ export const fighterArchetypes = {
     },
     attacks: {
       light: {
-        damage: 8,
+        damage: 10,
         staminaCost: 8,
         startup: 0.1,
         active: 0.1,
@@ -132,7 +132,7 @@ export const fighterArchetypes = {
         hitbox: { reach: 100, top: 0.75, bottom: 0.3 },
       },
       heavy: {
-        damage: 22,
+        damage: 26,
         staminaCost: 25,
         startup: 0.34,
         active: 0.12,
@@ -141,7 +141,7 @@ export const fighterArchetypes = {
         knockback: 400,
         hitstun: 0.55,
         blockstun: 0.28,
-        blockStaminaCost: 24,
+        blockStaminaCost: 32,
         blockPushback: 240,
         hitbox: { reach: 120, top: 0.85, bottom: 0.2 },
       },

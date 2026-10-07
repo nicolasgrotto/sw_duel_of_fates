@@ -402,7 +402,15 @@ npm run simulate -- --left shadow --right shadow --leftDifficulty hard --rightDi
 npm run simulate -- --set fighters.shadow.maxHealth=120   # testa um valor sem editar arquivos
 ```
 
-Referência atual (300 duelos, seed 1): com o mesmo perfil, Guardião × Sombra fica entre 43% e 52% em todas as dificuldades e os duelos duram ~24 s. A dificuldade é monotônica (Difícil vence Normal ~90%, Normal vence Fácil ~98%).
+Referência v0.2 (300 rounds por cenário, seed 1): o simulador mede um round por execução de duelo, sem as intros do melhor de 3. `avg hits` soma ambos os lados; `avg hits to KO` conta os hits recebidos pelo derrotado (exclui timeouts). O alvo de 6–9 é validado pela segunda métrica, coerente com 100 de vida, rápido 10, forte 24/26 e riposta 16/17. Bloquear forte custa 30/32 de stamina.
+
+| Dificuldade | Guardião vence (perfis próprios) | Tempo | Hits totais | Hits até K.O. | Guardião vence (ambos balanced) | Hits até K.O. (balanced) |
+| --- | --- | --- | --- | --- | --- | --- |
+| Fácil | 42,3% | 18,2 s | 12,7 | 7,5 | 43,3% | 7,8 |
+| Normal | 63,0% | 15,0 s | 13,9 | 8,4 | 50,7% | 8,6 |
+| Difícil | 59,3% | 16,0 s | 13,7 | 8,5 | 53,7% | 8,9 |
+
+Nenhum timeout nos seis cenários. Com ambos balanced, Difícil vence Normal 98,7% e Normal vence Fácil 99,3%. Os perfis próprios também medem a vantagem tática do perfil equilibrado sobre o agressivo, não apenas atributos.
 - O trail e a luz do sabre no corpo são só do render (`SaberTrail`, `drawSaberBodyLight`). O trail usa o tempo da simulação (`fighter.animation.time`), então a pausa congela o rastro.
 
 ---
