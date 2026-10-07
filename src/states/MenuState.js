@@ -32,6 +32,7 @@ export class MenuState extends GameState {
         { id: MenuOption.CONTROLS, label: texts.menu.controls },
       ],
       layout.menu,
+      this.game.audio,
     );
     this.footer = formatText(texts.menu.navigation, {
       up: formatActionKeys(keyBindings, Action.MENU_UP),

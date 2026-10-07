@@ -3,6 +3,8 @@ import assert from 'node:assert/strict';
 import { Action } from '../src/config/controlsConfig.js';
 import { colors } from '../src/config/themeConfig.js';
 import { layout } from '../src/config/uiConfig.js';
+import { audioConfig } from '../src/config/audioConfig.js';
+import { AudioManager } from '../src/core/AudioManager.js';
 import { StateMachine } from '../src/core/StateMachine.js';
 import { createState } from '../src/states/stateFactory.js';
 import { DuelMode } from '../src/states/duelModes.js';
@@ -16,6 +18,7 @@ function createFakeGame() {
     states: new StateMachine(),
     debug: { enabled: false },
     settings: { difficulty: 'normal', reducedEffects: false },
+    audio: new AudioManager(audioConfig),
     input: {
       wasPressed: (action) => pressed.has(action),
       isDown: () => false,

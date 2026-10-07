@@ -31,6 +31,7 @@ export class GameOverState extends GameState {
         { id: GameOverOption.MENU, label: texts.result.menu },
       ],
       layout.result,
+      this.game.audio,
     );
   }
 

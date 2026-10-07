@@ -1,9 +1,11 @@
 import { EnemyAI } from '../ai/EnemyAI.js';
+import { DuelAudio } from '../audio/DuelAudio.js';
 import { characters } from '../characters/characterData.js';
 import { createFighter } from '../characters/characterFactory.js';
 import { CombatEvent } from '../combat/combatEvents.js';
 import { createBox, getAttackHitbox, isAttackActive, isInvulnerable } from '../combat/hitboxes.js';
 import { aiConfig } from '../config/aiConfig.js';
+import { audioConfig } from '../config/audioConfig.js';
 import { Action, keyBindings } from '../config/controlsConfig.js';
 import { effectsConfig } from '../config/effectsConfig.js';
 import { animation as animationStyle } from '../config/fighterVisualConfig.js';
@@ -61,6 +63,10 @@ export class DuelState extends GameState {
     this.effects = new EffectsSystem(effectsConfig, this.camera, this.random, this.timeControl);
     this.effects.setReduced(this.game.settings.reducedEffects);
     this.view = new DuelRenderer();
+    this.duelAudio = new DuelAudio(this.game.audio, {
+      arenaWidth: gameConfig.canvas.width,
+      stereoWidth: audioConfig.stereoWidth,
+    });
     this.hud = new Hud(this.fighters[0], this.fighters[1]);
     this.message = new CombatMessage();
     this.message.show(texts.duel.intro, layout.messages.introDuration);
@@ -140,6 +146,7 @@ export class DuelState extends GameState {
 
     this.simulation.step(dt);
     this.effects.handleEvents(this.simulation.events);
+    this.duelAudio.handleEvents(this.simulation.events);
     this.rememberLastEvent();
     this.countPlayerStats();
     this.checkForDeath();

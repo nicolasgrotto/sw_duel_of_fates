@@ -20,6 +20,7 @@ export class PauseState extends GameState {
         { id: PauseOption.QUIT, label: texts.pause.quit },
       ],
       layout.pause,
+      this.game.audio,
     );
   }
 

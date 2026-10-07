@@ -1,10 +1,12 @@
+import { SoundName } from '../audio/soundNames.js';
 import { Action } from '../config/controlsConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
 import { layout } from '../config/uiConfig.js';
 
 export class MenuList {
-  constructor(items, { firstItemY, itemSpacing }) {
+  constructor(items, { firstItemY, itemSpacing }, sounds = null) {
     this.items = items;
+    this.sounds = sounds;
     this.firstItemY = firstItemY;
     this.itemSpacing = itemSpacing;
     this.selectedIndex = 0;
@@ -21,12 +23,17 @@ export class MenuList {
     if (input.wasPressed(Action.MENU_DOWN)) {
       this.move(1);
     }
-    return input.wasPressed(Action.CONFIRM) ? this.selected.id : null;
+    if (!input.wasPressed(Action.CONFIRM)) {
+      return null;
+    }
+    this.sounds?.play(SoundName.UI_CONFIRM);
+    return this.selected.id;
   }
 
   move(step) {
     const count = this.items.length;
     this.selectedIndex = (this.selectedIndex + step + count) % count;
+    this.sounds?.play(SoundName.UI_MOVE);
   }
 
   render(renderer, centerX) {

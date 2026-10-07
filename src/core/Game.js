@@ -1,10 +1,12 @@
 import { aiConfig } from '../config/aiConfig.js';
+import { audioConfig } from '../config/audioConfig.js';
 import { Action, keyBindings } from '../config/controlsConfig.js';
 import { gameConfig } from '../config/gameConfig.js';
 import { colors } from '../config/themeConfig.js';
 import { createState } from '../states/stateFactory.js';
 import { StateId } from '../states/stateIds.js';
 import { DebugOverlay } from '../utils/debug.js';
+import { AudioManager } from './AudioManager.js';
 import { GameLoop } from './GameLoop.js';
 import { Input } from './Input.js';
 import { Renderer } from './Renderer.js';
@@ -16,6 +18,10 @@ export class Game {
     this.input = new Input({ bindings: keyBindings, target: window });
     this.states = new StateMachine();
     this.settings = { difficulty: aiConfig.defaultDifficulty };
+    this.audio = new AudioManager(audioConfig);
+    this.unlockAudio = () => this.audio.unlock();
+    window.addEventListener('keydown', this.unlockAudio, { once: true });
+    window.addEventListener('pointerdown', this.unlockAudio, { once: true });
     this.debug = new DebugOverlay(gameConfig.debug);
     this.loop = new GameLoop({
       ...gameConfig.loop,
