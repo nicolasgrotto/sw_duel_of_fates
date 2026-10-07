@@ -173,8 +173,6 @@ As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e des
 - [x] Gamepad (Gamepad API dentro do `Input`), vibração em impactos
 - [x] Segundo preset de teclado (setas + Z X C V)
 
-Os itens de identidade (nome, fonte, letterbox, ignição e paleta de sabres) permanecem pendentes para trabalho visual do Opus, conforme a opção de divisão autorizada no pedido. Habilidades exclusivas e novos personagens também ficam para essa etapa de design/elenco, sem placeholders no código.
-
 ### v0.4 — Personagens I
 
 - [x] Golpes como dados por personagem (`moves`, `cancelsInto`, pose por golpe)

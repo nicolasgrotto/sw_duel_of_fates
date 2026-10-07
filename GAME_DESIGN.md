@@ -280,6 +280,18 @@ O perfil vem do personagem (`characterData.aiProfile`). A Sombra é agressiva.
 | **Normal** | média | às vezes | às vezes, quase nunca perfeito | às vezes | alguns |
 | **Difícil** | rápida (nunca abaixo de 0,15 s) | frequente | frequente, às vezes perfeito | frequente | raros |
 
+As dificuldades também mudam **o jeito** de jogar, não só os números:
+
+| Comportamento | Fácil | Normal | Difícil |
+| --- | --- | --- | --- |
+| **Aviso antes de atacar** (a IA para um instante antes do golpe) | 0,25 s | 0,08 s | nenhum |
+| **Punição inteligente** (usa forte quando a recovery do jogador é longa o bastante) | não | não | sim |
+| **Isca de whiff** (recua um passo para o golpe do jogador errar e pune a recovery) | não | às vezes | frequente |
+| **Memória de hábitos** (percebe se o jogador abusa de fortes, de bloqueio ou de ataques rápidos e se adapta) | não | não | sim |
+| **Habilidade exclusiva** | rara | às vezes | no momento certo |
+
+A memória de hábitos olha só o que o jogador fez (ações vistas), nunca o input. Ela aumenta um pouco a chance da resposta certa: mais parry contra quem abusa do forte, mais empurrão contra quem só bloqueia, mais guarda contra quem só ataca rápido. A IA continua errando às vezes.
+
 A dificuldade é escolhida no menu. Os valores ficam em `src/config/aiConfig.js`.
 
 ### Aleatoriedade
@@ -382,12 +394,12 @@ Conceitos aprovados. Entram aos poucos (ver TASKS). Escala de 1 a 5; "Dific." é
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | **Guardião** | técnico, fundamentos | 3 | 3 | 3 | 4 | 3 | 1 | bloqueio mais barato; riposta em dois golpes |
 | **Sombra** | agressiva | 3 | 3 | 4 | 2 | 3 | 2 | ímpeto: acertar devolve stamina; forte com armadura contra um ataque rápido |
-| **Bastião** | tanque pesado | 1 | 3 | 5 | 5 | 1 | 2 | anda bloqueando, não é empurrado no bloqueio; "Firmar" no lugar da esquiva |
+| **Bastião** | tanque pesado | 1 | 3 | 5 | 5 | 1 | 2 | anda bloqueando, não é empurrado no bloqueio; golpe com armadura |
 | **Vespa** | extremamente rápida, duas lâminas curtas | 5 | 1 | 1 | 2 | 4 | 4 | sequência de 5 ataques rápidos; cada um bloqueado drena stamina extra |
 | **Garça** | acrobática | 4 | 2 | 2 | 2 | 5 | 4 | dois ataques aéreos, pulo na parede, esquiva que atravessa o oponente |
 | **Espelho** | especialista em parry | 2 | 3 | 3 | 5 | 2 | 4 | janela de parry maior; postura de espera com riposta automática |
 | **Haste** | alcance, lâmina em haste | 2 | 5 | 3 | 3 | 2 | 3 | ponto doce: a ponta dá +50% de dano, de perto bate com o cabo |
-| **Brasa** | contra-ataque | 3 | 3 | 4 | 3 | 3 | 3 | o forte é uma postura de contra-golpe (leitura, não reação) |
+| **Brasa** | contra-ataque | 3 | 3 | 4 | 3 | 3 | 3 | postura de contra-golpe forte (leitura, não reação); punições causam mais dano |
 | **Eco** | trapaceiro | 4 | 3 | 2 | 2 | 4 | 5 | finta: cancela o startup do forte; passo-reflexo curto |
 | **Forja** | pesada com carga | 2 | 3 | 5 | 3 | 2 | 3 | forte carregável em 3 níveis; o nível 3 quebra a guarda |
 
@@ -407,6 +419,29 @@ Todos os personagens usam os mesmos inputs. A variedade vem do **conteúdo** de 
 | `I` | habilidade exclusiva do personagem |
 
 Finalizadores são só cinemáticos (câmera lenta e lâmina apagando), sem input.
+
+### Habilidades exclusivas e traços
+
+Cada personagem tem **um traço passivo** (sempre ligado) e **uma habilidade** no botão `I` (gamepad: RB ou RT; preset de setas: `B`). A habilidade é só mais um golpe em dados (`moves.special`), de um destes tipos:
+
+- **golpe**: ataque comum com propriedades extras (armadura, alcance enorme, carga);
+- **postura de contra-golpe**: o lutador fica parado em guarda por um tempo curto; um golpe de frente nesse tempo é desviado (o atacante fica desequilibrado) e respondido na hora com um golpe próprio. Se nada vier, a postura termina com recovery e fica punível. É uma **leitura antecipada**, diferente do parry, que é reação;
+- **avanço**: dash para a frente, invulnerável no começo, que pode atravessar o oponente.
+
+Armadura: durante o startup (e o active, quando indicado) o golpe aguenta N acertos. O lutador leva o dano (às vezes reduzido), mas não é interrompido. Armadura não protege contra parry, empurrão ou quebra de guarda.
+
+| Personagem | Traço passivo | Habilidade (`I`) |
+| --- | --- | --- |
+| **Guardião** | bloqueio custa 20% menos stamina | **Contraguarda**: postura curta (0,35 s); responde com a riposta |
+| **Sombra** | cada golpe que acerta devolve 6 de stamina | **Ímpeto**: avanço cortante com armadura contra 1 golpe |
+| **Bastião** | anda devagar enquanto bloqueia e não é empurrado no bloqueio | **Marreta**: golpe muito lento e pesado, com armadura contra 2 golpes (leva metade do dano) |
+| **Vespa** | sequência de 5 rápidos; rápido bloqueado drena stamina extra | **Zumbido**: avanço invulnerável que atravessa o oponente e troca de lado |
+| **Espelho** | janelas de parry maiores (perfeito 0,12 s, total 0,26 s) | **Postura de Espera**: postura longa (0,7 s); o golpe que chegar é aparado com efeito de parry perfeito e respondido com a riposta |
+| **Haste** | ponto doce: acerto com a ponta (último terço do alcance) dá +50% de dano; de muito perto, 60% | **Varredura**: golpe de alcance enorme e startup lento |
+| **Brasa** | +20% de dano contra oponente em recovery, desequilibrado ou atordoado | **Brasa Viva**: postura de contra-golpe (0,5 s) com resposta forte |
+| **Forja** | knockback maior em tudo | **Forja**: forte carregável segurando `I` (até 3 níveis); o nível 3 quebra a guarda de quem bloquear |
+
+Custos, tempos e números ficam em `src/config/movesConfig.js` e `fightersConfig.js`.
 
 ## 16. Modos e progressão planejados
 
