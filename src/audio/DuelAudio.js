@@ -1,6 +1,6 @@
 import { AttackType, isStrongAttack } from '../combat/attackPhases.js';
 import { CombatEvent } from '../combat/combatEvents.js';
-import { isAttackActive } from '../combat/hitboxes.js';
+import { isSaberStrikeActive } from '../combat/hitboxes.js';
 import { clamp } from '../utils/math.js';
 import { SoundName } from './soundNames.js';
 
@@ -10,7 +10,12 @@ function getSoundForEvent(event) {
 
   switch (event.type) {
     case CombatEvent.ATTACK_START:
+      if (event.attackType === AttackType.SHOVE) {
+        return null;
+      }
       return isHeavy ? SoundName.SWING_HEAVY : SoundName.SWING_LIGHT;
+    case CombatEvent.SHOVE:
+      return SoundName.SHOVE;
     case CombatEvent.HIT:
       return isStrong ? SoundName.HEAVY_HIT : SoundName.HIT;
     case CombatEvent.BLOCK:
@@ -44,7 +49,7 @@ function getHumMode(fighter) {
   if (!fighter.isAlive) {
     return HumMode.OFF;
   }
-  return isAttackActive(fighter) ? HumMode.SWING : HumMode.IDLE;
+  return isSaberStrikeActive(fighter) ? HumMode.SWING : HumMode.IDLE;
 }
 
 export class DuelAudio {

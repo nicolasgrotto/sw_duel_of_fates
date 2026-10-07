@@ -30,6 +30,9 @@ export const texts = {
       lightAttack: 'Ataque rápido',
       heavyAttack: 'Ataque forte',
       block: 'Bloquear (segurar)',
+      parry: 'Aparar (tocar na hora do golpe)',
+      riposte: 'Riposta (ataque rápido depois de aparar)',
+      shove: 'Empurrar (quebra a defesa)',
       dodge: 'Esquivar',
       pause: 'Pausar',
       toggleDebug: 'Debug',
@@ -62,17 +65,22 @@ export const difficultyNames = {
   hard: 'Difícil',
 };
 
-export const controlsScreenActions = [
-  'moveLeft',
-  'moveRight',
-  'jump',
-  'lightAttack',
-  'heavyAttack',
-  'block',
-  'dodge',
-  'pause',
-  'toggleDebug',
+export const controlsScreenRows = [
+  { label: 'moveLeft', actions: ['moveLeft'] },
+  { label: 'moveRight', actions: ['moveRight'] },
+  { label: 'jump', actions: ['jump'] },
+  { label: 'lightAttack', actions: ['lightAttack'] },
+  { label: 'heavyAttack', actions: ['heavyAttack'] },
+  { label: 'block', actions: ['block'] },
+  { label: 'parry', actions: ['block'] },
+  { label: 'riposte', actions: ['lightAttack'] },
+  { label: 'shove', actions: ['block', 'lightAttack'] },
+  { label: 'dodge', actions: ['dodge'] },
+  { label: 'pause', actions: ['pause'] },
+  { label: 'toggleDebug', actions: ['toggleDebug'] },
 ];
+
+export const keyComboSeparator = '  +  ';
 
 export const layout = {
   menu: {
@@ -93,8 +101,8 @@ export const layout = {
   },
   controls: {
     titleY: 110,
-    firstRowY: 200,
-    rowSpacing: 42,
+    firstRowY: 180,
+    rowSpacing: 36,
     columnGap: 16,
     footerY: 660,
   },

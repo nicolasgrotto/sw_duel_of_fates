@@ -1,15 +1,15 @@
 import { Action, keyBindings } from '../config/controlsConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
-import { controlsScreenActions, layout, texts } from '../config/uiConfig.js';
+import { controlsScreenRows, keyComboSeparator, layout, texts } from '../config/uiConfig.js';
 import { formatText } from '../ui/formatText.js';
 import { formatActionKeys } from '../ui/keyLabels.js';
 import { GameState } from './GameState.js';
 
 export class ControlsState extends GameState {
   enter() {
-    this.rows = controlsScreenActions.map((action) => ({
-      label: texts.controls.actions[action],
-      keys: formatActionKeys(keyBindings, action),
+    this.rows = controlsScreenRows.map(({ label, actions }) => ({
+      label: texts.controls.actions[label],
+      keys: actions.map((action) => formatActionKeys(keyBindings, action)).join(keyComboSeparator),
     }));
     this.footer = formatText(texts.controls.back, { back: formatActionKeys(keyBindings, Action.BACK) });
   }

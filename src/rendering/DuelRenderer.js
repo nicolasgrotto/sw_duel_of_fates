@@ -1,4 +1,4 @@
-import { isAttackActive } from '../combat/hitboxes.js';
+import { isSaberStrikeActive } from '../combat/hitboxes.js';
 import { effectsConfig } from '../config/effectsConfig.js';
 import { drawArena } from './arenaRenderer.js';
 import { DodgeAfterimage } from './DodgeAfterimage.js';
@@ -85,7 +85,7 @@ export class DuelRenderer {
       const pose = computePose(fighter, this.getPose(fighter));
       this.getAfterimage(fighter).record(fighter, pose);
 
-      if (isAttackActive(fighter)) {
+      if (isSaberStrikeActive(fighter)) {
         getBladeWorldPoints(fighter, pose, this.bladePoints);
         this.getTrail(fighter).record(fighter.animation.time, this.bladePoints);
       }

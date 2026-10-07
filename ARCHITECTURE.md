@@ -316,6 +316,7 @@ Arquivos: [src/ui/](src/ui/), [src/config/uiConfig.js](src/config/uiConfig.js). 
 
 - Todos os textos da interface ficam em `uiConfig.texts` (com `{placeholders}` preenchidos por `formatText`). Posições e medidas ficam em `uiConfig.layout`.
 - Nomes de teclas nunca são escritos à mão: `keyLabels.formatActionKeys(keyBindings, action)`.
+- A tela de Controles é gerada de `uiConfig.controlsScreenRows`: cada linha tem um texto e uma lista de ações (combinações como o empurrão aparecem como `L  +  J`).
 - `MenuList` é reutilizado no menu, na pausa e no resultado. `update(input)` devolve o id escolhido no `Enter` (ou `null`).
 - `Hud` só lê os lutadores. A barra fantasma é estado visual do próprio `Hud`.
 - `DuelState`: intro de `layout.messages.introDuration` com controles travados ("DUELO"), depois o duelo. No golpe final mostra "K.O." e, depois de `gameConfig.duel.resultDelay`, empilha o `GameOverState` com as estatísticas do jogador (tempo, golpes acertados, defesas), contadas a partir dos eventos de combate.
@@ -347,6 +348,7 @@ Arquivos: [src/combat/](src/combat/). Regras em [GAME_DESIGN.md](GAME_DESIGN.md#
 - `resolveHits`: em duas etapas. Primeiro encontra **todos** os contatos (hitbox × hurtbox), depois aplica. Assim, dois golpes no mesmo frame acertam os dois lados (trade), sem depender da ordem da lista.
 - Bloqueio só vale de frente. Sem stamina para bloquear, a guarda quebra (`STUNNED`).
 - **Parry**: o toque no bloqueio chega como `intent.blockPressed` e vira a ação `parry` no buffer. Ela entra em `BLOCKING` e arma a janela (`combat.parryArmed`, `combat.parryTime`). Também arma dentro do blockstun. Enquanto a janela está armada o lutador continua em `BLOCKING`, mesmo sem segurar. Quando a janela acaba sem golpe (ou o lutador sai do bloqueio), começa o `parryLockout`. Em `resolveContact`, golpe de frente + janela armada = `resolveParry`: o atacante perde o ataque e stamina e vai para `STAGGERED`, e o defensor fica livre (`IDLE`) com `combat.riposteTime`. `parryTime < perfectWindow` = parry perfeito. Valores em `fightersConfig.<arquétipo>.parry`.
+- **Empurrão**: `intent.lightAttack` com `intent.block` vira a ação `shove` no buffer (prioridade logo abaixo da esquiva). Sai de `IDLE`/`WALKING` ou de dentro do `BLOCKING` fora do blockstun (`startActionFromBlock`). É um ataque (`AttackType.SHOVE`, estado `ATTACKING`, dados em `attacks.shove`) que ignora bloqueio e parry: `applyShove` drena `staminaDamage`, empurra e deixa o alvo em `STAGGERED`. Não participa de clash e não tem trail nem zumbido de golpe (`isSaberAttack`, `isSaberStrikeActive`).
 - **Riposta**: com `riposteTime > 0`, a ação de ataque rápido usa `attacks.riposte` (`AttackType.RIPOSTE`, estado `ATTACKING`). `isStrongAttack` (forte ou riposta) escolhe o impacto e o som fortes.
 - Na morte, escolhe a direção da queda: para trás se houver espaço até a parede, senão para a frente.
 - Não desenha nada e não cria efeitos. Ele **emite eventos** (`hit`, `block`, `guardBreak`, `clash`, `death`, `parry`, `perfectParry`, e as ações `attackStart`, `dodge`, `actionRejected`) com atacante, defensor, tipo de ataque e ponto de contato. `events` é limpo a cada passo.

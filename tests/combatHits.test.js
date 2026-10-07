@@ -366,3 +366,63 @@ describe('parry', () => {
     assert.deepEqual(eventTypes(duel.events), [CombatEvent.PARRY, CombatEvent.HIT]);
   });
 });
+
+const SHOVE_DISTANCE = 90;
+
+function runShove(duel, opponentIntent = {}) {
+  const shove = duel.player.stats.attacks.shove;
+  duel.step({ block: true, lightAttack: true }, opponentIntent);
+  repeat(Math.ceil((shove.startup + shove.active) / STEP) + 1, () => duel.step({}, opponentIntent));
+}
+
+describe('shove', () => {
+  it('breaks through a held block and staggers without damage', () => {
+    const duel = createDuel(SHOVE_DISTANCE);
+    const { opponent, player } = duel;
+    const shove = player.stats.attacks.shove;
+
+    runShove(duel, { block: true });
+
+    assert.deepEqual(eventTypes(duel.events), [CombatEvent.SHOVE]);
+    assert.equal(opponent.state, FighterState.STAGGERED);
+    assert.equal(opponent.health, opponent.stats.maxHealth);
+    assert.ok(opponent.stamina <= opponent.stats.maxStamina - shove.staminaDamage + 1);
+    assert.ok(opponent.vx > 0);
+  });
+
+  it('cannot be parried', () => {
+    const duel = createDuel(SHOVE_DISTANCE);
+    const shove = duel.player.stats.attacks.shove;
+    const pressStep = Math.ceil(shove.startup / STEP) - 3;
+
+    duel.step({ block: true, lightAttack: true });
+    for (let step = 1; step <= Math.ceil((shove.startup + shove.active) / STEP); step += 1) {
+      duel.step({}, { block: step >= pressStep, blockPressed: step === pressStep });
+    }
+
+    assert.deepEqual(eventTypes(duel.events), [CombatEvent.SHOVE]);
+    assert.equal(duel.opponent.state, FighterState.STAGGERED);
+  });
+
+  it('can come out of a held block', () => {
+    const duel = createDuel(400);
+    const { player } = duel;
+
+    duel.step({ block: true });
+    assert.equal(player.state, FighterState.BLOCKING);
+
+    duel.step({ block: true, lightAttack: true });
+    assert.equal(player.state, FighterState.ATTACKING);
+    assert.equal(player.combat.attackType, 'shove');
+  });
+
+  it('loses to a faster attack', () => {
+    const duel = createDuel(SHOVE_DISTANCE);
+
+    runShove(duel, { lightAttack: true });
+
+    assert.equal(duel.events[0].type, CombatEvent.HIT);
+    assert.equal(duel.events[0].defender, duel.player);
+    assert.equal(duel.opponent.state === FighterState.STAGGERED, false);
+  });
+});

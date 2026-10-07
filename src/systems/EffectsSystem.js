@@ -13,6 +13,7 @@ export const EffectType = Object.freeze({
   FINAL_BLOW: 'finalBlow',
   PARRY_SPARK: 'parrySpark',
   PERFECT_PARRY: 'perfectParry',
+  SHOVE_IMPACT: 'shoveImpact',
 });
 
 function createLight() {
@@ -104,6 +105,9 @@ export class EffectsSystem {
         break;
       case CombatEvent.DEATH:
         this.spawn(EffectType.FINAL_BLOW, params);
+        break;
+      case CombatEvent.SHOVE:
+        this.spawn(EffectType.SHOVE_IMPACT, params);
         break;
       case CombatEvent.PARRY:
         this.spawnParry(EffectType.PARRY_SPARK, defender, params);

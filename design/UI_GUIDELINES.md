@@ -47,6 +47,7 @@ Todos os textos ficam em `src/config/uiConfig.js` (`texts`). Para trocar o nome 
 
 - Tabela simples de duas colunas: ação e teclas.
 - As teclas vêm de `controlsConfig` (formatadas por `ui/keyLabels.js`). Se a tecla mudar, a tela muda junto.
+- Combinações aparecem com `+` (ex.: empurrar `L  +  J`). Ações que usam a mesma tecla de outro jeito (aparar = tocar `L`) ganham linha própria com a explicação curta entre parênteses.
 - `Esc` ou `Enter` volta.
 
 ### Duelo (HUD)

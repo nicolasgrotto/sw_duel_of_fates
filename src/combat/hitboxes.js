@@ -1,5 +1,5 @@
 import { FighterState } from '../entities/fighterStates.js';
-import { AttackPhase, getAttackPhase } from './attackPhases.js';
+import { AttackPhase, getAttackPhase, isSaberAttack } from './attackPhases.js';
 
 export function createBox() {
   return { left: 0, right: 0, top: 0, bottom: 0 };
@@ -31,6 +31,10 @@ export function boxesOverlap(a, b) {
 export function isAttackActive(fighter) {
   const { attack } = fighter.combat;
   return attack !== null && getAttackPhase(attack, fighter.stateTime) === AttackPhase.ACTIVE;
+}
+
+export function isSaberStrikeActive(fighter) {
+  return isAttackActive(fighter) && isSaberAttack(fighter.combat.attackType);
 }
 
 export function hasActiveHitbox(fighter) {

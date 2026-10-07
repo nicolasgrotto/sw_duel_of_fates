@@ -1,7 +1,7 @@
 import { FighterState } from '../entities/fighterStates.js';
 import { canAfford, spendStamina } from '../systems/StaminaSystem.js';
 import { CombatAction, clearActionBuffer, updateActionBuffer } from './actionBuffer.js';
-import { ATTACK_STATES, AttackPhase, AttackType, getAttackDuration, getAttackPhase } from './attackPhases.js';
+import { ATTACK_STATES, AttackPhase, AttackType, getAttackDuration, getAttackPhase, isSaberAttack } from './attackPhases.js';
 import { CombatEvent, createCombatEvent } from './combatEvents.js';
 import { boxesOverlap, createBox, getAttackHitbox, getHurtbox, hasActiveHitbox, hasHurtbox } from './hitboxes.js';
 
@@ -96,9 +96,8 @@ export class CombatSystem {
   }
 
   startActions(fighter) {
-    if (fighter.state === FighterState.BLOCKING && fighter.combat.bufferedAction === CombatAction.PARRY) {
-      clearActionBuffer(fighter);
-      this.armParry(fighter);
+    if (fighter.state === FighterState.BLOCKING && this.startActionFromBlock(fighter)) {
+      return;
     }
     if (!fighter.canAct) {
       return;
@@ -111,6 +110,19 @@ export class CombatSystem {
       fighter.combat.blockstun = 0;
       fighter.setState(FighterState.BLOCKING);
     }
+  }
+
+  startActionFromBlock(fighter) {
+    const { bufferedAction, blockstun } = fighter.combat;
+    if (bufferedAction === CombatAction.PARRY) {
+      clearActionBuffer(fighter);
+      this.armParry(fighter);
+      return false;
+    }
+    if (bufferedAction === CombatAction.SHOVE && blockstun === 0) {
+      return this.tryBufferedAction(fighter, bufferedAction);
+    }
+    return false;
   }
 
   tryBufferedAction(fighter, action) {
@@ -126,6 +138,8 @@ export class CombatSystem {
     switch (action) {
       case CombatAction.DODGE:
         return this.tryDodge(fighter);
+      case CombatAction.SHOVE:
+        return this.tryAttack(fighter, AttackType.SHOVE);
       case CombatAction.HEAVY_ATTACK:
         return this.tryAttack(fighter, AttackType.HEAVY);
       case CombatAction.LIGHT_ATTACK:
@@ -221,6 +235,9 @@ export class CombatSystem {
     if (!hasActiveHitbox(a) || !hasActiveHitbox(b)) {
       return;
     }
+    if (!isSaberAttack(a.combat.attackType) || !isSaberAttack(b.combat.attackType)) {
+      return;
+    }
 
     const boxA = getAttackHitbox(a, a.combat.attack, this.hitbox);
     const boxB = getAttackHitbox(b, b.combat.attack, this.otherHitbox);
@@ -283,13 +300,28 @@ export class CombatSystem {
     if (!contact.defender.isAlive) {
       return;
     }
-    if (!isBlockingAttack(contact.defender, contact.attacker)) {
+    if (contact.attackType === AttackType.SHOVE) {
+      this.applyShove(contact);
+    } else if (!isBlockingAttack(contact.defender, contact.attacker)) {
       this.applyHit(contact);
     } else if (contact.defender.combat.parryArmed) {
       this.resolveParry(contact);
     } else {
       this.resolveBlock(contact);
     }
+  }
+
+  applyShove(contact) {
+    const { attacker, defender, attack } = contact;
+
+    spendStamina(defender, attack.staminaDamage);
+    defender.clearAttack();
+    defender.vx = attacker.facing * attack.knockback;
+    defender.combat.parryArmed = false;
+    defender.combat.blockstun = 0;
+    defender.combat.stunDuration = attack.hitstun;
+    defender.restartState(FighterState.STAGGERED);
+    this.emit(CombatEvent.SHOVE, contact);
   }
 
   resolveParry(contact) {

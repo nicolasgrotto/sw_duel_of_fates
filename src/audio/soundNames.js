@@ -11,6 +11,7 @@ export const SoundName = Object.freeze({
   DENIED: 'denied',
   PARRY: 'parry',
   PERFECT_PARRY: 'perfectParry',
+  SHOVE: 'shove',
   UI_MOVE: 'uiMove',
   UI_CONFIRM: 'uiConfirm',
 });

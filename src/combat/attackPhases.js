@@ -4,6 +4,7 @@ export const AttackType = Object.freeze({
   LIGHT: 'light',
   HEAVY: 'heavy',
   RIPOSTE: 'riposte',
+  SHOVE: 'shove',
 });
 
 export const AttackPhase = Object.freeze({
@@ -17,12 +18,17 @@ export const ATTACK_STATES = Object.freeze({
   [AttackType.LIGHT]: FighterState.ATTACKING,
   [AttackType.HEAVY]: FighterState.HEAVY_ATTACK,
   [AttackType.RIPOSTE]: FighterState.ATTACKING,
+  [AttackType.SHOVE]: FighterState.ATTACKING,
 });
 
 const STRONG_ATTACKS = new Set([AttackType.HEAVY, AttackType.RIPOSTE]);
 
 export function isStrongAttack(attackType) {
   return STRONG_ATTACKS.has(attackType);
+}
+
+export function isSaberAttack(attackType) {
+  return attackType !== null && attackType !== AttackType.SHOVE;
 }
 
 export function getAttackDuration(attack) {

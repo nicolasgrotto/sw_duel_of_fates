@@ -89,6 +89,10 @@ export const audioConfig = {
       { type: 'noise', duration: 0.05, attack: 0.001, gain: 0.3, filter: { type: 'bandpass', from: 6000, to: 6000, q: 1 } },
       { type: 'tone', wave: 'sine', from: 80, to: 35, duration: 0.4, attack: 0.002, gain: 0.3, filter: null },
     ],
+    shove: [
+      { type: 'tone', wave: 'sine', from: 120, to: 55, duration: 0.18, attack: 0.002, gain: 0.32, filter: null },
+      { type: 'noise', duration: 0.1, attack: 0.002, gain: 0.35, filter: { type: 'lowpass', from: 900, to: 300, q: 0.8 } },
+    ],
     uiMove: [
       { type: 'tone', wave: 'sine', from: 880, to: 880, duration: 0.05, attack: 0.002, gain: 0.08, filter: null },
     ],

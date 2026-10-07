@@ -9,6 +9,7 @@ export const CombatEvent = Object.freeze({
   ACTION_REJECTED: 'actionRejected',
   PARRY: 'parry',
   PERFECT_PARRY: 'perfectParry',
+  SHOVE: 'shove',
 });
 
 const CONTACT_EVENTS = new Set([
@@ -19,6 +20,7 @@ const CONTACT_EVENTS = new Set([
   CombatEvent.DEATH,
   CombatEvent.PARRY,
   CombatEvent.PERFECT_PARRY,
+  CombatEvent.SHOVE,
 ]);
 
 export function isContactEvent(event) {

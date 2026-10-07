@@ -55,7 +55,10 @@ Roda duelos IA × IA sem navegador e mostra vitórias e estatísticas. Opções 
 | Pular | `W`, seta para cima ou `Espaço` |
 | Ataque rápido | `J` |
 | Ataque forte | `K` |
-| Bloquear | `L` |
+| Bloquear (segurar) | `L` |
+| Aparar / parry (tocar na hora do golpe) | `L` |
+| Riposta (logo depois de aparar) | `J` |
+| Empurrar (quebra a defesa) | `L` + `J` |
 | Esquivar | `Shift` |
 | Navegar nos menus | `W` / `S` ou setas |
 | Confirmar | `Enter` |

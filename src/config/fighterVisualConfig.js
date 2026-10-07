@@ -59,6 +59,14 @@ export const combatPoses = {
       windupLift: 0.04,
       strikeReach: 0.15,
     },
+    shove: {
+      windupDegrees: -40,
+      strikeDegrees: -75,
+      windupLean: -6,
+      strikeLean: 16,
+      windupLift: 0.02,
+      strikeReach: 0.12,
+    },
   },
   block: {
     bladeDegrees: -95,
