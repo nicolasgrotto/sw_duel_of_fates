@@ -65,7 +65,7 @@ Roda duelos IA × IA sem navegador e mostra vitórias e estatísticas. Opções 
 | Voltar | `Esc` ou `Backspace` |
 | Pausar / voltar ao jogo | `Esc` ou `P` |
 | Debug | `F3` |
-| Comportamento do boneco (modo Treino, com debug ligado) | `F4` |
+| Comportamento do boneco (modo Treino); também para a reprodução | `F4` |
 | Gravar inputs no Treino | `F5` |
 | Reproduzir no boneco | `F6` |
 | Hitboxes no Treino, sem F3 | `F7` |

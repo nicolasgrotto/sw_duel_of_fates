@@ -198,7 +198,7 @@ O `CombatSystem` emite eventos (`hit`, `block`, `guardBreak`, `clash`, `death`, 
 
 ### Boneco de treino
 
-No modo **Treino** (menu), o oponente é um boneco em vez da IA. Com o debug ligado, `F4` alterna o comportamento: parado → bloqueando → atacando.
+No modo **Treino** (menu), o oponente é um boneco em vez da IA. `F4` alterna o comportamento: parado → bloqueando → atacando. As teclas do treino (`F4` a `F7`) não dependem do debug.
 
 - F5 grava até 10 s de inputs do jogador; F6 reproduz no boneco em loop. Movimento é relativo à direção de guarda. F4 volta ao comportamento manual e para a reprodução. F7 alterna hitboxes/hurtboxes sem exigir F3. Inputs e estado de gravação aparecem no rodapé.
 - O treino não tem limite de rounds: depois de um K.O., começa outro round.

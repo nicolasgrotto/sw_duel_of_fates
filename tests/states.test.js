@@ -197,17 +197,20 @@ describe('state flow', () => {
     assert.deepEqual(game.stateNames(), ['MenuState']);
   });
 
-  it('cycles the training dummy only when debug is enabled', () => {
+  it('cycles the training dummy and stops playback without the debug overlay', () => {
     const game = createFakeGame();
     game.changeState(StateId.DUEL, { mode: DuelMode.TRAINING });
     const duel = game.states.current;
+    duel.recorder.toggleRecording();
+    duel.recorder.record(duel.fighters[0].intent, 1);
+    duel.recorder.stop();
+    duel.recorder.startPlayback();
 
     game.step(Action.CYCLE_DUMMY);
-    assert.equal(duel.opponentController.behavior, 'idle');
 
-    game.debug.enabled = true;
-    game.step(Action.CYCLE_DUMMY);
+    assert.equal(game.debug.enabled, false);
     assert.equal(duel.opponentController.behavior, 'block');
+    assert.equal(duel.recorder.mode, 'idle');
   });
 
   it('uses the AI with the chosen difficulty in versus mode', () => {

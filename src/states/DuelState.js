@@ -173,12 +173,11 @@ export class DuelState extends GameState {
       return;
     }
 
-    if (this.isTraining && this.game.debug.enabled && this.game.input.wasPressed(Action.CYCLE_DUMMY)) {
-      this.opponentController.cycleBehavior();
-      this.recorder.stop();
-    }
-
     if (this.isTraining) {
+      if (this.game.input.wasPressed(Action.CYCLE_DUMMY)) {
+        this.opponentController.cycleBehavior();
+        this.recorder.stop();
+      }
       if (this.game.input.wasPressed(Action.RECORD_DUMMY)) {
         this.recorder.toggleRecording();
       }

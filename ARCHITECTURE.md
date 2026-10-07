@@ -143,7 +143,7 @@ Core **não** conhece detalhes de personagens, ataques ou IA.
 
 Controlam a tela atual (Menu, Duelo, Pausa, Game Over). Cada estado tem `enter()`, `exit()`, `update(dt)`, `render(renderer)`, `renderDebug(renderer)` e `getDebugInfo()`.
 
-O `DuelState` é dono do duelo: cria os lutadores, os controllers (IA no modo versus, boneco no modo treino, via `params.mode`), a `DuelSimulation` e o `DuelRenderer`. Também cuida da pausa, do fim do duelo (resultado + `Enter` para o menu) e do boneco de treino (`F4` com debug ligado).
+O `DuelState` é dono do duelo: cria os lutadores, os controllers (IA no modo versus, boneco no modo treino, via `params.mode`), a `DuelSimulation` e o `DuelRenderer`. Também cuida da pausa, do fim do duelo (resultado + `Enter` para o menu) e do boneco de treino (`F4` a `F7`, sem depender do debug).
 
 ### Characters
 
