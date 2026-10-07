@@ -1,7 +1,14 @@
 export class Camera {
-  constructor({ maxShakeAmplitude, maxShakeDuration }, random) {
+  constructor({ maxShakeAmplitude, maxShakeDuration, maxPunchZoom, maxPunchDuration }, random) {
     this.maxShakeAmplitude = maxShakeAmplitude;
     this.maxShakeDuration = maxShakeDuration;
+    this.maxPunchZoom = maxPunchZoom;
+    this.maxPunchDuration = maxPunchDuration;
+    this.punchAmount = 0;
+    this.punchDuration = 0;
+    this.punchTime = 0;
+    this.focusX = 0;
+    this.focusY = 0;
     this.random = random;
     this.shakeAmplitude = 0;
     this.shakeDuration = 0;
@@ -27,7 +34,28 @@ export class Camera {
     this.shakeTime = 0;
   }
 
+  get zoom() {
+    if (this.punchDuration <= 0 || this.punchTime >= this.punchDuration) {
+      return 1;
+    }
+    const remaining = 1 - this.punchTime / this.punchDuration;
+    return 1 + this.punchAmount * remaining * remaining;
+  }
+
+  punch(zoom, duration, x, y) {
+    const amount = Math.max(0, Math.min(zoom, this.maxPunchZoom));
+    if (amount < this.zoom - 1) {
+      return;
+    }
+    this.punchAmount = amount;
+    this.punchDuration = Math.max(0, Math.min(duration, this.maxPunchDuration));
+    this.punchTime = 0;
+    this.focusX = x;
+    this.focusY = y;
+  }
+
   update(dt) {
+    this.punchTime = Math.min(this.punchTime + dt, this.punchDuration);
     this.shakeTime = Math.min(this.shakeTime + dt, this.shakeDuration);
     const strength = this.shakeStrength;
 

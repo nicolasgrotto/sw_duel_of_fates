@@ -8,12 +8,17 @@ export const effectsConfig = {
     duration: 0.12,
   },
   desaturationDim: 0.3,
+  maxPunchZoom: 0.06,
+  maxPunchDuration: 0.25,
+  hitFlashDuration: 0.06,
+  hitStopTremor: { amplitude: 2.5, interval: 1 / 60 },
   maxShakeAmplitude: 12,
   maxShakeDuration: 0.3,
   maxFlashAlpha: 0.35,
   flashColor: '#ffffff',
   reduced: {
     shakeScale: 0.25,
+    punchScale: 0.25,
     flashScale: 0,
   },
   sparkColors: ['#ffffff', '#ffe9a8', '#fff4d6'],
@@ -42,6 +47,7 @@ export const effectsConfig = {
       slowMotion: null,
     },
     heavyImpact: {
+      punch: { zoom: 0.03, duration: 0.25 },
       count: [12, 16],
       speed: [220, 520],
       life: [0.15, 0.35],
@@ -68,6 +74,7 @@ export const effectsConfig = {
       slowMotion: null,
     },
     guardBreak: {
+      punch: { zoom: 0.04, duration: 0.25 },
       count: [18, 24],
       speed: [240, 560],
       life: [0.15, 0.35],
@@ -94,6 +101,7 @@ export const effectsConfig = {
       slowMotion: null,
     },
     finalBlow: {
+      punch: { zoom: 0.06, duration: 0.25 },
       count: [0, 0],
       speed: [0, 0],
       life: [0, 0],
@@ -136,6 +144,7 @@ export const effectsConfig = {
       desaturate: null,
     },
     perfectParry: {
+      punch: { zoom: 0.05, duration: 0.25 },
       count: [16, 22],
       speed: [260, 560],
       life: [0.15, 0.38],

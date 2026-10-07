@@ -54,6 +54,9 @@ export class EffectsSystem {
     this.timeControl = timeControl;
     this.shakeScale = 1;
     this.flashScale = 1;
+    this.punchScale = 1;
+    this.hitFlashes = new Map();
+    this.tremors = new Map();
     this.particles = new ParticlePool(config.maxParticles);
     this.lights = Array.from({ length: config.maxLights }, createLight);
     this.rings = Array.from({ length: config.maxRings }, createRing);
@@ -69,6 +72,10 @@ export class EffectsSystem {
   }
 
   setReduced(reduced) {
+    this.punchScale = reduced ? this.config.reduced.punchScale : 1;
+    if (reduced) {
+      this.hitFlashes.clear();
+    }
     this.shakeScale = reduced ? this.config.reduced.shakeScale : 1;
     this.flashScale = reduced ? this.config.reduced.flashScale : 1;
   }
@@ -91,6 +98,10 @@ export class EffectsSystem {
 
     switch (event.type) {
       case CombatEvent.HIT:
+        if (this.flashScale > 0) {
+          this.hitFlashes.set(defender, this.config.hitFlashDuration);
+        }
+        this.startTremor(defender);
         this.spawn(isStrongAttack(event.attackType) ? EffectType.HEAVY_IMPACT : EffectType.HIT_SPARK, params);
         break;
       case CombatEvent.BLOCK:
@@ -110,9 +121,11 @@ export class EffectsSystem {
         this.spawn(EffectType.SHOVE_IMPACT, params);
         break;
       case CombatEvent.PARRY:
+        this.startTremor(attacker);
         this.spawnParry(EffectType.PARRY_SPARK, defender, params);
         break;
       case CombatEvent.PERFECT_PARRY:
+        this.startTremor(attacker);
         this.spawnParry(EffectType.PERFECT_PARRY, defender, params);
         break;
       default:
@@ -134,6 +147,31 @@ export class EffectsSystem {
     }
   }
 
+  startTremor(fighter) {
+    this.tremors.set(fighter, { time: 0, offset: this.config.hitStopTremor.amplitude * this.shakeScale });
+  }
+
+  getTremor(fighter) {
+    return this.tremors.get(fighter)?.offset ?? 0;
+  }
+
+  hasHitFlash(fighter) {
+    return (this.hitFlashes.get(fighter) ?? 0) > 0;
+  }
+
+  updateTremors(dt) {
+    if (!this.timeControl.isFrozen) {
+      this.tremors.clear();
+      return;
+    }
+    const { amplitude, interval } = this.config.hitStopTremor;
+    for (const tremor of this.tremors.values()) {
+      tremor.time += dt;
+      const direction = Math.floor(tremor.time / interval) % 2 === 0 ? 1 : -1;
+      tremor.offset = direction * amplitude * this.shakeScale;
+    }
+  }
+
   getSaberFlare(fighter) {
     const remaining = this.saberFlares.get(fighter) ?? 0;
     return remaining / this.config.saberFlare.duration;
@@ -151,6 +189,9 @@ export class EffectsSystem {
     }
     if (recipe.shake && this.shakeScale > 0) {
       this.camera.shake(recipe.shake.amplitude * this.shakeScale, recipe.shake.duration);
+    }
+    if (recipe.punch && this.punchScale > 0) {
+      this.camera.punch(recipe.punch.zoom * this.punchScale, recipe.punch.duration, x, y);
     }
     if (recipe.flash && this.flashScale > 0) {
       this.startFlash(recipe.flash.alpha * this.flashScale, recipe.flash.duration);
@@ -262,7 +303,9 @@ export class EffectsSystem {
     this.updateLights(dt);
     this.updateFlash(dt);
     this.updateRings(dt);
-    this.updateSaberFlares(dt);
+    this.updateTimers(this.saberFlares, dt);
+    this.updateTimers(this.hitFlashes, dt);
+    this.updateTremors(dt);
     this.updateDesaturation(dt);
   }
 
@@ -281,12 +324,12 @@ export class EffectsSystem {
     }
   }
 
-  updateSaberFlares(dt) {
-    for (const [fighter, remaining] of this.saberFlares) {
+  updateTimers(timers, dt) {
+    for (const [fighter, remaining] of timers) {
       if (remaining <= dt) {
-        this.saberFlares.delete(fighter);
+        timers.delete(fighter);
       } else {
-        this.saberFlares.set(fighter, remaining - dt);
+        timers.set(fighter, remaining - dt);
       }
     }
   }

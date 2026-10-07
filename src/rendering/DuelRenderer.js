@@ -1,4 +1,5 @@
 import { isSaberStrikeActive } from '../combat/hitboxes.js';
+import { colors } from '../config/themeConfig.js';
 import { effectsConfig } from '../config/effectsConfig.js';
 import { drawArena } from './arenaRenderer.js';
 import { DodgeAfterimage } from './DodgeAfterimage.js';
@@ -46,6 +47,9 @@ export class DuelRenderer {
   render(renderer, arena, fighters, effects, camera) {
     renderer.save();
     renderer.translate(camera.offsetX, camera.offsetY);
+    renderer.translate(camera.focusX, camera.focusY);
+    renderer.scale(camera.zoom, camera.zoom);
+    renderer.translate(-camera.focusX, -camera.focusY);
 
     drawArena(renderer, arena);
     this.preparePoses(fighters);
@@ -57,17 +61,26 @@ export class DuelRenderer {
       this.getAfterimage(fighter).draw(renderer, fighter.animation.time, arena.floorY);
     }
     for (const fighter of fighters) {
-      drawFighterBody(renderer, fighter, this.getPose(fighter), arena.floorY);
+      renderer.save();
+      renderer.translate(effects.getTremor(fighter), 0);
+      drawFighterBody(renderer, fighter, this.getPose(fighter), arena.floorY, true, effects.hasHitFlash(fighter) ? colors.hitFlash : null);
+      renderer.restore();
     }
     for (const fighter of fighters) {
+      renderer.save();
+      renderer.translate(effects.getTremor(fighter), 0);
       drawSaberBodyLight(renderer, fighter, this.getPose(fighter));
+      renderer.restore();
     }
     drawDesaturation(renderer, effects.desaturation, effectsConfig.desaturationDim, arena.overscan);
     for (const fighter of fighters) {
       this.getTrail(fighter).draw(renderer, fighter.animation.time, fighter.appearance.saberColor);
     }
     for (const fighter of fighters) {
+      renderer.save();
+      renderer.translate(effects.getTremor(fighter), 0);
       drawSaber(renderer, fighter, this.getPose(fighter), effects.getSaberFlare(fighter));
+      renderer.restore();
     }
 
     drawImpactLights(renderer, effects.lights);

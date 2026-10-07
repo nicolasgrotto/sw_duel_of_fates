@@ -25,6 +25,7 @@ export const colors = {
   hudTrack: 'rgba(255, 255, 255, 0.08)',
   desaturateGray: '#808080',
   desaturateDim: '#000000',
+  hitFlash: '#ffffff',
   saberFlare: '#ffffff',
 };
 

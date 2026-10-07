@@ -226,3 +226,69 @@ describe('EffectsSystem', () => {
     assert.equal(effects.particles.activeCount, effectsConfig.maxParticles);
   });
 });
+
+describe('impact feedback', () => {
+  it('flashes only the hit fighter and expires in real time', () => {
+    const { effects } = createEffects();
+    const event = createEvent(CombatEvent.HIT);
+    effects.handleEvents([event]);
+    assert.equal(effects.hasHitFlash(event.defender), true);
+    assert.equal(effects.hasHitFlash(event.attacker), false);
+    effects.update(effectsConfig.hitFlashDuration);
+    assert.equal(effects.hasHitFlash(event.defender), false);
+  });
+
+  it('trembles the hit fighter during hit stop without moving its body', () => {
+    const { effects, timeControl } = createEffects();
+    const event = createEvent(CombatEvent.HIT);
+    const x = event.defender.x;
+    effects.handleEvents([event]);
+    const firstOffset = effects.getTremor(event.defender);
+    effects.update(STEP);
+    assert.equal(effects.getTremor(event.defender), -firstOffset);
+    assert.equal(effects.getTremor(event.attacker), 0);
+    assert.equal(event.defender.x, x);
+    timeControl.scale(1);
+    effects.update(STEP);
+    assert.equal(effects.getTremor(event.defender), 0);
+  });
+
+  it('trembles the attacker whose attack was parried', () => {
+    const { effects } = createEffects();
+    const event = createEvent(CombatEvent.PERFECT_PARRY);
+    effects.handleEvents([event]);
+    assert.notEqual(effects.getTremor(event.attacker), 0);
+    assert.equal(effects.getTremor(event.defender), 0);
+  });
+
+  it('focuses the punch on contact, limits it and returns to normal', () => {
+    const { effects, camera } = createEffects();
+    const event = createEvent(CombatEvent.HIT, 'heavy');
+    effects.handleEvents([event]);
+    assert.equal(camera.zoom, 1.03);
+    assert.equal(camera.focusX, event.x);
+    assert.equal(camera.focusY, event.y);
+    effects.handleEvents([createEvent(CombatEvent.DEATH)]);
+    assert.equal(camera.zoom, 1.06);
+    camera.punch(0.01, 0.1, 10, 10);
+    assert.equal(camera.focusX, event.x);
+    camera.punch(10, 10, event.x, event.y);
+    assert.equal(camera.zoom, 1 + effectsConfig.maxPunchZoom);
+    assert.equal(camera.punchDuration, effectsConfig.maxPunchDuration);
+    camera.update(STEP);
+    assert.ok(camera.zoom < 1.06 && camera.zoom > 1);
+    camera.update(1);
+    assert.equal(camera.zoom, 1);
+  });
+
+  it('disables hit flash and reduces punch and tremor', () => {
+    const { effects, camera, timeControl } = createEffects();
+    effects.setReduced(true);
+    const event = createEvent(CombatEvent.HIT, 'heavy');
+    effects.handleEvents([event]);
+    assert.equal(effects.hasHitFlash(event.defender), false);
+    assert.equal(camera.zoom, 1 + 0.03 * effectsConfig.reduced.punchScale);
+    assert.equal(effects.getTremor(event.defender), effectsConfig.hitStopTremor.amplitude * effectsConfig.reduced.shakeScale);
+    assert.ok(timeControl.isFrozen);
+  });
+});

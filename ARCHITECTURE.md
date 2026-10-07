@@ -227,7 +227,7 @@ Efeitos e câmera são só visuais e ficam fora da `DuelSimulation`, no `DuelSta
 Ordem do `DuelRenderer.render` (camadas do VISUAL_SYSTEM):
 
 ```
-[câmera: translate(offset do shake)]
+[câmera: translate(offset do shake) + zoom centrado no contato]
   arena → luz dos sabres no chão → afterimages da esquiva → corpos (sombra, capa, pernas, túnica, cabeça, braços)
   → luz dos sabres nos corpos → dessaturação (parry perfeito) → trails → sabres (com flare) → luzes de impacto → anéis → faíscas
 [fim da câmera]
@@ -377,6 +377,10 @@ CombatSystem.events → EffectsSystem.handleEvents → spawn(tipo, { x, y, direc
 - Receitas também pedem **hit stop** e **câmera lenta** ao `TimeControl`. Efeitos reduzidos (`setReduced`) diminuem o shake e desligam o flash.
 - Afterimage da esquiva e vinheta são só do render.
 - **Parry**: `parry`/`perfectParry` usam a cor e a direção do **defensor**. Além de faíscas, luz, shake e hit stop, criam um anel (pool fixo `rings`), marcam o flare da lâmina do defensor (`saberFlares`, lido por `getSaberFlare(fighter)` no render) e, no perfeito, pedem dessaturação (`desaturation`) e câmera lenta. `DuelAudio` abaixa a música por 0,3 s no parry perfeito.
+
+- Pacote de impacto: `EffectsSystem` guarda hit flashes por lutador (0,06 s) e tremores durante hit stop. O tremor do hit afeta o atingido; no parry, o atacante aparado. O renderer aplica o deslocamento ao corpo e à lâmina sem mudar posição física. A silhueta aceita cor substituta `colors.hitFlash`.
+- `Camera.punch(zoom, duration, x, y)` limita o zoom adicional a 6%, mantém o impulso mais forte e retorna suavemente em até 0,25 s. Receitas pedem 3/4/5/6% em forte/quebra de guarda/perfeito/morte. UI e flash de tela ficam fora da transformação. Efeitos reduzidos desativam hit flash e reduzem punch e tremor a 25%.
+- Timers de VFX avançam por `dt` real, inclusive no hit stop e na câmera lenta; animação e combate continuam usando o tempo escalado.
 
 ## Audio
 

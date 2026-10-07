@@ -115,6 +115,7 @@ Cores compartilhadas (em `themeConfig`):
 | `hudTrack` | `rgba(255, 255, 255, 0.08)` | fundo das barras |
 | `desaturateGray` | `#808080` | cor neutra do passo de dessaturação (parry perfeito) |
 | `desaturateDim` | `#000000` | escurecimento junto da dessaturação |
+| `hitFlash` | `#ffffff` | silhueta branca por 0,06 s ao receber hit |
 | `saberFlare` | `#ffffff` | brilho extra da lâmina de quem aparou |
 
 ## Sabre

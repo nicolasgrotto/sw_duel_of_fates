@@ -131,7 +131,7 @@ export class DuelState extends GameState {
       this.stepSimulation(simulationDt);
     }
 
-    this.effects.update(simulationDt > 0 ? simulationDt : dt);
+    this.effects.update(dt);
     this.camera.update(dt);
     this.hud.update(dt);
     this.message.update(dt);
