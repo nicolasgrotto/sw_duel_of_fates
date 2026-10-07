@@ -119,3 +119,15 @@ it('resets a fighter for the next round without replacing combat or intent refer
   assert.equal(intent.heavyAttack, false);
   assert.equal(fighter.animation.walkBlend, 0);
 });
+
+it('creates move definitions per character without sharing mutable attacks', () => {
+  const first = createFighter('guardian', spawn);
+  const second = createFighter('guardian', spawn);
+  assert.notEqual(first.moves, second.moves);
+  assert.notEqual(first.moves.heavy, second.moves.heavy);
+  assert.equal(first.moves.heavy.pose, 'heavy');
+  assert.equal(first.moves.heavy.type, 'heavy');
+  assert.equal(first.moves.heavy.damage, fighterArchetypes.guardian.attacks.heavy.damage);
+  assert.equal(first.stats.attacks, first.moves);
+  assert.deepEqual(first.moves.light.cancelsInto, []);
+});

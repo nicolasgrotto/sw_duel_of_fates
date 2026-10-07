@@ -165,7 +165,7 @@ Os itens de identidade (nome, fonte, letterbox, ignição e paleta de sabres) pe
 
 ### v0.4 — Personagens I
 
-- [ ] Golpes como dados por personagem (`moves`, `cancelsInto`, pose por golpe)
+- [x] Golpes como dados por personagem (`moves`, `cancelsInto`, pose por golpe)
 - [ ] Sequências de ataques rápidos (encadeiam só no acerto ou no bloqueio)
 - [ ] Ataque aéreo e forte de avanço
 - [ ] Habilidade exclusiva (`I`)

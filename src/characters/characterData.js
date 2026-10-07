@@ -1,8 +1,11 @@
+import { movesByCharacter } from '../config/movesConfig.js';
+
 export const characters = {
   guardian: {
     id: 'guardian',
     name: 'Guardião',
     archetype: 'guardian',
+    moves: movesByCharacter.guardian,
     aiProfile: 'balanced',
     sound: {
       humFrequency: 74,
@@ -22,6 +25,7 @@ export const characters = {
     id: 'shadow',
     name: 'Sombra',
     archetype: 'shadow',
+    moves: movesByCharacter.shadow,
     aiProfile: 'aggressive',
     sound: {
       humFrequency: 62,

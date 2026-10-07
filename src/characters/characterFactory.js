@@ -13,10 +13,15 @@ export function createFighter(characterId, { x, y, facing }) {
     throw new Error(`Unknown archetype: ${character.archetype}`);
   }
 
+  const moves = {};
+  for (const [id, definition] of Object.entries(character.moves)) {
+    moves[id] = { ...stats.attacks[definition.attack], ...definition };
+  }
+
   return new Fighter({
     id: character.id,
     name: character.name,
-    stats,
+    stats: { ...stats, attacks: moves },
     appearance: character.appearance,
     sound: character.sound,
     x,

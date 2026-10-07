@@ -101,6 +101,7 @@ src/
     uiConfig.js             ✅ textos da interface e layout das telas
     aiConfig.js             ✅ perfis, dificuldades e percepção da IA
     audioConfig.js          ✅ volumes, receitas de som, zumbido e música
+    movesConfig.js          ✅ golpes por personagem: base de atributos, tipo, pose e cancelsInto
     fightersConfig.js       ✅ atributos por arquétipo (vida, stamina, corpo, movimento, ataques, esquiva)
     fighterVisualConfig.js  ✅ proporções, animação, poses de combate, sombra e estilo do sabre
     effectsConfig.js        ✅ limites e receitas de VFX
@@ -149,6 +150,8 @@ Personagens são **dados**:
 - `characterData.js`: id, nome, arquétipo e aparência (cores, capuz, capa, ângulo de guarda, tamanho da lâmina).
 - `fightersConfig.js`: atributos de cada arquétipo (vida, stamina, tamanho do corpo, movimento).
 - `characterFactory.createFighter(id, spawn)` junta os dois e cria um `Fighter`.
+
+`characterData.moves` aponta para `movesConfig.movesByCharacter`. A factory resolve cada golpe combinando os atributos base de fightersConfig com a definição do personagem e cria um mapa independente por Fighter. `fighter.moves` é o catálogo; `stats.attacks` mantém o mesmo mapa para percepção, balanceamento e testes existentes. CombatSystem lê o catálogo e escolhe estado pelo tipo do golpe; o renderer escolhe pose pelo id da definição. Overrides do simulador continuam sendo aplicados antes da factory, sem snapshots de atributos no import.
 
 Trocar todos os personagens (ex.: versão com identidade própria) deve exigir apenas mudar dados e assets, nunca o combate. Para adicionar um personagem: adicione uma entrada em `characterData.js` e, se precisar de atributos novos, um arquétipo em `fightersConfig.js`.
 

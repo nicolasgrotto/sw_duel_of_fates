@@ -14,21 +14,21 @@ function createIntent() {
 
 function createCombat() {
   return {
-      attack: null,
-      attackType: null,
-      hasHit: false,
-      lungeApplied: false,
-      stunDuration: 0,
-      blockstun: 0,
-      dodgeDirection: 0,
-      fallDirection: 0,
-      staminaRegenDelay: 0,
-      bufferedAction: null,
-      bufferTime: 0,
-      parryArmed: false,
-      parryTime: 0,
-      parryLockout: 0,
-      riposteTime: 0,
+    attack: null,
+    attackType: null,
+    hasHit: false,
+    lungeApplied: false,
+    stunDuration: 0,
+    blockstun: 0,
+    dodgeDirection: 0,
+    fallDirection: 0,
+    staminaRegenDelay: 0,
+    bufferedAction: null,
+    bufferTime: 0,
+    parryArmed: false,
+    parryTime: 0,
+    parryLockout: 0,
+    riposteTime: 0,
   };
 }
 
@@ -81,6 +81,10 @@ export class Fighter {
     this.animation.walkPhase = 0;
     this.animation.walkBlend = 0;
     this.animation.airBlend = 0;
+  }
+
+  get moves() {
+    return this.stats.attacks;
   }
 
   get width() {

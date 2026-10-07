@@ -55,7 +55,7 @@ function resetCombatPose(guardDegrees) {
 
 function applyAttackPose(fighter, guardDegrees) {
   const { attack, attackType } = fighter.combat;
-  const style = combatPoses.attacks[attackType];
+  const style = combatPoses.attacks[attack.pose ?? attackType];
   const progress = getPhaseProgress(attack, fighter.stateTime);
 
   switch (getAttackPhase(attack, fighter.stateTime)) {

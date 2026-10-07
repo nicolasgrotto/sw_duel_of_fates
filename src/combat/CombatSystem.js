@@ -168,7 +168,7 @@ export class CombatSystem {
   }
 
   tryAttack(fighter, attackType) {
-    const attack = fighter.stats.attacks[attackType];
+    const attack = fighter.moves[attackType];
     if (!canAfford(fighter, attack.staminaCost)) {
       return false;
     }
@@ -178,7 +178,7 @@ export class CombatSystem {
     fighter.clearAttack();
     fighter.combat.attack = attack;
     fighter.combat.attackType = attackType;
-    fighter.setState(ATTACK_STATES[attackType]);
+    fighter.setState(ATTACK_STATES[attack.type ?? attackType]);
     this.emitAction(CombatEvent.ATTACK_START, fighter, attackType);
     return true;
   }
