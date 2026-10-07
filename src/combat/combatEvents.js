@@ -29,7 +29,7 @@ export function isContactEvent(event) {
   return CONTACT_EVENTS.has(event.type);
 }
 
-export function createCombatEvent(type, { attacker, defender, attackType, x, y, armored = false }) {
+export function createCombatEvent(type, { attacker, defender, attackType, x, y, armored = false, damage = 0 }) {
   return {
     type,
     attacker,
@@ -38,5 +38,6 @@ export function createCombatEvent(type, { attacker, defender, attackType, x, y, 
     x,
     y,
     armored,
+    damage,
   };
 }

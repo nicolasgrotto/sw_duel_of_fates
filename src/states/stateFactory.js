@@ -3,6 +3,7 @@ import { ControlsState } from './ControlsState.js';
 import { DuelState } from './DuelState.js';
 import { GameOverState } from './GameOverState.js';
 import { MenuState } from './MenuState.js';
+import { MoveListState } from './MoveListState.js';
 import { OptionsState } from './OptionsState.js';
 import { PauseState } from './PauseState.js';
 import { StateId } from './stateIds.js';
@@ -15,6 +16,7 @@ const stateClasses = {
   [StateId.CONTROLS]: ControlsState,
   [StateId.GAME_OVER]: GameOverState,
   [StateId.OPTIONS]: OptionsState,
+  [StateId.MOVE_LIST]: MoveListState,
 };
 
 export function createState(id, game, params) {

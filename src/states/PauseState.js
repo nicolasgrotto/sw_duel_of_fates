@@ -1,4 +1,5 @@
 import { Action } from '../config/controlsConfig.js';
+import { gameConfig } from '../config/gameConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
 import { layout, texts } from '../config/uiConfig.js';
 import { MenuList } from '../ui/MenuList.js';
@@ -7,6 +8,7 @@ import { StateId } from './stateIds.js';
 
 export const PauseOption = Object.freeze({
   RESUME: 'resume',
+  MOVES: 'moves',
   RESTART: 'restart',
   QUIT: 'quit',
 });
@@ -16,6 +18,7 @@ export class PauseState extends GameState {
     this.menu = new MenuList(
       [
         { id: PauseOption.RESUME, label: texts.pause.resume },
+        { id: PauseOption.MOVES, label: texts.pause.moves },
         { id: PauseOption.RESTART, label: texts.pause.restart },
         { id: PauseOption.QUIT, label: texts.pause.quit },
       ],
@@ -35,6 +38,9 @@ export class PauseState extends GameState {
     switch (this.menu.update(input)) {
       case PauseOption.RESUME:
         this.game.popState();
+        break;
+      case PauseOption.MOVES:
+        this.game.pushState(StateId.MOVE_LIST, { characterId: this.params.duelParams?.playerCharacter ?? gameConfig.duel.playerCharacter });
         break;
       case PauseOption.RESTART:
         this.game.changeState(StateId.DUEL, this.params.duelParams);

@@ -6,4 +6,5 @@ export const StateId = Object.freeze({
   CONTROLS: 'controls',
   GAME_OVER: 'gameOver',
   OPTIONS: 'options',
+  MOVE_LIST: 'moveList',
 });

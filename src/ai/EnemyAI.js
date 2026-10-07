@@ -22,6 +22,8 @@ export const AiDecision = Object.freeze({
   WAIT: 'wait',
 });
 
+const STUN_STATES = new Set([FighterState.HIT, FighterState.STAGGERED]);
+
 const PendingAction = Object.freeze({
   NONE: null,
   LIGHT_ATTACK: 'lightAttack',
@@ -49,6 +51,7 @@ export class EnemyAI {
       moveX: 0,
       blockTime: 0,
       parryDelay: -1,
+      punishAfterBlock: false,
       pendingAction: PendingAction.NONE,
       delayedAction: PendingAction.NONE,
       actionDelay: 0,
@@ -66,10 +69,21 @@ export class EnemyAI {
     }
 
     this.habits.observe(this.opponent, dt);
+    this.updateBlockPunish();
     this.updateParryTiming(dt);
     this.updateDelayedAction(dt);
     this.tryChain();
     this.writeIntent(intent);
+  }
+
+  updateBlockPunish() {
+    const { plan, self } = this;
+    if (!plan.punishAfterBlock || self.state !== FighterState.BLOCKING || self.combat.blockstun <= 0) {
+      return;
+    }
+    plan.punishAfterBlock = false;
+    plan.blockTime = 0;
+    plan.pendingAction = PendingAction.LIGHT_ATTACK;
   }
 
   updateDelayedAction(dt) {
@@ -157,6 +171,7 @@ export class EnemyAI {
       return AiDecision.ATTACK;
     }
     if (!self.canAct && self.state !== FighterState.BLOCKING) {
+      this.planRecoveryGuard();
       return AiDecision.BUSY;
     }
     if (this.random() < this.difficulty.mistakeChance) {
@@ -172,6 +187,18 @@ export class EnemyAI {
       this.tryGuard() ??
       this.position()
     );
+  }
+
+  planRecoveryGuard() {
+    const { self, plan } = this;
+    if (!STUN_STATES.has(self.state) || plan.blockTime > 0) {
+      return;
+    }
+    if (this.random() >= this.difficulty.recoveryGuardChance) {
+      return;
+    }
+    plan.blockTime = getVulnerableTime(self) + this.perception.blockHoldTime;
+    plan.punishAfterBlock = this.random() < this.difficulty.blockPunishChance;
   }
 
   tryDefend() {
@@ -199,6 +226,7 @@ export class EnemyAI {
 
     if (roll < blockChance) {
       this.plan.blockTime = this.perception.blockHoldTime;
+      this.plan.punishAfterBlock = !isHeavyAttack(this.opponent.combat.attackType) && this.random() < this.difficulty.blockPunishChance;
       return AiDecision.BLOCK;
     }
     if (roll < blockChance + dodgeChance && canAfford(this.self, this.self.stats.dodge.staminaCost)) {
@@ -350,6 +378,7 @@ export class EnemyAI {
     }
 
     this.plan.blockTime = this.perception.blockHoldTime;
+    this.plan.punishAfterBlock = this.random() < this.difficulty.blockPunishChance;
     return AiDecision.GUARD;
   }
 

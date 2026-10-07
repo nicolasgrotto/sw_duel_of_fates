@@ -41,7 +41,8 @@ src/
     ControlsState.js        ✅ tabela de controles gerada do controlsConfig
     DuelState.js            ✅ duelo: intro, simulação, efeitos, HUD, fim do duelo
     PauseState.js           ✅ continuar, reiniciar, sair
-    GameOverState.js        ✅ vitória/derrota, estatísticas, revanche
+    GameOverState.js        ✅ vitória/derrota, tabela de estatísticas dos dois lutadores, revanche
+    MoveListState.js        ✅ lista de golpes do personagem do jogador (aberta pela pausa)
     OptionsState.js         ✅ dificuldade, efeitos, som, música
   arenas/                   ✅ dados visuais de arenas, sem regras de gameplay
     arenaData.js            ✅ camadas estáticas e partículas ambientes por arena
@@ -99,6 +100,7 @@ src/
     Letterbox.js            ✅ barras cinematográficas (alvo suave + pulso curto)
     keyLabels.js            ✅ nomes de teclas a partir do controlsConfig
     formatText.js           ✅ textos com {placeholders}
+    moveList.js             ✅ monta a lista de golpes a partir dos dados do personagem e das teclas ativas
   config/                   ✅ valores e ajustes
     gameConfig.js           ✅ canvas, loop, arena, física, duelo, debug
     themeConfig.js          ✅ cores, estilos de texto, animação de UI
@@ -344,7 +346,7 @@ Arquivos: [src/ui/](src/ui/), [src/config/uiConfig.js](src/config/uiConfig.js). 
 - A tela de Controles é gerada de `uiConfig.controlsScreenRows`: cada linha tem um texto e uma lista de ações (combinações como o empurrão aparecem como `L  +  J`).
 - `MenuList` é reutilizado no menu, na pausa e no resultado. `update(input)` devolve o id escolhido no `Enter` (ou `null`).
 - `Hud` só lê os lutadores. A barra fantasma é estado visual do próprio `Hud`.
-- `DuelState`: intro de `layout.messages.introDuration` com controles travados (ROUND 1/2/FINAL). `roundWins` guarda o placar do melhor de 3 (`roundsToWin = 2`) e alimenta os quadrados espelhados da HUD. No K.O., soma a vitória uma vez e espera `resultDelay`: reinicia o round ou empilha o resultado. `Fighter.resetForRound(x, facing)` restaura posição, vida, stamina, combate, intent e animação, preservando as referências dos dados. Controllers de IA e feedback visual são renovados; o Treino mantém o comportamento do boneco e reinicia sem limite. As estatísticas (tempo ativo, hits, bloqueios, parries comuns/perfeitos e quebras de guarda causadas) somam todos os rounds e aparecem em duas linhas no resultado. Se um trade matar ambos, nenhum ponto é somado e começa outro round.
+- `DuelState`: intro de `layout.messages.introDuration` com controles travados (ROUND 1/2/FINAL). `roundWins` guarda o placar do melhor de 3 (`roundsToWin = 2`) e alimenta os quadrados espelhados da HUD. No K.O., soma a vitória uma vez e espera `resultDelay`: reinicia o round ou empilha o resultado. `Fighter.resetForRound(x, facing)` restaura posição, vida, stamina, combate, intent e animação, preservando as referências dos dados. Controllers de IA e feedback visual são renovados; o Treino mantém o comportamento do boneco e reinicia sem limite. As estatísticas somam todos os rounds e são contadas para os dois lutadores (`fighterStats`, com `stats` = jogador): golpes, dano (o evento `hit` carrega `damage`), defesas, parries comuns e perfeitos, quebras de guarda, empurrões e a maior sequência (passo do golpe `lightN` que acertou). O resultado mostra uma tabela com uma coluna por lutador e a duração. A pausa tem "Lista de golpes", que empilha o `MoveListState` com o personagem do jogador (`duelParams.playerCharacter`). Se um trade matar ambos, nenhum ponto é somado e começa outro round.
 
 ---
 
@@ -508,6 +510,8 @@ DuelSimulation → CombatSystem executa (igual ao jogador)
 - **Parry**: contra um ataque forte ainda no startup, com `difficulty.parryChance`, a IA calcula quanto falta para o golpe ficar ativo e agenda o toque (`plan.parryDelay`) para cair no meio da janela (ou no começo, para o perfeito, com `perfectParryChance`). Se já for tarde, cai para bloqueio/esquiva. A contagem regressiva roda a cada frame em `updateParryTiming`, mas a decisão só nasce no pensamento: a IA continua limitada ao próprio tempo de reação.
 - **Empurrão**: com o oponente em `BLOCKING` no alcance do empurrão, `profile.shoveChance × difficulty.shoveMultiplier`. Contra um empurrão que está vindo, a IA tenta acertar um ataque rápido antes (é o que vence o empurrão).
 - **Comportamento por dificuldade** (`aiConfig.difficulties`):
+  - `blockPunishChance`: ao decidir bloquear (ou guardar) contra golpe que não é forte, a IA já planeja a punição (`plan.punishAfterBlock`); quando o bloqueio acontece, solta a guarda e pede um ataque rápido, que sai assim que o blockstun acaba (buffer). É o "apertar antes" de um humano;
+  - `recoveryGuardChance`: em `HIT`/`STAGGERED`, a IA pode decidir segurar a guarda até o fim do travamento (`getVulnerableTime(self)` + `blockHoldTime`). Sem isso, a IA esperava o próximo pensamento depois de cada golpe e perdia para quem só apertava ataque rápido;
   - `attackTell`: o ataque decidido vira `plan.delayedAction` e só sai depois desse tempo, com a IA parada (o "aviso" do Fácil). Punições não esperam. Se a IA for atingida no meio, o golpe é cancelado;
   - `smartPunish`: na punição, usa o forte quando `getVulnerableTime(oponente)` passa do startup do forte mais `perception.punishMargin`;
   - `whiffBaitChance`: contra um golpe no startup, recua um passo em vez de defender, para o golpe errar e a recovery ficar punível;

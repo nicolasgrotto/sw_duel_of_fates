@@ -20,16 +20,14 @@ export class GameOverState extends GameState {
 
     this.title = playerWon ? texts.result.victory : texts.result.defeat;
     this.winnerLine = formatText(texts.result.winner, { name: winnerName });
-    this.statsLine = formatText(texts.result.stats, {
-      time: formatSeconds(stats.time),
-      hits: stats.hits,
-      blocks: stats.blocks,
-    });
-    this.defenseStatsLine = formatText(texts.result.defenseStats, {
-      parries: stats.parries ?? 0,
-      perfectParries: stats.perfectParries ?? 0,
-      guardBreaks: stats.guardBreaks ?? 0,
-    });
+    this.statsLine = formatText(texts.result.time, { time: formatSeconds(stats.time) });
+    this.names = this.params.names ?? ['', ''];
+    const opponentStats = this.params.opponentStats ?? {};
+    this.rows = texts.result.rows.map(({ key, label }) => ({
+      label,
+      left: String(Math.round(stats[key] ?? 0)),
+      right: String(Math.round(opponentStats[key] ?? 0)),
+    }));
     this.menu = new MenuList(
       [
         { id: GameOverOption.REMATCH, label: texts.result.rematch },
@@ -52,13 +50,26 @@ export class GameOverState extends GameState {
 
   render(renderer) {
     const centerX = renderer.width / 2;
-    const { titleY, winnerY, statsY, defenseStatsY } = layout.result;
+    const { titleY, winnerY, statsY } = layout.result;
 
     renderer.overlay(colors.overlay);
     renderer.text(this.title, centerX, titleY, textStyles.title);
     renderer.text(this.winnerLine, centerX, winnerY, textStyles.subtitle);
     renderer.text(this.statsLine, centerX, statsY, textStyles.hint);
-    renderer.text(this.defenseStatsLine, centerX, defenseStatsY, textStyles.hint);
+    this.renderTable(renderer, centerX);
     this.menu.render(renderer, centerX);
+  }
+
+  renderTable(renderer, centerX) {
+    const { tableY, tableRowSpacing, tableColumnGap } = layout.result;
+    renderer.text(this.names[0], centerX - tableColumnGap, tableY, textStyles.resultName);
+    renderer.text(this.names[1], centerX + tableColumnGap, tableY, textStyles.resultName);
+    for (let index = 0; index < this.rows.length; index += 1) {
+      const row = this.rows[index];
+      const y = tableY + (index + 1) * tableRowSpacing;
+      renderer.text(row.left, centerX - tableColumnGap, y, textStyles.resultValue);
+      renderer.text(row.label, centerX, y, textStyles.hint);
+      renderer.text(row.right, centerX + tableColumnGap, y, textStyles.resultValue);
+    }
   }
 }

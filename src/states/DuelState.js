@@ -37,12 +37,24 @@ import { GameState } from './GameState.js';
 import { DuelMode } from './duelModes.js';
 import { StateId } from './stateIds.js';
 
+function createFighterStats() {
+  return { hits: 0, damage: 0, blocks: 0, parries: 0, perfectParries: 0, guardBreaks: 0, shoves: 0, longestChain: 0 };
+}
+
+function getChainStep(attackType) {
+  if (attackType === 'light') {
+    return 1;
+  }
+  return attackType?.startsWith('light') ? Number(attackType.slice('light'.length)) : 0;
+}
+
 export class DuelState extends GameState {
   enter() {
     this.duelTime = 0;
     this.introTime = 0;
     this.outcome = null;
-    this.stats = { hits: 0, blocks: 0, parries: 0, perfectParries: 0, guardBreaks: 0 };
+    this.fighterStats = [createFighterStats(), createFighterStats()];
+    this.stats = this.fighterStats[0];
     this.roundWins = [0, 0];
     this.roundNumber = 1;
     this.lastEvent = 'none';
@@ -324,17 +336,40 @@ export class DuelState extends GameState {
 
   countPlayerStats() {
     for (const event of this.simulation.events) {
-      if (event.type === CombatEvent.HIT && event.attacker === this.player) {
-        this.stats.hits += 1;
-      } else if (event.type === CombatEvent.BLOCK && event.defender === this.player) {
-        this.stats.blocks += 1;
-      } else if (event.type === CombatEvent.PARRY && event.defender === this.player) {
-        this.stats.parries += 1;
-      } else if (event.type === CombatEvent.PERFECT_PARRY && event.defender === this.player) {
-        this.stats.perfectParries += 1;
-      } else if (event.type === CombatEvent.GUARD_BREAK && event.attacker === this.player) {
-        this.stats.guardBreaks += 1;
+      this.countEvent(event);
+    }
+  }
+
+  statsOf(fighter) {
+    return this.fighterStats[this.fighters.indexOf(fighter)];
+  }
+
+  countEvent(event) {
+    switch (event.type) {
+      case CombatEvent.HIT: {
+        const stats = this.statsOf(event.attacker);
+        stats.hits += 1;
+        stats.damage += event.damage;
+        stats.longestChain = Math.max(stats.longestChain, getChainStep(event.attackType));
+        break;
       }
+      case CombatEvent.BLOCK:
+        this.statsOf(event.defender).blocks += 1;
+        break;
+      case CombatEvent.PARRY:
+        this.statsOf(event.defender).parries += 1;
+        break;
+      case CombatEvent.PERFECT_PARRY:
+        this.statsOf(event.defender).perfectParries += 1;
+        break;
+      case CombatEvent.GUARD_BREAK:
+        this.statsOf(event.attacker).guardBreaks += 1;
+        break;
+      case CombatEvent.SHOVE:
+        this.statsOf(event.attacker).shoves += 1;
+        break;
+      default:
+        break;
     }
   }
 
@@ -367,6 +402,8 @@ export class DuelState extends GameState {
       playerWon: this.outcome.winner === this.player,
       winnerName: this.outcome.winner.name,
       stats: { time: this.duelTime, ...this.stats },
+      opponentStats: { ...this.fighterStats[1] },
+      names: this.fighters.map((fighter) => fighter.name),
     });
   }
 

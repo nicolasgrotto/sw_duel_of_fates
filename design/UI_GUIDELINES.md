@@ -75,7 +75,14 @@ NOME ESQUERDA                                         NOME DIREITA
 ### Pausa
 
 - Overlay escuro sobre o duelo congelado.
-- "PAUSADO" + opções: **Continuar**, **Reiniciar duelo**, **Sair para o menu**.
+- "PAUSADO" + opções: **Continuar**, **Lista de golpes**, **Reiniciar duelo**, **Sair para o menu**.
+
+### Lista de golpes
+
+- Tela opaca (fundo `background`), título "GOLPES · NOME".
+- Duas colunas: teclas alinhadas à direita (`tableKey`) e a descrição alinhada à esquerda (`tableDescription`). As teclas vêm do preset ativo.
+- Inclui a sequência de rápidos (com o tamanho do personagem), forte, forte de avanço, aéreo, aparar, riposta, empurrão, esquiva, a habilidade e o traço passivo.
+- `Esc` ou `Enter` voltam para a pausa.
 - `Esc` também continua.
 
 ### Resultado
@@ -83,7 +90,8 @@ NOME ESQUERDA                                         NOME DIREITA
 - Aparece por cima do duelo congelado, depois do K.O. e da queda.
 - Título: **VITÓRIA** ou **DERROTA**.
 - Frase curta: "<nome do vencedor> venceu o duelo".
-- Duas linhas de estatísticas do jogador no duelo inteiro: tempo, golpes acertados, defesas; parries, parries perfeitos, quebras de guarda causadas.
+- Duração do duelo em uma linha `hint`.
+- Tabela comparativa: nome de cada lutador no topo da sua coluna (`resultName`, em `accent`), valores em `resultValue` e o nome da estatística no centro em `hint`. Linhas: golpes acertados, dano causado, defesas, parries, parries perfeitos, quebras de guarda, empurrões e maior sequência.
 - Opções: **Revanche**, **Menu principal**.
 
 ## Dicas de controle

@@ -21,6 +21,8 @@ const PERFECT = {
   adaptation: 0,
   chainChance: 0,
   specialMultiplier: 0,
+  blockPunishChance: 0,
+  recoveryGuardChance: 0,
 };
 
 const DEFENSES = new Set([AiDecision.BLOCK, AiDecision.PARRY]);
@@ -332,6 +334,34 @@ describe('EnemyAI difficulty behaviors', () => {
 
     const forgetful = createDuel(400, { difficulty: { ...PERFECT, adaptation: 0 } });
     assert.equal(forgetful.ai.getHabitBonus(1, 'heavy'), 0);
+  });
+
+  it('plans a punish when it blocks and throws it as soon as the block lands', () => {
+    const { ai, self, opponent } = createDuel(40, { roll: 0, difficulty: { ...PERFECT, blockPunishChance: 1 } });
+    startAttack(opponent, 'light');
+
+    let intent = think(ai);
+    assert.equal(ai.decision, AiDecision.BLOCK);
+    assert.equal(intent.lightAttack, false);
+
+    self.restartState(FighterState.BLOCKING);
+    self.combat.blockstun = 0.1;
+    intent = think(ai);
+
+    assert.equal(intent.lightAttack, true);
+    assert.equal(intent.block, false);
+  });
+
+  it('keeps its guard up for the end of a hitstun, like a player holding block', () => {
+    const { ai, self } = createDuel(40, { roll: 0, difficulty: { ...PERFECT, recoveryGuardChance: 1 } });
+    self.combat.stunDuration = 0.3;
+    self.restartState(FighterState.HIT);
+
+    const intent = think(ai);
+
+    assert.equal(ai.decision, AiDecision.BUSY);
+    assert.equal(intent.block, true);
+    assert.ok(ai.plan.blockTime > 0.3);
   });
 
   it('continues a light chain after its strike connects', () => {

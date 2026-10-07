@@ -189,7 +189,7 @@ As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e des
 - [ ] Tutorial / desafio de parry
 - [ ] Arcade (6 lutas + chefe)
 - [ ] 2P local
-- [ ] Tela de resultado completa e lista de golpes na pausa
+- [x] Tela de resultado completa e lista de golpes na pausa (e IA que pune depois de bloquear e guarda ao sair do hitstun)
 - [x] Santuário Alagado e Mina de Cristal (reflexo na água, cristais na cor dos sabres, escolha de arena)
 
 ### v0.6 — Personagens II e arenas

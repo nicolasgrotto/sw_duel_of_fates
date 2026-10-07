@@ -506,6 +506,7 @@ export class CombatSystem {
 
     attacker.combat.attackConnected = true;
     attacker.stamina = Math.min(attacker.stats.maxStamina, attacker.stamina + attacker.stats.staminaOnHit);
+    contact.damage = Math.min(defender.health, damage);
     defender.health = Math.max(0, defender.health - damage);
     contact.armored = armored;
     if (!armored) {

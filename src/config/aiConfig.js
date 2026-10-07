@@ -28,6 +28,8 @@ export const aiConfig = {
       adaptation: 0,
       chainChance: 0.2,
       specialMultiplier: 0.3,
+      blockPunishChance: 0.15,
+      recoveryGuardChance: 0.1,
     },
     [Difficulty.NORMAL]: {
       reactionTime: 0.28,
@@ -43,6 +45,8 @@ export const aiConfig = {
       adaptation: 0,
       chainChance: 0.6,
       specialMultiplier: 0.7,
+      blockPunishChance: 0.55,
+      recoveryGuardChance: 0.5,
     },
     [Difficulty.HARD]: {
       reactionTime: 0.15,
@@ -58,6 +62,8 @@ export const aiConfig = {
       adaptation: 1,
       chainChance: 0.8,
       specialMultiplier: 1,
+      blockPunishChance: 0.85,
+      recoveryGuardChance: 0.75,
     },
   },
   profiles: {

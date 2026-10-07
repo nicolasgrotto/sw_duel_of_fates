@@ -165,6 +165,7 @@ describe('state flow', () => {
     game.step(Action.PAUSE);
     game.step(Action.MENU_DOWN);
     game.step(Action.MENU_DOWN);
+    game.step(Action.MENU_DOWN);
     game.step(Action.CONFIRM);
 
     assert.deepEqual(game.stateNames(), ['MenuState']);
@@ -235,6 +236,7 @@ describe('state flow', () => {
 
     game.step(Action.PAUSE);
     game.step(Action.MENU_DOWN);
+    game.step(Action.MENU_DOWN);
     game.step(Action.CONFIRM);
 
     assert.equal(game.states.current.mode, DuelMode.TRAINING);
@@ -298,6 +300,7 @@ describe('state flow', () => {
     const firstDuel = game.states.current;
 
     game.step(Action.PAUSE);
+    game.step(Action.MENU_DOWN);
     game.step(Action.MENU_DOWN);
     game.step(Action.CONFIRM);
 
@@ -446,7 +449,7 @@ describe('duel rounds', () => {
     assert.equal(game.states.current.params.stats.parries, 1);
     assert.equal(game.states.current.params.stats.perfectParries, 1);
     assert.equal(game.states.current.params.stats.guardBreaks, 1);
-    assert.ok(game.states.current.defenseStatsLine.includes('Perfeitos  1'));
+    assert.equal(game.states.current.rows.find((row) => row.label === 'Parries perfeitos').left, '1');
   });
 });
 
@@ -506,10 +509,40 @@ it('lets the player select Shadow and keeps the choice after restart and between
   assert.equal(duel.opponentController.profile, aiConfig.profiles.balanced);
   game.step(Action.PAUSE);
   game.step(Action.MENU_DOWN);
+  game.step(Action.MENU_DOWN);
   game.step(Action.CONFIRM);
   duel = game.states.current;
   assert.equal(duel.player.id, 'shadow');
   assert.equal(duel.fighters[1].id, 'guardian');
+});
+
+it('opens the move list of the player character from the pause and goes back', () => {
+  const game = createFakeGame();
+  game.changeState(StateId.DUEL, { playerCharacter: 'wasp', opponentCharacter: 'guardian' });
+
+  game.step(Action.PAUSE);
+  game.step(Action.MENU_DOWN);
+  game.step(Action.CONFIRM);
+  assert.deepEqual(game.stateNames(), ['DuelState', 'PauseState', 'MoveListState']);
+  assert.ok(game.states.current.title.includes('VESPA'));
+
+  game.step(Action.BACK);
+  assert.deepEqual(game.stateNames(), ['DuelState', 'PauseState']);
+});
+
+it('counts the stats of both fighters for the result table', () => {
+  const game = createFakeGame();
+  game.changeState(StateId.DUEL);
+  const duel = game.states.current;
+  const [player, opponent] = duel.fighters;
+
+  duel.countEvent({ type: 'hit', attacker: opponent, defender: player, attackType: 'light3', damage: 10 });
+  duel.countEvent({ type: 'shove', attacker: player, defender: opponent });
+
+  assert.equal(duel.fighterStats[1].hits, 1);
+  assert.equal(duel.fighterStats[1].damage, 10);
+  assert.equal(duel.fighterStats[1].longestChain, 3);
+  assert.equal(duel.fighterStats[0].shoves, 1);
 });
 
 it('goes back from the opponent step to the player step', () => {

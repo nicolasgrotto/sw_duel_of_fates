@@ -105,6 +105,30 @@ export const textStyles = {
     font: `18px ${FONT_FAMILY}`,
     color: colors.textMuted, align: 'left', baseline: 'middle',
   },
+  resultName: {
+    font: `bold 22px ${FONT_FAMILY}`,
+    color: colors.accent,
+    align: 'center',
+    baseline: 'middle',
+  },
+  resultValue: {
+    font: `22px ${FONT_FAMILY}`,
+    color: colors.text,
+    align: 'center',
+    baseline: 'middle',
+  },
+  tableKey: {
+    font: `22px ${FONT_FAMILY}`,
+    color: colors.text,
+    align: 'right',
+    baseline: 'middle',
+  },
+  tableDescription: {
+    font: `22px ${FONT_FAMILY}`,
+    color: colors.textMuted,
+    align: 'left',
+    baseline: 'middle',
+  },
   tableLabel: {
     font: `22px ${FONT_FAMILY}`,
     color: colors.textMuted,
