@@ -133,6 +133,8 @@ Plano aprovado depois da análise de game design da v0.1. Cada versão é jogáv
 - [x] Rebalanceamento "poucos golpes, todos importantes" validado com `npm run simulate`
 - [x] Dados de frame no modo Treino
 
+Correção posterior do pacote de impacto: tronco passou a receber a mesma cor de hit flash das demais partes; teste cobre a silhueta inteira dos dois personagens.
+
 Verificação visual: Chrome headless em localhost:8080, Canvas 1280×720. Parry comum e perfeito e empurrão gerados pela DuelSimulation real; anéis, flare e sabres coloridos sobre o mundo dessaturado conferidos com deslocamento máximo de câmera. Controles legíveis, incluindo L + J. Sem correções necessárias.
 
 Balanceamento validado em 300 rounds por dificuldade, seed 1, com perfis próprios e com ambos balanced. Hits até K.O.: 7,5/8,4/8,5 (Fácil/Normal/Difícil); com balanced: 7,8/8,6/8,9. O simulador distingue essa contagem dos hits totais dos dois lados. Tabela completa em ARCHITECTURE.md.
