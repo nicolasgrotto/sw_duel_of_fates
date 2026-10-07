@@ -8,6 +8,7 @@ export const effectsConfig = {
     duration: 0.12,
   },
   desaturationDim: 0.3,
+  framing: { maxZoom: 1.04, margin: 160, smoothing: 8 },
   maxPunchZoom: 0.06,
   maxPunchDuration: 0.25,
   hitFlashDuration: 0.06,

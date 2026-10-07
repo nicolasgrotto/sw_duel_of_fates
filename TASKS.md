@@ -155,7 +155,7 @@ As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e des
 
 - [x] Arenas como dados (`src/arenas/`), camadas estáticas pré-renderizadas, partículas ambientes
 - [x] Plataforma de Refino (primeira arena de verdade)
-- [ ] Câmera dinâmica (enquadra os dois lutadores, zoom leve com a distância)
+- [x] Câmera dinâmica (enquadra os dois lutadores, zoom leve com a distância)
 - [ ] Nome próprio do jogo, fonte display OFL, letterbox, ignição dos sabres na intro
 - [ ] Paleta de sabres sem codificação herói/vilão
 - [ ] Gamepad (Gamepad API dentro do `Input`), vibração em impactos

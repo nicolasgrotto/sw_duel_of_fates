@@ -388,6 +388,8 @@ CombatSystem.events → EffectsSystem.handleEvents → spawn(tipo, { x, y, direc
 - `Camera.punch(zoom, duration, x, y)` limita o zoom adicional a 6%, mantém o impulso mais forte e retorna suavemente em até 0,25 s. Receitas pedem 3/4/5/6% em forte/quebra de guarda/perfeito/morte. UI e flash de tela ficam fora da transformação. Efeitos reduzidos desativam hit flash e reduzem punch e tremor a 25%.
 - Timers de VFX avançam por `dt` real, inclusive no hit stop e na câmera lenta; animação e combate continuam usando o tempo escalado.
 
+`Camera.frame(left, right, width, anchorY, dt)` recebe o envelope dos corpos e suaviza centro e zoom de enquadramento (máximo 4%, margem para lâminas, âncora no chão). Mantém o viewport dentro da arena; quanto maior a distância, mais próximo de 1 o zoom. O renderer combina enquadramento e punch-in sem transformar a HUD. Valores em `effectsConfig.framing`.
+
 ## Arenas
 
 `gameConfig.duel.arena` seleciona `arenas/arenaData.js`: camadas de geometria com tokens de tema e configuração de partículas ambientes. `ArenaRenderer` usa `Renderer.createLayer/drawLayer` para pré-renderizar fundo e chão uma vez, com overscan para o shake. Só o core cria canvases internos; lógica e dados continuam testáveis em Node. `AmbientSystem` mantém um pool fixo, avança no update do duelo e congela na pausa. Usa RNG próprio para não interferir nas decisões da IA. O cenário não emite eventos nem muda combate. `refinery` é a arena padrão: três planos industriais, piso suspenso sobre fosso, reflexo dos sabres e vapor com glows em cache. Os nomes de arena ficam em `uiConfig.texts.arenas` e a origem da geometria está em ASSETS.md.

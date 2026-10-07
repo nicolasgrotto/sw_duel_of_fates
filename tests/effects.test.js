@@ -292,3 +292,17 @@ describe('impact feedback', () => {
     assert.ok(timeControl.isFrozen);
   });
 });
+
+it('frames both fighters inside the arena and reduces zoom as they separate', () => {
+  const camera = new Camera(effectsConfig, createRandom(1));
+  repeat(120, () => camera.frame(40, 160, 1280, 600, STEP));
+  assert.ok(camera.framingZoom <= effectsConfig.framing.maxZoom);
+  const leftEdge = camera.centerX - 1280 / (2 * camera.framingZoom);
+  assert.ok(leftEdge >= 0);
+  assert.ok(camera.centerX + 1280 / (2 * camera.framingZoom) <= 1280);
+  const closeZoom = camera.framingZoom;
+  repeat(120, () => camera.frame(40, 1240, 1280, 600, STEP));
+  assert.ok(camera.framingZoom < closeZoom);
+  assert.ok(Math.abs(camera.framingZoom - 1) < 0.001);
+  assert.equal(camera.anchorY, 600);
+});

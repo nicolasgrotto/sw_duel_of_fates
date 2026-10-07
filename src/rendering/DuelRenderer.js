@@ -49,10 +49,7 @@ export class DuelRenderer {
 
   render(renderer, arena, fighters, effects, camera, ambient = null) {
     renderer.save();
-    renderer.translate(camera.offsetX, camera.offsetY);
-    renderer.translate(camera.focusX, camera.focusY);
-    renderer.scale(camera.zoom, camera.zoom);
-    renderer.translate(-camera.focusX, -camera.focusY);
+    camera.applyTransform(renderer);
 
     this.arenaView.render(renderer, arena, ambient);
     this.preparePoses(fighters);

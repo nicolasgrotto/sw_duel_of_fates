@@ -235,7 +235,7 @@ describe('state flow', () => {
     const [player] = duel.fighters;
     const drawnColors = () => {
       const strokes = [];
-      duel.renderDebug({ strokeRect: (x, y, width, height, color) => strokes.push(color) });
+      duel.renderDebug({ save: () => {}, restore: () => {}, translate: () => {}, scale: () => {}, width: 1280, strokeRect: (x, y, width, height, color) => strokes.push(color) });
       return strokes;
     };
 

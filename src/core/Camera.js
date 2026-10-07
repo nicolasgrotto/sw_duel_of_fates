@@ -1,7 +1,12 @@
 export class Camera {
-  constructor({ maxShakeAmplitude, maxShakeDuration, maxPunchZoom, maxPunchDuration }, random) {
+  constructor({ maxShakeAmplitude, maxShakeDuration, maxPunchZoom, maxPunchDuration, framing }, random) {
     this.maxShakeAmplitude = maxShakeAmplitude;
     this.maxShakeDuration = maxShakeDuration;
+    this.framing = framing;
+    this.centerX = 0;
+    this.anchorY = 0;
+    this.framingZoom = 1;
+    this.isFramed = false;
     this.maxPunchZoom = maxPunchZoom;
     this.maxPunchDuration = maxPunchDuration;
     this.punchAmount = 0;
@@ -32,6 +37,31 @@ export class Camera {
     this.shakeAmplitude = limitedAmplitude;
     this.shakeDuration = Math.min(duration, this.maxShakeDuration);
     this.shakeTime = 0;
+  }
+
+  frame(left, right, width, anchorY, dt) {
+    const { maxZoom, margin, smoothing } = this.framing;
+    const targetZoom = Math.max(1, Math.min(maxZoom, width / (right - left + margin)));
+    const blend = 1 - Math.exp(-smoothing * dt);
+    this.framingZoom += (targetZoom - this.framingZoom) * blend;
+    const halfView = width / (2 * this.framingZoom);
+    const targetX = Math.max(halfView, Math.min(width - halfView, (left + right) / 2));
+    this.centerX = this.isFramed ? this.centerX + (targetX - this.centerX) * blend : targetX;
+    this.centerX = Math.max(halfView, Math.min(width - halfView, this.centerX));
+    this.anchorY = anchorY;
+    this.isFramed = true;
+  }
+
+  applyTransform(renderer) {
+    renderer.translate(this.offsetX, this.offsetY);
+    if (this.isFramed) {
+      renderer.translate(renderer.width / 2, this.anchorY);
+      renderer.scale(this.framingZoom, this.framingZoom);
+      renderer.translate(-this.centerX, -this.anchorY);
+    }
+    renderer.translate(this.focusX, this.focusY);
+    renderer.scale(this.zoom, this.zoom);
+    renderer.translate(-this.focusX, -this.focusY);
   }
 
   get zoom() {

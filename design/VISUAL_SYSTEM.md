@@ -180,3 +180,7 @@ Controlado pela **Camera**, a pedido do `EffectsSystem`. Nunca diretamente pelo 
 - Use pool de partículas, sem criar objetos novos a cada frame.
 - Limite o número de partículas ativas (ver VFX_GUIDELINES).
 - Sempre restaure o estado do contexto (`save`/`restore`) depois de mudar composite, alpha ou transform.
+
+## Enquadramento dinâmico
+
+O centro acompanha suavemente o ponto médio dos corpos, respeitando os limites horizontais do mundo. Zoom adicional de enquadramento de até 4%, reduzido quando os lutadores se afastam; margem de 160 px para as lâminas. O chão é a âncora vertical. O punch-in de impacto se soma ao enquadramento, com foco no contato, e a UI continua fixa.

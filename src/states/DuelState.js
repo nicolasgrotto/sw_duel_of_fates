@@ -184,6 +184,11 @@ export class DuelState extends GameState {
 
     this.ambient.update(dt);
     this.effects.update(dt);
+    this.camera.frame(
+      Math.min(this.fighters[0].left, this.fighters[1].left),
+      Math.max(this.fighters[0].right, this.fighters[1].right),
+      gameConfig.canvas.width, this.arena.floorY, dt,
+    );
     this.camera.update(dt);
     this.hud.update(dt);
     this.message.update(dt);
@@ -330,6 +335,8 @@ export class DuelState extends GameState {
   }
 
   renderDebug(renderer) {
+    renderer.save();
+    this.camera.applyTransform(renderer);
     for (const fighter of this.fighters) {
       const hurtboxColor = isInvulnerable(fighter) ? colors.debugInvulnerable : colors.debugBody;
       renderer.strokeRect(fighter.left, fighter.top, fighter.width, fighter.height, hurtboxColor);
@@ -339,6 +346,7 @@ export class DuelState extends GameState {
         renderer.strokeRect(box.left, box.top, box.right - box.left, box.bottom - box.top, colors.debugHitbox, 2);
       }
     }
+    renderer.restore();
   }
 
   getDebugInfo() {
