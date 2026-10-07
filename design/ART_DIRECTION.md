@@ -33,6 +33,16 @@ O jogo deve transmitir:
 
 As duas silhuetas devem ser diferentes mesmo pintadas de preto: capuz, comprimento da roupa e ângulo da lâmina resolvem isso.
 
+| | Bastião | Vespa | Espelho |
+| --- | --- | --- | --- |
+| Roupa | túnica de armadura verde-oliva, ombreiras grandes | túnica curta cor de areia | manto longo cinza-claro, o único personagem claro |
+| Cabeça | sem capuz | sem capuz | capuz levantado e máscara lisa com fenda |
+| Postura | ereta, ombros muito largos | muito inclinada para a frente, baixa | totalmente ereta, imóvel |
+| Guarda | lâmina larga e quase horizontal | duas lâminas curtas: uma à frente, outra invertida para trás | lâmina vertical à frente do rosto |
+| Sabre | verde-ácido, lâmina mais grossa | amarelo-âmbar, lâminas finas | branco-prata |
+
+Recursos de silhueta disponíveis em `characterData.appearance`: `shoulderScale` (largura dos ombros), `pauldrons` (ombreiras), `masked` (máscara no lugar do rosto), `bladeWidthScale` (espessura da lâmina) e `dualBlade` (segunda lâmina na mão de trás). Use-os para que cada personagem novo continue reconhecível pintado de preto.
+
 ## Paleta
 
 ### Ambiente

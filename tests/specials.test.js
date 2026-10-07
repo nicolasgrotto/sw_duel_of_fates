@@ -99,3 +99,61 @@ describe('character traits', () => {
     assert.ok(Math.abs(duel.left.stamina - (duel.left.stats.maxStamina - light.staminaCost + duel.left.stats.staminaOnHit)) < 1e-9);
   });
 });
+
+describe('new characters', () => {
+  it('lets the bastion walk while blocking and keeps him in place on a block', () => {
+    const duel = createDuel('bastion', 'shadow', 300);
+    const { left } = duel;
+
+    duel.step({ block: true });
+    repeat(20, () => duel.step({ block: true, moveX: 1 }));
+    assert.equal(left.state, FighterState.BLOCKING);
+    assert.ok(left.x > 500);
+
+    const blocking = createDuel('bastion', 'shadow');
+    const heavy = blocking.right.moves.heavy;
+    blocking.step({ block: true }, { heavyAttack: true });
+    repeat(Math.ceil(heavy.startup / STEP) + 1, () => blocking.step({ block: true }));
+    assert.deepEqual(types(blocking.events), [CombatEvent.BLOCK]);
+    assert.equal(blocking.left.vx, 0);
+  });
+
+  it('dashes the wasp through the opponent to the other side', () => {
+    const duel = createDuel('wasp', 'guardian', 120);
+    const { left, right } = duel;
+    const dash = left.moves.special.dash;
+
+    duel.step({ special: true });
+    assert.equal(left.state, FighterState.DODGING);
+    repeat(Math.ceil(dash.duration / STEP) + 2, () => duel.step());
+
+    assert.ok(left.x > right.x);
+    assert.deepEqual(types(duel.events), []);
+  });
+
+  it('chains five light strikes for the wasp', () => {
+    const duel = createDuel('wasp', 'guardian', 80);
+    const { left, right } = duel;
+
+    duel.step({ lightAttack: true });
+    for (let step = 0; step < 200 && left.combat.attackType !== 'light5'; step += 1) {
+      duel.step({ lightAttack: left.combat.attackConnected });
+    }
+
+    assert.equal(left.combat.attackType, 'light5');
+    assert.ok(right.health < right.stats.maxHealth);
+  });
+
+  it('turns a strike into a perfect parry for the mirror waiting stance', () => {
+    const duel = createDuel('mirror', 'shadow');
+    const { left, right } = duel;
+
+    duel.step({ special: true });
+    duel.step({}, { heavyAttack: true });
+    repeat(Math.ceil(right.moves.heavy.startup / STEP) + 1, () => duel.step());
+
+    assert.deepEqual(types(duel.events), [CombatEvent.PERFECT_PARRY]);
+    assert.equal(right.state, FighterState.STAGGERED);
+    assert.equal(left.combat.attackType, 'riposte');
+  });
+});

@@ -58,6 +58,7 @@ export const texts = {
   },
   characterSelect: {
     title: 'ESCOLHA SEU LUTADOR',
+    opponentTitle: 'ESCOLHA O ADVERSÁRIO',
     footer: '{up}  e  {down}  escolher · {confirm}  confirmar · {back}  voltar',
   },
   training: {
@@ -132,7 +133,16 @@ export const layout = {
     footerY: 660,
   },
   characterSelect: {
-    titleY: 160, firstItemY: 270, itemSpacing: 52, previewY: 560, previewScale: 1.3, footerY: 660,
+    titleY: 110,
+    listX: 380,
+    firstItemY: 230,
+    itemSpacing: 58,
+    previewX: 880,
+    previewY: 590,
+    previewScale: 1.3,
+    infoY: 200,
+    infoLineSpacing: 36,
+    footerY: 670,
   },
   menuList: {
     markerWidth: 18,

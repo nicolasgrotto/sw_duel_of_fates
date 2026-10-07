@@ -59,6 +59,8 @@ describe('state flow', () => {
     game.step(Action.CONFIRM);
     assert.deepEqual(game.stateNames(), ['CharacterSelectState']);
     game.step(Action.CONFIRM);
+    assert.deepEqual(game.stateNames(), ['CharacterSelectState']);
+    game.step(Action.CONFIRM);
     assert.deepEqual(game.stateNames(), ['DuelState']);
   });
 
@@ -118,6 +120,7 @@ describe('state flow', () => {
     game.step(Action.BACK);
     game.step(Action.MENU_UP);
     game.step(Action.MENU_UP);
+    game.step(Action.CONFIRM);
     game.step(Action.CONFIRM);
     game.step(Action.CONFIRM);
     const duel = game.states.current;
@@ -486,6 +489,9 @@ it('lets the player select Shadow and keeps the choice after restart and between
   game.step(Action.CONFIRM);
   game.step(Action.MENU_DOWN);
   game.step(Action.CONFIRM);
+  game.step(Action.MENU_UP);
+  game.step(Action.MENU_UP);
+  game.step(Action.CONFIRM);
   let duel = game.states.current;
   assert.equal(duel.player.id, 'shadow');
   assert.equal(duel.fighters[1].id, 'guardian');
@@ -499,6 +505,20 @@ it('lets the player select Shadow and keeps the choice after restart and between
   duel = game.states.current;
   assert.equal(duel.player.id, 'shadow');
   assert.equal(duel.fighters[1].id, 'guardian');
+});
+
+it('goes back from the opponent step to the player step', () => {
+  const game = createFakeGame();
+  game.changeState(StateId.CHARACTER_SELECT);
+  game.step(Action.MENU_DOWN);
+  game.step(Action.CONFIRM);
+  const select = game.states.current;
+  assert.equal(select.step, 'opponent');
+
+  game.step(Action.BACK);
+  assert.equal(select.step, 'player');
+  assert.equal(select.menu.selected.id, 'shadow');
+  assert.deepEqual(game.stateNames(), ['CharacterSelectState']);
 });
 
 it('returns from character selection to the menu without starting a duel', () => {

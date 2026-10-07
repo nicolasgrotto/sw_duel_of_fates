@@ -157,7 +157,14 @@ Personagens são **dados**:
 
 `characterData.moves` aponta para `movesConfig.movesByCharacter`. A factory resolve cada golpe combinando os atributos base de fightersConfig com a definição do personagem e cria um mapa independente por Fighter. `fighter.moves` é o catálogo; `stats.attacks` mantém o mesmo mapa para percepção, balanceamento e testes existentes. CombatSystem lê o catálogo e escolhe estado pelo tipo do golpe; o renderer escolhe pose pelo id da definição. Overrides do simulador continuam sendo aplicados antes da factory, sem snapshots de atributos no import.
 
-Trocar todos os personagens (ex.: versão com identidade própria) deve exigir apenas mudar dados e assets, nunca o combate. Para adicionar um personagem: adicione uma entrada em `characterData.js` e, se precisar de atributos novos, um arquétipo em `fightersConfig.js`.
+Trocar todos os personagens (ex.: versão com identidade própria) deve exigir apenas mudar dados e assets, nunca o combate. Para adicionar um personagem:
+
+1. um arquétipo em `fightersConfig.js` (atributos, ataques base, parry, esquiva e traços passivos);
+2. os golpes em `movesConfig.js` (sequência de rápidos via `cancelsInto`, aéreo, forte de avanço e `special`);
+3. a entrada em `characterData.js` (nome, perfil de IA, textos `info` da seleção, som e aparência com todos os campos de silhueta);
+4. poses novas, se houver, em `fighterVisualConfig.combatPoses.attacks`, e os nomes dos golpes em `uiConfig.texts.training.attacks`.
+
+Personagens atuais: Guardião, Sombra, Bastião, Vespa e Espelho.
 
 ### Controllers
 

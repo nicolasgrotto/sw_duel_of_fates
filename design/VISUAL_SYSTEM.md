@@ -108,6 +108,11 @@ Cores de personagem são **dados do personagem** e ficam em `src/characters/char
 | --- | --- | --- | --- |
 | Guardião | `#6b5a48` | `#2e2925` | ciano-gelo `#7fe4ff` |
 | Sombra | `#1f2029` | `#121319` | magenta `#ff3f9e` |
+| Bastião | `#3d4636` | `#1f231c` | verde-ácido `#9dff3f` |
+| Vespa | `#5c4a33` | `#2a2219` | amarelo-âmbar `#ffd23f` |
+| Espelho | `#b9bcc7` | `#3a3d47` | branco-prata `#e8eeff` |
+
+`trimColor` (também dado do personagem) pinta ombreiras e máscara.
 
 Cores compartilhadas (em `themeConfig`):
 

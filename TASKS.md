@@ -180,7 +180,7 @@ As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e des
 - [x] Ataque aéreo e forte de avanço
 - [x] Habilidade exclusiva (`I`): golpe com armadura, postura de contra-golpe e avanço; traços passivos como dados
 - [x] Tela de seleção de personagem (o jogador pode ser qualquer um)
-- [ ] Bastião, Vespa e Espelho
+- [x] Bastião, Vespa e Espelho (com seleção de adversário)
 - [ ] IA com comportamento por dificuldade (punir bloqueio, iscas de whiff, memória curta de hábitos no Difícil)
 - [x] Treino: boneco que grava e reproduz, hitboxes visíveis sem F3, display de inputs
 

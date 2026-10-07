@@ -64,9 +64,21 @@ function drawTorso(renderer, fighter, pose, shoulderWidth, flare, cloakColor) {
   renderer.fillPolygon(torsoPoints, cloakColor);
 }
 
-function drawHead(renderer, fighter, pose, cloakColor, bodyColor) {
+function drawPauldrons(renderer, pose, shoulderWidth, trimColor) {
+  const radius = shoulderWidth * 0.62;
+  renderer.fillCircle(pose.shoulderX - shoulderWidth * 0.7, pose.shoulderY + radius * 0.4, radius, trimColor);
+  renderer.fillCircle(pose.shoulderX + shoulderWidth * 0.7, pose.shoulderY + radius * 0.4, radius, trimColor);
+}
+
+function drawMask(renderer, pose, trimColor, bodyColor) {
   const { headX, headY, headRadius: radius } = pose;
-  const { hoodUp } = fighter.appearance;
+  renderer.fillCircle(headX + radius * 0.3, headY + radius * 0.1, radius * 0.75, trimColor);
+  renderer.line(headX - radius * 0.1, headY, headX + radius * 0.8, headY, bodyColor, radius * 0.1);
+}
+
+function drawHead(renderer, fighter, pose, cloakColor, bodyColor, trimColor) {
+  const { headX, headY, headRadius: radius } = pose;
+  const { hoodUp, masked } = fighter.appearance;
 
   if (!hoodUp) {
     renderer.fillEllipse(headX - radius * 0.7, headY + radius * 0.9, radius, radius * 0.55, cloakColor);
@@ -83,6 +95,10 @@ function drawHead(renderer, fighter, pose, cloakColor, bodyColor) {
   );
   renderer.fillPolygon(hoodTipPoints, cloakColor);
   renderer.fillCircle(headX, headY, hoodRadius, cloakColor);
+  if (masked) {
+    drawMask(renderer, pose, trimColor, bodyColor);
+    return;
+  }
   renderer.fillCircle(headX + radius * 0.3, headY + radius * 0.1, radius * 0.75, bodyColor);
 }
 
@@ -99,7 +115,8 @@ export function drawFighterBody(renderer, fighter, pose, floorY, withShadow = tr
   const { height, appearance } = fighter;
   const cloakColor = overrideColor ?? appearance.cloakColor;
   const bodyColor = overrideColor ?? appearance.bodyColor;
-  const shoulderWidth = height * proportions.shoulderWidth;
+  const trimColor = overrideColor ?? appearance.trimColor;
+  const shoulderWidth = height * proportions.shoulderWidth * appearance.shoulderScale;
   const flare = height * proportions.tunicFlare;
   const legWidth = height * proportions.legWidth;
 
@@ -119,7 +136,10 @@ export function drawFighterBody(renderer, fighter, pose, floorY, withShadow = tr
   drawLeg(renderer, pose, pose.backKneeX, pose.backKneeY, pose.backFootX, pose.backFootY, bodyColor, legWidth);
   drawLeg(renderer, pose, pose.frontKneeX, pose.frontKneeY, pose.frontFootX, pose.frontFootY, bodyColor, legWidth);
   drawTorso(renderer, fighter, pose, shoulderWidth, flare, cloakColor);
-  drawHead(renderer, fighter, pose, cloakColor, bodyColor);
+  if (appearance.pauldrons) {
+    drawPauldrons(renderer, pose, shoulderWidth, trimColor);
+  }
+  drawHead(renderer, fighter, pose, cloakColor, bodyColor, trimColor);
   drawArms(renderer, fighter, pose, cloakColor, bodyColor);
 
   renderer.restore();
