@@ -31,4 +31,4 @@ assets/
 
 | Arquivo | Tipo | Autor / origem | Licença | Notas |
 | --- | --- | --- | --- | --- |
-| — | — | — | — | Nenhum asset ainda |
+| src/arenas/arenaData.js (refinery) | cenário procedural | geometria original do projeto | MIT | Plataforma de Refino desenhada por código; sem imagem externa |

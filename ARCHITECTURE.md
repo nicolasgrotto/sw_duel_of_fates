@@ -390,7 +390,7 @@ CombatSystem.events → EffectsSystem.handleEvents → spawn(tipo, { x, y, direc
 
 ## Arenas
 
-`gameConfig.duel.arena` seleciona `arenas/arenaData.js`: camadas de geometria com tokens de tema e configuração de partículas ambientes. `ArenaRenderer` usa `Renderer.createLayer/drawLayer` para pré-renderizar fundo e chão uma vez, com overscan para o shake. Só o core cria canvases internos; lógica e dados continuam testáveis em Node. `AmbientSystem` mantém um pool fixo, avança no update do duelo e congela na pausa. Usa RNG próprio para não interferir nas decisões da IA. O cenário não emite eventos nem muda combate.
+`gameConfig.duel.arena` seleciona `arenas/arenaData.js`: camadas de geometria com tokens de tema e configuração de partículas ambientes. `ArenaRenderer` usa `Renderer.createLayer/drawLayer` para pré-renderizar fundo e chão uma vez, com overscan para o shake. Só o core cria canvases internos; lógica e dados continuam testáveis em Node. `AmbientSystem` mantém um pool fixo, avança no update do duelo e congela na pausa. Usa RNG próprio para não interferir nas decisões da IA. O cenário não emite eventos nem muda combate. `refinery` é a arena padrão: três planos industriais, piso suspenso sobre fosso, reflexo dos sabres e vapor com glows em cache. Os nomes de arena ficam em `uiConfig.texts.arenas` e a origem da geometria está em ASSETS.md.
 
 ## Audio
 

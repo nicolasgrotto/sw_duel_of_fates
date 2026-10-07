@@ -1,4 +1,5 @@
 export const texts = {
+  arenas: { refinery: 'Plataforma de Refino', platform: 'Plataforma de treino' },
   menu: {
     duel: 'Duelar',
     training: 'Treino',

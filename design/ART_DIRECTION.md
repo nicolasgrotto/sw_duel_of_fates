@@ -131,3 +131,7 @@ Curvas de tempo: startup com easing de saída (prepara devagar no fim), active q
 ## Camadas de arena como dados
 
 Cada arena descreve camadas estáticas de geometria em tokens da paleta existente. O renderer pré-renderiza essas camadas em canvases internos e as reutiliza. Partículas ambientes são poucas, lentas e pouco opacas, atrás dos corpos; não geram eventos nem colisão. A plataforma provisória mantém o desenho atual até a implementação da Plataforma de Refino.
+
+### Plataforma de Refino
+
+Três planos de geometria procedural: pilares distantes em wall com alpha 0,25; passarelas e feixes verticais em floorEdge com alpha 0,16; plataforma metálica de 32 px sobre fosso escuro, com segmentos e suportes em wall. Vapor lento atrás dos corpos, alpha máximo 0,06, sem encobrir as silhuetas. A luz existente dos sabres no chão produz o reflexo da superfície. Sem cores novas nem assets externos.

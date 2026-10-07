@@ -14,7 +14,7 @@ it('pre-renders each static layer once and reuses it across renders', () => {
     width: 1280, height: 720,
     createLayer: callback => { builds += 1; callback(renderer); return 'layer'; },
     drawLayer: () => { draws += 1; },
-    fillRect: () => {}, line: () => {},
+    fillRect: () => {}, line: () => {}, save: () => {}, restore: () => {}, setAlpha: () => {},
   };
   view.render(renderer, arena);
   view.render(renderer, arena);

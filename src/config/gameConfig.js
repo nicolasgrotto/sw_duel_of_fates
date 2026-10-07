@@ -29,7 +29,7 @@ export const gameConfig = {
     },
   },
   duel: {
-    arena: 'platform',
+    arena: 'refinery',
     playerCharacter: 'guardian',
     opponentCharacter: 'shadow',
     spawnDistance: 440,
