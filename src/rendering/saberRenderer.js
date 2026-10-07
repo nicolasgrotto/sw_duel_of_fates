@@ -18,7 +18,7 @@ function updateBladeGeometry(fighter, pose) {
   const directionX = Math.cos(pose.bladeAngle);
   const directionY = Math.sin(pose.bladeAngle);
   const hiltLength = fighter.height * proportions.hiltLength;
-  const bladeLength = fighter.appearance.bladeLength;
+  const bladeLength = fighter.appearance.bladeLength * pose.bladeExtension;
 
   blade.hiltStartX = pose.handX - directionX * hiltLength * HILT_BEHIND_HAND;
   blade.hiltStartY = pose.handY - directionY * hiltLength * HILT_BEHIND_HAND;
@@ -51,8 +51,12 @@ export function getBladeWorldPoints(fighter, pose, out) {
 
 const worldBlade = { baseX: 0, baseY: 0, tipX: 0, tipY: 0 };
 
+function isBladeLit(pose) {
+  return pose.bladeVisible && pose.bladeExtension > 0;
+}
+
 export function drawSaberBodyLight(renderer, fighter, pose) {
-  if (!pose.bladeVisible) {
+  if (!isBladeLit(pose)) {
     return;
   }
   getBladeWorldPoints(fighter, pose, worldBlade);
@@ -64,13 +68,13 @@ export function drawSaberBodyLight(renderer, fighter, pose) {
     (worldBlade.baseY + worldBlade.tipY) / 2,
     saberStyle.bodyLightRadius,
     fighter.appearance.saberColor,
-    saberStyle.bodyLightAlpha,
+    saberStyle.bodyLightAlpha * pose.bladeExtension,
   );
   renderer.restore();
 }
 
 export function drawSaberFloorLight(renderer, fighter, pose, floorY) {
-  if (!pose.bladeVisible) {
+  if (!isBladeLit(pose)) {
     return;
   }
   updateBladeGeometry(fighter, pose);
@@ -78,7 +82,7 @@ export function drawSaberFloorLight(renderer, fighter, pose, floorY) {
 
   renderer.save();
   renderer.setBlendMode('lighter');
-  renderer.setAlpha(saberStyle.floorLightAlpha);
+  renderer.setAlpha(saberStyle.floorLightAlpha * pose.bladeExtension);
   renderer.fillEllipse(centerX, floorY, saberStyle.floorLightRadiusX, saberStyle.floorLightRadiusY, fighter.appearance.saberColor);
   renderer.restore();
 }
@@ -103,7 +107,7 @@ export function drawSaber(renderer, fighter, pose, flare = 0) {
 
   renderer.line(blade.hiltStartX, blade.hiltStartY, blade.baseX, blade.baseY, colors.saberHilt, saberStyle.hiltWidth);
 
-  if (!pose.bladeVisible) {
+  if (!isBladeLit(pose)) {
     renderer.restore();
     return;
   }

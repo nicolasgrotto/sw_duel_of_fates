@@ -95,6 +95,7 @@ src/
     MenuList.js             ✅ lista de opções navegável
     Hud.js                  ✅ nomes, barras de vida (com fantasma) e stamina
     CombatMessage.js        ✅ mensagens curtas (ROUND 1/2/FINAL, K.O.) com fade
+    Letterbox.js            ✅ barras cinematográficas (alvo suave + pulso curto)
     keyLabels.js            ✅ nomes de teclas a partir do controlsConfig
     formatText.js           ✅ textos com {placeholders}
   config/                   ✅ valores e ajustes
@@ -338,6 +339,8 @@ Arquivos: [src/ui/](src/ui/), [src/config/uiConfig.js](src/config/uiConfig.js). 
 - `DuelState`: intro de `layout.messages.introDuration` com controles travados (ROUND 1/2/FINAL). `roundWins` guarda o placar do melhor de 3 (`roundsToWin = 2`) e alimenta os quadrados espelhados da HUD. No K.O., soma a vitória uma vez e espera `resultDelay`: reinicia o round ou empilha o resultado. `Fighter.resetForRound(x, facing)` restaura posição, vida, stamina, combate, intent e animação, preservando as referências dos dados. Controllers de IA e feedback visual são renovados; o Treino mantém o comportamento do boneco e reinicia sem limite. As estatísticas (tempo ativo, hits, bloqueios, parries comuns/perfeitos e quebras de guarda causadas) somam todos os rounds e aparecem em duas linhas no resultado. Se um trade matar ambos, nenhum ponto é somado e começa outro round.
 
 ---
+
+Identidade no duelo: o `Letterbox` fica fechado (alvo 1) na intro e depois do K.O. e abre quando o round está em jogo; o parry perfeito pede um pulso curto. É desenhado depois do mundo e da vinheta e antes da HUD. A ignição é só visual: `DuelState.getBladeExtension()` vai de 0 a 1 durante a intro (`layout.ignition`), o `DuelRenderer` copia o valor para `pose.bladeExtension` e o `saberRenderer` escala o comprimento da lâmina e as luzes por ele. O som `ignite` toca uma vez por round, quando a ignição começa.
 
 No Treino, `DuelState.updateFrameData` lê os contatos do jogador e usa `combat/frameData.js`, puro e testável, para comparar os tempos de travamento restantes. Ataque em curso usa startup+active+recovery menos stateTime; bloqueio usa blockstun; hit/stun/stagger usam stunDuration menos stateTime. Parry cancelou o ataque: o stagger do atacante produz a desvantagem correta. Contatos de K.O. são ignorados, pois não há próxima ação. Texto em `uiConfig.training`, linha hint acima da pausa, limpa no próximo round.
 

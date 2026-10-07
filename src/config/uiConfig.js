@@ -185,6 +185,16 @@ export const layout = {
     roundGap: 6,
     pauseHintY: 690,
   },
+  letterbox: {
+    height: 64,
+    speed: 3.5,
+    perfectParryAmount: 0.5,
+    perfectParryDuration: 0.35,
+  },
+  ignition: {
+    delay: 0.25,
+    duration: 0.35,
+  },
   messages: {
     y: 300,
     introDuration: 1,

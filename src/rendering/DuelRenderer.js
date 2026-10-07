@@ -47,12 +47,12 @@ export class DuelRenderer {
     return afterimage;
   }
 
-  render(renderer, arena, fighters, effects, camera, ambient = null) {
+  render(renderer, arena, fighters, effects, camera, ambient = null, bladeExtension = 1) {
     renderer.save();
     camera.applyTransform(renderer);
 
     this.arenaView.render(renderer, arena, ambient);
-    this.preparePoses(fighters);
+    this.preparePoses(fighters, bladeExtension);
 
     for (const fighter of fighters) {
       drawSaberFloorLight(renderer, fighter, this.getPose(fighter), arena.floorY);
@@ -93,9 +93,10 @@ export class DuelRenderer {
     renderer.drawVignette(effectsConfig.vignette);
   }
 
-  preparePoses(fighters) {
+  preparePoses(fighters, bladeExtension) {
     for (const fighter of fighters) {
       const pose = computePose(fighter, this.getPose(fighter));
+      pose.bladeExtension = bladeExtension;
       this.getAfterimage(fighter).record(fighter, pose);
 
       if (isSaberStrikeActive(fighter)) {

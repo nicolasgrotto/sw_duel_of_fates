@@ -29,6 +29,8 @@ import { TimeControl } from '../systems/TimeControl.js';
 import { CombatMessage } from '../ui/CombatMessage.js';
 import { formatText } from '../ui/formatText.js';
 import { Hud } from '../ui/Hud.js';
+import { Letterbox } from '../ui/Letterbox.js';
+import { clamp } from '../utils/math.js';
 import { formatActionKeys } from '../ui/keyLabels.js';
 import { createRandom, createRandomSeed } from '../utils/random.js';
 import { GameState } from './GameState.js';
@@ -82,6 +84,8 @@ export class DuelState extends GameState {
     });
     this.hud = this.createHud();
     this.message = new CombatMessage();
+    this.letterbox = new Letterbox(layout.letterbox);
+    this.ignited = false;
     this.showRoundIntro();
     this.pauseHint = formatText(texts.duel.pauseHint, { pause: formatActionKeys(this.game.input.bindings ?? keyBindings, Action.PAUSE) });
   }
@@ -130,6 +134,7 @@ export class DuelState extends GameState {
     this.inputsLine = '';
     this.inputSignature = '';
     this.roundNumber += 1;
+    this.ignited = false;
     this.showRoundIntro();
   }
 
@@ -199,6 +204,7 @@ export class DuelState extends GameState {
       this.introTime += dt;
       this.clearAllIntents();
     }
+    this.updateIgnition();
 
     if (this.isPlaying()) {
       this.captureInputs();
@@ -219,6 +225,8 @@ export class DuelState extends GameState {
     );
     this.camera.update(dt);
     this.hud.update(dt);
+    this.letterbox.setTarget(this.isPlaying() ? 0 : 1);
+    this.letterbox.update(dt);
     this.message.update(dt);
     this.duelAudio.update(this.fighters);
   }
@@ -252,6 +260,9 @@ export class DuelState extends GameState {
     for (const event of this.simulation.events) {
       const type = event.type === CombatEvent.HIT && isStrongAttack(event.attackType) ? 'heavyHit' : event.type;
       this.game.input.rumble?.(type, this.game.settings.reducedEffects);
+      if (event.type === CombatEvent.PERFECT_PARRY) {
+        this.letterbox.pulse(layout.letterbox.perfectParryAmount, layout.letterbox.perfectParryDuration);
+      }
     }
     this.hud.handleEvents(this.simulation.events);
     this.rememberLastEvent();
@@ -380,6 +391,18 @@ export class DuelState extends GameState {
     }
   }
 
+  updateIgnition() {
+    if (!this.ignited && this.introTime >= layout.ignition.delay) {
+      this.ignited = true;
+      this.duelAudio.playIgnition();
+    }
+  }
+
+  getBladeExtension() {
+    const { delay, duration } = layout.ignition;
+    return clamp((this.introTime - delay) / duration, 0, 1);
+  }
+
   isIntroPlaying() {
     return this.introTime < layout.messages.introDuration;
   }
@@ -389,10 +412,11 @@ export class DuelState extends GameState {
   }
 
   render(renderer) {
-    this.view.render(renderer, this.arena, this.fighters, this.effects, this.camera, this.ambient);
+    this.view.render(renderer, this.arena, this.fighters, this.effects, this.camera, this.ambient, this.getBladeExtension());
     if (this.isTraining && this.trainingHitboxes && !this.game.debug.enabled) {
       this.renderDebug(renderer);
     }
+    this.letterbox.render(renderer);
     this.hud.render(renderer);
     this.message.render(renderer);
 

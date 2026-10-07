@@ -269,6 +269,24 @@ describe('state flow', () => {
     assert.equal(player.state, 'ATTACKING');
   });
 
+  it('ignites the sabers during the intro and opens the letterbox when the round starts', () => {
+    const game = createFakeGame();
+    const played = [];
+    game.audio.play = (name) => played.push(name);
+    game.changeState(StateId.DUEL);
+    const duel = game.states.current;
+
+    assert.equal(duel.getBladeExtension(), 0);
+    skipIntro(game);
+
+    assert.equal(duel.getBladeExtension(), 1);
+    assert.equal(played.filter((name) => name === 'ignite').length, 1);
+    for (let step = 0; step < 60; step += 1) {
+      game.step();
+    }
+    assert.equal(duel.letterbox.amount, 0);
+  });
+
   it('restarts the duel from the pause menu', () => {
     const game = createFakeGame();
     game.changeState(StateId.DUEL);

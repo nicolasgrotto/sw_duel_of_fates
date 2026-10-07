@@ -96,6 +96,11 @@ export class DuelAudio {
     }
   }
 
+  playIgnition() {
+    this.playOptions.pan = 0;
+    this.audio.play(SoundName.IGNITE, this.playOptions);
+  }
+
   stop() {
     for (const hum of this.hums ?? []) {
       hum.handle.stop();

@@ -25,6 +25,7 @@ export function createPose() {
     handY: 0,
     bladeAngle: 0,
     bladeVisible: true,
+    bladeExtension: 1,
     bodyRotation: 0,
     bodyLift: 0,
     clothSway: 0,
