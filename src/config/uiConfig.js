@@ -1,5 +1,10 @@
 export const texts = {
-  arenas: { refinery: 'Plataforma de Refino', platform: 'Plataforma de treino' },
+  arenas: { refinery: 'Plataforma de Refino', sanctuary: 'Santuário Alagado', crystalMine: 'Mina de Cristal', platform: 'Plataforma de treino' },
+  arenaDescriptions: {
+    refinery: 'Plataforma industrial suspensa sobre o fosso',
+    sanctuary: 'Templo em ruínas sob a lua, sobre a água',
+    crystalMine: 'Caverna onde os cristais pegam a cor das lâminas',
+  },
   menu: {
     tagline: 'UM DUELO DE LÂMINAS DE ENERGIA',
     duel: 'Duelar',
@@ -57,8 +62,7 @@ export const texts = {
     pauseHint: '{pause}  pausar',
   },
   characterSelect: {
-    title: 'ESCOLHA SEU LUTADOR',
-    opponentTitle: 'ESCOLHA O ADVERSÁRIO',
+    titles: { player: 'ESCOLHA SEU LUTADOR', opponent: 'ESCOLHA O ADVERSÁRIO', arena: 'ESCOLHA A ARENA' },
     footer: '{up}  e  {down}  escolher · {confirm}  confirmar · {back}  voltar',
   },
   training: {
@@ -142,6 +146,8 @@ export const layout = {
     previewScale: 1.3,
     infoY: 200,
     infoLineSpacing: 36,
+    arenaPreviewY: 260,
+    arenaPreviewScale: 0.42,
     footerY: 670,
   },
   menuList: {

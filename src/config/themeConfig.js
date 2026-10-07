@@ -29,6 +29,13 @@ export const colors = {
   hitFlash: '#ffffff',
   saberFlare: '#ffffff',
   letterbox: '#000000',
+  arenaStone: '#1d2430',
+  arenaMoon: '#9fb7d9',
+  arenaWater: '#0a1622',
+  arenaWaterEdge: '#3b5f80',
+  arenaRock: '#110d16',
+  arenaCrystal: '#2a2140',
+  arenaCrystalEdge: '#4d3d70',
 };
 
 export const textStyles = {

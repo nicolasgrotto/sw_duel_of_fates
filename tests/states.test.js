@@ -59,6 +59,7 @@ describe('state flow', () => {
     game.step(Action.CONFIRM);
     assert.deepEqual(game.stateNames(), ['CharacterSelectState']);
     game.step(Action.CONFIRM);
+    game.step(Action.CONFIRM);
     assert.deepEqual(game.stateNames(), ['CharacterSelectState']);
     game.step(Action.CONFIRM);
     assert.deepEqual(game.stateNames(), ['DuelState']);
@@ -120,6 +121,7 @@ describe('state flow', () => {
     game.step(Action.BACK);
     game.step(Action.MENU_UP);
     game.step(Action.MENU_UP);
+    game.step(Action.CONFIRM);
     game.step(Action.CONFIRM);
     game.step(Action.CONFIRM);
     game.step(Action.CONFIRM);
@@ -492,7 +494,10 @@ it('lets the player select Shadow and keeps the choice after restart and between
   game.step(Action.MENU_UP);
   game.step(Action.MENU_UP);
   game.step(Action.CONFIRM);
+  game.step(Action.MENU_DOWN);
+  game.step(Action.CONFIRM);
   let duel = game.states.current;
+  assert.equal(duel.arenaId, 'sanctuary');
   assert.equal(duel.player.id, 'shadow');
   assert.equal(duel.fighters[1].id, 'guardian');
   assert.equal(duel.opponentController.profile, aiConfig.profiles.balanced);

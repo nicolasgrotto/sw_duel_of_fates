@@ -30,6 +30,7 @@ export const gameConfig = {
   },
   duel: {
     arena: 'refinery',
+    arenaOrder: ['refinery', 'sanctuary', 'crystalMine'],
     playerCharacter: 'guardian',
     opponentCharacter: 'shadow',
     spawnDistance: 440,

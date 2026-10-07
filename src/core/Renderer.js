@@ -158,6 +158,20 @@ export class Renderer {
     this.context.stroke();
   }
 
+  clipRect(x, y, width, height) {
+    this.context.beginPath();
+    this.context.rect(x, y, width, height);
+    this.context.clip();
+  }
+
+  strokeEllipse(x, y, radiusX, radiusY, color, lineWidth = 1) {
+    this.context.strokeStyle = color;
+    this.context.lineWidth = lineWidth;
+    this.context.beginPath();
+    this.context.ellipse(x, y, radiusX, radiusY, 0, 0, Math.PI * 2);
+    this.context.stroke();
+  }
+
   fillEllipse(x, y, radiusX, radiusY, color) {
     this.context.fillStyle = color;
     this.context.beginPath();

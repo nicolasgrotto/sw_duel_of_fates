@@ -1,9 +1,13 @@
+import { arenas } from '../arenas/arenaData.js';
 import { characters } from '../characters/characterData.js';
 import { createFighter } from '../characters/characterFactory.js';
 import { Action, keyBindings } from '../config/controlsConfig.js';
+import { gameConfig } from '../config/gameConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
 import { layout, texts } from '../config/uiConfig.js';
+import { ArenaRenderer } from '../rendering/arenaRenderer.js';
 import { computePose, createPose } from '../rendering/fighterPose.js';
+import { createArenaBounds } from '../simulation/arenaBounds.js';
 import { drawFighterBody } from '../rendering/fighterRenderer.js';
 import { drawSaber } from '../rendering/saberRenderer.js';
 import { formatText } from '../ui/formatText.js';
@@ -15,6 +19,7 @@ import { StateId } from './stateIds.js';
 export const SelectStep = Object.freeze({
   PLAYER: 'player',
   OPPONENT: 'opponent',
+  ARENA: 'arena',
 });
 
 export class CharacterSelectState extends GameState {
@@ -22,7 +27,12 @@ export class CharacterSelectState extends GameState {
     this.characterIds = Object.keys(characters);
     this.step = SelectStep.PLAYER;
     this.playerChoice = null;
-    this.menu = new MenuList(this.characterIds.map((id) => ({ id, label: characters[id].name })), layout.characterSelect, this.game.audio);
+    this.opponentChoice = null;
+    this.characterMenu = new MenuList(this.characterIds.map((id) => ({ id, label: characters[id].name })), layout.characterSelect, this.game.audio);
+    this.arenaMenu = new MenuList(gameConfig.duel.arenaOrder.map((id) => ({ id, label: texts.arenas[id] })), layout.characterSelect, this.game.audio);
+    this.menu = this.characterMenu;
+    this.arenaBounds = createArenaBounds(gameConfig);
+    this.arenaViews = new Map(gameConfig.duel.arenaOrder.map((id) => [id, new ArenaRenderer(arenas[id])]));
     this.previews = new Map(this.characterIds.map((id) => [id, createFighter(id, { x: 0, y: 0, facing: -1 })]));
     this.pose = createPose();
     const bindings = this.game.input.bindings ?? keyBindings;
@@ -44,10 +54,18 @@ export class CharacterSelectState extends GameState {
       this.choose(choice);
       return;
     }
-    this.previews.get(this.menu.selected.id).animation.time += dt;
+    if (this.step !== SelectStep.ARENA) {
+      this.previews.get(this.menu.selected.id).animation.time += dt;
+    }
   }
 
   goBack() {
+    if (this.step === SelectStep.ARENA) {
+      this.step = SelectStep.OPPONENT;
+      this.menu = this.characterMenu;
+      this.menu.selectedIndex = this.characterIds.indexOf(this.opponentChoice);
+      return;
+    }
     if (this.step === SelectStep.OPPONENT) {
       this.step = SelectStep.PLAYER;
       this.menu.selectedIndex = this.characterIds.indexOf(this.playerChoice);
@@ -63,21 +81,53 @@ export class CharacterSelectState extends GameState {
       this.menu.selectedIndex = (this.characterIds.indexOf(choice) + 1) % this.characterIds.length;
       return;
     }
+    if (this.step === SelectStep.OPPONENT) {
+      this.opponentChoice = choice;
+      this.step = SelectStep.ARENA;
+      this.menu = this.arenaMenu;
+      return;
+    }
     this.game.changeState(StateId.DUEL, {
       ...this.params,
       playerCharacter: this.playerChoice,
-      opponentCharacter: choice,
+      opponentCharacter: this.opponentChoice,
+      arena: choice,
     });
   }
 
   render(renderer) {
-    const { titleY, listX, previewX, previewY, previewScale, infoY, infoLineSpacing, footerY } = layout.characterSelect;
-    const title = this.step === SelectStep.PLAYER ? texts.characterSelect.title : texts.characterSelect.opponentTitle;
-    const character = characters[this.menu.selected.id];
-
     renderer.clear(colors.background);
-    renderer.text(title, renderer.width / 2, titleY, textStyles.heading);
-    this.menu.render(renderer, listX);
+    renderer.text(texts.characterSelect.titles[this.step], renderer.width / 2, layout.characterSelect.titleY, textStyles.heading);
+    this.menu.render(renderer, layout.characterSelect.listX);
+    if (this.step === SelectStep.ARENA) {
+      this.renderArenaPreview(renderer);
+    } else {
+      this.renderCharacterPreview(renderer);
+    }
+    renderer.text(this.footer, renderer.width / 2, layout.characterSelect.footerY, textStyles.hint);
+  }
+
+  renderArenaPreview(renderer) {
+    const { previewX, arenaPreviewY, arenaPreviewScale, infoY } = layout.characterSelect;
+    const id = this.menu.selected.id;
+    const width = renderer.width * arenaPreviewScale;
+    const height = renderer.height * arenaPreviewScale;
+    const left = previewX - width / 2;
+
+    renderer.text(texts.arenaDescriptions[id], previewX, infoY, textStyles.hint);
+    renderer.save();
+    renderer.clipRect(left, arenaPreviewY, width, height);
+    renderer.translate(left, arenaPreviewY);
+    renderer.scale(arenaPreviewScale, arenaPreviewScale);
+    this.arenaViews.get(id).renderBackground(renderer, this.arenaBounds, [], []);
+    this.arenaViews.get(id).renderFloor(renderer, this.arenaBounds);
+    renderer.restore();
+    renderer.strokeRect(left, arenaPreviewY, width, height, colors.accent, 1);
+  }
+
+  renderCharacterPreview(renderer) {
+    const { previewX, previewY, previewScale, infoY, infoLineSpacing } = layout.characterSelect;
+    const character = characters[this.menu.selected.id];
 
     renderer.text(character.info.style, previewX, infoY, textStyles.subtitle);
     renderer.text(character.info.trait, previewX, infoY + infoLineSpacing, textStyles.hint);
@@ -91,6 +141,5 @@ export class CharacterSelectState extends GameState {
     drawFighterBody(renderer, fighter, this.pose, 0);
     drawSaber(renderer, fighter, this.pose);
     renderer.restore();
-    renderer.text(this.footer, renderer.width / 2, footerY, textStyles.hint);
   }
 }

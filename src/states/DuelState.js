@@ -59,7 +59,9 @@ export class DuelState extends GameState {
     this.opponentCharacter = this.params.opponentCharacter ?? gameConfig.duel.opponentCharacter;
     this.random = createRandom(createRandomSeed());
     this.arena = createArenaBounds(gameConfig);
-    this.ambient = new AmbientSystem(arenas[gameConfig.duel.arena].ambient, this.arena, createRandom(createRandomSeed()));
+    this.arenaId = this.params.arena ?? gameConfig.duel.arena;
+    this.arenaDefinition = arenas[this.arenaId];
+    this.ambients = this.arenaDefinition.ambient.map((config) => new AmbientSystem(config, this.arena, createRandom(createRandomSeed())));
     this.participants = this.createParticipants();
     this.opponentController = this.participants[1].controller;
     this.fighters = this.participants.map((participant) => participant.fighter);
@@ -74,7 +76,7 @@ export class DuelState extends GameState {
     this.timeControl = new TimeControl();
     this.effects = new EffectsSystem(effectsConfig, this.camera, this.random, this.timeControl);
     this.effects.setReduced(this.game.settings.reducedEffects);
-    this.view = new DuelRenderer();
+    this.view = new DuelRenderer(this.arenaDefinition);
     this.duelAudio = new DuelAudio(this.game.audio, {
       arenaWidth: gameConfig.canvas.width,
       stereoWidth: audioConfig.stereoWidth,
@@ -125,7 +127,7 @@ export class DuelState extends GameState {
     this.timeControl = new TimeControl();
     this.effects = new EffectsSystem(effectsConfig, this.camera, this.random, this.timeControl);
     this.effects.setReduced(this.game.settings.reducedEffects);
-    this.view = new DuelRenderer();
+    this.view = new DuelRenderer(this.arenaDefinition);
     this.hud = this.createHud();
     this.outcome = null;
     this.introTime = 0;
@@ -216,7 +218,9 @@ export class DuelState extends GameState {
     }
 
     this.updateTrainingStatus();
-    this.ambient.update(dt);
+    for (const ambient of this.ambients) {
+      ambient.update(dt);
+    }
     this.effects.update(dt);
     this.camera.frame(
       Math.min(this.fighters[0].left, this.fighters[1].left),
@@ -412,7 +416,7 @@ export class DuelState extends GameState {
   }
 
   render(renderer) {
-    this.view.render(renderer, this.arena, this.fighters, this.effects, this.camera, this.ambient, this.getBladeExtension());
+    this.view.render(renderer, this.arena, this.fighters, this.effects, this.camera, this.ambients, this.getBladeExtension());
     if (this.isTraining && this.trainingHitboxes && !this.game.debug.enabled) {
       this.renderDebug(renderer);
     }

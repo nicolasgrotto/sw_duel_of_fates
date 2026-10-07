@@ -104,7 +104,7 @@ NOME ESQUERDA                                         NOME DIREITA
 
 ### Seleção de personagem
 
-Duelar abre a seleção em duas etapas: ESCOLHA SEU LUTADOR e depois ESCOLHA O ADVERSÁRIO (pode ser o mesmo personagem). A lista de nomes fica na coluna da esquerda, com a navegação e o marcador do MenuList. Na coluna da direita aparecem o estilo do personagem (`subtitle`), o traço e a habilidade (`hint`) e, embaixo, a silhueta em guarda com o sabre aceso. `Esc` na etapa do adversário volta para a do lutador. A seleção acompanha pausa, reinício e revanche.
+Duelar abre a seleção em três etapas: ESCOLHA SEU LUTADOR, ESCOLHA O ADVERSÁRIO (pode ser o mesmo personagem) e ESCOLHA A ARENA. Na etapa da arena, a coluna da direita mostra uma frase curta sobre ela e uma miniatura da arena com moldura fina em `accent`. A lista de nomes fica na coluna da esquerda, com a navegação e o marcador do MenuList. Na coluna da direita aparecem o estilo do personagem (`subtitle`), o traço e a habilidade (`hint`) e, embaixo, a silhueta em guarda com o sabre aceso. `Esc` volta uma etapa. A seleção acompanha pausa, reinício e revanche.
 
 ### Ferramentas do Treino
 

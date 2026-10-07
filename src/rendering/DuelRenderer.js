@@ -1,8 +1,6 @@
 import { isSaberStrikeActive } from '../combat/hitboxes.js';
 import { colors } from '../config/themeConfig.js';
 import { effectsConfig } from '../config/effectsConfig.js';
-import { arenas } from '../arenas/arenaData.js';
-import { gameConfig } from '../config/gameConfig.js';
 import { ArenaRenderer } from './arenaRenderer.js';
 import { DodgeAfterimage } from './DodgeAfterimage.js';
 import { drawDesaturation, drawFlash, drawImpactLights, drawParticles, drawRings } from './effectsRenderer.js';
@@ -12,8 +10,8 @@ import { SaberTrail } from './SaberTrail.js';
 import { drawSaber, drawSaberBodyLight, drawSaberFloorLight, getBladeWorldPoints } from './saberRenderer.js';
 
 export class DuelRenderer {
-  constructor() {
-    this.arenaView = new ArenaRenderer(arenas[gameConfig.duel.arena]);
+  constructor(arenaDefinition) {
+    this.arenaView = new ArenaRenderer(arenaDefinition);
     this.poses = new Map();
     this.trails = new Map();
     this.afterimages = new Map();
@@ -47,12 +45,18 @@ export class DuelRenderer {
     return afterimage;
   }
 
-  render(renderer, arena, fighters, effects, camera, ambient = null, bladeExtension = 1) {
+  render(renderer, arena, fighters, effects, camera, ambients = [], bladeExtension = 1) {
     renderer.save();
     camera.applyTransform(renderer);
 
-    this.arenaView.render(renderer, arena, ambient);
     this.preparePoses(fighters, bladeExtension);
+    this.arenaView.renderBackground(renderer, arena, ambients, fighters);
+    this.arenaView.renderFloor(renderer, arena);
+    if (this.arenaView.definition.reflection) {
+      this.drawReflections(renderer, fighters, arena.floorY);
+      this.arenaView.renderReflectionCover(renderer, arena);
+    }
+    this.arenaView.renderFloorAmbient(renderer, ambients);
 
     for (const fighter of fighters) {
       drawSaberFloorLight(renderer, fighter, this.getPose(fighter), arena.floorY);
@@ -91,6 +95,19 @@ export class DuelRenderer {
 
     drawFlash(renderer, effects.flash);
     renderer.drawVignette(effectsConfig.vignette);
+  }
+
+  drawReflections(renderer, fighters, floorY) {
+    renderer.save();
+    renderer.translate(0, floorY * 2);
+    renderer.scale(1, -1);
+    for (const fighter of fighters) {
+      drawFighterBody(renderer, fighter, this.getPose(fighter), floorY, false);
+    }
+    for (const fighter of fighters) {
+      drawSaber(renderer, fighter, this.getPose(fighter));
+    }
+    renderer.restore();
   }
 
   preparePoses(fighters, bladeExtension) {
