@@ -1,5 +1,6 @@
 import { aiConfig } from '../config/aiConfig.js';
 import { audioConfig } from '../config/audioConfig.js';
+import { loadSettings, saveSettings } from './settingsStorage.js';
 import { Action, keyBindings } from '../config/controlsConfig.js';
 import { gameConfig } from '../config/gameConfig.js';
 import { colors } from '../config/themeConfig.js';
@@ -17,8 +18,14 @@ export class Game {
     this.renderer = new Renderer(canvas, gameConfig.canvas);
     this.input = new Input({ bindings: keyBindings, target: window });
     this.states = new StateMachine();
-    this.settings = { difficulty: aiConfig.defaultDifficulty };
+    this.settings = loadSettings(
+      { difficulty: aiConfig.defaultDifficulty, reducedEffects: false, sound: true, music: true },
+      globalThis.localStorage,
+      gameConfig.settingsStorageKey,
+      { difficulty: aiConfig.difficultyOrder },
+    );
     this.audio = new AudioManager(audioConfig);
+    this.applySettings();
     this.unlockAudio = () => this.audio.unlock();
     window.addEventListener('keydown', this.unlockAudio, { once: true });
     window.addEventListener('pointerdown', this.unlockAudio, { once: true });
@@ -37,6 +44,15 @@ export class Game {
     this.renderer.canvas.focus();
     this.changeState(StateId.MENU);
     this.loop.start();
+  }
+
+  applySettings() {
+    this.audio.setSfxEnabled(this.settings.sound);
+    this.audio.setMusicEnabled(this.settings.music);
+  }
+
+  saveSettings() {
+    saveSettings(this.settings, globalThis.localStorage, gameConfig.settingsStorageKey);
   }
 
   changeState(id, params) {

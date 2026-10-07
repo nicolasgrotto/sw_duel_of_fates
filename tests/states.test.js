@@ -17,7 +17,12 @@ function createFakeGame() {
   const game = {
     states: new StateMachine(),
     debug: { enabled: false },
-    settings: { difficulty: 'normal', reducedEffects: false },
+    settings: { difficulty: 'normal', reducedEffects: false, sound: true, music: true },
+    saved: 0,
+    applySettings: () => {},
+    saveSettings: () => {
+      game.saved += 1;
+    },
     audio: new AudioManager(audioConfig),
     input: {
       wasPressed: (action) => pressed.has(action),
@@ -77,25 +82,43 @@ describe('state flow', () => {
     assert.equal(game.states.current.mode, DuelMode.TRAINING);
   });
 
-  it('cycles the difficulty from the menu and uses it in the next duel', () => {
+  it('changes the options, saves them and uses the difficulty in the next duel', () => {
     const game = createFakeGame();
     game.changeState(StateId.MENU);
-    const menu = game.states.current;
 
     game.step(Action.MENU_DOWN);
     game.step(Action.MENU_DOWN);
     game.step(Action.CONFIRM);
-    assert.equal(game.settings.difficulty, 'hard');
-    assert.equal(menu.difficultyItem.label, 'Dificuldade: Difícil');
+    assert.deepEqual(game.stateNames(), ['MenuState', 'OptionsState']);
+    const options = game.states.current;
 
+    game.step(Action.CONFIRM);
     game.step(Action.CONFIRM);
     assert.equal(game.settings.difficulty, 'easy');
+    assert.equal(options.items.difficulty.label, 'Dificuldade: Fácil');
 
+    game.step(Action.MENU_DOWN);
+    game.step(Action.CONFIRM);
+    assert.equal(game.settings.reducedEffects, true);
+    assert.equal(options.items.effects.label, 'Efeitos: Reduzidos');
+
+    game.step(Action.MENU_DOWN);
+    game.step(Action.CONFIRM);
+    game.step(Action.MENU_DOWN);
+    game.step(Action.CONFIRM);
+    assert.equal(game.settings.sound, false);
+    assert.equal(game.settings.music, false);
+    assert.equal(options.items.music.label, 'Música: Desligada');
+    assert.equal(game.saved, 5);
+
+    game.step(Action.BACK);
     game.step(Action.MENU_UP);
     game.step(Action.MENU_UP);
     game.step(Action.CONFIRM);
-    assert.equal(game.states.current.mode, DuelMode.VERSUS);
-    assert.equal(game.states.current.opponentController.difficulty.reactionTime, 0.45);
+    const duel = game.states.current;
+    assert.equal(duel.mode, DuelMode.VERSUS);
+    assert.equal(duel.opponentController.difficulty.reactionTime, 0.45);
+    assert.equal(duel.effects.flashScale, 0);
   });
 
   it('pauses the duel and resumes it', () => {

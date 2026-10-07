@@ -2,9 +2,23 @@ export const texts = {
   menu: {
     duel: 'Duelar',
     training: 'Treino',
-    difficulty: 'Dificuldade: {level}',
+    options: 'Opções',
     controls: 'Controles',
     navigation: '{up}  e  {down}  escolher   ·   {confirm}  confirmar',
+  },
+  options: {
+    title: 'OPÇÕES',
+    difficulty: 'Dificuldade: {level}',
+    effects: 'Efeitos: {value}',
+    sound: 'Som: {value}',
+    music: 'Música: {value}',
+    back: 'Voltar',
+    full: 'Completos',
+    reduced: 'Reduzidos',
+    on: 'Ligado',
+    off: 'Desligado',
+    onFeminine: 'Ligada',
+    offFeminine: 'Desligada',
   },
   controls: {
     title: 'CONTROLES',
@@ -71,6 +85,11 @@ export const layout = {
     markerWidth: 18,
     markerGap: 16,
     markerThickness: 2,
+  },
+  options: {
+    titleY: 180,
+    firstItemY: 300,
+    itemSpacing: 52,
   },
   controls: {
     titleY: 110,

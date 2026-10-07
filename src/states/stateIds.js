@@ -4,4 +4,5 @@ export const StateId = Object.freeze({
   PAUSE: 'pause',
   CONTROLS: 'controls',
   GAME_OVER: 'gameOver',
+  OPTIONS: 'options',
 });
