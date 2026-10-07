@@ -54,6 +54,20 @@ export class Renderer {
     this.vignette = null;
   }
 
+  createLayer(draw, padding = 0) {
+    const canvas = document.createElement('canvas');
+    canvas.width = this.width + padding * 2;
+    canvas.height = this.height + padding * 2;
+    const layer = new Renderer(canvas, { width: this.width, height: this.height });
+    layer.translate(padding, padding);
+    draw(layer);
+    return canvas;
+  }
+
+  drawLayer(layer, padding = 0) {
+    this.context.drawImage(layer, -padding, -padding, this.width + padding * 2, this.height + padding * 2);
+  }
+
   drawVignette(style) {
     if (!this.vignette) {
       this.vignette = createVignette(this.width, this.height, style);

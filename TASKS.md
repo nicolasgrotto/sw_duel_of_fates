@@ -153,7 +153,7 @@ As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e des
 
 ### v0.3 — Arena e identidade
 
-- [ ] Arenas como dados (`src/arenas/`), camadas estáticas pré-renderizadas, partículas ambientes
+- [x] Arenas como dados (`src/arenas/`), camadas estáticas pré-renderizadas, partículas ambientes
 - [ ] Plataforma de Refino (primeira arena de verdade)
 - [ ] Câmera dinâmica (enquadra os dois lutadores, zoom leve com a distância)
 - [ ] Nome próprio do jogo, fonte display OFL, letterbox, ignição dos sabres na intro

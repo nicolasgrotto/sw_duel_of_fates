@@ -1,7 +1,9 @@
 import { isSaberStrikeActive } from '../combat/hitboxes.js';
 import { colors } from '../config/themeConfig.js';
 import { effectsConfig } from '../config/effectsConfig.js';
-import { drawArena } from './arenaRenderer.js';
+import { arenas } from '../arenas/arenaData.js';
+import { gameConfig } from '../config/gameConfig.js';
+import { ArenaRenderer } from './arenaRenderer.js';
 import { DodgeAfterimage } from './DodgeAfterimage.js';
 import { drawDesaturation, drawFlash, drawImpactLights, drawParticles, drawRings } from './effectsRenderer.js';
 import { computePose, createPose } from './fighterPose.js';
@@ -11,6 +13,7 @@ import { drawSaber, drawSaberBodyLight, drawSaberFloorLight, getBladeWorldPoints
 
 export class DuelRenderer {
   constructor() {
+    this.arenaView = new ArenaRenderer(arenas[gameConfig.duel.arena]);
     this.poses = new Map();
     this.trails = new Map();
     this.afterimages = new Map();
@@ -44,14 +47,14 @@ export class DuelRenderer {
     return afterimage;
   }
 
-  render(renderer, arena, fighters, effects, camera) {
+  render(renderer, arena, fighters, effects, camera, ambient = null) {
     renderer.save();
     renderer.translate(camera.offsetX, camera.offsetY);
     renderer.translate(camera.focusX, camera.focusY);
     renderer.scale(camera.zoom, camera.zoom);
     renderer.translate(-camera.focusX, -camera.focusY);
 
-    drawArena(renderer, arena);
+    this.arenaView.render(renderer, arena, ambient);
     this.preparePoses(fighters);
 
     for (const fighter of fighters) {

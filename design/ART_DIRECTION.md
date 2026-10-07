@@ -127,3 +127,7 @@ Usar easing nas transições e um pequeno exagero (antecipação e follow-throug
 | Morto | cai para trás e a lâmina apaga |
 
 Curvas de tempo: startup com easing de saída (prepara devagar no fim), active quase linear e rápido, recovery com easing suave.
+
+## Camadas de arena como dados
+
+Cada arena descreve camadas estáticas de geometria em tokens da paleta existente. O renderer pré-renderiza essas camadas em canvases internos e as reutiliza. Partículas ambientes são poucas, lentas e pouco opacas, atrás dos corpos; não geram eventos nem colisão. A plataforma provisória mantém o desenho atual até a implementação da Plataforma de Refino.

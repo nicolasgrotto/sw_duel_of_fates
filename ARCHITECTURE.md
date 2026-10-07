@@ -41,6 +41,8 @@ src/
     PauseState.js           ✅ continuar, reiniciar, sair
     GameOverState.js        ✅ vitória/derrota, estatísticas, revanche
     OptionsState.js         ✅ dificuldade, efeitos, som, música
+  arenas/                   ✅ dados visuais de arenas, sem regras de gameplay
+    arenaData.js            ✅ camadas estáticas e partículas ambientes por arena
   characters/               ✅ dados e criação de personagens
     characterData.js        ✅ personagens: nome, arquétipo, perfil de IA, aparência
     characterFactory.js     ✅ cria um Fighter a partir dos dados
@@ -56,6 +58,7 @@ src/
     CollisionSystem.js      ✅ corpos não se atravessam
     AnimationSystem.js      ✅ tempo, ciclo de passos, blends
     StaminaSystem.js        ✅ regeneração e gasto de stamina
+    AmbientSystem.js        ✅ pool fixo de partículas ambientes, sem combate
     EffectsSystem.js        ✅ eventos de combate → faíscas, luzes de impacto, flash, shake
     ParticlePool.js         ✅ pool fixo de partículas
     TimeControl.js          ✅ hit stop e câmera lenta
@@ -78,7 +81,7 @@ src/
     perception.js           ✅ leitura pura dos lutadores (distância, ameaça, chance de punir)
   rendering/                ✅ desenho (só lê dados)
     DuelRenderer.js         ✅ ordem das camadas do duelo
-    arenaRenderer.js        ✅ chão e limites
+    arenaRenderer.js        ✅ ArenaRenderer: camadas e chão em cache, partículas ambientes
     fighterPose.js          ✅ calcula a pose a partir do estado e da animação
     fighterRenderer.js      ✅ silhueta do lutador e sombra
     saberRenderer.js        ✅ cabo, glows, núcleo, luz no chão e no corpo
@@ -384,6 +387,10 @@ CombatSystem.events → EffectsSystem.handleEvents → spawn(tipo, { x, y, direc
 - Pacote de impacto: `EffectsSystem` guarda hit flashes por lutador (0,06 s) e tremores durante hit stop. O tremor do hit afeta o atingido; no parry, o atacante aparado. O renderer aplica o deslocamento ao corpo e à lâmina sem mudar posição física. A silhueta aceita cor substituta `colors.hitFlash`.
 - `Camera.punch(zoom, duration, x, y)` limita o zoom adicional a 6%, mantém o impulso mais forte e retorna suavemente em até 0,25 s. Receitas pedem 3/4/5/6% em forte/quebra de guarda/perfeito/morte. UI e flash de tela ficam fora da transformação. Efeitos reduzidos desativam hit flash e reduzem punch e tremor a 25%.
 - Timers de VFX avançam por `dt` real, inclusive no hit stop e na câmera lenta; animação e combate continuam usando o tempo escalado.
+
+## Arenas
+
+`gameConfig.duel.arena` seleciona `arenas/arenaData.js`: camadas de geometria com tokens de tema e configuração de partículas ambientes. `ArenaRenderer` usa `Renderer.createLayer/drawLayer` para pré-renderizar fundo e chão uma vez, com overscan para o shake. Só o core cria canvases internos; lógica e dados continuam testáveis em Node. `AmbientSystem` mantém um pool fixo, avança no update do duelo e congela na pausa. Usa RNG próprio para não interferir nas decisões da IA. O cenário não emite eventos nem muda combate.
 
 ## Audio
 

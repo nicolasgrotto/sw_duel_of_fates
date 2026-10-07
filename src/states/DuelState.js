@@ -1,3 +1,5 @@
+import { arenas } from '../arenas/arenaData.js';
+import { AmbientSystem } from '../systems/AmbientSystem.js';
 import { EnemyAI } from '../ai/EnemyAI.js';
 import { DuelAudio } from '../audio/DuelAudio.js';
 import { characters } from '../characters/characterData.js';
@@ -44,6 +46,7 @@ export class DuelState extends GameState {
     this.mode = this.params.mode ?? DuelMode.VERSUS;
     this.random = createRandom(createRandomSeed());
     this.arena = createArenaBounds(gameConfig);
+    this.ambient = new AmbientSystem(arenas[gameConfig.duel.arena].ambient, this.arena, createRandom(createRandomSeed()));
     this.participants = this.createParticipants();
     this.opponentController = this.participants[1].controller;
     this.fighters = this.participants.map((participant) => participant.fighter);
@@ -179,6 +182,7 @@ export class DuelState extends GameState {
       this.stepSimulation(simulationDt);
     }
 
+    this.ambient.update(dt);
     this.effects.update(dt);
     this.camera.update(dt);
     this.hud.update(dt);
@@ -313,7 +317,7 @@ export class DuelState extends GameState {
   }
 
   render(renderer) {
-    this.view.render(renderer, this.arena, this.fighters, this.effects, this.camera);
+    this.view.render(renderer, this.arena, this.fighters, this.effects, this.camera, this.ambient);
     this.hud.render(renderer);
     this.message.render(renderer);
 
