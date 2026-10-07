@@ -450,6 +450,8 @@ Arquivo: [src/utils/debug.js](src/utils/debug.js)
 
 ---
 
+Verificação visual da v0.2: Chrome headless local, Canvas real, eventos de parry/perfeito/empurrão gerados pela simulação e tela de Controles inspecionada. Dessaturação cobre o mundo com shake de ±12 px; lâminas, anéis e flare mantêm a cor.
+
 ## Testabilidade
 
 Testes rodam em Node (`npm test`), sem navegador. Por isso:
