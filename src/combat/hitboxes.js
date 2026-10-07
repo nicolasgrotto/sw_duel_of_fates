@@ -42,7 +42,7 @@ export function hasActiveHitbox(fighter) {
 }
 
 export function isInvulnerable(fighter) {
-  return fighter.state === FighterState.DODGING && fighter.stateTime < fighter.stats.dodge.invulnerableTime;
+  return fighter.state === FighterState.DODGING && fighter.stateTime < fighter.combat.dodgeProfile.invulnerableTime;
 }
 
 export function hasHurtbox(fighter) {

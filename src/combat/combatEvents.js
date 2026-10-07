@@ -10,6 +10,7 @@ export const CombatEvent = Object.freeze({
   PARRY: 'parry',
   PERFECT_PARRY: 'perfectParry',
   SHOVE: 'shove',
+  COUNTER: 'counter',
 });
 
 const CONTACT_EVENTS = new Set([
@@ -21,13 +22,14 @@ const CONTACT_EVENTS = new Set([
   CombatEvent.PARRY,
   CombatEvent.PERFECT_PARRY,
   CombatEvent.SHOVE,
+  CombatEvent.COUNTER,
 ]);
 
 export function isContactEvent(event) {
   return CONTACT_EVENTS.has(event.type);
 }
 
-export function createCombatEvent(type, { attacker, defender, attackType, x, y }) {
+export function createCombatEvent(type, { attacker, defender, attackType, x, y, armored = false }) {
   return {
     type,
     attacker,
@@ -35,5 +37,6 @@ export function createCombatEvent(type, { attacker, defender, attackType, x, y }
     attackType,
     x,
     y,
+    armored,
   };
 }

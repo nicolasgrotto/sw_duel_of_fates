@@ -14,6 +14,12 @@ export const movesByCharacter = {
     heavy: { attack: 'heavy', type: 'heavy', pose: 'heavy', cancelsInto: [] },
     riposte: { attack: 'riposte', type: 'riposte', pose: 'riposte', cancelsInto: [] },
     shove: { attack: 'shove', type: 'shove', pose: 'shove', cancelsInto: [] },
+    special: {
+      attack: 'heavy', type: 'stance', pose: 'stance', cancelsInto: [],
+      damage: 0, staminaCost: 15, startup: 0.35, active: 0, recovery: 0.35, lunge: 0,
+      hitbox: { reach: 0, top: 0.9, bottom: 0.3 },
+      counter: { move: 'riposte', stagger: 0.45, event: 'counter' },
+    },
   },
   shadow: {
     light: { attack: 'light', type: 'light', pose: 'light', cancelsInto: ['light2'] },
@@ -31,5 +37,10 @@ export const movesByCharacter = {
     heavy: { attack: 'heavy', type: 'heavy', pose: 'heavy', cancelsInto: [] },
     riposte: { attack: 'riposte', type: 'riposte', pose: 'riposte', cancelsInto: [] },
     shove: { attack: 'shove', type: 'shove', pose: 'shove', cancelsInto: [] },
+    special: {
+      attack: 'heavy', type: 'heavy', pose: 'impetus', cancelsInto: [],
+      damage: 18, staminaCost: 28, startup: 0.28, active: 0.12, recovery: 0.45, lunge: 520,
+      armor: { hits: 1, damageScale: 1 },
+    },
   },
 };

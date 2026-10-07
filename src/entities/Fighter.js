@@ -9,6 +9,8 @@ function createIntent() {
     block: false,
     blockPressed: false,
     dodge: false,
+    special: false,
+    specialHeld: false,
   };
 }
 
@@ -23,6 +25,9 @@ function createCombat() {
     stunDuration: 0,
     blockstun: 0,
     dodgeDirection: 0,
+    dodgeProfile: null,
+    passThrough: false,
+    armorHits: 0,
     fallDirection: 0,
     staminaRegenDelay: 0,
     bufferedAction: null,
@@ -155,5 +160,7 @@ export class Fighter {
     intent.block = false;
     intent.blockPressed = false;
     intent.dodge = false;
+    intent.special = false;
+    intent.specialHeld = false;
   }
 }

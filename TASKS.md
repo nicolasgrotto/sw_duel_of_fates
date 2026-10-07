@@ -178,7 +178,7 @@ As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e des
 - [x] Golpes como dados por personagem (`moves`, `cancelsInto`, pose por golpe)
 - [x] Sequências de ataques rápidos (encadeiam só no acerto ou no bloqueio)
 - [x] Ataque aéreo e forte de avanço
-- [ ] Habilidade exclusiva (`I`)
+- [x] Habilidade exclusiva (`I`): golpe com armadura, postura de contra-golpe e avanço; traços passivos como dados
 - [x] Tela de seleção de personagem (o jogador pode ser qualquer um)
 - [ ] Bastião, Vespa e Espelho
 - [ ] IA com comportamento por dificuldade (punir bloqueio, iscas de whiff, memória curta de hábitos no Difícil)

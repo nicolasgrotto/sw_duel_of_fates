@@ -6,6 +6,7 @@ const PRESS_ACTIONS = [
   { action: Action.HEAVY_ATTACK, intentKey: 'heavyAttack' },
   { action: Action.DODGE, intentKey: 'dodge' },
   { action: Action.BLOCK, intentKey: 'blockPressed' },
+  { action: Action.SPECIAL, intentKey: 'special' },
 ];
 
 export class PlayerController {
@@ -39,6 +40,7 @@ export class PlayerController {
     this.captureInput();
     intent.moveX = right - left;
     intent.block = input.isDown(Action.BLOCK);
+    intent.specialHeld = input.isDown(Action.SPECIAL);
     for (const { intentKey } of PRESS_ACTIONS) {
       intent[intentKey] = latched[intentKey];
       latched[intentKey] = false;

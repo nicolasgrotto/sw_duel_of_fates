@@ -1,16 +1,48 @@
 import { FighterState } from '../entities/fighterStates.js';
 import { canAfford, spendStamina } from '../systems/StaminaSystem.js';
 import { CombatAction, clearActionBuffer, updateActionBuffer } from './actionBuffer.js';
+import { clamp } from '../utils/math.js';
 import { ATTACK_STATES, AttackPhase, AttackType, getAttackDuration, getAttackPhase, isSaberAttack } from './attackPhases.js';
 import { CombatEvent, createCombatEvent } from './combatEvents.js';
 import { boxesOverlap, createBox, getAttackHitbox, getHurtbox, hasActiveHitbox, hasHurtbox } from './hitboxes.js';
 
-function isBlockingAttack(defender, attacker) {
-  if (defender.state !== FighterState.BLOCKING) {
-    return false;
-  }
+const PUNISHED_STATES = new Set([FighterState.STAGGERED, FighterState.STUNNED]);
+
+function comesFromFront(defender, attacker) {
   const attackerSide = Math.sign(attacker.x - defender.x);
   return attackerSide === 0 || attackerSide === defender.facing;
+}
+
+function isBlockingAttack(defender, attacker) {
+  return defender.state === FighterState.BLOCKING && comesFromFront(defender, attacker);
+}
+
+function isInCounterStance(defender, attacker) {
+  const { attack } = defender.combat;
+  return Boolean(attack?.counter) && getAttackPhase(attack, defender.stateTime) === AttackPhase.STARTUP && comesFromFront(defender, attacker);
+}
+
+function hasArmor(fighter) {
+  const { attack, armorHits } = fighter.combat;
+  return Boolean(attack?.armor) && armorHits > 0 && getAttackPhase(attack, fighter.stateTime) !== AttackPhase.RECOVERY;
+}
+
+function isOpenToPunish(fighter) {
+  const { attack } = fighter.combat;
+  return PUNISHED_STATES.has(fighter.state) || (attack !== null && getAttackPhase(attack, fighter.stateTime) === AttackPhase.RECOVERY);
+}
+
+function getSweetSpotScale(attacker, defender, attack) {
+  const { sweetSpot } = attack;
+  if (!sweetSpot) {
+    return 1;
+  }
+  const gap = Math.abs(defender.x - attacker.x) - (attacker.width + defender.width) / 2;
+  const ratio = clamp(gap / attack.hitbox.reach, 0, 1);
+  if (ratio >= sweetSpot.tipFrom) {
+    return sweetSpot.tipScale;
+  }
+  return ratio < sweetSpot.innerTo ? sweetSpot.innerScale : 1;
 }
 
 function chooseFallDirection(fighter, arena, roomMargin) {
@@ -62,7 +94,8 @@ export class CombatSystem {
         }
         break;
       case FighterState.DODGING:
-        if (fighter.stateTime >= stats.dodge.duration) {
+        if (fighter.stateTime >= combat.dodgeProfile.duration) {
+          combat.passThrough = false;
           fighter.setState(FighterState.IDLE);
         }
         break;
@@ -183,6 +216,8 @@ export class CombatSystem {
         return this.tryDodge(fighter);
       case CombatAction.SHOVE:
         return this.tryAttack(fighter, AttackType.SHOVE);
+      case CombatAction.SPECIAL:
+        return this.trySpecial(fighter);
       case CombatAction.HEAVY_ATTACK:
         return this.tryAttack(fighter, fighter.intent.moveX === fighter.facing ? AttackType.FORWARD_HEAVY : AttackType.HEAVY);
       case CombatAction.LIGHT_ATTACK:
@@ -192,6 +227,23 @@ export class CombatSystem {
       default:
         return false;
     }
+  }
+
+  trySpecial(fighter) {
+    const move = fighter.moves[AttackType.SPECIAL];
+    if (!move) {
+      return false;
+    }
+    return move.dash ? this.tryDash(fighter, move) : this.tryAttack(fighter, AttackType.SPECIAL);
+  }
+
+  tryDash(fighter, move) {
+    if (!canAfford(fighter, move.staminaCost)) {
+      return false;
+    }
+    spendStamina(fighter, move.staminaCost);
+    this.startDodge(fighter, move.dash, fighter.facing, move.dash.passThrough);
+    return true;
   }
 
   startParry(fighter) {
@@ -221,6 +273,7 @@ export class CombatSystem {
     fighter.clearAttack();
     fighter.combat.attack = attack;
     fighter.combat.attackType = attackType;
+    fighter.combat.armorHits = attack.armor ? attack.armor.hits : 0;
     fighter.restartState(ATTACK_STATES[attack.type ?? attackType]);
     this.emitAction(CombatEvent.ATTACK_START, fighter, attackType);
     return true;
@@ -234,17 +287,23 @@ export class CombatSystem {
 
     spendStamina(fighter, dodge.staminaCost);
     const { moveX } = fighter.intent;
-    fighter.combat.dodgeDirection = moveX !== 0 ? Math.sign(moveX) : -fighter.facing;
-    fighter.setState(FighterState.DODGING);
-    this.emitAction(CombatEvent.DODGE, fighter, null);
+    this.startDodge(fighter, dodge, moveX !== 0 ? Math.sign(moveX) : -fighter.facing, false);
     return true;
+  }
+
+  startDodge(fighter, profile, direction, passThrough) {
+    fighter.combat.dodgeProfile = profile;
+    fighter.combat.dodgeDirection = direction;
+    fighter.combat.passThrough = passThrough;
+    fighter.restartState(FighterState.DODGING);
+    this.emitAction(CombatEvent.DODGE, fighter, null);
   }
 
   applyActionMovement(fighter) {
     const { combat } = fighter;
 
     if (fighter.state === FighterState.DODGING) {
-      fighter.vx = combat.dodgeDirection * fighter.stats.dodge.speed;
+      fighter.vx = combat.dodgeDirection * combat.dodgeProfile.speed;
       return;
     }
 
@@ -345,6 +404,8 @@ export class CombatSystem {
     }
     if (contact.attackType === AttackType.SHOVE) {
       this.applyShove(contact);
+    } else if (isInCounterStance(contact.defender, contact.attacker)) {
+      this.resolveCounter(contact);
     } else if (!isBlockingAttack(contact.defender, contact.attacker)) {
       this.applyHit(contact);
     } else if (contact.defender.combat.parryArmed) {
@@ -365,6 +426,20 @@ export class CombatSystem {
     defender.combat.stunDuration = attack.hitstun;
     defender.restartState(FighterState.STAGGERED);
     this.emit(CombatEvent.SHOVE, contact);
+  }
+
+  resolveCounter(contact) {
+    const { attacker, defender } = contact;
+    const { counter } = defender.combat.attack;
+
+    attacker.clearAttack();
+    attacker.vx = -attacker.facing * defender.stats.parry.attackerRecoil;
+    attacker.combat.stunDuration = counter.stagger;
+    attacker.restartState(FighterState.STAGGERED);
+
+    defender.vx = 0;
+    this.emit(counter.event, contact);
+    this.tryAttack(defender, counter.move);
   }
 
   resolveParry(contact) {
@@ -394,35 +469,60 @@ export class CombatSystem {
 
   resolveBlock(contact) {
     const { attacker, defender, attack } = contact;
+    const staminaCost = attack.blockStaminaCost * defender.stats.blockStaminaScale;
     attacker.combat.attackConnected = true;
-    defender.vx = attacker.facing * attack.blockPushback;
+    defender.vx = attacker.facing * attack.blockPushback * defender.stats.blockPushbackScale;
 
-    if (canAfford(defender, attack.blockStaminaCost)) {
-      spendStamina(defender, attack.blockStaminaCost);
+    if (attack.breaksGuard) {
+      this.breakGuard(defender, contact);
+      return;
+    }
+    if (canAfford(defender, staminaCost)) {
+      spendStamina(defender, staminaCost);
       defender.combat.blockstun = attack.blockstun;
       this.emit(CombatEvent.BLOCK, contact);
       return;
     }
 
+    this.breakGuard(defender, contact);
+  }
+
+  breakGuard(defender, contact) {
     spendStamina(defender, defender.stamina);
     defender.combat.stunDuration = defender.stats.guardBreakStun;
     defender.restartState(FighterState.STUNNED);
     this.emit(CombatEvent.GUARD_BREAK, contact);
   }
 
+  getHitDamage(attacker, defender, attack) {
+    const punishScale = isOpenToPunish(defender) ? attacker.stats.punishDamageScale : 1;
+    return attack.damage * punishScale * getSweetSpotScale(attacker, defender, attack);
+  }
+
   applyHit(contact) {
     const { attacker, defender, attack } = contact;
+    const armored = hasArmor(defender);
+    const damage = this.getHitDamage(attacker, defender, attack) * (armored ? defender.combat.attack.armor.damageScale : 1);
 
     attacker.combat.attackConnected = true;
-    defender.health = Math.max(0, defender.health - attack.damage);
-    defender.vx = attacker.facing * attack.knockback;
-    defender.clearAttack();
+    attacker.stamina = Math.min(attacker.stats.maxStamina, attacker.stamina + attacker.stats.staminaOnHit);
+    defender.health = Math.max(0, defender.health - damage);
+    contact.armored = armored;
+    if (!armored) {
+      defender.vx = attacker.facing * attack.knockback * attacker.stats.knockbackScale;
+      defender.clearAttack();
+    }
     this.emit(CombatEvent.HIT, contact);
 
     if (defender.health === 0) {
+      defender.clearAttack();
       defender.combat.fallDirection = chooseFallDirection(defender, this.arena, this.fallRoomMargin);
       defender.restartState(FighterState.DEAD);
       this.emit(CombatEvent.DEATH, contact);
+      return;
+    }
+    if (armored) {
+      defender.combat.armorHits -= 1;
       return;
     }
 

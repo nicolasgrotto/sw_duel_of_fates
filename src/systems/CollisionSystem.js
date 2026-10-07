@@ -1,3 +1,4 @@
+import { FighterState } from '../entities/fighterStates.js';
 import { clampToArena } from './PhysicsSystem.js';
 
 function horizontalOverlap(a, b) {
@@ -6,6 +7,10 @@ function horizontalOverlap(a, b) {
 
 function overlapsVertically(a, b) {
   return a.top < b.y && b.top < a.y;
+}
+
+function isPassingThrough(fighter) {
+  return fighter.state === FighterState.DODGING && fighter.combat.passThrough;
 }
 
 function isAtLeftWall(fighter, arena) {
@@ -27,7 +32,7 @@ export class CollisionSystem {
 
   separate(a, b) {
     const overlap = horizontalOverlap(a, b);
-    if (overlap <= 0 || !overlapsVertically(a, b)) {
+    if (overlap <= 0 || !overlapsVertically(a, b) || isPassingThrough(a) || isPassingThrough(b)) {
       return;
     }
 

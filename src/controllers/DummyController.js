@@ -26,6 +26,8 @@ export class DummyController {
     intent.dodge = false;
     intent.block = this.behavior === DummyBehavior.BLOCK;
     intent.blockPressed = false;
+    intent.special = false;
+    intent.specialHeld = false;
     intent.lightAttack = this.behavior === DummyBehavior.ATTACK && this.isAttackDue(dt);
   }
 

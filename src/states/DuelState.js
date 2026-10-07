@@ -16,7 +16,7 @@ import { animation as animationStyle } from '../config/fighterVisualConfig.js';
 import { gameConfig } from '../config/gameConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
 import { layout, texts } from '../config/uiConfig.js';
-import { IntentRecorder, encodeIntent } from '../controllers/IntentRecorder.js';
+import { ENCODED_INTENT_RANGE, IntentRecorder, encodeIntent } from '../controllers/IntentRecorder.js';
 import { formatIntent } from '../ui/trainingInputs.js';
 import { DummyController } from '../controllers/DummyController.js';
 import { Camera } from '../core/Camera.js';
@@ -286,7 +286,7 @@ export class DuelState extends GameState {
     }
     this.recorder.record(this.player.intent, this.player.facing);
     const [player, dummy] = this.fighters;
-    const signature = encodeIntent(player.intent, 1) * 256 + encodeIntent(dummy.intent, 1);
+    const signature = encodeIntent(player.intent, 1) * ENCODED_INTENT_RANGE + encodeIntent(dummy.intent, 1);
     if (signature !== this.inputSignature) {
       this.inputSignature = signature;
       this.inputsLine = formatText(texts.training.inputs, {

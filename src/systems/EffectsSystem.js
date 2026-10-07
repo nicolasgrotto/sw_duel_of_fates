@@ -120,6 +120,9 @@ export class EffectsSystem {
       case CombatEvent.SHOVE:
         this.spawn(EffectType.SHOVE_IMPACT, params);
         break;
+      case CombatEvent.COUNTER:
+        this.spawnParry(EffectType.PARRY_SPARK, defender, params);
+        break;
       case CombatEvent.PARRY:
         this.startTremor(attacker);
         this.spawnParry(EffectType.PARRY_SPARK, defender, params);

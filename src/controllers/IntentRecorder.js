@@ -1,4 +1,6 @@
-const FLAGS = ['jump', 'lightAttack', 'heavyAttack', 'block', 'blockPressed', 'dodge'];
+const FLAGS = ['jump', 'lightAttack', 'heavyAttack', 'block', 'blockPressed', 'dodge', 'special', 'specialHeld'];
+
+export const ENCODED_INTENT_RANGE = 1 << (FLAGS.length + 2);
 
 export function encodeIntent(intent, facing) {
   let value = Math.sign(intent.moveX) * facing + 1;

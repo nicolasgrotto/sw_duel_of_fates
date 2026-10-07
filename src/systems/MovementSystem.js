@@ -18,6 +18,10 @@ export class MovementSystem {
 
   applyIntents(fighters, dt) {
     for (const fighter of fighters) {
+      if (fighter.state === FighterState.BLOCKING && fighter.stats.blockWalkSpeed > 0) {
+        this.applyBlockWalk(fighter, dt);
+        continue;
+      }
       if (!fighter.canMove) {
         this.applyActionFriction(fighter, dt);
         continue;
@@ -42,6 +46,11 @@ export class MovementSystem {
       return;
     }
     fighter.vx = approach(fighter.vx, 0, this.actionFriction * dt);
+  }
+
+  applyBlockWalk(fighter, dt) {
+    const targetSpeed = fighter.intent.moveX * fighter.stats.blockWalkSpeed;
+    fighter.vx = approach(fighter.vx, targetSpeed, fighter.stats.movement.groundAcceleration * dt);
   }
 
   faceOpponent(fighter, opponent) {

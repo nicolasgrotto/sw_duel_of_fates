@@ -31,6 +31,7 @@ function getSoundForEvent(event) {
     case CombatEvent.ACTION_REJECTED:
       return SoundName.DENIED;
     case CombatEvent.PARRY:
+    case CombatEvent.COUNTER:
       return SoundName.PARRY;
     case CombatEvent.PERFECT_PARRY:
       return SoundName.PERFECT_PARRY;
