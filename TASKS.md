@@ -115,11 +115,68 @@ Atualize este arquivo ao terminar cada tarefa.
 - [x] Simulador de duelos para balanceamento (npm run simulate)
 - [x] Ajustes de balanceamento (atributos da Sombra, perfis de IA, guarda por antecipação)
 
-## Próximos passos (sugestões)
+## Roadmap
 
-- [ ] Cenário da arena (fundo em camadas, passarelas, feixes de luz) seguindo DESIGN.md
-- [ ] Escolha de personagem (o jogador também pode ser a Sombra)
-- [ ] Mais personagens / arquétipos
-- [ ] Suporte a gamepad
-- [ ] Ataques aéreos e combos
-- [ ] Identidade própria para a versão de portfólio (nome, personagens, título)
+Plano aprovado depois da análise de game design da v0.1. Cada versão é jogável sozinha. Ordem de prioridade dentro de cada versão.
+
+### v0.2 — Combate técnico
+
+- [ ] Buffer de input (0,15 s) e aviso de ação recusada por falta de stamina (barra pisca, som seco)
+- [ ] Parry por timing, parry perfeito, parry falho e estado `STAGGERED`
+- [ ] Riposta depois do parry
+- [ ] Efeitos e sons do parry (anel, lâmina clareando, dessaturação e câmera lenta no perfeito)
+- [ ] Empurrão (bloqueio + ataque rápido)
+- [ ] IA usando parry (contra fortes) e empurrão, com chances por dificuldade
+- [ ] Pacote de impacto: hit flash, tremor no hit stop, punch-in da câmera
+- [ ] Melhor de 3 rounds (HUD com rounds, intro por round, estatísticas do duelo inteiro)
+- [ ] Rebalanceamento "poucos golpes, todos importantes" validado com `npm run simulate`
+- [ ] Dados de frame no modo Treino
+
+### v0.3 — Arena e identidade
+
+- [ ] Arenas como dados (`src/arenas/`), camadas estáticas pré-renderizadas, partículas ambientes
+- [ ] Plataforma de Refino (primeira arena de verdade)
+- [ ] Câmera dinâmica (enquadra os dois lutadores, zoom leve com a distância)
+- [ ] Nome próprio do jogo, fonte display OFL, letterbox, ignição dos sabres na intro
+- [ ] Paleta de sabres sem codificação herói/vilão
+- [ ] Gamepad (Gamepad API dentro do `Input`), vibração em impactos
+- [ ] Segundo preset de teclado (setas + Z X C V)
+
+### v0.4 — Personagens I
+
+- [ ] Golpes como dados por personagem (`moves`, `cancelsInto`, pose por golpe)
+- [ ] Sequências de ataques rápidos (encadeiam só no acerto ou no bloqueio)
+- [ ] Ataque aéreo e forte de avanço
+- [ ] Habilidade exclusiva (`I`)
+- [ ] Tela de seleção de personagem (o jogador pode ser qualquer um)
+- [ ] Bastião, Vespa e Espelho
+- [ ] IA com comportamento por dificuldade (punir bloqueio, iscas de whiff, memória curta de hábitos no Difícil)
+- [ ] Treino: boneco que grava e reproduz, hitboxes visíveis sem F3, display de inputs
+
+### v0.5 — Modos
+
+- [ ] Tutorial / desafio de parry
+- [ ] Arcade (6 lutas + chefe)
+- [ ] 2P local
+- [ ] Tela de resultado completa e lista de golpes na pausa
+- [ ] Santuário Alagado e Mina de Cristal
+
+### v0.6 — Personagens II e arenas
+
+- [ ] Haste, Brasa e Forja
+- [ ] IA por personagem (prioridades e pesos como dados)
+- [ ] Mais 2–3 arenas
+
+### v0.7 — Polimento
+
+- [ ] Replay do golpe final (re-simulação determinística dos intents gravados)
+- [ ] Música dinâmica pela vida dos dois, batida grave com vida baixa
+- [ ] Remapeamento de teclas
+- [ ] Desafios por personagem com cores de sabre desbloqueáveis
+- [ ] Garça e Eco, pulo na parede, Sobrevivência
+
+### v1.0 — Portfólio
+
+- [ ] 8–10 personagens e 6–8 arenas
+- [ ] Deploy no GitHub Pages, README com GIFs
+- [ ] Revisão final da documentação de arquitetura

@@ -57,7 +57,9 @@ Frase-guia: **"poucos golpes, todos importantes."**
 
 ## Gameplay (resumo)
 
-Movimento, ataque rápido, ataque forte, bloqueio, esquiva, stamina e IA com perfis. Os detalhes ficam em [GAME_DESIGN.md](GAME_DESIGN.md).
+Movimento, ataque rápido, ataque forte, bloqueio, **parry por timing**, riposta, empurrão, esquiva, stamina, rounds e IA com perfis. Os detalhes ficam em [GAME_DESIGN.md](GAME_DESIGN.md).
+
+O coração do duelo é o triângulo **ataque > empurrão > guarda/parry > ataque**. O parry é a mecânica-assinatura: o ataque forte se apara por reação, o rápido só por leitura. Assim o duelo premia ler o oponente, e não esperar por ele.
 
 ## Personagens
 
@@ -67,12 +69,30 @@ Movimento, ataque rápido, ataque forte, bloqueio, esquiva, stamina e IA com per
   - **Sombra**: postura agressiva, movimentos amplos, sabre vermelho.
 - Silhueta reconhecível de longe: capa, capuz, postura e forma de segurar o sabre diferenciam os personagens antes da cor.
 - Os nomes finais ainda não estão definidos.
+- **Elenco planejado** (conceitos aprovados, detalhes em [GAME_DESIGN.md](GAME_DESIGN.md#15-elenco-planejado)): Guardião, Sombra, Bastião, Vespa, Garça, Espelho, Haste, Brasa, Eco e Forja. Cada um muda a forma de jogar, não só os números, e passa no teste da silhueta pintada de preto.
 
 ## Arenas
 
 - Primeira arena: plataforma industrial suspensa, com fosso escuro abaixo, passarelas e feixes de luz no fundo.
 - Arenas são cenário: não interferem na lógica dos personagens.
 - Profundidade com 2 a 3 camadas de fundo, e pouco detalhe perto da área de luta.
+
+### Arenas planejadas
+
+Todas seguem a regra "o sabre é a principal fonte de luz" e começam sem afetar o gameplay. A arquitetura deixa espaço para elementos interativos no futuro (reagindo a eventos de combate, como os efeitos).
+
+| Arena | Identidade | Assinatura visual |
+| --- | --- | --- |
+| Plataforma de Refino | plataforma industrial suspensa (a primeira) | vapor subindo, chão metálico que reflete os sabres |
+| Santuário Alagado | templo em ruínas com lâmina d'água | reflexo das lâminas na água |
+| Anel Orbital | plataforma acima de um planeta | luz dura de lado, terminador dia/noite |
+| Telhado Neon | cidade vertical na chuva, letreiros em glifos inventados | chuva virando vapor nas lâminas |
+| Salinas de Vidro | deserto de sal ao entardecer | miragem de calor, poeira no knockback |
+| Floresta Lumínica | floresta bioluminescente | esporos acendem na cor do sabre próximo |
+| Convés em Voo | cargueiro atravessando nuvens | parallax rápido, vento nas capas |
+| Mina de Cristal | caverna escura de cristais | cristais refratam a cor dos sabres |
+| Cume Nevado | mosteiro em nevasca | neve de lado, luz branca difusa |
+| Cidadela do Eclipse | salão brutalista com janela enorme | eclipse escurece tudo menos os sabres |
 
 ## UI
 
@@ -112,6 +132,17 @@ Todo o som é **sintetizado** com a Web Audio API (osciladores, ruído e filtros
 - Logos, nomes, personagens, músicas ou sons oficiais de Star Wars em assets ou no código.
 - Um estilo novo criado por um agente sem atualizar estes documentos.
 
+Mecânicas e sistemas descartados de propósito (complexidade sem ganho):
+
+- barra de postura separada da stamina, barra de super ou de especial;
+- defesa alta/baixa, agachar e mixups de altura;
+- juggles e combos no ar;
+- dano por chip no bloqueio;
+- números de dano na tela;
+- XP, moeda, loja, melhoria de atributos ou qualquer grind;
+- online, campanha com diálogos, perigos de arena que matam (ring-out);
+- mais de 6 botões de combate.
+
 ---
 
 ## Propriedade intelectual
@@ -128,6 +159,8 @@ Para essa troca não exigir reescrever o jogo:
 - Todo asset tem origem e licença registradas em [ASSETS.md](ASSETS.md).
 
 ## Decisões em aberto
+
+Direção aprovada para a identidade de portfólio (ver TASKS, v0.3): cores de sabre sem a codificação herói/vilão (uma cor por personagem, sem moral implícita), uma única fonte display condensada com licença OFL, barras de letterbox como motivo cinematográfico (intro, K.O., parry perfeito) e ignição dos sabres no começo do duelo.
 
 - Nome final do jogo (hoje: "Duel of Fates", só para o protótipo).
 - Nomes e visual final dos personagens.

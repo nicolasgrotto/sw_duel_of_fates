@@ -31,18 +31,43 @@ Os valores reais ficam em `src/config/effectsConfig.js`.
 | `block-spark` | `block` | 10–16 faíscas, luz média | muito leve | — |
 | `guard-break` | `guardBreak` | 18–24 faíscas, luz forte | médio | fraco |
 | `saber-clash` | `clash` | 24–32 faíscas, luz forte nas duas cores | forte | médio |
-| `final-blow` | `death` | flash e shake (somados ao efeito do hit) | máximo | máximo |
+| `final-blow` | `death` | flash, shake e punch-in (somados ao efeito do hit) | máximo | máximo |
+| `parry-spark` | `parry` | 10–14 faíscas para cima, anel na cor do sabre do defensor, lâmina do defensor clareia | leve | — |
+| `perfect-parry` | `perfectParry` | 16–22 faíscas, anel maior, lâmina clareia, **mundo dessatura** por 0,15 s, punch-in | médio | fraco |
+| `shove-impact` | `shove` | 4–6 faíscas baixas, luz pequena | muito leve | — |
+| `hit-flash` | `hit` | silhueta do atingido fica branca por ~0,06 s | — | — |
 | `dodge-afterimage` | (render) durante a esquiva | 3 silhuetas transparentes que somem rápido | — | — |
 
 ### Hit stop e câmera lenta
 
 - **Hit stop**: a simulação congela por um instante no impacto. Efeitos e câmera continuam. Ataque rápido 0,04 s, ataque forte 0,08 s, bloqueio 0,03 s, quebra de guarda 0,1 s, clash 0,1 s.
 - **Câmera lenta no golpe final**: a simulação roda a 30% da velocidade por 0,8 s (tempo real) depois do K.O.
+- **Câmera lenta no parry perfeito**: 50% da velocidade por 0,25 s. São os únicos dois momentos com câmera lenta, para ela não perder o peso.
+- Parry: hit stop de 0,07 s. Parry perfeito: 0,1 s.
+- **Tremor no hit stop**: durante o congelamento, o lutador atingido (ou aparado) treme 2–3 px na horizontal. Torna o hit stop visível.
+
+### Punch-in da câmera
+
+- Zoom curto em direção ao ponto de contato: começa forte e volta em ~0,25 s.
+- Usado no ataque forte (3%), na quebra de guarda (4%), no parry perfeito (5%) e no golpe final (6%).
+- Transmite peso sem tremer a tela. O shake continua reservado aos impactos mais fortes.
+
+### Anel do parry
+
+Círculo fino (traço), aditivo, na cor do sabre de quem aparou. Cresce de ~16 px até o raio da receita e some em ~0,25 s. Só existe no parry: é a assinatura visual da defesa ativa.
+
+### Dessaturação do parry perfeito
+
+O mundo (arena e corpos) perde a cor e escurece um pouco por 0,15 s, enquanto os sabres e os efeitos continuam com cor total. É feita entre as camadas de corpos e de sabres (`globalCompositeOperation = 'saturation'`). É a assinatura visual do jogo: no momento mais importante, só a luz das lâminas tem cor.
+
+### Lâmina desequilibrada
+
+Durante `STAGGERED`, a lâmina do lutador tremula (o glow oscila). O jogador lê que o oponente está aberto sem nenhum texto na tela.
 - Os dois são controlados por `TimeControl` e pedidos pelas receitas de efeito.
 
 ### Efeitos reduzidos
 
-Opção de acessibilidade. Com efeitos reduzidos: screen shake a 25% e flash desligado. Hit stop e câmera lenta continuam (não piscam nem tremem).
+Opção de acessibilidade. Com efeitos reduzidos: screen shake e punch-in a 25%, flash e hit flash desligados. Hit stop, câmera lenta e dessaturação continuam (não piscam nem tremem).
 
 ### Faíscas
 
@@ -68,6 +93,8 @@ Camada de cor sobre a cena inteira (abaixo da UI), com blend aditivo e alpha que
 | Screen shake (duração máxima) | 0,3 s |
 | Flash de tela (alpha máximo) | 0,35 |
 | Hit stop | 0,03 a 0,1 s |
+| Punch-in (zoom máximo) | 6% |
+| Dessaturação | 0,15 s |
 
 ## Implementação
 

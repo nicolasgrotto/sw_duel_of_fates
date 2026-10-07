@@ -55,15 +55,19 @@ Todos os textos ficam em `src/config/uiConfig.js` (`texts`). Para trocar o nome 
 NOME ESQUERDA                                         NOME DIREITA
 ████████████░░░░░░                         ░░░░░░████████████
 ▬▬▬▬▬▬▬▬▬▬                                         ▬▬▬▬▬▬▬▬▬▬
+■ □                                                          □ ■
 ```
 
 - Barras finas no topo, espelhadas (jogador à esquerda, oponente à direita). A parte cheia fica presa à borda da tela e esvazia em direção ao centro.
 - Vida: cor neutra clara (`hudHealth`). Abaixo de 25%, vira `hudDanger` e pisca devagar (não depende só da cor).
 - Dano recebido: a parte perdida fica visível como barra "fantasma" (`hudGhost`) e encolhe depois de um pequeno atraso.
 - Stamina: barra mais fina abaixo da vida (`hudStamina`).
+- **Ação recusada**: quando o lutador tenta uma ação sem stamina, a barra de stamina dele fica `hudDanger` e pisca por ~0,3 s. Diz ao jogador por que nada aconteceu.
+- **Rounds**: quadrados pequenos embaixo da stamina, um por round necessário para vencer. Round vencido = cheio (`hudHealth`), não vencido = só contorno (`hudTrack`).
 - Fundo das barras: `hudTrack`, quase invisível.
-- Nada no centro da tela, exceto mensagens curtas: **DUELO** no início e **K.O.** no golpe final, cada uma por no máximo 1,5 s.
-- No início do duelo há uma introdução curta (a mensagem "DUELO"), com os controles travados.
+- Nada no centro da tela, exceto mensagens curtas: **ROUND 1**, **ROUND 2** ou **ROUND FINAL** no início de cada round e **K.O.** no golpe final, cada uma por no máximo 1,5 s.
+- No início de cada round há uma introdução curta (a mensagem do round), com os controles travados.
+- **Treino**: uma linha discreta (`hint`) no rodapé, acima da dica de pausa, com os dados de frame do último golpe do jogador (ex.: `Forte · bloqueado · −0,30 s`).
 - A dica `Esc  pausar` fica no rodapé.
 
 ### Pausa
@@ -77,7 +81,7 @@ NOME ESQUERDA                                         NOME DIREITA
 - Aparece por cima do duelo congelado, depois do K.O. e da queda.
 - Título: **VITÓRIA** ou **DERROTA**.
 - Frase curta: "<nome do vencedor> venceu o duelo".
-- Uma linha de estatísticas do jogador: tempo, golpes acertados, defesas.
+- Duas linhas de estatísticas do jogador no duelo inteiro: tempo, golpes acertados, defesas; parries, parries perfeitos, quebras de guarda causadas.
 - Opções: **Revanche**, **Menu principal**.
 
 ## Dicas de controle
