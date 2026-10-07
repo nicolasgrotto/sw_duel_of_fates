@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "start": "node tools/server.js",
+    "simulate": "node tools/simulate.js",
     "test": "node --test \"tests/**/*.test.js\""
   },
   "engines": {

@@ -16,6 +16,7 @@ import { DummyController } from '../controllers/DummyController.js';
 import { Camera } from '../core/Camera.js';
 import { PlayerController } from '../controllers/PlayerController.js';
 import { DuelRenderer } from '../rendering/DuelRenderer.js';
+import { createArenaBounds } from '../simulation/arenaBounds.js';
 import { DuelSimulation } from '../simulation/DuelSimulation.js';
 import { EffectsSystem } from '../systems/EffectsSystem.js';
 import { TimeControl } from '../systems/TimeControl.js';
@@ -27,15 +28,6 @@ import { createRandom, createRandomSeed } from '../utils/random.js';
 import { GameState } from './GameState.js';
 import { DuelMode } from './duelModes.js';
 import { StateId } from './stateIds.js';
-
-function createArenaBounds({ canvas, arena }) {
-  return {
-    left: arena.wallPadding,
-    right: canvas.width - arena.wallPadding,
-    floorY: arena.floorY,
-    overscan: arena.overscan,
-  };
-}
 
 export class DuelState extends GameState {
   enter() {
