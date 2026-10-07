@@ -50,7 +50,7 @@ export const texts = {
   },
   training: {
     frameData: '{attack} · {result} · {advantage} s',
-    attacks: { light: 'Rápido', heavy: 'Forte', riposte: 'Riposta', shove: 'Empurrão' },
+    attacks: { light: 'Rápido', light2: 'Rápido 2', light3: 'Rápido 3', heavy: 'Forte', riposte: 'Riposta', shove: 'Empurrão' },
     results: {
       hit: 'acertou',
       block: 'bloqueado',

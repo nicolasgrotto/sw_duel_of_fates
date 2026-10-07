@@ -97,7 +97,7 @@ Os valores reais ficam em `src/config/fightersConfig.js`, por arquétipo.
 - **Buffer de input**: uma ação apertada enquanto o lutador ainda não pode agir (recovery, hitstun, blockstun, hit stop) fica guardada por `gameConfig.combat.inputBuffer` (0,15 s) e sai no primeiro frame possível. A última ação apertada substitui a anterior.
 - Prioridade quando várias teclas chegam juntas: esquiva > empurrão > ataque forte > ataque rápido > bloqueio.
 - Sem stamina suficiente, a ação é recusada e o jogo avisa: a barra de stamina pisca e toca um som seco (evento `actionRejected`). A ação recusada sai do buffer.
-- Um ataque não pode ser cancelado. O único jeito de interromper é sendo atingido, aparado ou entrando em clash.
+- Um ataque só pode cancelar a recuperação para o próximo rápido declarado em `cancelsInto`, depois de acertar ou ser bloqueado. No whiff, parry ou clash a rota não abre. Demais interrupções continuam sendo hit, parry e clash.
 
 **Ataques**
 
@@ -390,7 +390,7 @@ Todos os personagens usam os mesmos inputs. A variedade vem do **conteúdo** de 
 
 | Input | Golpe |
 | --- | --- |
-| `J`, `J J`, `J J J` | sequência de ataques rápidos (2 a 5, por personagem); só encadeia se o golpe anterior acertou ou foi bloqueado |
+| `J`, `J J`, `J J J` | sequência de ataques rápidos (2 a 5, por personagem); só encadeia se o golpe anterior acertou ou foi bloqueado; Guardião tem 2 rápidos, Sombra 3 |
 | `K` | ataque forte |
 | `→ + K` | forte de avanço (lunge longo, mais recovery) |
 | `J` ou `K` no ar | ataque aéreo |

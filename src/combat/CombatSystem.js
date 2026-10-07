@@ -96,6 +96,9 @@ export class CombatSystem {
   }
 
   startActions(fighter) {
+    if (this.tryAttackChain(fighter)) {
+      return;
+    }
     if (fighter.state === FighterState.BLOCKING && this.startActionFromBlock(fighter)) {
       return;
     }
@@ -110,6 +113,26 @@ export class CombatSystem {
       fighter.combat.blockstun = 0;
       fighter.setState(FighterState.BLOCKING);
     }
+  }
+
+  tryAttackChain(fighter) {
+    const { combat, moves } = fighter;
+    if (!combat.attack || !combat.attackConnected || combat.bufferedAction !== CombatAction.LIGHT_ATTACK) {
+      return false;
+    }
+    if (getAttackPhase(combat.attack, fighter.stateTime) !== AttackPhase.RECOVERY) {
+      return false;
+    }
+    const next = combat.attack.cancelsInto?.find((id) => moves[id]?.type === AttackType.LIGHT);
+    if (!next) {
+      return false;
+    }
+    clearActionBuffer(fighter);
+    if (this.tryAttack(fighter, next)) {
+      return true;
+    }
+    this.emitAction(CombatEvent.ACTION_REJECTED, fighter, next);
+    return false;
   }
 
   startActionFromBlock(fighter) {
@@ -178,7 +201,7 @@ export class CombatSystem {
     fighter.clearAttack();
     fighter.combat.attack = attack;
     fighter.combat.attackType = attackType;
-    fighter.setState(ATTACK_STATES[attack.type ?? attackType]);
+    fighter.restartState(ATTACK_STATES[attack.type ?? attackType]);
     this.emitAction(CombatEvent.ATTACK_START, fighter, attackType);
     return true;
   }
@@ -351,6 +374,7 @@ export class CombatSystem {
 
   resolveBlock(contact) {
     const { attacker, defender, attack } = contact;
+    attacker.combat.attackConnected = true;
     defender.vx = attacker.facing * attack.blockPushback;
 
     if (canAfford(defender, attack.blockStaminaCost)) {
@@ -369,6 +393,7 @@ export class CombatSystem {
   applyHit(contact) {
     const { attacker, defender, attack } = contact;
 
+    attacker.combat.attackConnected = true;
     defender.health = Math.max(0, defender.health - attack.damage);
     defender.vx = attacker.facing * attack.knockback;
     defender.clearAttack();

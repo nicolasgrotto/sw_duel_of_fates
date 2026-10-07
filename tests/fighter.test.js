@@ -129,5 +129,5 @@ it('creates move definitions per character without sharing mutable attacks', () 
   assert.equal(first.moves.heavy.type, 'heavy');
   assert.equal(first.moves.heavy.damage, fighterArchetypes.guardian.attacks.heavy.damage);
   assert.equal(first.stats.attacks, first.moves);
-  assert.deepEqual(first.moves.light.cancelsInto, []);
+  assert.deepEqual(first.moves.light.cancelsInto, ['light2']);
 });

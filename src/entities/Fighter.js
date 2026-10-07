@@ -17,6 +17,7 @@ function createCombat() {
     attack: null,
     attackType: null,
     hasHit: false,
+    attackConnected: false,
     lungeApplied: false,
     stunDuration: 0,
     blockstun: 0,
@@ -136,6 +137,7 @@ export class Fighter {
     this.combat.attack = null;
     this.combat.attackType = null;
     this.combat.hasHit = false;
+    this.combat.attackConnected = false;
     this.combat.lungeApplied = false;
   }
 
