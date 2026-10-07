@@ -169,7 +169,7 @@ As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e des
 - [x] Plataforma de Refino (primeira arena de verdade)
 - [x] Câmera dinâmica (enquadra os dois lutadores, zoom leve com a distância)
 - [ ] Nome próprio do jogo, fonte display OFL, letterbox, ignição dos sabres na intro
-- [ ] Paleta de sabres sem codificação herói/vilão
+- [x] Paleta de sabres sem codificação herói/vilão
 - [x] Gamepad (Gamepad API dentro do `Input`), vibração em impactos
 - [x] Segundo preset de teclado (setas + Z X C V)
 

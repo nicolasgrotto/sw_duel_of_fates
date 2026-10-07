@@ -206,6 +206,7 @@ export class Renderer {
     this.context.fillStyle = style.color;
     this.context.textAlign = style.align;
     this.context.textBaseline = style.baseline;
+    this.context.letterSpacing = style.letterSpacing ?? '0px';
     this.context.fillText(content, x, y);
   }
 

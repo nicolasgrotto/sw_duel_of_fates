@@ -25,23 +25,34 @@ Os valores desta página existem no código em [src/config/themeConfig.js](../sr
 | `overlay` | `rgba(0, 0, 0, 0.65)` | escurecer a cena (pausa) |
 | `debug` | `#7cfc00` | só no overlay de debug |
 
-Cores de sabre (ficam em `fightersConfig`, por personagem):
+Cores de sabre (ficam em `characterData`, por personagem; uma cor por personagem, sem moral):
 
-| Nome | Valor |
-| --- | --- |
-| azul | `#3fa9ff` |
-| verde | `#4cff7a` |
-| vermelho | `#ff3b3b` |
-| roxo | `#b45cff` |
-| núcleo | `#ffffff` |
+| Nome | Valor | Personagem |
+| --- | --- | --- |
+| ciano-gelo | `#7fe4ff` | Guardião |
+| magenta | `#ff3f9e` | Sombra |
+| verde-ácido | `#9dff3f` | Bastião |
+| amarelo-âmbar | `#ffd23f` | Vespa |
+| branco-prata | `#e8eeff` | Espelho |
+| violeta | `#a46bff` | Haste |
+| laranja-brasa | `#ff7a2a` | Brasa |
+| vermelho-forja | `#ff4038` | Forja |
+| núcleo | `#ffffff` | todos |
 
 Não crie cores novas direto no código. Adicione um token aqui e no `themeConfig`.
 
 ## Tipografia
 
-- Fonte: `system-ui` (sem fontes externas por enquanto).
-- Estilos de texto ficam em `themeConfig.textStyles` (`title`, `heading`, `subtitle`, `hint`, `debug`).
-- Títulos em maiúsculas. Textos de UI curtos.
+- Fonte: **Oxanium** (OFL), arquivo em `assets/fonts/Oxanium.ttf`, carregada por `@font-face` em `styles/main.css`. Até carregar, o canvas usa `system-ui` como reserva.
+- Uma fonte só. O debug usa a fonte mono do sistema.
+- Estilos de texto ficam em `themeConfig.textStyles` (`title`, `heading`, `subtitle`, `hint`, `debug`...).
+- Títulos em maiúsculas, com espaçamento largo entre letras no título do jogo. Textos de UI curtos.
+
+## Letterbox
+
+- Duas barras `letterbox` (preto), em cima e embaixo, com altura máxima `uiConfig.layout.letterbox.height`.
+- Entram suavemente na intro do round e no K.O. e saem quando o round começa. No parry perfeito há um pulso curto (metade da altura).
+- Desenhadas depois da vinheta e antes da HUD: a HUD continua legível por cima.
 
 ## Camadas de renderização
 
@@ -95,8 +106,8 @@ Cores de personagem são **dados do personagem** e ficam em `src/characters/char
 
 | Personagem | Túnica / capa | Corpo | Sabre |
 | --- | --- | --- | --- |
-| Guardião | `#6b5a48` | `#2e2925` | azul `#3fa9ff` |
-| Sombra | `#1f2029` | `#121319` | vermelho `#ff3b3b` |
+| Guardião | `#6b5a48` | `#2e2925` | ciano-gelo `#7fe4ff` |
+| Sombra | `#1f2029` | `#121319` | magenta `#ff3f9e` |
 
 Cores compartilhadas (em `themeConfig`):
 
@@ -117,6 +128,7 @@ Cores compartilhadas (em `themeConfig`):
 | `desaturateDim` | `#000000` | escurecimento junto da dessaturação |
 | `hitFlash` | `#ffffff` | silhueta branca por 0,06 s ao receber hit |
 | `saberFlare` | `#ffffff` | brilho extra da lâmina de quem aparou |
+| `letterbox` | `#000000` | barras cinematográficas |
 
 ## Sabre
 

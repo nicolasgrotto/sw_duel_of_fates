@@ -15,9 +15,10 @@ Legenda: ✅ existe · ⏳ planejado (criar só quando a tarefa pedir)
 ```
 index.html                  ✅ página com o canvas
 styles/
-  main.css                  ✅ layout da página e do canvas
+  main.css                  ✅ layout da página e do canvas, @font-face da fonte do jogo
 design/                     ✅ direção de arte, sistema visual, UI, VFX, referências
-assets/                     ⏳ ver ASSETS.md (characters, backgrounds, effects, ui, audio, fonts, generated)
+assets/                     ✅ ver ASSETS.md
+  fonts/                    ✅ Oxanium (OFL) e o texto da licença
 src/
   main.js                   ✅ ponto de entrada
   core/                     ✅ infraestrutura do jogo
@@ -349,7 +350,8 @@ Arquivo: [src/core/Renderer.js](src/core/Renderer.js)
 - Dono do canvas e do contexto 2D.
 - Trabalha em **resolução lógica** fixa (`gameConfig.canvas`, 1280×720). `fitToDisplay` ajusta o tamanho real ao tamanho exibido e ao `devicePixelRatio`, para ficar nítido. Um `ResizeObserver` no `Game` chama esse método.
 - Expõe primitivas (`clear`, `overlay`, `fillRect`, `strokeRect`, `line`, `text`, `measureText`).
-- Estilos de texto vêm de `themeConfig.textStyles`, objetos criados uma vez (sem alocar por frame).
+- Estilos de texto vêm de `themeConfig.textStyles`, objetos criados uma vez (sem alocar por frame). Um estilo pode ter `letterSpacing` (usado no título).
+- Fonte: `themeConfig.DISPLAY_FONT` (Oxanium) é declarada em `styles/main.css` e o `main.js` pede o carregamento (`document.fonts.load`) antes de o jogo começar. O canvas usa `system-ui` como reserva até a fonte chegar; como o texto é redesenhado todo frame, a troca é automática.
 - Desenho específico (arena, lutador, sabre, efeitos) vai para `src/rendering/`, recebe a entidade como **dado** e só lê dela.
 
 Renderer **não** decide dano, vitória, derrota, colisões ou comportamento da IA.

@@ -66,6 +66,7 @@ export class MenuState extends GameState {
     const centerX = renderer.width / 2;
 
     renderer.text(gameConfig.title.toUpperCase(), centerX, layout.menu.titleY, textStyles.title);
+    renderer.text(texts.menu.tagline, centerX, layout.menu.taglineY, textStyles.tagline);
     this.menu.render(renderer, centerX);
     renderer.text(this.footer, centerX, layout.menu.footerY, textStyles.hint);
   }

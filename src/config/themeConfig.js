@@ -1,4 +1,5 @@
-const FONT_FAMILY = 'system-ui, sans-serif';
+export const DISPLAY_FONT = 'Oxanium';
+const FONT_FAMILY = `${DISPLAY_FONT}, system-ui, sans-serif`;
 const MONO_FONT_FAMILY = 'ui-monospace, Consolas, monospace';
 
 export const colors = {
@@ -27,14 +28,23 @@ export const colors = {
   desaturateDim: '#000000',
   hitFlash: '#ffffff',
   saberFlare: '#ffffff',
+  letterbox: '#000000',
 };
 
 export const textStyles = {
   title: {
-    font: `bold 72px ${FONT_FAMILY}`,
+    font: `bold 88px ${FONT_FAMILY}`,
     color: colors.text,
     align: 'center',
     baseline: 'middle',
+    letterSpacing: '18px',
+  },
+  tagline: {
+    font: `22px ${FONT_FAMILY}`,
+    color: colors.accent,
+    align: 'center',
+    baseline: 'middle',
+    letterSpacing: '6px',
   },
   heading: {
     font: `bold 48px ${FONT_FAMILY}`,

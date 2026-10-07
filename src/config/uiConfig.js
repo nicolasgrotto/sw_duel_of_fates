@@ -1,6 +1,7 @@
 export const texts = {
   arenas: { refinery: 'Plataforma de Refino', platform: 'Plataforma de treino' },
   menu: {
+    tagline: 'UM DUELO DE LÂMINAS DE ENERGIA',
     duel: 'Duelar',
     training: 'Treino',
     options: 'Opções',
@@ -121,7 +122,8 @@ export const keyComboSeparator = '  +  ';
 
 export const layout = {
   menu: {
-    titleY: 230,
+    titleY: 210,
+    taglineY: 278,
     firstItemY: 370,
     itemSpacing: 52,
     footerY: 660,

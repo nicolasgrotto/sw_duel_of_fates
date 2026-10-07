@@ -46,7 +46,9 @@ Saturação baixa. A cor saturada da cena vem dos sabres e dos efeitos.
 
 ### Sabres
 
-Cada personagem tem uma cor principal de sabre. O sabre possui:
+Cada personagem tem uma cor principal de sabre, diferente da de todos os outros. As cores não têm moral: nenhuma significa herói ou vilão (o jogo não herda a convenção azul/verde contra vermelho). Os tons ficam espaçados no círculo cromático para os dois lutadores nunca se confundirem. Tabela em [VISUAL_SYSTEM.md](VISUAL_SYSTEM.md#cores-de-personagem).
+
+O sabre possui:
 
 - núcleo branco
 - glow interno (cor do sabre, forte)

@@ -1,4 +1,4 @@
-# Duel of Fates — Star Wars 2D Duel
+# Vigil — duelo 2D de lâminas de energia
 
 **Academic Project / Prototype**
 

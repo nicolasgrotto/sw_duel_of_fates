@@ -13,7 +13,7 @@ export const characters = {
     appearance: {
       cloakColor: '#6b5a48',
       bodyColor: '#2e2925',
-      saberColor: '#3fa9ff',
+      saberColor: '#7fe4ff',
       hoodUp: false,
       longCape: false,
       torsoLeanDegrees: 3,
@@ -33,7 +33,7 @@ export const characters = {
     appearance: {
       cloakColor: '#1f2029',
       bodyColor: '#121319',
-      saberColor: '#ff3b3b',
+      saberColor: '#ff3f9e',
       hoodUp: true,
       longCape: true,
       torsoLeanDegrees: 10,

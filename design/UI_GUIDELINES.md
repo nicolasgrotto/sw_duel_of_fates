@@ -33,7 +33,7 @@ Todos os textos ficam em `src/config/uiConfig.js` (`texts`). Para trocar o nome 
 
 ### Menu
 
-- Título centralizado, em maiúsculas.
+- Título do jogo (`gameConfig.title`) centralizado, em maiúsculas, com letras espaçadas, e um subtítulo curto (`texts.menu.tagline`) em `accent`.
 - Opções: **Duelar** (contra a IA), **Treino** (contra o boneco), **Opções**, **Controles**.
 
 ### Opções
