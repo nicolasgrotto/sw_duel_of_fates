@@ -5,6 +5,32 @@ export const audioConfig = {
     music: 0.35,
   },
   stereoWidth: 0.6,
+  hum: {
+    wave: 'sawtooth',
+    detune: 1.012,
+    cutoff: 380,
+    level: 0.035,
+    swingLevel: 0.1,
+    swingCutoff: 1400,
+    swingPitch: 1.35,
+    smoothing: 0.04,
+    releaseTime: 0.25,
+  },
+  music: {
+    notes: [
+      { frequency: 55, wave: 'triangle', gain: 0.5 },
+      { frequency: 82.6, wave: 'sine', gain: 0.35 },
+      { frequency: 110.4, wave: 'triangle', gain: 0.2 },
+    ],
+    cutoff: 320,
+    lfoRate: 0.06,
+    lfoDepth: 160,
+    level: 0.6,
+    fadeIn: 2,
+    duckDuration: 1.6,
+    duckFade: 0.05,
+    returnFade: 0.6,
+  },
   envelopeFloor: 0.0001,
   sounds: {
     swingLight: [

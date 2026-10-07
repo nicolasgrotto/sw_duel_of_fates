@@ -18,6 +18,7 @@ export function createFighter(characterId, { x, y, facing }) {
     name: character.name,
     stats,
     appearance: character.appearance,
+    sound: character.sound,
     x,
     y,
     facing,

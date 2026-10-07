@@ -12,11 +12,12 @@ function createIntent() {
 }
 
 export class Fighter {
-  constructor({ id, name, stats, appearance, x, y, facing }) {
+  constructor({ id, name, stats, appearance, sound = null, x, y, facing }) {
     this.id = id;
     this.name = name;
     this.stats = stats;
     this.appearance = appearance;
+    this.sound = sound;
 
     this.x = x;
     this.y = y;

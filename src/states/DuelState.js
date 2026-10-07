@@ -66,6 +66,8 @@ export class DuelState extends GameState {
     this.duelAudio = new DuelAudio(this.game.audio, {
       arenaWidth: gameConfig.canvas.width,
       stereoWidth: audioConfig.stereoWidth,
+      hum: audioConfig.hum,
+      musicDuckDuration: audioConfig.music.duckDuration,
     });
     this.hud = new Hud(this.fighters[0], this.fighters[1]);
     this.message = new CombatMessage();
@@ -136,6 +138,11 @@ export class DuelState extends GameState {
     this.camera.update(dt);
     this.hud.update(dt);
     this.message.update(dt);
+    this.duelAudio.update(this.fighters);
+  }
+
+  exit() {
+    this.duelAudio.stop();
   }
 
   stepSimulation(dt) {

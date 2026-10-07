@@ -1,4 +1,10 @@
-import { playSound } from '../audio/synth.js';
+import { createHum, createMusic, playSound } from '../audio/synth.js';
+
+const SILENT_HUM = Object.freeze({
+  setMode() {},
+  setPan() {},
+  stop() {},
+});
 
 function getAudioContextClass() {
   return globalThis.AudioContext ?? globalThis.webkitAudioContext ?? null;
@@ -10,6 +16,7 @@ export class AudioManager {
     this.context = null;
     this.sfxEnabled = true;
     this.musicEnabled = true;
+    this.music = null;
   }
 
   get isReady() {
@@ -26,6 +33,9 @@ export class AudioManager {
     }
     if (this.context.state === 'suspended') {
       this.context.resume();
+    }
+    if (!this.music) {
+      this.music = createMusic(this.context, this.musicBus, this.config.music);
     }
   }
 
@@ -57,6 +67,17 @@ export class AudioManager {
     if (this.context) {
       this.musicBus.gain.value = enabled ? this.config.volumes.music : 0;
     }
+  }
+
+  createHum(frequency) {
+    if (!this.isReady) {
+      return SILENT_HUM;
+    }
+    return createHum(this.context, this.sfxBus, this.config.hum, frequency);
+  }
+
+  duckMusic(duration) {
+    this.music?.duck(duration);
   }
 
   play(name, options = {}) {

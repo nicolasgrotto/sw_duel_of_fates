@@ -60,6 +60,88 @@ function playLayer(context, output, layer, startTime, intensity, envelopeFloor) 
   source.stop(startTime + layer.duration + STOP_PADDING);
 }
 
+function createOscillator(context, wave, frequency) {
+  const oscillator = context.createOscillator();
+  oscillator.type = wave;
+  oscillator.frequency.value = frequency;
+  return oscillator;
+}
+
+export function createHum(context, output, hum, frequency) {
+  const oscillators = [createOscillator(context, hum.wave, frequency), createOscillator(context, hum.wave, frequency * hum.detune)];
+  const filter = context.createBiquadFilter();
+  const gain = context.createGain();
+  const panner = context.createStereoPanner();
+
+  filter.type = 'lowpass';
+  filter.frequency.value = hum.cutoff;
+  gain.gain.value = 0;
+  for (const oscillator of oscillators) {
+    oscillator.connect(filter);
+    oscillator.start();
+  }
+  filter.connect(gain);
+  gain.connect(panner);
+  panner.connect(output);
+
+  const setTarget = (param, value) => param.setTargetAtTime(value, context.currentTime, hum.smoothing);
+
+  return {
+    setMode(level, cutoff, pitch) {
+      setTarget(gain.gain, level);
+      setTarget(filter.frequency, cutoff);
+      setTarget(oscillators[0].frequency, frequency * pitch);
+      setTarget(oscillators[1].frequency, frequency * hum.detune * pitch);
+    },
+    setPan(value) {
+      panner.pan.value = value;
+    },
+    stop() {
+      setTarget(gain.gain, 0);
+      for (const oscillator of oscillators) {
+        oscillator.stop(context.currentTime + hum.releaseTime);
+      }
+    },
+  };
+}
+
+export function createMusic(context, output, music) {
+  const gain = context.createGain();
+  const filter = context.createBiquadFilter();
+  const lfo = createOscillator(context, 'sine', music.lfoRate);
+  const lfoGain = context.createGain();
+
+  filter.type = 'lowpass';
+  filter.frequency.value = music.cutoff;
+  lfoGain.gain.value = music.lfoDepth;
+  lfo.connect(lfoGain);
+  lfoGain.connect(filter.frequency);
+  lfo.start();
+
+  for (const note of music.notes) {
+    const oscillator = createOscillator(context, note.wave, note.frequency);
+    const noteGain = context.createGain();
+    noteGain.gain.value = note.gain;
+    oscillator.connect(noteGain);
+    noteGain.connect(filter);
+    oscillator.start();
+  }
+
+  filter.connect(gain);
+  gain.connect(output);
+  gain.gain.setValueAtTime(0, context.currentTime);
+  gain.gain.linearRampToValueAtTime(music.level, context.currentTime + music.fadeIn);
+
+  return {
+    duck(duration) {
+      const now = context.currentTime;
+      gain.gain.cancelScheduledValues(now);
+      gain.gain.setTargetAtTime(0, now, music.duckFade);
+      gain.gain.setTargetAtTime(music.level, now + duration, music.returnFade);
+    },
+  };
+}
+
 export function playSound(context, output, layers, { pan = 0, intensity = 1, envelopeFloor }) {
   const startTime = context.currentTime;
   const panner = context.createStereoPanner();

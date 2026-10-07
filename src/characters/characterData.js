@@ -4,6 +4,9 @@ export const characters = {
     name: 'Guardião',
     archetype: 'guardian',
     aiProfile: 'balanced',
+    sound: {
+      humFrequency: 74,
+    },
     appearance: {
       cloakColor: '#6b5a48',
       bodyColor: '#2e2925',
@@ -20,6 +23,9 @@ export const characters = {
     name: 'Sombra',
     archetype: 'shadow',
     aiProfile: 'aggressive',
+    sound: {
+      humFrequency: 62,
+    },
     appearance: {
       cloakColor: '#1f2029',
       bodyColor: '#121319',
