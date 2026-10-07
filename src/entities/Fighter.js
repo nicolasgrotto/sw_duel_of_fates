@@ -18,6 +18,7 @@ function createCombat() {
     attackType: null,
     hasHit: false,
     attackConnected: false,
+    airAttackUsed: false,
     lungeApplied: false,
     stunDuration: 0,
     blockstun: 0,

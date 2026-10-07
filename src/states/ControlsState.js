@@ -7,9 +7,11 @@ import { GameState } from './GameState.js';
 
 export class ControlsState extends GameState {
   enter() {
-    this.rows = controlsScreenRows.map(({ label, actions }) => ({
+    this.rows = controlsScreenRows.map(({ label, actions, groups }) => ({
       label: texts.controls.actions[label],
-      keys: actions.map((action) => formatActionKeys(this.game.input.bindings ?? keyBindings, action)).join(keyComboSeparator),
+      keys: (groups ?? actions.map((action) => [action]))
+        .map((group) => group.map((action) => formatActionKeys(this.game.input.bindings ?? keyBindings, action)).join(texts.controls.or))
+        .join(keyComboSeparator),
     }));
     this.footer = formatText(texts.controls.back, { back: formatActionKeys(this.game.input.bindings ?? keyBindings, Action.BACK) });
   }

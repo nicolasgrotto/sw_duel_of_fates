@@ -93,7 +93,7 @@ Os valores reais ficam em `src/config/fightersConfig.js`, por arquétipo.
 
 **Quando dá para agir**
 
-- Ataques, bloqueio e esquiva só começam no chão, a partir de `IDLE` ou `WALKING`. O empurrão também pode sair de dentro do bloqueio.
+- Ataques de chão, bloqueio e esquiva só começam no chão, a partir de `IDLE` ou `WALKING`. O empurrão também pode sair de dentro do bloqueio.
 - **Buffer de input**: uma ação apertada enquanto o lutador ainda não pode agir (recovery, hitstun, blockstun, hit stop) fica guardada por `gameConfig.combat.inputBuffer` (0,15 s) e sai no primeiro frame possível. A última ação apertada substitui a anterior.
 - Prioridade quando várias teclas chegam juntas: esquiva > empurrão > ataque forte > ataque rápido > bloqueio.
 - Sem stamina suficiente, a ação é recusada e o jogo avisa: a barra de stamina pisca e toca um som seco (evento `actionRejected`). A ação recusada sai do buffer.
@@ -149,6 +149,12 @@ O parry é a defesa ativa. Usa o mesmo botão do bloqueio: **tocar** abre a jane
 - Startup lento (0,20 s) e alcance curto. Qualquer ataque mais rápido vence o empurrão, e ele não gera clash.
 - Não causa dano. Atravessa bloqueio e parry: o alvo é empurrado, perde stamina e fica `STAGGERED` por 0,35 s, o que permite um ataque rápido garantido.
 - Fecha o triângulo do duelo: **ataque > empurrão > guarda/parry > ataque**.
+
+**Ataque aéreo e forte de avanço**
+
+- J ou K no ar inicia um único golpe aéreo por pulo, com gravidade e trajetória preservadas. Não permite encadear nem altera a velocidade vertical do alvo (sem juggle).
+- Direção para a frente + K inicia o forte de avanço: lunge maior, custo de stamina e recovery maiores. Pode ser bloqueado ou aparado como qualquer forte.
+- Ambos usam os dados de movesConfig e as poses de rápido/forte existentes; números em config.
 
 **Clash (choque de sabres)**
 

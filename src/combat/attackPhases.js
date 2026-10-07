@@ -3,6 +3,8 @@ import { FighterState } from '../entities/fighterStates.js';
 export const AttackType = Object.freeze({
   LIGHT: 'light',
   HEAVY: 'heavy',
+  FORWARD_HEAVY: 'forwardHeavy',
+  AIR: 'air',
   RIPOSTE: 'riposte',
   SHOVE: 'shove',
 });
@@ -21,7 +23,12 @@ export const ATTACK_STATES = Object.freeze({
   [AttackType.SHOVE]: FighterState.ATTACKING,
 });
 
-const STRONG_ATTACKS = new Set([AttackType.HEAVY, AttackType.RIPOSTE]);
+const HEAVY_ATTACKS = new Set([AttackType.HEAVY, AttackType.FORWARD_HEAVY]);
+const STRONG_ATTACKS = new Set([...HEAVY_ATTACKS, AttackType.RIPOSTE]);
+
+export function isHeavyAttack(attackType) {
+  return HEAVY_ATTACKS.has(attackType);
+}
 
 export function isStrongAttack(attackType) {
   return STRONG_ATTACKS.has(attackType);

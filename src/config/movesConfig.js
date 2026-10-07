@@ -2,6 +2,15 @@ export const movesByCharacter = {
   guardian: {
     light: { attack: 'light', type: 'light', pose: 'light', cancelsInto: ['light2'] },
     light2: { attack: 'light', type: 'light', pose: 'light', cancelsInto: [] },
+    air: {
+      attack: 'light', type: 'light', pose: 'light', airborne: true, cancelsInto: [],
+      damage: 12, staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
+      lunge: 0, hitstun: 0.2, knockback: 180, blockStaminaCost: 10,
+    },
+    forwardHeavy: {
+      attack: 'heavy', type: 'heavy', pose: 'heavy', cancelsInto: [],
+      staminaCost: 30, startup: 0.38, recovery: 0.55, lunge: 450,
+    },
     heavy: { attack: 'heavy', type: 'heavy', pose: 'heavy', cancelsInto: [] },
     riposte: { attack: 'riposte', type: 'riposte', pose: 'riposte', cancelsInto: [] },
     shove: { attack: 'shove', type: 'shove', pose: 'shove', cancelsInto: [] },
@@ -10,6 +19,15 @@ export const movesByCharacter = {
     light: { attack: 'light', type: 'light', pose: 'light', cancelsInto: ['light2'] },
     light2: { attack: 'light', type: 'light', pose: 'light', cancelsInto: ['light3'] },
     light3: { attack: 'light', type: 'light', pose: 'light', cancelsInto: [] },
+    air: {
+      attack: 'light', type: 'light', pose: 'light', airborne: true, cancelsInto: [],
+      damage: 12, staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
+      lunge: 0, hitstun: 0.2, knockback: 180, blockStaminaCost: 10,
+    },
+    forwardHeavy: {
+      attack: 'heavy', type: 'heavy', pose: 'heavy', cancelsInto: [],
+      staminaCost: 30, startup: 0.38, recovery: 0.55, lunge: 450,
+    },
     heavy: { attack: 'heavy', type: 'heavy', pose: 'heavy', cancelsInto: [] },
     riposte: { attack: 'riposte', type: 'riposte', pose: 'riposte', cancelsInto: [] },
     shove: { attack: 'shove', type: 'shove', pose: 'shove', cancelsInto: [] },

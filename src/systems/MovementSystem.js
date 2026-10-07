@@ -38,7 +38,7 @@ export class MovementSystem {
   }
 
   applyActionFriction(fighter, dt) {
-    if (fighter.state === FighterState.DODGING) {
+    if (fighter.state === FighterState.DODGING || (!fighter.grounded && fighter.combat.attack?.airborne)) {
       return;
     }
     fighter.vx = approach(fighter.vx, 0, this.actionFriction * dt);

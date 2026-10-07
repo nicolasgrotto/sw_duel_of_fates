@@ -125,13 +125,15 @@ describe('CombatSystem actions', () => {
     assert.equal(player.combat.lungeApplied, true);
   });
 
-  it('cannot attack in the air', () => {
+  it('starts the aerial move after a jump', () => {
     const { player, simulation } = createDuel();
     stepWithIntent(simulation, player, { jump: true });
 
     stepWithIntent(simulation, player, { lightAttack: true });
 
-    assert.equal(player.state, FighterState.JUMPING);
+    assert.equal(player.state, FighterState.ATTACKING);
+    assert.equal(player.combat.attackType, 'air');
+    assert.equal(player.combat.airAttackUsed, true);
   });
 
   it('blocks while the key is held and stops when released', () => {
@@ -241,5 +243,53 @@ describe('input buffer', () => {
     stepFor(simulation, 0.1);
 
     assert.equal(player.state, FighterState.DODGING);
+  });
+});
+
+describe('aerial and advancing attacks', () => {
+  it('allows only one aerial attack per jump and rearms it on landing', () => {
+    const { player, simulation } = createDuel();
+    stepWithIntent(simulation, player, { jump: true });
+    stepWithIntent(simulation, player, { heavyAttack: true });
+    assert.equal(player.combat.attackType, 'air');
+    stepFor(simulation, getAttackDuration(player.moves.air) + STEP);
+    assert.equal(player.grounded, false);
+    stepWithIntent(simulation, player, { lightAttack: true });
+    assert.equal(player.combat.attack, null);
+    assert.equal(player.combat.airAttackUsed, true);
+    stepFor(simulation, 1);
+    stepWithIntent(simulation, player, { jump: true });
+    stepWithIntent(simulation, player, { lightAttack: true });
+    assert.equal(player.combat.attackType, 'air');
+  });
+
+  it('preserves horizontal momentum and applies gravity during an aerial attack', () => {
+    const { player, simulation } = createDuel();
+    stepWithIntent(simulation, player, { jump: true, moveX: 1 });
+    const vx = player.vx;
+    const vy = player.vy;
+    stepWithIntent(simulation, player, { lightAttack: true });
+    assert.equal(player.vx, vx);
+    assert.ok(player.vy > vy);
+    assert.equal(player.grounded, false);
+  });
+
+  it('selects the advancing heavy only when holding forward', () => {
+    const forward = createDuel();
+    stepWithIntent(forward.simulation, forward.player, { heavyAttack: true, moveX: 1 });
+    assert.equal(forward.player.combat.attackType, 'forwardHeavy');
+    assert.ok(forward.player.combat.attack.lunge > forward.player.moves.heavy.lunge);
+    assert.ok(forward.player.combat.attack.recovery > forward.player.moves.heavy.recovery);
+    const backward = createDuel();
+    stepWithIntent(backward.simulation, backward.player, { heavyAttack: true, moveX: -1 });
+    assert.equal(backward.player.combat.attackType, 'heavy');
+  });
+
+  it('refuses the more expensive advancing heavy without enough stamina', () => {
+    const { player, simulation } = createDuel();
+    player.stamina = player.moves.forwardHeavy.staminaCost - 1;
+    stepWithIntent(simulation, player, { heavyAttack: true, moveX: 1 });
+    assert.equal(player.combat.attack, null);
+    assert.equal(simulation.events[0].type, 'actionRejected');
   });
 });

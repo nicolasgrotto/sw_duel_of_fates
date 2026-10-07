@@ -1,4 +1,4 @@
-import { AttackPhase, AttackType, getAttackPhase } from '../combat/attackPhases.js';
+import { AttackPhase, AttackType, getAttackPhase, isHeavyAttack } from '../combat/attackPhases.js';
 import { FighterState } from '../entities/fighterStates.js';
 import { canAfford } from '../systems/StaminaSystem.js';
 import { canReach, getDirectionTo, getGap, isPunishable, isThreatening } from './perception.js';
@@ -157,7 +157,7 @@ export class EnemyAI {
 
   tryParry() {
     const { attack, attackType } = this.opponent.combat;
-    if (attackType !== AttackType.HEAVY || getAttackPhase(attack, this.opponent.stateTime) !== AttackPhase.STARTUP) {
+    if (!isHeavyAttack(attackType) || getAttackPhase(attack, this.opponent.stateTime) !== AttackPhase.STARTUP) {
       return false;
     }
     if (this.random() >= this.difficulty.parryChance) {

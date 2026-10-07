@@ -25,6 +25,7 @@ export const texts = {
   },
   controls: {
     title: 'CONTROLES',
+    or: ' ou ',
     back: '{back}  voltar',
     gamepad: 'Controle: direcional mover · A pular · X rápido · Y forte · LB/LT guarda · B esquiva · Start pausa · A confirmar',
     actions: {
@@ -33,6 +34,8 @@ export const texts = {
       jump: 'Pular',
       lightAttack: 'Ataque rápido',
       heavyAttack: 'Ataque forte',
+      forwardHeavy: 'Forte de avanço (para a frente)',
+      airAttack: 'Ataque aéreo (durante o pulo)',
       block: 'Bloquear (segurar)',
       parry: 'Aparar (tocar na hora do golpe)',
       riposte: 'Riposta (ataque rápido depois de aparar)',
@@ -50,7 +53,7 @@ export const texts = {
   },
   training: {
     frameData: '{attack} · {result} · {advantage} s',
-    attacks: { light: 'Rápido', light2: 'Rápido 2', light3: 'Rápido 3', heavy: 'Forte', riposte: 'Riposta', shove: 'Empurrão' },
+    attacks: { air: 'Aéreo', forwardHeavy: 'Forte de avanço', light: 'Rápido', light2: 'Rápido 2', light3: 'Rápido 3', heavy: 'Forte', riposte: 'Riposta', shove: 'Empurrão' },
     results: {
       hit: 'acertou',
       block: 'bloqueado',
@@ -89,6 +92,8 @@ export const controlsScreenRows = [
   { label: 'jump', actions: ['jump'] },
   { label: 'lightAttack', actions: ['lightAttack'] },
   { label: 'heavyAttack', actions: ['heavyAttack'] },
+  { label: 'forwardHeavy', groups: [['moveLeft', 'moveRight'], ['heavyAttack']] },
+  { label: 'airAttack', groups: [['lightAttack', 'heavyAttack']] },
   { label: 'block', actions: ['block'] },
   { label: 'parry', actions: ['block'] },
   { label: 'riposte', actions: ['lightAttack'] },
@@ -119,8 +124,8 @@ export const layout = {
   },
   controls: {
     titleY: 110,
-    firstRowY: 180,
-    rowSpacing: 36,
+    firstRowY: 160,
+    rowSpacing: 32,
     columnGap: 16,
     gamepadY: 624,
     footerY: 670,

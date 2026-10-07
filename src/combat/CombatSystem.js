@@ -47,6 +47,9 @@ export class CombatSystem {
   updateTimers(fighter, dt) {
     const { combat, stats } = fighter;
 
+    if (fighter.grounded) {
+      combat.airAttackUsed = false;
+    }
     this.updateParryTimers(fighter, dt);
     combat.riposteTime = Math.max(0, combat.riposteTime - dt);
 
@@ -103,6 +106,7 @@ export class CombatSystem {
       return;
     }
     if (!fighter.canAct) {
+      this.tryAirAttack(fighter);
       return;
     }
 
@@ -112,6 +116,22 @@ export class CombatSystem {
     if (!started && fighter.intent.block) {
       fighter.combat.blockstun = 0;
       fighter.setState(FighterState.BLOCKING);
+    }
+  }
+
+  tryAirAttack(fighter) {
+    const { bufferedAction } = fighter.combat;
+    if (fighter.grounded || fighter.state !== FighterState.JUMPING || fighter.combat.airAttackUsed) {
+      return;
+    }
+    if (bufferedAction !== CombatAction.LIGHT_ATTACK && bufferedAction !== CombatAction.HEAVY_ATTACK) {
+      return;
+    }
+    clearActionBuffer(fighter);
+    if (this.tryAttack(fighter, AttackType.AIR)) {
+      fighter.combat.airAttackUsed = true;
+    } else {
+      this.emitAction(CombatEvent.ACTION_REJECTED, fighter, AttackType.AIR);
     }
   }
 
@@ -164,7 +184,7 @@ export class CombatSystem {
       case CombatAction.SHOVE:
         return this.tryAttack(fighter, AttackType.SHOVE);
       case CombatAction.HEAVY_ATTACK:
-        return this.tryAttack(fighter, AttackType.HEAVY);
+        return this.tryAttack(fighter, fighter.intent.moveX === fighter.facing ? AttackType.FORWARD_HEAVY : AttackType.HEAVY);
       case CombatAction.LIGHT_ATTACK:
         return this.tryAttack(fighter, fighter.combat.riposteTime > 0 ? AttackType.RIPOSTE : AttackType.LIGHT);
       case CombatAction.PARRY:

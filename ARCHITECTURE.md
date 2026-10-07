@@ -436,6 +436,8 @@ Nenhum timeout nos seis cenários. Com ambos balanced, Difícil vence Normal 98,
 
 Sequências: o combate marca `attackConnected` apenas em hit ou bloqueio (inclui quebra de guarda). `tryAttackChain` lê um rápido no buffer durante recovery e procura o próximo golpe declarado em `cancelsInto`. Cada passo cobra stamina, reinicia stateTime/hasHit/lunge e emite attackStart; whiff/parry/clash não confirmam a rota. Guardião tem dois passos, Sombra três. As poses existentes de rápido são reutilizadas; o Treino identifica Rápido 2/3.
 
+`tryAirAttack` aceita rápido/forte no estado JUMPING uma vez por pulo (`airAttackUsed`, rearmado no chão). O move air usa gravidade e velocidade horizontal existentes; MovementSystem não aplica atrito de ação no ar. Forte + intent à frente escolhe forwardHeavy, com startup/custo/recovery/lunge próprios. `isHeavyAttack` inclui o avanço para áudio e parry da IA. Não há knockback vertical nem cancels aéreos.
+
 ## AI
 
 Arquivos: [src/ai/](src/ai/), [src/config/aiConfig.js](src/config/aiConfig.js). Regras em [GAME_DESIGN.md](GAME_DESIGN.md#7-ia).

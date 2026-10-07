@@ -1,11 +1,11 @@
-import { AttackType, isStrongAttack } from '../combat/attackPhases.js';
+import { AttackType, isHeavyAttack, isStrongAttack } from '../combat/attackPhases.js';
 import { CombatEvent } from '../combat/combatEvents.js';
 import { isSaberStrikeActive } from '../combat/hitboxes.js';
 import { clamp } from '../utils/math.js';
 import { SoundName } from './soundNames.js';
 
 function getSoundForEvent(event) {
-  const isHeavy = event.attackType === AttackType.HEAVY;
+  const isHeavy = isHeavyAttack(event.attackType);
   const isStrong = isStrongAttack(event.attackType);
 
   switch (event.type) {
