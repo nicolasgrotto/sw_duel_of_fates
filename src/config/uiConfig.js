@@ -123,6 +123,8 @@ export const layout = {
     lowHealthRatio: 0.25,
     lowHealthBlinkPeriod: 0.8,
     lowHealthDimAlpha: 0.45,
+    rejectFlashDuration: 0.3,
+    rejectBlinkPeriod: 0.1,
     pauseHintY: 690,
   },
   messages: {

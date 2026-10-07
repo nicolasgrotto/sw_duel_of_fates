@@ -62,6 +62,7 @@ src/
   combat/                   ✅ regras de combate
     CombatSystem.js         ✅ ações, timers, hits, bloqueio, quebra de guarda, morte, eventos
     attackPhases.js         ✅ tipos de ataque e fases (startup, active, recovery)
+    actionBuffer.js         ✅ buffer de input: ação apertada fica guardada até o lutador poder agir
     hitboxes.js             ✅ hitbox, hurtbox, sobreposição, invulnerabilidade
     combatEvents.js         ✅ tipos e criação de eventos de combate
   simulation/               ✅
@@ -151,7 +152,7 @@ Trocar todos os personagens (ex.: versão com identidade própria) deve exigir a
 
 Um controller escreve no `fighter.intent` o que o lutador **quer** fazer (`moveX`, `jump`, `lightAttack`, `heavyAttack`, `block`, `dodge`). Ele nunca altera posição, vida ou estado.
 
-- `PlayerController`: lê o `Input`.
+- `PlayerController`: lê o `Input`. Durante o hit stop a simulação não roda, então o `DuelState` chama `captureInput()` a cada update: toques ficam guardados no controller até o próximo `updateIntent`. Assim, um ataque apertado no congelamento do impacto não se perde.
 - `EnemyAI`: oponente no modo versus (ver seção AI).
 - `DummyController`: boneco do modo treino.
 
@@ -341,7 +342,8 @@ Arquivos: [src/combat/](src/combat/). Regras em [GAME_DESIGN.md](GAME_DESIGN.md#
 
 `CombatSystem` é responsável por ataques, bloqueios, esquivas, colisões de ataque, dano, stun, knockback, morte e transições de combate.
 
-- `update`: termina estados que acabaram, começa ações a partir do `intent` (com custo de stamina) e aplica o lunge do ataque e a velocidade da esquiva.
+- `update`: termina estados que acabaram, atualiza o buffer de input, começa ações a partir do buffer (com custo de stamina) e aplica o lunge do ataque e a velocidade da esquiva.
+- **Buffer de input** (`actionBuffer.js`): cada passo lê a ação apertada no `intent` (prioridade esquiva > forte > rápido) e guarda em `combat.bufferedAction` por `gameConfig.combat.inputBuffer`. Quando o lutador pode agir, a ação sai e o buffer é limpo. Se faltar stamina, a ação é descartada e o evento `actionRejected` é emitido (HUD pisca a stamina, `DuelAudio` toca `denied`). O buffer vive na simulação, então vale igual para jogador, IA e testes.
 - `resolveHits`: em duas etapas. Primeiro encontra **todos** os contatos (hitbox × hurtbox), depois aplica. Assim, dois golpes no mesmo frame acertam os dois lados (trade), sem depender da ordem da lista.
 - Bloqueio só vale de frente. Sem stamina para bloquear, a guarda quebra (`STUNNED`).
 - Na morte, escolhe a direção da queda: para trás se houver espaço até a parede, senão para a frente.

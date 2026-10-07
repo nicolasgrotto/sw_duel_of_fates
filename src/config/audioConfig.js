@@ -74,6 +74,9 @@ export const audioConfig = {
     dodge: [
       { type: 'noise', duration: 0.16, attack: 0.01, gain: 0.25, filter: { type: 'bandpass', from: 2400, to: 900, q: 1.5 } },
     ],
+    denied: [
+      { type: 'tone', wave: 'square', from: 150, to: 110, duration: 0.08, attack: 0.002, gain: 0.07, filter: { type: 'lowpass', from: 900, to: 600, q: 1 } },
+    ],
     uiMove: [
       { type: 'tone', wave: 'sine', from: 880, to: 880, duration: 0.05, attack: 0.002, gain: 0.08, filter: null },
     ],

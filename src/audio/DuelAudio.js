@@ -22,6 +22,8 @@ function getSoundForEvent(event) {
       return SoundName.DEATH;
     case CombatEvent.DODGE:
       return SoundName.DODGE;
+    case CombatEvent.ACTION_REJECTED:
+      return SoundName.DENIED;
     default:
       return null;
   }

@@ -36,4 +36,21 @@ describe('PlayerController', () => {
     assert.equal(fighter.intent.lightAttack, false);
     assert.equal(fighter.intent.block, true);
   });
+
+  it('keeps presses captured while the simulation is frozen until the next intent update', () => {
+    const fighter = spawnFighter(400);
+    const pressed = [Action.LIGHT_ATTACK];
+    const controller = new PlayerController({
+      isDown: () => false,
+      wasPressed: (action) => pressed.includes(action),
+    });
+
+    controller.captureInput();
+    pressed.length = 0;
+    controller.updateIntent(fighter.intent);
+    assert.equal(fighter.intent.lightAttack, true);
+
+    controller.updateIntent(fighter.intent);
+    assert.equal(fighter.intent.lightAttack, false);
+  });
 });

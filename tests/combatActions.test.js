@@ -67,13 +67,17 @@ describe('CombatSystem actions', () => {
     assert.deepEqual(simulation.events.map((event) => event.type), [CombatEvent.DODGE]);
   });
 
-  it('does not emit an event for a refused action', () => {
+  it('emits actionRejected once for a refused action', () => {
     const { player, simulation } = createDuel();
     player.stamina = 0;
 
     stepWithIntent(simulation, player, { heavyAttack: true });
+    assert.deepEqual(simulation.events.map((event) => event.type), [CombatEvent.ACTION_REJECTED]);
+    assert.equal(simulation.events[0].attacker, player);
 
+    simulation.step(STEP);
     assert.deepEqual(simulation.events, []);
+    assert.equal(player.combat.bufferedAction, null);
   });
 
   it('starts a heavy attack', () => {
@@ -196,5 +200,46 @@ describe('StaminaSystem', () => {
     });
 
     assert.ok(blocking.player.stamina < idle.player.stamina);
+  });
+});
+
+describe('input buffer', () => {
+  it('starts an attack pressed during recovery on the first free frame', () => {
+    const { player, simulation } = createDuel();
+    const attack = player.stats.attacks.light;
+
+    stepWithIntent(simulation, player, { lightAttack: true });
+    stepFor(simulation, getAttackDuration(attack) - 0.1);
+    assert.equal(player.state, FighterState.ATTACKING);
+
+    stepWithIntent(simulation, player, { heavyAttack: true });
+    stepFor(simulation, 0.1);
+
+    assert.equal(player.state, FighterState.HEAVY_ATTACK);
+  });
+
+  it('forgets a press after the buffer time', () => {
+    const { player, simulation } = createDuel();
+    const attack = player.stats.attacks.heavy;
+
+    stepWithIntent(simulation, player, { heavyAttack: true });
+    stepWithIntent(simulation, player, { lightAttack: true });
+    stepFor(simulation, getAttackDuration(attack));
+
+    assert.equal(player.state, FighterState.IDLE);
+    assert.equal(player.combat.bufferedAction, null);
+  });
+
+  it('keeps only the latest press', () => {
+    const { player, simulation } = createDuel();
+    const attack = player.stats.attacks.light;
+
+    stepWithIntent(simulation, player, { lightAttack: true });
+    stepFor(simulation, getAttackDuration(attack) - 0.1);
+    stepWithIntent(simulation, player, { heavyAttack: true });
+    stepWithIntent(simulation, player, { dodge: true });
+    stepFor(simulation, 0.1);
+
+    assert.equal(player.state, FighterState.DODGING);
   });
 });

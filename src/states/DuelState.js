@@ -121,6 +121,10 @@ export class DuelState extends GameState {
       this.clearAllIntents();
     }
 
+    if (this.isPlaying()) {
+      this.captureInputs();
+    }
+
     const simulationDt = this.timeControl.scale(dt);
     if (simulationDt > 0) {
       this.stepSimulation(simulationDt);
@@ -137,8 +141,18 @@ export class DuelState extends GameState {
     this.duelAudio.stop();
   }
 
+  captureInputs() {
+    for (const { controller } of this.participants) {
+      controller.captureInput?.();
+    }
+  }
+
+  isPlaying() {
+    return !this.outcome && !this.isIntroPlaying();
+  }
+
   stepSimulation(dt) {
-    if (!this.outcome && !this.isIntroPlaying()) {
+    if (this.isPlaying()) {
       this.duelTime += dt;
       this.updateIntents(dt);
     }
@@ -146,6 +160,7 @@ export class DuelState extends GameState {
     this.simulation.step(dt);
     this.effects.handleEvents(this.simulation.events);
     this.duelAudio.handleEvents(this.simulation.events);
+    this.hud.handleEvents(this.simulation.events);
     this.rememberLastEvent();
     this.countPlayerStats();
     this.checkForDeath();

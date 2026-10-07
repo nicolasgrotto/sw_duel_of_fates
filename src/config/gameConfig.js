@@ -21,6 +21,7 @@ export const gameConfig = {
     actionFriction: 1400,
   },
   combat: {
+    inputBuffer: 0.15,
     fallRoomMargin: 60,
     clash: {
       pushback: 280,

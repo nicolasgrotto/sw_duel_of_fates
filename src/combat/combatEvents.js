@@ -6,6 +6,7 @@ export const CombatEvent = Object.freeze({
   DEATH: 'death',
   ATTACK_START: 'attackStart',
   DODGE: 'dodge',
+  ACTION_REJECTED: 'actionRejected',
 });
 
 const CONTACT_EVENTS = new Set([

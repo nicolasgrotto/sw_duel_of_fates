@@ -1,5 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { CombatEvent } from '../src/combat/combatEvents.js';
+import { colors } from '../src/config/themeConfig.js';
 import { layout } from '../src/config/uiConfig.js';
 import { Hud } from '../src/ui/Hud.js';
 import { STEP, repeat, spawnFighter } from './helpers.js';
@@ -66,5 +68,20 @@ describe('Hud', () => {
     const { margin, healthWidth } = layout.hud;
     const rightHealth = rects.find((rect) => rect.x > 640 && rect.width === healthWidth / 2);
     assert.equal(rightHealth.x + rightHealth.width, 1280 - margin);
+  });
+
+  it('flashes the stamina bar of a fighter whose action was rejected', () => {
+    const { left, hud } = createHud();
+    const [leftState, rightState] = hud.sides;
+
+    hud.handleEvents([{ type: CombatEvent.ACTION_REJECTED, attacker: left }]);
+
+    assert.equal(leftState.rejectTime, layout.hud.rejectFlashDuration);
+    assert.equal(rightState.rejectTime, 0);
+    assert.equal(hud.getStaminaColor(rightState), colors.hudStamina);
+
+    repeat(Math.ceil(layout.hud.rejectFlashDuration / STEP) + 1, () => hud.update(STEP));
+    assert.equal(leftState.rejectTime, 0);
+    assert.equal(hud.getStaminaColor(leftState), colors.hudStamina);
   });
 });

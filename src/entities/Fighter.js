@@ -42,6 +42,8 @@ export class Fighter {
       dodgeDirection: 0,
       fallDirection: 0,
       staminaRegenDelay: 0,
+      bufferedAction: null,
+      bufferTime: 0,
     };
 
     this.intent = createIntent();

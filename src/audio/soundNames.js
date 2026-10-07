@@ -8,6 +8,7 @@ export const SoundName = Object.freeze({
   CLASH: 'clash',
   DEATH: 'death',
   DODGE: 'dodge',
+  DENIED: 'denied',
   UI_MOVE: 'uiMove',
   UI_CONFIRM: 'uiConfirm',
 });

@@ -1,5 +1,6 @@
 import { FighterState } from '../entities/fighterStates.js';
 import { canAfford, spendStamina } from '../systems/StaminaSystem.js';
+import { CombatAction, clearActionBuffer, updateActionBuffer } from './actionBuffer.js';
 import { ATTACK_STATES, AttackPhase, AttackType, getAttackDuration, getAttackPhase } from './attackPhases.js';
 import { CombatEvent, createCombatEvent } from './combatEvents.js';
 import { boxesOverlap, createBox, getAttackHitbox, getHurtbox, hasActiveHitbox, hasHurtbox } from './hitboxes.js';
@@ -20,8 +21,9 @@ function chooseFallDirection(fighter, arena, roomMargin) {
 }
 
 export class CombatSystem {
-  constructor(arena, { fallRoomMargin, clash }) {
+  constructor(arena, { inputBuffer, fallRoomMargin, clash }) {
     this.arena = arena;
+    this.inputBuffer = inputBuffer;
     this.fallRoomMargin = fallRoomMargin;
     this.clash = clash;
     this.otherHitbox = createBox();
@@ -36,6 +38,7 @@ export class CombatSystem {
 
     for (const fighter of fighters) {
       this.updateTimers(fighter, dt);
+      updateActionBuffer(fighter, dt, this.inputBuffer);
       this.startActions(fighter);
       this.applyActionMovement(fighter);
     }
@@ -79,15 +82,34 @@ export class CombatSystem {
       return;
     }
 
-    const { intent } = fighter;
-    const started =
-      (intent.dodge && this.tryDodge(fighter)) ||
-      (intent.heavyAttack && this.tryAttack(fighter, AttackType.HEAVY)) ||
-      (intent.lightAttack && this.tryAttack(fighter, AttackType.LIGHT));
+    const action = fighter.combat.bufferedAction;
+    const started = action !== null && this.tryBufferedAction(fighter, action);
 
-    if (!started && intent.block) {
+    if (!started && fighter.intent.block) {
       fighter.combat.blockstun = 0;
       fighter.setState(FighterState.BLOCKING);
+    }
+  }
+
+  tryBufferedAction(fighter, action) {
+    clearActionBuffer(fighter);
+    const started = this.tryAction(fighter, action);
+    if (!started) {
+      this.emitAction(CombatEvent.ACTION_REJECTED, fighter, null);
+    }
+    return started;
+  }
+
+  tryAction(fighter, action) {
+    switch (action) {
+      case CombatAction.DODGE:
+        return this.tryDodge(fighter);
+      case CombatAction.HEAVY_ATTACK:
+        return this.tryAttack(fighter, AttackType.HEAVY);
+      case CombatAction.LIGHT_ATTACK:
+        return this.tryAttack(fighter, AttackType.LIGHT);
+      default:
+        return false;
     }
   }
 
