@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { Action } from '../src/config/controlsConfig.js';
 import { colors } from '../src/config/themeConfig.js';
 import { layout } from '../src/config/uiConfig.js';
+import { aiConfig } from '../src/config/aiConfig.js';
 import { audioConfig } from '../src/config/audioConfig.js';
 import { AudioManager } from '../src/core/AudioManager.js';
 import { StateMachine } from '../src/core/StateMachine.js';
@@ -210,8 +211,8 @@ describe('state flow', () => {
     const duel = game.states.current;
 
     assert.equal(duel.opponentController.constructor.name, 'EnemyAI');
-    assert.equal(duel.opponentController.difficulty.reactionTime, 0.15);
-    assert.equal(duel.opponentController.profile.attackChance, 0.8);
+    assert.equal(duel.opponentController.difficulty, aiConfig.difficulties.hard);
+    assert.equal(duel.opponentController.profile, aiConfig.profiles.aggressive);
   });
 
   it('keeps the duel mode when restarting from the pause', () => {

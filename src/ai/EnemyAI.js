@@ -9,6 +9,7 @@ export const AiDecision = Object.freeze({
   BLOCK: 'block',
   DODGE: 'dodge',
   COUNTER: 'counter',
+  GUARD: 'guard',
   RECOVER: 'recover',
   ATTACK: 'attack',
   APPROACH: 'approach',
@@ -95,6 +96,7 @@ export class EnemyAI {
       this.tryCounter() ??
       this.tryRecoverStamina() ??
       this.tryAttack() ??
+      this.tryGuard() ??
       this.position()
     );
   }
@@ -155,6 +157,19 @@ export class EnemyAI {
 
     const wantsHeavy = this.random() < this.profile.heavyChance;
     return this.startAttack(wantsHeavy) ? AiDecision.ATTACK : null;
+  }
+
+  tryGuard() {
+    const opponentReach = this.opponent.stats.attacks.light;
+    if (!canReach(this.opponent, this.self, opponentReach, -this.perception.threatMargin)) {
+      return null;
+    }
+    if (this.random() >= this.profile.guardChance * this.difficulty.defenseMultiplier) {
+      return null;
+    }
+
+    this.plan.blockTime = this.perception.blockHoldTime;
+    return AiDecision.GUARD;
   }
 
   position() {

@@ -145,6 +145,25 @@ describe('EnemyAI decisions', () => {
     assert.equal(intent.heavyAttack, true);
   });
 
+  it('guards when the opponent is in reach and it cannot attack', () => {
+    const { ai } = createDuel(40, { roll: 0 });
+    ai.attackCooldown = 10;
+
+    const intent = think(ai);
+
+    assert.equal(ai.decision, AiDecision.GUARD);
+    assert.equal(intent.block, true);
+  });
+
+  it('does not guard when the opponent is far', () => {
+    const { ai } = createDuel(400, { roll: 0 });
+    ai.attackCooldown = 10;
+
+    think(ai);
+
+    assert.equal(ai.decision, AiDecision.APPROACH);
+  });
+
   it('backs away to recover stamina', () => {
     const { ai, self } = createDuel(40);
     self.stamina = 5;
