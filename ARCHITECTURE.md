@@ -662,6 +662,60 @@ Evitar dependências circulares.
 
 ---
 
+## v2 planejada
+
+Roteiro e tarefas no TASKS.md ("v2.0 — Duelo expandido e Story"). Esta seção registra as decisões de arquitetura aprovadas. Cada módulo só é criado na task que precisar dele e então entra na estrutura de pastas.
+
+**Princípios.** Tudo novo que muda o resultado de uma luta roda dentro da `DuelSimulation` com o dt fixo, guarda estado em `fighter.combat` (copiado inteiro pelo snapshot do replay) e é configurado em `src/config/`. Game, Renderer, Audio, Effects e Input não contêm regra de gameplay. Os modos clássicos (Arcade, Sobrevivência, Tutorial, Treino) recebem `rules` padrão e ficam idênticos à v1.0.
+
+**Refactors da v1.1 (antes de qualquer feature).**
+
+1. `Input` com fontes genéricas: teclado, gamepad e, depois, toque alimentam o mesmo conjunto de ações (o gamepad hoje é um caso especial com `padActions`).
+2. Save versionado (`saveStorage.js`): `{ version, settings, unlocks, progression, story, protagonist }` com lista de migrações; a v1 (objeto plano de settings) migra sem perda.
+3. `DuelResult` (objeto simples: vencedor, `healthRatio`, estatísticas, tempo) e `duelOutcomes` (roteamento por modo), tirando Arcade e Sobrevivência do `DuelState`. Story e finais leem o `DuelResult`, nunca o `Fighter`.
+4. `rules` nos parâmetros do duelo (`powers`, `attributes`), repassadas à simulação.
+5. Teste que falha se um campo mutável do `Fighter` ficar fora do `captureFighter`.
+6. `maxPixelRatio` no `Renderer.fitToDisplay` e tempo de frame no F3.
+
+**Módulos previstos.**
+
+```
+core/TouchInput.js            pointer events no canvas → ações (multitoque por pointerId, joystick com zona morta)
+core/saveStorage.js           save versionado e migrações
+core/textPrompt.js            input DOM temporário só na tela de nome (injetado)
+config/touchLayoutConfig.js, attributesConfig.js, powersConfig.js, powerTiersConfig.js,
+       storyConfig.js, secretsConfig.js, introConfig.js
+characters/attributes.js      applyAttributes(base, attributes, config) → stats derivados (puro)
+characters/protagonist.js     createProtagonistCharacter(save) → dados para a createFighter atual
+characters/skins.js           resolveAppearance(character, skinId)
+combat/powerResistance.js     resolvePowerOutcome(rule, levelDiff) → { scale, outcome } (puro)
+combat/powerEffects.js        registro { push, pull, lightning, barrier } → handler
+combat/PowerSystem.js         medidor, recargas, fases do poder, eventos
+modes/DuelResult.js, modes/duelOutcomes.js
+modes/story/StoryDirector.js, modes/story/conditions.js
+modes/SecretUnlockSystem.js   casa sequências de teclas (lastPressedCode) e de ações; persiste o desbloqueio
+states/IntroState.js, StoryState.js, DialogueState.js, ProtagonistState.js
+rendering/powerRenderer.js    aura em cache por tier, raio em polilinha, ondas
+ui/TouchControls.js           controles de toque desenhados no canvas
+```
+
+**Decisões.**
+
+- **Atributos** (1–9; só o `foretold` tem Fluxo 10) são a única fonte dos stats escalares: Vida → vida; Stamina → máximo e regeneração; Lâmina → escala de dano e bônus pequeno no parry perfeito; Defesa → guarda (custo do bloqueio, recuo, limite de quebra), não redução de dano; Agilidade → velocidade, pulo, dash e janela do EVADE; Fluxo → `powerLevel`. O arquétipo continua dono de tempos, golpes e traços.
+- **Fluxo**: `powerLevel` (permanente) define potência, resistência, máximo do medidor e tier visual; `powerMeter` é o recurso da luta; `stamina` continua o recurso físico.
+- **Resistência**: `levelDiff = alvo.powerLevel − conjurador.powerLevel`; cada poder aponta para uma regra em dados (faixas → escala e resultado `normal`, `reduced`, `resisted`). Um único resolvedor puro, sem `if` por poder.
+- **Poderes** são definições com fases (startup, active, recovery), como os golpes, pagas com `powerMeter`. Estados novos: `CASTING` e `CHANNELING`. Sem projéteis na v2. Efeitos no alvo reaproveitam `HIT` e `STAGGERED`.
+- **EVADE** (esquiva de precisão) é uma ação nova no "baixo" (S/↓, direcional baixo, joystick baixo); o Shift continua o dash. Flag `evade` no intent (o `IntentRecorder` passa de 10 para 12 bits com `power`, cabe no `Uint16`).
+- **Pulo duplo**: `movement.maxJumps` com contador em `fighter.combat`; zera no chão; o pulo na parede não devolve o pulo aéreo.
+- **Finais e condições** são dados (`{ condition: { type, threshold }, next }`) avaliados por um registro de condições contra o `DuelResult`.
+- **Protagonista** é dados gerados do save e entra na `createFighter`; não há sistema de animação novo.
+- **Skins** são overrides parciais de `appearance` (paleta e peças de silhueta existentes), sem efeito em stats; a escolha fica no save.
+- **Segredo**: sequência de letras (teclado) e de ações (gamepad e toque) em `secretsConfig`; o input do jogador é o gesto que libera o áudio; a intro termina numa tela de título que só avança com Confirmar.
+
+**Orçamento de desempenho (alvo mobile).** Update ≤ 2 ms e render ≤ 10 ms por frame em celular intermediário. Partículas dos poderes usam o pool atual (`maxParticles` 300; metade com efeitos reduzidos); luzes 8 (4 com efeitos reduzidos); raio com no máximo 2 polilinhas de cerca de 10 segmentos, regeradas a cada poucos frames; aura em sprites pré-renderizados por tier; nada de `shadowBlur`, `filter` ou gradiente criado por frame; DPR limitado por config; áudio continua sintetizado.
+
+---
+
 ## Convenções de código
 
 - Um módulo por arquivo. Classes em `PascalCase.js`, o resto em `camelCase.js`.

@@ -168,6 +168,21 @@ Para essa troca não exigir reescrever o jogo:
 - **Ignição**: no começo de cada round as lâminas acendem, da base à ponta, com um som de ignição sintetizado.
 - **Sabres sem moral**: cada personagem tem uma cor própria e nenhuma cor significa "bom" ou "mau". O vermelho deixou de ser a cor do agressivo.
 
+## Nomes da v2 (decididos)
+
+A v2 traz poderes, alinhamentos e personagens secretos. Para manter a identidade própria, nenhum termo ou fala da franquia entra no jogo. O código usa termos neutros; os nomes de tela ficam em `src/config/` e podem mudar sem tocar na lógica.
+
+| Conceito | No código | Na tela (provisório) |
+| --- | --- | --- |
+| Energia dos poderes | `power`, `powerLevel` (1–10, permanente), `powerMeter` (recurso da luta) | o Fluxo |
+| Alinhamentos | `alignment`: `light` ou `dark` | Caminho da Aurora, Caminho do Eclipse |
+| Chefe secreto | `sovereign` | o Soberano |
+| Personagem secreto de nível 10 | `foretold` | o Predestinado |
+
+- Falas do segredo e do final secreto são originais e ficam em `uiConfig`.
+- As cores dos tiers do Fluxo (azul → roxo → vermelho no nível 10) são da energia, nunca da lâmina. A regra "sabres sem moral" continua valendo.
+- Voz gravada não entra na v2: segredo e finais usam texto na tela e som sintetizado.
+
 ## Decisões em aberto
 
 - Estilo dos sprites: desenho por código (formas e silhuetas) ou sprites desenhados/gerados.

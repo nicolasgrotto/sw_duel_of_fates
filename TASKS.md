@@ -6,7 +6,7 @@ Atualize este arquivo ao terminar cada tarefa.
 
 - **v1.0 concluída no código**: 10 personagens, 6 arenas, todos os modos das versões anteriores, 340 testes e balanceamento medido pela matriz do simulador (ARCHITECTURE → Balanceamento).
 - Falta só o que depende do autor: criar o repositório remoto, ativar o GitHub Pages (passos no README) e, se quiser, gravar GIFs para o README (hoje ele usa capturas em `media/`).
-- Próximas versões: cada uma em sua própria branch, a partir das ideias em "Depois da v1.0". Nenhuma está aprovada ainda.
+- **v2.0 em andamento** na branch `v2-development` (a tag `v1.0.0` marca a base). Roteiro aprovado em "v2.0 — Duelo expandido e Story". Próximo item: v1.1 — Fundação, quando o autor pedir.
 
 ## Projeto e publicação
 
@@ -213,18 +213,103 @@ As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e des
 - [ ] GIFs de gameplay no README (opcional, gravados pelo autor)
 - [x] Revisão final da documentação de arquitetura (árvore de pastas, fluxo de telas, input, configurações, testes e dependências)
 
-## Depois da v1.0 — ideias a avaliar
+## v2.0 — Duelo expandido e Story
 
-Contexto registrado pelo autor. Nada aqui está aprovado: cada item será avaliado antes, em sua própria versão e branch. Usar sempre nomes neutros no código e nos textos (ver regra de propriedade intelectual).
+Trabalho na branch `v2-development`, a partir da tag `v1.0.0`. Cada etapa v1.N é um passo rumo à v2.0, não uma versão final; ao terminar uma etapa, crie a tag `v1.N` na branch. Uma task = implementar, testar, `npm test`, atualizar a ARCHITECTURE e commitar. Arquitetura e decisões: ARCHITECTURE → "v2 planejada"; nomes: DESIGN → "Nomes da v2".
 
-| Ideia | Notas de viabilidade e peso |
-| --- | --- |
-| Modo história / campanha | Cabe como novo `mode` com diretor (como o tutorial e o Arcade). O custo maior é conteúdo (textos, cenas, telas), não código. |
-| Atributos de personagem (dano, velocidade, stamina, vida, força) | Já são dados por arquétipo; o risco é balanceamento. Exige rodar a matriz do simulador a cada mudança. |
-| Personagens e chefes secretos | Barato: personagem com `selectable: false` desbloqueado por progresso (o Arcade já salva quem venceu). |
-| Refino do combate e animações mais bonitas | Animação por código escala bem; sprites desenhados aumentam muito o peso e o trabalho por personagem. |
-| Poderes de energia com dois alinhamentos e personagens separados por alinhamento | Novo tipo de habilidade em dados (projéteis, empurrão à distância). Atenção a IP: nomes e conceitos próprios, sem termos da franquia. |
-| Personalização de personagem no modo história | Aparência já é dado; cores e peças de silhueta são viáveis. Precisa de tela própria. |
-| Versão mobile (no fim, se viável) | Precisa de controles de toque com design próprio; o combate por timing fica difícil em botões virtuais. Avaliar por último. |
+### v1.1 — Fundação
+- [ ] Input com fontes genéricas (teclado, gamepad) sem mudar comportamento
+- [ ] Save versionado com migração v1 → v2 e teste com save v1 real
+- [ ] `DuelResult` e `duelOutcomes`: tirar o roteamento de Arcade e Sobrevivência do DuelState
+- [ ] `rules` nos parâmetros do duelo (padrão = v1.0)
+- [ ] Teste de cobertura do snapshot do replay (campos mutáveis do Fighter)
+- [ ] `maxPixelRatio` e tempo de frame no F3
+
+### v1.2 — Mobile
+- [ ] Viewport: `viewport-fit=cover`, safe areas, `touch-action: none`, tela "gire o aparelho" no retrato
+- [ ] `TouchInput`: multitoque por `pointerId`, joystick virtual (com zona morta) e botões → ações
+- [ ] `TouchControls` desenhados no canvas, só quando o último input foi toque
+- [ ] Toque nos menus: `MenuList` com tocar para escolher e confirmar; setas de cor na seleção
+- [ ] Botão de pausa; esconder remapeamento e 2 Jogadores em toque
+- [ ] Efeitos reduzidos automáticos em ponteiro "coarse" (opção sobrescreve)
+- [ ] Manifest com orientação paisagem e ícone (registrar no ASSETS)
+- [ ] Teste em celular real (Chrome Android, Safari iOS) e registro do resultado
+
+### v1.3 — Movimento
+- [ ] Ação `EVADE` (S/↓, direcional baixo, joystick baixo) e flag `evade` no intent
+- [ ] Esquiva de precisão: inclinação curta, sem stamina, janela de invulnerabilidade curta e recuperação punível; flag em config
+- [ ] IA: usar EVADE contra golpe já em active por perfil e dificuldade
+- [ ] `movement.maxJumps` com contador; pulo duplo não recarrega no pulo na parede
+- [ ] IA e simulador com pulo duplo; matriz para confirmar que o modo clássico não mudou
+
+### v1.4 — Atributos
+- [ ] `attributesConfig` e `applyAttributes` (puro)
+- [ ] Calibrar os atributos dos 10 personagens; tirar os escalares do fightersConfig
+- [ ] Matriz completa: médias dentro de ±5 pontos da v1.0
+- [ ] Atributos na seleção de personagem (barras 1–9; regra visual nos docs de design antes)
+
+### v1.5 — Sistema do Fluxo
+- [ ] `powerLevel`, `powerMeter` e regras de ganho; medidor no HUD (com `rules.powers`)
+- [ ] `resolvePowerOutcome` com regras em dados
+- [ ] `powerTiersConfig` e aura em cache por tier (sem `shadowBlur`, sem gradiente por frame)
+- [ ] Simulador com `--rules powers`
+
+### v1.6 — Poderes
+- [ ] Estados `CASTING` e `CHANNELING`; ação `POWER` (teclado, gamepad RT, botão de toque)
+- [ ] `PowerSystem` e registro de efeitos; Empurrão
+- [ ] Puxão
+- [ ] Raio (ticks, canal, polilinha na renderização)
+- [ ] Barreira (bloqueia o raio, responde ao empurrão)
+- [ ] Eventos → VFX, som e câmera; resistido → efeito de barreira
+- [ ] IA: lançar e responder a poderes considerando a resistência
+- [ ] Alinhamento, nível e 2 poderes para os 10 personagens; matriz com poderes
+
+### v1.7 — Base do Story
+- [ ] `storyConfig` (formato), `StoryDirector` e `conditions` (puros)
+- [ ] `StoryState` (hub da campanha) e `DialogueState`
+- [ ] Protagonista: arquétipo, `createProtagonistCharacter`, criação simples (nome, alinhamento, cor)
+- [ ] Progressão: pontos por encontro, teto por dificuldade (Fácil 8, Normal 7, Difícil 6) e orçamento total
+- [ ] Save do Story (progresso, protagonista)
+
+### v1.8 — Conteúdo do Story
+- [ ] Campanha linear de cerca de 8 encontros com diálogos e variações de fala por alinhamento
+- [ ] Recompensas e poderes liberados por progresso
+- [ ] Finais em dados; final normal; final secreto (vida > 75% contra o Soberano)
+
+### v1.9 — Secretos e intro
+- [ ] Soberano e Predestinado (`selectable: false`, desbloqueio salvo)
+- [ ] `IntroState` com linha do tempo em dados e tela de título
+- [ ] `SecretUnlockSystem` (sequência de teclas e de ações) e reação na intro
+- [ ] Duelo secreto e epílogo do Story
+
+### v1.10 — Skins e personalização
+- [ ] `skins` nos dados e `resolveAppearance`; escolha na seleção
+- [ ] Skins liberadas por progresso (reaproveita `unlocks.js`)
+- [ ] Skins e variações na criação do protagonista; nome com `textPrompt` (funciona no teclado do celular)
+
+### v1.x final — Equilíbrio, desempenho e QA
+- [ ] Matrizes: clássico, com poderes, protagonista no teto de cada dificuldade contra o Soberano
+- [ ] Orçamento de desempenho medido em celular intermediário
+- [ ] Regressão: IA, replay, 2 Jogadores, gamepad, remapeamento, Tutorial, Arcade, Sobrevivência, Treino
+- [ ] Revisão de docs; tag `v2.0.0`; merge da `v2-development` na `main`
+
+### Critérios de aceitação da v2.0
+
+- Todos os modos da v1.0 funcionam no desktop; a matriz do modo clássico fica dentro de ±5 pontos da v1.0.
+- Jogável de ponta a ponta em celular intermediário em paisagem (menus, duelo, Story), 60 FPS na maior parte do tempo e nunca abaixo de 50 FPS em luta com poderes e efeitos reduzidos.
+- 4 poderes com resistência por nível, em dados, usados pela IA; replay determinístico com poderes.
+- Story linear completo com final normal e final secreto; protagonista criado, evoluído e salvo.
+- Soberano e Predestinado desbloqueáveis pelo código na intro e pelo Story, com desbloqueio salvo.
+- EVADE e pulo duplo funcionando, inclusive na IA; skins para personagens e protagonista; save v1 migra sem perda.
+- `npm test` passa; ARCHITECTURE, GAME_DESIGN, TASKS e docs de design atualizados; ASSETS registra todo asset novo.
+- Nenhum nome ou fala da franquia no código, nos textos ou nos assets.
+
+## Depois da v2.0 (v3+)
+
+- Poderes Cura e Fúria; poderes com projéteis; árvore de habilidades; mais de 2 poderes por personagem.
+- Campanha maior que cerca de 8 encontros; missões diferentes por alinhamento; história ramificada.
+- Service worker para jogar offline (PWA completo).
+- Voz gravada (a v2 usa texto e som sintetizado).
+- Character creator detalhado, equipamentos, skins com silhueta ou animação novas, destruição de arena.
 
 **O que tende a pesar e deve ser evitado:** muitas partículas ou glows dinâmicos por frame (usar cache e pools, como hoje), `shadowBlur` no canvas, imagens grandes sem compressão, áudio gravado longo (manter síntese), alocar objetos no loop, e qualquer biblioteca ou engine para resolver algo pequeno.
