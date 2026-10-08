@@ -54,3 +54,15 @@ describe('PlayerController', () => {
     assert.equal(fighter.intent.lightAttack, false);
   });
 });
+
+it('latches evade during hit stop and clears it after one step', () => {
+  const fighter = spawnFighter(400);
+  let pressed = true;
+  const controller = new PlayerController({ isDown: () => false, wasPressed: (action) => pressed && action === Action.EVADE });
+  controller.captureInput();
+  pressed = false;
+  controller.updateIntent(fighter.intent);
+  assert.equal(fighter.intent.evade, true);
+  controller.updateIntent(fighter.intent);
+  assert.equal(fighter.intent.evade, false);
+});

@@ -325,6 +325,8 @@ Fontes seguem o contrato `{ actions: Set, poll?(), reset?(), endFrame?(), destro
 
 Save: `saveStorage.js` usa a mesma chave e escreve `{ version: 2, settings }`. A lista `saveMigrations` transforma o objeto plano v1 no envelope v2; JSON corrompido, envelopes invalidos e versoes futuras retornam defaults sem sobrescrever dados. `settingsStorage.js` continua validando campos com `loadSettings` e delega leitura/escrita ao saveStorage. Teste com fixture completa do formato v1 cobre progresso, cores, recordes e bindings.
 
+EVADE usa S/baixo e pode dividir tecla com MENU_DOWN; gamepad baixo e eixo Y positivo alimentam ambas as acoes. PlayerController captura o toque inclusive no hit stop. O IntentRecorder acrescenta evade no bit 10, preservando os bits v1; reset e boneco limpam a flag. No J2, Numpad2 agora e EVADE; o atalho numerico de forte mudou para Numpad4 (K continua), evitando duas acoes de combate na mesma tecla. Controles, remapeamento, lista de golpes e inputs de Treino incluem EVADE. A tabela de controles usa espacamento 25 para manter o rodape livre.
+
 ## Estados (StateMachine)
 
 Arquivos: [src/core/StateMachine.js](src/core/StateMachine.js), [src/states/](src/states/)

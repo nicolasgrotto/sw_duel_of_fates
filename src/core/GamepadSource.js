@@ -35,11 +35,19 @@ export class GamepadSource {
       for (const axis of axes) {
         const value = this.gamepad.axes[axis.index] ?? 0;
         if (value < -deadzone) {
-          this.actions.add(axis.negative);
+          this.addAxisActions(axis.negative);
         } else if (value > deadzone) {
-          this.actions.add(axis.positive);
+          this.addAxisActions(axis.positive);
         }
       }
+    }
+  }
+
+  addAxisActions(actions) {
+    if (Array.isArray(actions)) {
+      for (const action of actions) this.actions.add(action);
+    } else {
+      this.actions.add(actions);
     }
   }
 

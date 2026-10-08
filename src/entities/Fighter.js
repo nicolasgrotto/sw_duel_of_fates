@@ -9,6 +9,7 @@ function createIntent() {
     block: false,
     blockPressed: false,
     dodge: false,
+    evade: false,
     special: false,
     specialHeld: false,
   };
@@ -162,6 +163,7 @@ export class Fighter {
     intent.block = false;
     intent.blockPressed = false;
     intent.dodge = false;
+    intent.evade = false;
     intent.special = false;
     intent.specialHeld = false;
   }

@@ -5,6 +5,7 @@ const PRESS_ACTIONS = [
   { action: Action.LIGHT_ATTACK, intentKey: 'lightAttack' },
   { action: Action.HEAVY_ATTACK, intentKey: 'heavyAttack' },
   { action: Action.DODGE, intentKey: 'dodge' },
+  { action: Action.EVADE, intentKey: 'evade' },
   { action: Action.BLOCK, intentKey: 'blockPressed' },
   { action: Action.SPECIAL, intentKey: 'special' },
 ];

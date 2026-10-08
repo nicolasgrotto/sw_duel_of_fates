@@ -1,6 +1,6 @@
 import { beforeEach, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { Action, keyboardPresets } from '../src/config/controlsConfig.js';
+import { Action, keyboardPresets, twoPlayerBindings } from '../src/config/controlsConfig.js';
 import { Input } from '../src/core/Input.js';
 
 const bindings = {
@@ -266,4 +266,21 @@ describe('Input gamepad slots', () => {
     input.destroy();
     assert.equal(destroyed, true);
   });
+});
+
+it('maps down to EVADE and menu down, with no conflicting J2 attack binding', () => {
+  const target = new EventTarget();
+  const input = new Input({ target, bindings: keyboardPresets.classic });
+  target.dispatchEvent(keyEvent('keydown', 'KeyS'));
+  assert.equal(input.wasPressed(Action.EVADE), true);
+  assert.equal(input.wasPressed(Action.MENU_DOWN), true);
+  input.setBindings(twoPlayerBindings.p2);
+  target.dispatchEvent(keyEvent('keydown', 'Numpad2'));
+  assert.equal(input.wasPressed(Action.EVADE), true);
+  assert.equal(input.wasPressed(Action.HEAVY_ATTACK), false);
+  const pad = { connected: true, mapping: 'standard', axes: [0, 1], buttons: [] };
+  const controller = new Input({ target, bindings: {}, getGamepads: () => [pad] });
+  controller.poll();
+  assert.equal(controller.wasPressed(Action.EVADE), true);
+  assert.equal(controller.wasPressed(Action.MENU_DOWN), true);
 });

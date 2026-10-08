@@ -1,6 +1,6 @@
 import { texts } from '../config/uiConfig.js';
 
-const INPUTS = ['jump', 'lightAttack', 'heavyAttack', 'block', 'dodge', 'special'];
+const INPUTS = ['jump', 'lightAttack', 'heavyAttack', 'block', 'dodge', 'evade', 'special'];
 
 export function formatIntent(intent) {
   const names = texts.training.inputNames;

@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { IntentRecorder } from '../src/controllers/IntentRecorder.js';
+import { IntentRecorder, encodeIntent, decodeIntent } from '../src/controllers/IntentRecorder.js';
 import { spawnFighter } from './helpers.js';
 
 describe('intent recording', () => {
@@ -53,4 +53,15 @@ describe('intent recording', () => {
     assert.equal(recorder.startPlayback(), false);
     assert.equal(recorder.mode, 'idle');
   });
+});
+
+it('appends evade without changing legacy intent bits', () => {
+  const fighter = spawnFighter(400);
+  fighter.intent.specialHeld = true;
+  const legacy = encodeIntent(fighter.intent, 1);
+  assert.equal(legacy, 513);
+  fighter.intent.evade = true;
+  assert.equal(encodeIntent(fighter.intent, 1), legacy | 1024);
+  decodeIntent(legacy, fighter.intent, 1);
+  assert.equal(fighter.intent.evade, false);
 });

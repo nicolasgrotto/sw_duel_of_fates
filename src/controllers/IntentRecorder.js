@@ -1,4 +1,4 @@
-const FLAGS = ['jump', 'lightAttack', 'heavyAttack', 'block', 'blockPressed', 'dodge', 'special', 'specialHeld'];
+const FLAGS = ['jump', 'lightAttack', 'heavyAttack', 'block', 'blockPressed', 'dodge', 'special', 'specialHeld', 'evade'];
 
 export const ENCODED_INTENT_RANGE = 1 << (FLAGS.length + 2);
 

@@ -29,6 +29,7 @@ export function buildMoveList(character, bindings) {
     { label: labels.riposte, keys: keys(bindings, Action.LIGHT_ATTACK) },
     { label: labels.shove, keys: keys(bindings, Action.BLOCK, Action.LIGHT_ATTACK) },
     { label: labels.dodge, keys: keys(bindings, Action.DODGE) },
+    { label: labels.evade, keys: keys(bindings, Action.EVADE) },
     { label: character.info.ability, keys: keys(bindings, Action.SPECIAL) },
     { label: character.info.trait, keys: labels.passive },
   ];

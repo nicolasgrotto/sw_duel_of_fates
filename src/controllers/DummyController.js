@@ -53,6 +53,7 @@ export class DummyController {
     intent.moveX = attacking ? this.getApproachDirection() : 0;
     intent.jump = false;
     intent.dodge = false;
+    intent.evade = false;
     intent.block = this.behavior === DummyBehavior.BLOCK;
     intent.blockPressed = false;
     intent.special = false;
