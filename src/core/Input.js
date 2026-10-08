@@ -9,7 +9,8 @@ export class Input {
     this.polledActions = new Set();
     this.nextActions = new Set();
     this.keyboard = new KeyboardSource({ bindings, target, onPress: (action) => {
-      if (this.focused) this.pressedActions.add(action);
+      const heldElsewhere = this.sources.some((source) => source !== this.keyboard && source.actions.has(action));
+      if (this.focused && !heldElsewhere) this.pressedActions.add(action);
     } });
     this.pad = new GamepadSource({ getGamepads, gamepadSlot });
     this.sources = [this.keyboard, this.pad];

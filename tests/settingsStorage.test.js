@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { loadSettings, saveSettings } from '../src/core/settingsStorage.js';
@@ -54,13 +55,9 @@ describe('settingsStorage', () => {
 });
 
 it('migrates a complete v1 save without losing progress or bindings', () => {
-  const settings = {
-    difficulty: 'hard', sound: false, music: true, reducedEffects: true,
-    finalReplay: false, keyboardPreset: 'custom', customBindings: { jump: ['KeyQ'] },
-    arcadeCleared: ['guardian', 'wasp'], unlocks: { guardian: ['challenge'] },
-    survivalBest: 17, parryChallengeBest: 920,
-  };
-  const storage = createStorage({ [KEY]: JSON.stringify(settings) });
+  const legacy = readFileSync(new URL('./fixtures/save-v1.json', import.meta.url), 'utf8');
+  const settings = JSON.parse(legacy);
+  const storage = createStorage({ [KEY]: legacy });
   assert.deepEqual(loadSettings({ difficulty: 'normal', sound: true, music: false, reducedEffects: false, finalReplay: true, keyboardPreset: 'classic', customBindings: {}, arcadeCleared: [], unlocks: {}, survivalBest: 0, parryChallengeBest: 0 }, storage, KEY), settings);
   saveSettings(settings, storage, KEY);
   assert.deepEqual(JSON.parse(storage.data[KEY]), { version: 2, settings });

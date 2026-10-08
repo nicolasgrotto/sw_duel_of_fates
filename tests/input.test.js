@@ -284,3 +284,16 @@ it('maps down to EVADE and menu down, with no conflicting J2 attack binding', ()
   assert.equal(controller.wasPressed(Action.EVADE), true);
   assert.equal(controller.wasPressed(Action.MENU_DOWN), true);
 });
+
+it('does not repeat a source edge when keyboard joins an already held action', () => {
+  const target = new EventTarget();
+  const input = new Input({ bindings, target });
+  input.addSource({ actions: new Set(['jump']) });
+  input.poll();
+  input.endFrame();
+  target.dispatchEvent(keyEvent('keydown', 'Space'));
+  assert.equal(input.wasPressed('jump'), false);
+  assert.equal(input.wasPressed('confirm'), true);
+  input.poll();
+  assert.equal(input.wasPressed('jump'), false);
+});

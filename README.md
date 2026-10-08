@@ -84,7 +84,8 @@ Roda duelos IA × IA sem navegador e mostra vitórias e estatísticas. `npm run 
 | Aparar / parry (tocar na hora do golpe) | `L` |
 | Riposta (logo depois de aparar) | `J` |
 | Empurrar (quebra a defesa) | `L` + `J` |
-| Esquivar | `Shift` |
+| Esquivar (dash) | `Shift` |
+| Esquiva de precisão | `S` ou seta para baixo |
 | Navegar nos menus | `W` / `S` ou setas |
 | Confirmar | `Enter` |
 | Voltar | `Esc` ou `Backspace` |
@@ -102,6 +103,8 @@ Habilidade do personagem: `I`. Gamepad: ataques nos botões frontais (X rápido,
 **Dois jogadores no mesmo teclado:** J1 usa `W A S D`, `F G H` (rápido, forte, guarda), `T` (habilidade) e `Shift` esquerdo; J2 usa as setas, `J K L`, `I` e `Shift` direito (ou o teclado numérico). Cada jogador também pode usar um controle.
 
 As teclas de luta podem ser trocadas em **Opções → Configurar teclas** (fica salvo no navegador).
+
+A esquiva de precisão evita um golpe com timing curto, sem stamina; se errar o tempo, a recuperação fica vulnerável. A Vespa pode pular uma segunda vez no ar. No teclado numérico do J2, `Numpad2` faz a esquiva de precisão e `Numpad4` aciona o forte.
 
 Os controles ficam em [src/config/controlsConfig.js](src/config/controlsConfig.js).
 

@@ -9,6 +9,7 @@ Os valores desta página existem no código em [src/config/themeConfig.js](../sr
 - Resolução lógica: **1280×720** (`gameConfig.canvas`).
 - Todo desenho usa coordenadas lógicas. Nunca use o tamanho real do canvas na lógica.
 - O canvas escala proporcionalmente (16:9) e respeita o `devicePixelRatio` para ficar nítido (`Renderer.fitToDisplay`).
+- O DPR fica limitado a `gameConfig.canvas.maxPixelRatio` (2) pelo Game, sem alterar as coordenadas lógicas.
 - O chão da arena fica em `gameConfig.arena.floorY`.
 
 ## Paleta (tokens)

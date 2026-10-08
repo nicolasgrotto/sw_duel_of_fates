@@ -476,7 +476,7 @@ CombatSystem.events → EffectsSystem.handleEvents → spawn(tipo, { x, y, direc
 - `Camera` guarda o shake mais forte e produz `offsetX/offsetY`. Hoje a arena cabe inteira na tela, então a câmera não precisa seguir os lutadores. Enquadramento e zoom entram quando houver arenas maiores.
 - RNG com seed (`utils/random.js`) é injetado. Os testes usam seed fixa e são determinísticos.
 - Receitas também pedem **hit stop** e **câmera lenta** ao `TimeControl`. Efeitos reduzidos (`setReduced`) diminuem o shake e desligam o flash.
-- Afterimage da esquiva e vinheta são só do render.
+- Afterimage do dash e vinheta são do render; EVADE_SUCCESS também alimenta um timer visual no EffectsSystem.
 - **Parry**: `parry`/`perfectParry` usam a cor e a direção do **defensor**. Além de faíscas, luz, shake e hit stop, criam um anel (pool fixo `rings`), marcam o flare da lâmina do defensor (`saberFlares`, lido por `getSaberFlare(fighter)` no render) e, no perfeito, pedem dessaturação (`desaturation`) e câmera lenta. `DuelAudio` abaixa a música por 0,3 s no parry perfeito.
 
 - Pacote de impacto: `EffectsSystem` guarda hit flashes por lutador (0,06 s) e tremores durante hit stop. O tremor do hit afeta o atingido; no parry, o atacante aparado. O renderer aplica o deslocamento ao corpo e à lâmina sem mudar posição física. A silhueta aceita cor substituta `colors.hitFlash`.
@@ -651,7 +651,7 @@ Testes rodam em Node (`npm test`), sem navegador. Por isso:
 - Quando um módulo do core precisa do navegador (`Input`, `GameLoop`), a dependência é injetada.
 - `computePose` é uma função pura e também é testada.
 
-Testes atuais: 368 testes em `tests/`, um arquivo por área (loop, input, estados e modos, combate, especiais, IA, simulação, replay, áudio, efeitos, UI, desbloqueios, Arcade, Sobrevivência, remapeamento). `tests/states.test.js` cobre o fluxo de telas; `goToMenuItem(game, id)` navega no menu pelo id, sem depender da posição dos itens. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
+Testes atuais: 369 testes em `tests/`, um arquivo por área (loop, input, estados e modos, combate, especiais, IA, simulação, replay, áudio, efeitos, UI, desbloqueios, Arcade, Sobrevivência, remapeamento). `tests/states.test.js` cobre o fluxo de telas; `goToMenuItem(game, id)` navega no menu pelo id, sem depender da posição dos itens. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
 
 ---
 
@@ -699,7 +699,6 @@ A regra `rules` nos parâmetros do duelo (`powers`) entra na v1.5, junto com o p
 
 ```
 core/TouchInput.js            pointer events no canvas → ações (multitoque por pointerId, joystick com zona morta)
-core/saveStorage.js           save versionado e migrações
 core/textPrompt.js            input DOM temporário só na tela de nome (injetado)
 config/touchLayoutConfig.js, attributesConfig.js, powersConfig.js, powerTiersConfig.js,
        storyConfig.js, secretsConfig.js, introConfig.js
@@ -709,7 +708,6 @@ characters/skins.js           resolveAppearance(character, skinId)
 combat/powerResistance.js     resolvePowerOutcome(rule, levelDiff) → { scale, outcome } (puro)
 combat/powerEffects.js        registro { push, pull, lightning, barrier } → handler
 combat/PowerSystem.js         medidor, recargas, fases do poder, eventos
-modes/DuelResult.js, modes/duelOutcomes.js
 modes/story/StoryDirector.js, modes/story/conditions.js
 modes/SecretUnlockSystem.js   casa sequências de teclas (lastPressedCode) e de ações; persiste o desbloqueio
 states/IntroState.js, StoryState.js, DialogueState.js, ProtagonistState.js
@@ -747,7 +745,7 @@ ui/TouchControls.js           controles de toque desenhados no canvas
 
 `evadeConfig.js` define enabled e perfil global; stats.evade opcional substitui o perfil completo. CombatSystem.tryEvade reaproveita startDodge e DODGING, com combat.evading/evadeSucceeded no snapshot. Deslocamento para tras so durante movementTime. findContacts detecta hitbox contra hurtbox invulneravel do EVADE e captura evaded antes de resolver; marca hasHit do atacante e emite EVADE_SUCCESS, libera IDLE e zera velocidade. Dash comum continua ignorando contatos invulneraveis. EffectsSystem guarda timer visual por defensor; DuelRenderer e DodgeAfterimage usam esse sinal para uma silhueta inclinada curta, inclusive depois da liberacao imediata. Audio reutiliza DODGE. Sem novas cores/assets ou estado de combate.
 
-IA EVADE: getTimeUntilAttackActive exp?e startup restante, zero no active ainda nao conectado e Infinity fora da ameaca. No pensamento de defesa, a rolagem ja existente escolhe EVADE por evadeChance e evadeWeight do perfil, somente contra active. evadeTimingJitter agenda atraso; a cada passo o plano valida se aquele golpe ainda existe e solicita intent.evade uma vez. Nenhuma mutacao no lutador. Fora de blockstun, EVADE tambem pode sair de BLOCKING. Chances iniciais pequenas preservam o combate classico; calibracao final pela matriz.
+IA EVADE: getTimeUntilAttackActive expoe startup restante, zero no active ainda nao conectado e Infinity fora da ameaca. No pensamento de defesa, a rolagem ja existente escolhe EVADE por evadeChance e evadeWeight do perfil, somente contra active. evadeTimingJitter agenda atraso; a cada passo o plano valida se aquele golpe ainda existe e solicita intent.evade uma vez. Nenhuma mutacao no lutador. Fora de blockstun, EVADE tambem pode sair de BLOCKING. Chances iniciais pequenas preservam o combate classico; calibracao final pela matriz.
 
 Pulo duplo: MovementSystem incrementa combat.jumpsUsed (snapshot automatico) no pulo terrestre e aereo, com limite movement.maxJumps. PhysicsSystem zera no contato com chao, mesmo em estados de combate; resetForRound tambem zera. tryWallJump retorna se executou para dar prioridade ao pulo na parede e nao muda jumpsUsed. Saltos de habilidade consomem o primeiro pulo. airJumpVelocityScale configura a velocidade do aereo. Um voo continua permitindo um unico ataque aereo. F3 mostra contador e tempo do EVADE.
 
@@ -782,3 +780,5 @@ Pulo duplo: MovementSystem incrementa combat.jumpsUsed (snapshot automatico) no 
 | Eco | 25 | 43 | 58 | 38 | 28 | 62 | 25 | 58 | 40 | -- | 42.0 | -0.4 |
 
 IA de movimento so pede intent.jump: inicia o salto ao aproximar/recuar/recuperar stamina com maxJumps > 1 e tenta o segundo a partir do apice, respeitando jumpsUsed. O simulador usa os mesmos controllers/sistemas e agora informa pulos, pulos aereos, tentativas e sucessos de EVADE. --set evade.enabled=false permite comparar sem EVADE, sem criar rules.
+
+Validacao final: fixture `tests/fixtures/save-v1.json` foi produzida pelo saveSettings original do commit 305b59f, com progresso e remapeamento reais do esquema v1. Fontes de input nao repetem a borda quando teclado assume uma acao ja segurada por outra fonte; testes cobrem as duas ordens. Chrome headless local: DPR 3 limitado a 2, Canvas real, F3 com medias e pose inclinada do EVADE; nenhum erro de JavaScript. Servidor de teste encerrado ao finalizar.
