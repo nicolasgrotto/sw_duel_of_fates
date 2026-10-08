@@ -196,7 +196,7 @@ As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e des
 
 - [x] Haste, Brasa e Forja (ponto doce, contra-golpe próprio, golpe carregável)
 - [x] IA por personagem (prioridades e pesos como dados; habilidade usada conforme o tipo do golpe)
-- [ ] Mais 2–3 arenas
+- [x] Mais 2–3 arenas: Telhado Neon, Anel Orbital e Floresta Lumínica (6 arenas no total)
 
 ### v0.7 — Polimento
 

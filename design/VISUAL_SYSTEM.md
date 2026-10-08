@@ -221,7 +221,7 @@ Controlado pela **Camera**, a pedido do `EffectsSystem`. Nunca diretamente pelo 
 
 ## Arenas
 
-Arenas são dados (`src/arenas/arenaData.js`) com cores sempre por token. Primitivas disponíveis nas camadas: retângulos, linhas, polígonos, círculos e glows. Camadas estáticas são pré-renderizadas.
+Arenas são dados (`src/arenas/arenaData.js`) com cores sempre por token. Primitivas disponíveis nas camadas: retângulos, linhas, polígonos, círculos, arcos e glows. Partículas: vapor, poeira, ondulação e chuva (riscos com o comprimento de `streak`). Camadas estáticas são pré-renderizadas.
 
 ### Reflexo na água
 

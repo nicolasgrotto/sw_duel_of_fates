@@ -33,5 +33,6 @@ assets/
 | --- | --- | --- | --- | --- |
 | src/arenas/arenaData.js (refinery) | cenário procedural | geometria original do projeto | MIT | Plataforma de Refino desenhada por código; sem imagem externa |
 | src/arenas/arenaData.js (sanctuary, crystalMine) | cenário procedural | geometria original do projeto | MIT | Santuário Alagado e Mina de Cristal desenhados por código; sem imagem externa |
+| src/arenas/arenaData.js (rooftop, orbital, forest) | cenário procedural | geometria original do projeto | MIT | Telhado Neon (glifos inventados, sem texto real), Anel Orbital e Floresta Lumínica desenhados por código |
 | assets/fonts/Oxanium.ttf | fonte | The Oxanium Project Authors (github.com/sevmeyer/oxanium), via github.com/google/fonts | SIL OFL 1.1 | Fonte variável; licença completa em assets/fonts/Oxanium-OFL.txt |
 | assets/fonts/Oxanium-OFL.txt | licença | The Oxanium Project Authors | SIL OFL 1.1 | Texto da licença distribuído junto com a fonte |

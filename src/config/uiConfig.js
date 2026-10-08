@@ -1,9 +1,20 @@
 export const texts = {
-  arenas: { refinery: 'Plataforma de Refino', sanctuary: 'Santuário Alagado', crystalMine: 'Mina de Cristal', platform: 'Plataforma de treino' },
+  arenas: {
+    refinery: 'Plataforma de Refino',
+    sanctuary: 'Santuário Alagado',
+    crystalMine: 'Mina de Cristal',
+    rooftop: 'Telhado Neon',
+    orbital: 'Anel Orbital',
+    forest: 'Floresta Lumínica',
+    platform: 'Plataforma de treino',
+  },
   arenaDescriptions: {
     refinery: 'Plataforma industrial suspensa sobre o fosso',
     sanctuary: 'Templo em ruínas sob a lua, sobre a água',
     crystalMine: 'Caverna onde os cristais pegam a cor das lâminas',
+    rooftop: 'Topo de prédio na chuva, entre letreiros de glifos',
+    orbital: 'Plataforma presa a um anel, acima de um planeta',
+    forest: 'Clareira onde os fungos acendem com as lâminas',
   },
   menu: {
     tagline: 'UM DUELO DE LÂMINAS DE ENERGIA',

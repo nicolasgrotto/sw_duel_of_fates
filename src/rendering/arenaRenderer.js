@@ -128,6 +128,10 @@ export class ArenaRenderer {
       } else if (kind === 'ripple') {
         const size = radius * progress;
         renderer.strokeEllipse(particle.x, particle.y, size, size * 0.22, colors[color], 1.5);
+      } else if (kind === 'rain') {
+        const { driftSpeed, riseSpeed, streak } = ambient.config;
+        renderer.setAlpha(alpha);
+        renderer.line(particle.x, particle.y, particle.x + driftSpeed * streak, particle.y - riseSpeed * streak, colors[color], radius);
       } else {
         renderer.fillCircle(particle.x, particle.y, radius, colors[color]);
       }
@@ -136,7 +140,13 @@ export class ArenaRenderer {
   }
 
   drawCrystalBodies(renderer) {
+    const isFungus = this.definition.crystalShape === 'fungus';
     for (const [x, y, size] of this.definition.crystals) {
+      if (isFungus) {
+        renderer.line(x, y, x, y + size * 0.9, colors.arenaWood, size * 0.3);
+        renderer.fillEllipse(x, y, size, size * 0.45, colors.arenaFungus);
+        continue;
+      }
       const points = setCrystalPoints(x, y, size);
       renderer.fillPolygon(points, colors.arenaCrystal);
       renderer.polyline(points, colors.arenaCrystalEdge, 1.5);
@@ -160,6 +170,9 @@ export class ArenaRenderer {
     }
     for (const [x, y, radius, color, alpha] of layer.glows ?? []) {
       renderer.drawGlow(x, y, radius, colors[color], alpha);
+    }
+    for (const [x, y, radius, startAngle, endAngle, color, width] of layer.arcs ?? []) {
+      renderer.strokeArc(x, y, radius, startAngle, endAngle, colors[color], width);
     }
     renderer.restore();
   }

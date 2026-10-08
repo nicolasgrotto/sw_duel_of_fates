@@ -158,6 +158,14 @@ export class Renderer {
     this.context.stroke();
   }
 
+  strokeArc(x, y, radius, startAngle, endAngle, color, lineWidth = 1) {
+    this.context.strokeStyle = color;
+    this.context.lineWidth = lineWidth;
+    this.context.beginPath();
+    this.context.arc(x, y, radius, startAngle, endAngle);
+    this.context.stroke();
+  }
+
   clipRect(x, y, width, height) {
     this.context.beginPath();
     this.context.rect(x, y, width, height);

@@ -36,6 +36,17 @@ export const colors = {
   arenaRock: '#110d16',
   arenaCrystal: '#2a2140',
   arenaCrystalEdge: '#4d3d70',
+  arenaCity: '#0d111c',
+  arenaNeon: '#5fd4e6',
+  arenaRoof: '#10141f',
+  arenaRain: '#9fb4d9',
+  arenaPlanet: '#16233a',
+  arenaAtmosphere: '#4f7fb8',
+  arenaSun: '#e8f0ff',
+  arenaWood: '#0c1410',
+  arenaMoss: '#0f1a14',
+  arenaFungus: '#1f3a30',
+  arenaSpore: '#6fe0b0',
 };
 
 export const textStyles = {

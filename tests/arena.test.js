@@ -1,6 +1,8 @@
 import { it } from 'node:test';
 import assert from 'node:assert/strict';
 import { arenas } from '../src/arenas/arenaData.js';
+import { gameConfig } from '../src/config/gameConfig.js';
+import { texts } from '../src/config/uiConfig.js';
 import { ArenaRenderer } from '../src/rendering/arenaRenderer.js';
 import { AmbientSystem } from '../src/systems/AmbientSystem.js';
 import { createRandom } from '../src/utils/random.js';
@@ -41,4 +43,19 @@ it('keeps ambient particles bounded in a fixed pool with deterministic updates',
   assert.equal(first.particles.length, config.count);
   assert.equal(first.particles[0], particles[0]);
   assert.ok(first.particles.every(p => p.x >= arena.left && p.x <= arena.right && p.y >= 0 && p.y <= arena.floorY));
+});
+
+it('describes every selectable arena with the fields the renderer needs', () => {
+  for (const id of gameConfig.duel.arenaOrder) {
+    const definition = arenas[id];
+    assert.ok(definition, id);
+    for (const field of ['floorHeight', 'floorColor', 'floorEdgeColor', 'layers', 'crystals', 'crystalShape', 'ambient']) {
+      assert.ok(field in definition, `${id}.${field}`);
+    }
+    assert.ok(texts.arenas[id] && texts.arenaDescriptions[id], id);
+    for (const config of definition.ambient) {
+      assert.ok(['steam', 'dust', 'ripple', 'rain'].includes(config.kind), `${id}: ${config.kind}`);
+      assert.equal(config.area.length, 2);
+    }
+  }
 });
