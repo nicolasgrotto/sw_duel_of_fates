@@ -66,7 +66,7 @@ function readOptions(argv) {
   return options;
 }
 
-function createController(self, opponent, { characterId, difficulty, profile }, random) {
+function createController(self, opponent, { characterId, difficulty, profile }, random, rules) {
   return new EnemyAI({
     self,
     opponent,
@@ -74,6 +74,7 @@ function createController(self, opponent, { characterId, difficulty, profile }, 
     difficulty: aiConfig.difficulties[difficulty],
     perception: aiConfig.perception,
     random,
+    rules,
   });
 }
 
@@ -92,8 +93,8 @@ function runDuel(leftSetup, rightSetup, random, rules) {
   const right = createFighter(rightId, { x: centerX + half, y: arena.floorY, facing: -1 });
   const fighters = [left, right];
   const controllers = [
-    createController(left, right, leftSetup, random),
-    createController(right, left, rightSetup, random),
+    createController(left, right, leftSetup, random, rules),
+    createController(right, left, rightSetup, random, rules),
   ];
   const simulation = new DuelSimulation({
     arena,
@@ -103,7 +104,7 @@ function runDuel(leftSetup, rightSetup, random, rules) {
     animationConfig: animationStyle,
     rules,
   });
-  const counts = { hits: 0, blocks: 0, clashes: 0, guardBreaks: 0, parries: 0, perfectParries: 0, shoves: 0, evades: 0, evadeAttempts: 0, jumps: 0, airJumps: 0 };
+  const counts = { hits: 0, blocks: 0, clashes: 0, guardBreaks: 0, parries: 0, perfectParries: 0, shoves: 0, evades: 0, evadeAttempts: 0, jumps: 0, airJumps: 0, powers: 0, powerHits: 0, powerResisted: 0, powerAbsorbed: 0 };
 
   const hitsReceived = new Map([[left, 0], [right, 0]]);
   let time = 0;
@@ -132,6 +133,10 @@ function runDuel(leftSetup, rightSetup, random, rules) {
       if (event.type === CombatEvent.PERFECT_PARRY) counts.perfectParries += 1;
       if (event.type === CombatEvent.EVADE_SUCCESS) counts.evades += 1;
       if (event.type === CombatEvent.SHOVE) counts.shoves += 1;
+      if (event.type === CombatEvent.POWER_START) counts.powers += 1;
+      if (event.type === CombatEvent.POWER_HIT) counts.powerHits += 1;
+      if (event.type === CombatEvent.POWER_RESISTED) counts.powerResisted += 1;
+      if (event.type === CombatEvent.POWER_ABSORBED) counts.powerAbsorbed += 1;
     }
     time += STEP;
   }
@@ -187,6 +192,10 @@ function main() {
   console.log(`avg evades : ${average(results.map((result) => result.counts.evades)).toFixed(2)}  attempts: ${average(results.map((result) => result.counts.evadeAttempts)).toFixed(2)}`);
   console.log(`avg jumps  : ${average(results.map((result) => result.counts.jumps)).toFixed(2)}  air: ${average(results.map((result) => result.counts.airJumps)).toFixed(2)}`);
   console.log(`avg shoves : ${average(results.map((result) => result.counts.shoves)).toFixed(2)}`);
+  if (rules.powers) {
+    const counts = (name) => average(results.map((result) => result.counts[name])).toFixed(2);
+    console.log(`avg powers : ${counts('powers')}  hits: ${counts('powerHits')}  resisted: ${counts('powerResisted')}  absorbed: ${counts('powerAbsorbed')}`);
+  }
 }
 
 main();

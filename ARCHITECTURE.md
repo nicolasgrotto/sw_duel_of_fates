@@ -690,7 +690,7 @@ Matriz v1.0 (perfil **próprio** de cada personagem, 60 duelos por par, seed 1, 
 | Garça | 45 | 58 | 85 | 28 | 43 | 85 | 52 | 60 | -- | 77 | 59.3 | 0,0 |
 | Eco | 25 | 43 | 58 | 38 | 28 | 62 | 25 | 58 | 40 | -- | 42.0 | 0,0 |
 
-O equilíbrio depende da dificuldade, e isso foi aceito na v1.0: personagens de execução e leitura (Vespa, Espelho, Brasa, Garça) rendem mais com a IA Difícil, que completa sequências e apara melhor; os de força bruta (Bastião, Sombra, Haste) rendem mais com a Normal. Na média das duas dificuldades todos ficam entre 45% e 57%. A IA Normal apara com `parryChance` 0,38 e a Difícil com 0,5 para não ampliar essa diferença. Para reproduzir: `npm run matrix` (padrão: Normal e Difícil, 60 duelos por par; `--difficulties`, `--duels` e `--characters a,b,c` mudam isso). Ele roda o `simulate` para cada par, sem `--profile`.
+O equilíbrio depende da dificuldade, e isso foi aceito na v1.0: personagens de execução e leitura (Vespa, Espelho, Brasa, Garça) rendem mais com a IA Difícil, que completa sequências e apara melhor; os de força bruta (Bastião, Sombra, Haste) rendem mais com a Normal. Na média das duas dificuldades todos ficam entre 45% e 57%. A IA Normal apara com `parryChance` 0,38 e a Difícil com 0,5 para não ampliar essa diferença. Para reproduzir: `npm run matrix` (padrão: Normal e Difícil, 60 duelos por par; `--difficulties`, `--duels`, `--characters a,b,c` e `--rules powers` mudam isso). Ele roda o `simulate` para cada par, sem `--profile`.
 
 A Vespa é o personagem de execução: rende pouco com a IA Normal (que completa só 60% das sequências) e fica equilibrada no Difícil. Isso é intencional (dificuldade 4 no GAME_DESIGN). Rode a matriz de novo depois de mexer em atributos.
 
@@ -702,6 +702,42 @@ Nenhum timeout nos seis cenários. Com ambos balanced, Difícil vence Normal 98,
 Sequências: o combate marca `attackConnected` apenas em hit ou bloqueio (inclui quebra de guarda). `tryAttackChain` lê um rápido no buffer durante recovery e procura o próximo golpe declarado em `cancelsInto`. Cada passo cobra stamina, reinicia stateTime/hasHit/lunge e emite attackStart; whiff/parry/clash não confirmam a rota. Guardião tem dois passos, Sombra três. As poses existentes de rápido são reutilizadas; o Treino identifica Rápido 2/3.
 
 `tryAirAttack` aceita rápido/forte no estado JUMPING uma vez por pulo (`airAttackUsed`, rearmado no chão). O move air usa gravidade e velocidade horizontal existentes; MovementSystem não aplica atrito de ação no ar. Forte + intent à frente escolhe forwardHeavy, com startup/custo/recovery/lunge próprios. `isHeavyAttack` inclui o avanço para áudio e parry da IA. Não há knockback vertical nem cancels aéreos.
+
+### Matriz v1.6 (poderes ligados)
+
+`npm run matrix -- --rules powers`: Normal e Difícil, perfis próprios, seed 1, 60 duelos por par ordenado. É o que o jogador enfrenta em Duelar com poderes. Sem `--rules powers` a matriz continua idêntica à v1.3/v1.4 (a IA não consome o RNG com poderes desligados).
+
+| Normal v1.6 | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco | média |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Guardião | — | 53 | 23 | 70 | 50 | 25 | 45 | 32 | 67 | 35 | 44,4 |
+| Sombra | 45 | — | 40 | 68 | 60 | 52 | 68 | 57 | 82 | 62 | 59,3 |
+| Bastião | 82 | 53 | — | 68 | 73 | 45 | 82 | 55 | 75 | 67 | 66,7 |
+| Vespa | 35 | 22 | 27 | — | 48 | 33 | 40 | 38 | 45 | 45 | 37,0 |
+| Espelho | 45 | 32 | 18 | 50 | — | 23 | 50 | 32 | 55 | 43 | 38,7 |
+| Haste | 80 | 33 | 53 | 70 | 80 | — | 62 | 62 | 75 | 68 | 64,8 |
+| Brasa | 55 | 35 | 23 | 60 | 53 | 18 | — | 30 | 48 | 42 | 40,5 |
+| Forja | 63 | 35 | 55 | 53 | 70 | 37 | 70 | — | 60 | 47 | 54,4 |
+| Garça | 38 | 13 | 33 | 57 | 63 | 28 | 60 | 23 | — | 27 | 38,1 |
+| Eco | 62 | 40 | 42 | 48 | 70 | 32 | 63 | 47 | 62 | — | 51,7 |
+
+| Difícil v1.6 | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco | média |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Guardião | — | 67 | 50 | 63 | 45 | 32 | 45 | 53 | 53 | 55 | 51,5 |
+| Sombra | 33 | — | 55 | 27 | 50 | 62 | 25 | 45 | 53 | 45 | 43,9 |
+| Bastião | 57 | 50 | — | 25 | 23 | 35 | 25 | 40 | 40 | 30 | 36,1 |
+| Vespa | 40 | 57 | 67 | — | 53 | 77 | 28 | 75 | 70 | 60 | 58,5 |
+| Espelho | 63 | 55 | 68 | 42 | — | 60 | 35 | 55 | 50 | 53 | 53,5 |
+| Haste | 78 | 33 | 62 | 22 | 42 | — | 40 | 52 | 30 | 32 | 43,3 |
+| Brasa | 70 | 77 | 57 | 67 | 52 | 58 | — | 55 | 60 | 75 | 63,3 |
+| Forja | 55 | 35 | 73 | 38 | 42 | 50 | 42 | — | 38 | 42 | 46,1 |
+| Garça | 55 | 42 | 75 | 42 | 62 | 68 | 45 | 57 | — | 42 | 54,1 |
+| Eco | 47 | 43 | 63 | 40 | 40 | 75 | 33 | 53 | 62 | — | 50,7 |
+
+| Média das duas | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| % | 48 | 52 | 51 | 48 | 46 | 54 | 52 | 50 | 46 | 51 |
+
+Na média das duas dificuldades todos ficam entre 46% e 54% (no clássico, 45–57%). A diferença por dificuldade continua: no Normal os fortes de lâmina (Bastião, Haste) seguem na frente; no Difícil a IA apara e usa Barreira/guarda melhor, e Brasa e Vespa sobem. A Vespa (Fluxo 4) cai no Normal porque os poderes alheios a alcançam de longe. Nenhum atributo foi mexido para isso; ajustes futuros devem começar por `aiConfig.perception.powerUse`, `powerChance` e os custos em `powersConfig`.
 
 ## AI
 
@@ -717,7 +753,7 @@ DuelSimulation → CombatSystem executa (igual ao jogador)
 
 - `EnemyAI` é um controller como o `PlayerController`: `updateIntent(intent, dt)`. Ela recebe `self` e `opponent` só para **ler**.
 - Além de defender ataques que estão vindo, a IA pode **guardar por antecipação** (`guardChance`) quando está no alcance do oponente e não pode atacar. É o que permite defender ataques rápidos, cujo startup é menor que o tempo de reação.
-- **IA por personagem**: cada personagem tem um perfil em `aiConfig.profiles` (mesmo id do personagem; os perfis genéricos `aggressive`, `defensive` e `balanced` continuam para testes e para `simulate --profile`). O perfil traz pesos (`attackChance`, `blockChance`, `specialChance`...), distância (`preferredGap`, `closeGapRatio`), `chargeHold` (quanto segurar uma habilidade de carga) e `priorities`: a ordem dos passos de `decide()` (`defend`, `counter`, `shove`, `recover`, `special`, `attack`, `guard`, `position`). O primeiro passo que devolve uma decisão vence; `position` não devolve nada quando a distância já está boa.
+- **IA por personagem**: cada personagem tem um perfil em `aiConfig.profiles` (mesmo id do personagem; os perfis genéricos `aggressive`, `defensive` e `balanced` continuam para testes e para `simulate --profile`). O perfil traz pesos (`attackChance`, `blockChance`, `specialChance`...), distância (`preferredGap`, `closeGapRatio`), `chargeHold` (quanto segurar uma habilidade de carga) e `priorities`: a ordem dos passos de `decide()` (`defend`, `counter`, `shove`, `recover`, `special`, `power`, `attack`, `guard`, `position`). O primeiro passo que devolve uma decisão vence; `position` não devolve nada quando a distância já está boa.
 - **Habilidade proativa** (`trySpecialAttack`): o tipo vem dos dados do golpe (`getSpecialKind`: `counter`, `armor`, `dash`, `charge`, `leap`, `strike`). O salto é usado perto do oponente (`perception.leapGap`). A finta usa `profile.feintChance`: ao decidir um forte, a IA agenda o toque na guarda para `heavy.startup × perception.feintAt` (só personagens com `stats.feint`). Postura de contra-golpe é usada como leitura quando o oponente está no alcance e parado; armadura, carga e golpe comum quando a habilidade alcança; o avanço só é usado como resposta (`trySpecialAnswer`). Na carga, `plan.chargeHoldTime` mantém `intent.specialHeld`.
 - `perception.js` tem funções puras (`getGap`, `canReach`, `isThreatening`, `isPunishable`).
 - O plano guarda direção, tempo de bloqueio e uma ação pontual (`pendingAction`), que vira intent por um frame só.
@@ -740,6 +776,8 @@ DuelSimulation → CombatSystem executa (igual ao jogador)
 **Garantia testada:** a IA roda com os lutadores congelados (`Object.freeze`) sem erro, ou seja, ela nunca altera HP, stamina, posição ou estado.
 
 ---
+
+IA de poderes (v1.6): a `EnemyAI` recebe `rules` e só pensa em poderes com `rules.powers`; sem a regra, nenhum passo novo consome o RNG, então o duelo clássico fica idêntico. O passo `power` (depois de `special` nas `priorities` de todos os perfis) testa os espaços `forward` e `neutral` do loadout (a Barreira é só defensiva): precisa de recarga zerada, medidor para o custo (mais uma reserva de canal, `perception.powerChannelReserve`), alcance, o oponente fora da guarda, distância dentro de `perception.powerUse[efeito]` (Repulsão de perto, Raio a meia distância, Puxão de longe) e, com `difficulty.powerAware`, uma escala de resistência maior que zero (o Fácil não sabe disso e gasta medidor à toa). A chance é `profile.powerChance` (ou `perception.powerChance`) × `difficulty.powerMultiplier`. `startPower` aponta o `moveX` para o espaço escolhido e segura `powerHeld` por `plan.powerHoldTime` (Raio: sorteio em `perception.lightningHold`). Na defesa, `tryDefendPower` roda antes da ameaça de lâmina: contra um poder do oponente que alcança, com a chance de bloqueio do perfil, levanta a Barreira (se tiver, com `perception.barrierPreference`) ou segura a guarda até o fim do poder. Contra golpes de lâmina, a Barreira também entra com `perception.barrierVsSaberChance`.
 
 IA EVADE: getTimeUntilAttackActive expõe startup restante, zero no active ainda não conectado e Infinity fora da ameaça. No pensamento de defesa, a rolagem já existente escolhe EVADE por evadeChance e evadeWeight do perfil, somente contra active. evadeTimingJitter agenda atraso; a cada passo o plano valida se aquele golpe ainda existe e solicita intent.evade uma vez. Nenhuma mutação no lutador. Fora de blockstun, EVADE também pode sair de BLOCKING. Chances iniciais pequenas preservam o combate clássico; calibração final pela matriz.
 

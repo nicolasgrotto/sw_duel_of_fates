@@ -337,6 +337,7 @@ export class DuelState extends GameState {
       difficulty: aiConfig.difficulties[this.difficultyId],
       perception: aiConfig.perception,
       random: this.random,
+      rules: this.rules,
     });
   }
 
