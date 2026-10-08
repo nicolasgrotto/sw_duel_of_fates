@@ -41,9 +41,17 @@ As duas silhuetas devem ser diferentes mesmo pintadas de preto: capuz, comprimen
 | Guarda | lâmina larga e quase horizontal | duas lâminas curtas: uma à frente, outra invertida para trás | lâmina vertical à frente do rosto |
 | Sabre | verde-ácido, lâmina mais grossa | amarelo-âmbar, lâminas finas | branco-prata |
 
+| | Haste | Brasa | Forja |
+| --- | --- | --- | --- |
+| Roupa | túnica cinza-violeta | túnica curta vermelho-queimado | túnica de couro, ombros largos |
+| Cabeça | sem capuz | capuz levantado, sem capa | sem capuz, cabeça grande |
+| Postura | ereta, longe do oponente | baixa, à espreita | firme, pesada |
+| Guarda | **haste longa**: cabo de mais de um metro, lâmina à frente | **empunhadura invertida**: lâmina para trás e para baixo | lâmina **muito larga** à frente |
+| Sabre | violeta | laranja-brasa | vermelho-forja; brilha mais conforme carrega |
+
 O chefe **Sombra Desperta** usa a silhueta da Sombra com ombreiras (`pauldrons`), ombros mais largos, capa ainda mais escura e lâmina mais grossa. Continua magenta: é a mesma pessoa, mais perigosa.
 
-Recursos de silhueta disponíveis em `characterData.appearance`: `shoulderScale` (largura dos ombros), `pauldrons` (ombreiras), `masked` (máscara no lugar do rosto), `bladeWidthScale` (espessura da lâmina) e `dualBlade` (segunda lâmina na mão de trás). Use-os para que cada personagem novo continue reconhecível pintado de preto.
+Recursos de silhueta disponíveis em `characterData.appearance`: `shoulderScale` (largura dos ombros), `pauldrons` (ombreiras), `masked` (máscara no lugar do rosto), `bladeWidthScale` (espessura da lâmina), `hiltScale` (comprimento do cabo; a Haste usa um cabo longo como uma lança) e `dualBlade` (segunda lâmina na mão de trás). Use-os para que cada personagem novo continue reconhecível pintado de preto.
 
 ## Paleta
 
@@ -167,5 +175,31 @@ Caverna escura, com cristais nas paredes.
 - **Assinatura**: os cristais **pegam a cor do sabre mais próximo** (regra de cristais no VISUAL_SYSTEM). A caverna muda de cor conforme os lutadores se movem. É o pilar "o sabre é a fonte de luz" levado ao cenário.
 - **Chão**: rocha (`arenaRock`) com borda em `arenaCrystalEdge`.
 - **Ambiente**: brilhos minúsculos que flutuam devagar.
+
+### Telhado Neon
+
+Topo de prédio numa cidade vertical, à noite, na chuva.
+
+- **Fundo**: torres em silhueta (`arenaCity`) com janelas apagadas e **letreiros em glifos inventados** (traços geométricos sem letras reais), em neon frio e fraco (`arenaNeon`, glow com alpha baixo). O neon nunca compete com os sabres.
+- **Chão**: laje molhada (`arenaRoof`) que **reflete** os lutadores, mais fraco que a água do Santuário.
+- **Ambiente**: chuva inclinada, rápida e fina, na frente do fundo e atrás dos corpos.
+
+### Anel Orbital
+
+Plataforma de metal presa a um anel acima de um planeta.
+
+- **Fundo**: céu preto com estrelas fixas, um **planeta enorme** (`arenaPlanet`) ocupando a parte de baixo do fundo, com a borda iluminada pela atmosfera (`arenaAtmosphere`, glow), e a curva do anel cruzando o céu.
+- **Iluminação**: um sol forte e distante à esquerda (glow branco-frio).
+- **Chão**: placa metálica (`floor`) com borda clara.
+- **Ambiente**: partículas quase paradas, como poeira em gravidade baixa.
+
+### Floresta Lumínica
+
+Clareira numa floresta bioluminescente.
+
+- **Fundo**: troncos e raízes em silhueta (`arenaWood`), copas que cobrem o céu, fungos nos troncos (`arenaFungus`).
+- **Assinatura**: os **fungos acendem na cor do sabre mais próximo**, com a mesma regra dos cristais da Mina.
+- **Chão**: musgo escuro (`arenaMoss`).
+- **Ambiente**: esporos subindo devagar.
 
 Elementos interativos (colunas que caem, cristais que estilhaçam) ficam para o futuro: a arena reage a eventos de combate, como o `EffectsSystem`, sem mexer no combate.

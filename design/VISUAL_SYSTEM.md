@@ -111,6 +111,9 @@ Cores de personagem são **dados do personagem** e ficam em `src/characters/char
 | Bastião | `#3d4636` | `#1f231c` | verde-ácido `#9dff3f` |
 | Vespa | `#5c4a33` | `#2a2219` | amarelo-âmbar `#ffd23f` |
 | Espelho | `#b9bcc7` | `#3a3d47` | branco-prata `#e8eeff` |
+| Haste | `#3b3348` | `#1c1924` | violeta `#a46bff` |
+| Brasa | `#5a2c1e` | `#24140f` | laranja-brasa `#ff7a2a` |
+| Forja | `#4a3a30` | `#211a15` | vermelho-forja `#ff4038` |
 
 `trimColor` (também dado do personagem) pinta ombreiras e máscara.
 
@@ -141,6 +144,17 @@ Cores compartilhadas (em `themeConfig`):
 | `arenaRock` | `#110d16` | rocha da Mina de Cristal |
 | `arenaCrystal` | `#2a2140` | corpo dos cristais |
 | `arenaCrystalEdge` | `#4d3d70` | aresta dos cristais e borda do chão da Mina |
+| `arenaCity` | `#0d111c` | torres do Telhado Neon |
+| `arenaNeon` | `#5fd4e6` | letreiros de glifos (sempre com alpha baixo) |
+| `arenaRoof` | `#10141f` | laje molhada |
+| `arenaRain` | `#9fb4d9` | chuva |
+| `arenaPlanet` | `#16233a` | planeta do Anel Orbital |
+| `arenaAtmosphere` | `#4f7fb8` | borda da atmosfera |
+| `arenaSun` | `#e8f0ff` | sol distante |
+| `arenaWood` | `#0c1410` | troncos da Floresta Lumínica |
+| `arenaMoss` | `#0f1a14` | chão de musgo |
+| `arenaFungus` | `#1f3a30` | corpo dos fungos |
+| `arenaSpore` | `#6fe0b0` | esporos (alpha baixo) |
 
 ## Sabre
 
@@ -213,9 +227,13 @@ Arenas são dados (`src/arenas/arenaData.js`) com cores sempre por token. Primit
 
 Quando a arena tem `reflection`, os corpos e as lâminas são desenhados espelhados no eixo do chão, logo depois do chão. Por cima vem uma película da cor da água (`reflection.cover`), que escurece o reflexo por igual, inclusive o brilho das lâminas. O reflexo nunca fica mais forte que os lutadores e não tem sombra no chão.
 
+### Lâmina carregando (Forja)
+
+Enquanto o golpe carregável está preso na preparação, o flare branco da lâmina cresce com o nível de carga (o mesmo traço do flare do parry). No nível máximo o flare fica cheio.
+
 ### Cristais que pegam a cor do sabre
 
-Cada cristal tem um corpo fixo (pré-renderizado) e um brilho dinâmico. A cada frame o brilho usa a cor do sabre do lutador mais próximo, com intensidade que cai com a distância (`crystalGlow.range`) e alpha máximo baixo (`crystalGlow.alpha`). O brilho é aditivo e fica atrás dos corpos.
+Vale também para os fungos da Floresta Lumínica (`crystalShape: 'fungus'`). Cada cristal tem um corpo fixo (pré-renderizado) e um brilho dinâmico. A cada frame o brilho usa a cor do sabre do lutador mais próximo, com intensidade que cai com a distância (`crystalGlow.range`) e alpha máximo baixo (`crystalGlow.alpha`). O brilho é aditivo e fica atrás dos corpos.
 
 ## Enquadramento dinâmico
 

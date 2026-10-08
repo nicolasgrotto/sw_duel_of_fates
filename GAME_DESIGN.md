@@ -260,6 +260,7 @@ A IA controla o oponente pelo mesmo `intent` do jogador. Ela só **solicita** a�
   6. **Guardar**: no alcance do jogador e sem poder atacar, segura o bloqueio por antecipação (ataques rápidos são mais rápidos que a reação da IA).
   7. **Posicionar**: fora do alcance, aproxima. Perto demais (para o perfil), recua um pouco ou espera.
 - Cada pensamento tem uma chance de **erro** (hesitar, não defender), que depende da dificuldade.
+- **Por personagem**: a ordem das decisões (`priorities`) e os pesos ficam no perfil de cada personagem (`aiConfig.profiles.<personagem>`). Exemplos: o Espelho prefere guardar a atacar e usa a postura contra qualquer golpe que vê chegando; a Haste mantém distância para acertar com a ponta; a Vespa usa o avanço para atravessar fortes; a Forja carrega o golpe quando o oponente está longe; o Bastião anda bloqueando e solta a Marreta quando o oponente insiste; a Brasa espera golpes para usar a postura e pune tudo.
 - **Justiça**: a IA só vê o que o jogador vê (estado e fase do golpe). Ela nunca reage mais rápido que o `reactionTime` e não consegue aparar um ataque rápido por reação.
 
 ### Perfis
@@ -442,6 +443,12 @@ Armadura: durante o startup (e o active, quando indicado) o golpe aguenta N acer
 | **Forja** | knockback maior em tudo | **Forja**: forte carregável segurando `I` (até 3 níveis); o nível 3 quebra a guarda de quem bloquear |
 
 Custos, tempos e números ficam em `src/config/movesConfig.js` e `fightersConfig.js`.
+
+**Carga (Forja)**: apertar `I` começa o golpe; **segurar** `I` prende o golpe no fim da preparação e acumula carga (0,35 s por nível, até 3 níveis). Soltar libera o golpe. Nível 1 = dano normal, nível 2 = +35%, nível 3 = +70% e **quebra a guarda** de quem bloquear. A lâmina brilha mais a cada nível: o oponente sempre vê a carga chegando e pode punir, esquivar ou empurrar. Segurar demais não ajuda: no nível máximo o golpe sai sozinho.
+
+**Ponto doce (Haste)**: o dano depende da distância entre os corpos no acerto, em relação ao alcance do golpe. No último terço do alcance, +50%; no primeiro quarto (muito perto), 60%.
+
+**Brasa Viva (Brasa)**: postura de contra-golpe de 0,5 s; o contra-golpe é um corte rápido e forte (startup 0,08 s), não a riposta comum.
 
 ## 16. Tutorial e desafio de parry
 
