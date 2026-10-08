@@ -81,7 +81,7 @@ export class Game {
   }
 
   handleResize() {
-    this.renderer.fitToDisplay(window.devicePixelRatio || 1);
+    this.renderer.fitToDisplay(Math.min(window.devicePixelRatio || 1, gameConfig.canvas.maxPixelRatio));
   }
 
   update(dt) {
@@ -99,6 +99,6 @@ export class Game {
   render() {
     this.renderer.clear(colors.background);
     this.states.render(this.renderer);
-    this.debug.render(this.renderer, this.states);
+    this.debug.render(this.renderer, this.states, this.loop.timings);
   }
 }

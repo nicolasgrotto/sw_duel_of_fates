@@ -120,3 +120,17 @@ describe('GameLoop start and stop', () => {
     assert.equal(scheduleCount, 1);
   });
 });
+
+it('measures update and render cost with the injected clock and preserves fixed dt', () => {
+  let time = 0;
+  const steps = [];
+  const { loop } = createLoop({
+    now: () => time, timingSampleFrames: 2,
+    update: (dt) => { steps.push(dt); time += 2; },
+    render: () => { time += 5; },
+  });
+  loop.advance(FIXED_STEP * 2);
+  loop.advance(0);
+  assert.deepEqual(steps, [FIXED_STEP, FIXED_STEP]);
+  assert.deepEqual(loop.timings, { updateMs: 2, renderMs: 5 });
+});

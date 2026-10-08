@@ -17,4 +17,4 @@
 ## Ponto de continuidade
 
 - **v1.0** publicada: `main` e tag `v1.0.0` no GitHub. Falta ativar o GitHub Pages (passos no README) e, se o autor quiser, gravar GIFs para o README.
-- **v2.0** em andamento na `v2-development`. Próximas etapas: **v1.1 Fundação (Codex)**; depois **v1.2 Mobile (Claude)** e **v1.3 Movimento (Codex)** em paralelo.
+- **v2.0** em andamento na `v2-development`. Próximas etapas: **v1.1 concluida (tag local `v1.1`)**; agora **v1.2 Mobile (Claude)** e **v1.3 Movimento (Codex)** em paralelo.

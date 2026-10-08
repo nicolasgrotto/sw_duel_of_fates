@@ -4,10 +4,12 @@ export const gameConfig = {
   canvas: {
     width: 1280,
     height: 720,
+    maxPixelRatio: 2,
   },
   loop: {
     fixedStep: 1 / 60,
     maxFrameTime: 0.25,
+    timingSampleFrames: 60,
   },
   arena: {
     floorY: 600,

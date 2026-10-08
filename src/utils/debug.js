@@ -39,11 +39,13 @@ export class DebugOverlay {
     this.enabled = !this.enabled;
   }
 
-  collectLines(stateMachine) {
+  collectLines(stateMachine, timings) {
     const lines = [
       `fps: ${Math.round(this.fpsCounter.fps)}`,
       `states: ${stateMachine.stack.map((state) => state.name).join(' > ')}`,
     ];
+
+    if (timings) lines.splice(1, 0, `update: ${timings.updateMs.toFixed(2)} ms  render: ${timings.renderMs.toFixed(2)} ms`);
 
     for (const state of stateMachine.stack) {
       lines.push(...state.getDebugInfo());
@@ -52,7 +54,7 @@ export class DebugOverlay {
     return lines;
   }
 
-  render(renderer, stateMachine) {
+  render(renderer, stateMachine, timings) {
     this.fpsCounter.tick(this.now());
 
     if (!this.enabled) {
@@ -64,7 +66,7 @@ export class DebugOverlay {
     }
 
     const { x, y, padding, lineHeight, width } = this.layout;
-    const lines = this.collectLines(stateMachine);
+    const lines = this.collectLines(stateMachine, timings);
     const height = lines.length * lineHeight + padding * 2;
 
     renderer.fillRect(x, y, width, height, colors.debugBackground);

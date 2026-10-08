@@ -8,6 +8,7 @@ export class GameLoop {
     maxFrameTime,
     update,
     render,
+    timingSampleFrames = 60,
     now = defaultNow,
     schedule = defaultSchedule,
     cancel = defaultCancel,
@@ -19,6 +20,11 @@ export class GameLoop {
     this.now = now;
     this.schedule = schedule;
     this.cancel = cancel;
+    this.timingSampleFrames = timingSampleFrames;
+    this.timings = { updateMs: 0, renderMs: 0 };
+    this.timingFrames = 0;
+    this.updateTotal = 0;
+    this.renderTotal = 0;
     this.accumulator = 0;
     this.lastTime = 0;
     this.running = false;
@@ -61,6 +67,7 @@ export class GameLoop {
   advance(frameTime) {
     this.accumulator += Math.min(Math.max(frameTime, 0), this.maxFrameTime);
 
+    const updateStart = this.now();
     let steps = 0;
     while (this.accumulator >= this.fixedStep) {
       this.update(this.fixedStep);
@@ -68,7 +75,18 @@ export class GameLoop {
       steps += 1;
     }
 
+    const renderStart = this.now();
     this.render(this.accumulator / this.fixedStep);
+    this.updateTotal += renderStart - updateStart;
+    this.renderTotal += this.now() - renderStart;
+    this.timingFrames += 1;
+    if (this.timingFrames >= this.timingSampleFrames) {
+      this.timings.updateMs = this.updateTotal / this.timingFrames;
+      this.timings.renderMs = this.renderTotal / this.timingFrames;
+      this.timingFrames = 0;
+      this.updateTotal = 0;
+      this.renderTotal = 0;
+    }
     return steps;
   }
 }

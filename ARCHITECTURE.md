@@ -682,13 +682,13 @@ Roteiro e tarefas em [versions/v2.md](versions/v2.md). Esta seção registra as 
 
 **Princípios.** Tudo novo que muda o resultado de uma luta roda dentro da `DuelSimulation` com o dt fixo, guarda estado em `fighter.combat` (copiado inteiro pelo snapshot do replay) e é configurado em `src/config/`. Game, Renderer, Audio, Effects e Input não contêm regra de gameplay. Os modos clássicos (Arcade, Sobrevivência, Tutorial, Treino) recebem `rules` padrão e ficam idênticos à v1.0.
 
-**Refactors da v1.1 (antes de qualquer feature).**
+**Refactors da v1.1 (concluidos).**
 
 1. `Input` com fontes genéricas: teclado, gamepad e, depois, toque alimentam o mesmo conjunto de ações (o gamepad hoje é um caso especial com `padActions`).
 2. Save versionado (`saveStorage.js`): `{ version: 2, settings }` com lista de migrações; a v1 (objeto plano de settings) migra sem perda. Seções novas (story, protagonista) entram na task que precisar delas, com uma migração.
 3. `DuelResult` (objeto simples: vencedor, `healthRatio`, estatísticas, tempo) e `duelOutcomes` (roteamento por modo), tirando Arcade e Sobrevivência do `DuelState`. Story e finais leem o `DuelResult`, nunca o `Fighter`.
 4. Teste que falha se um campo mutável do `Fighter` ficar fora do `captureFighter`.
-5. `maxPixelRatio` no `Renderer.fitToDisplay` e tempo de frame no F3.
+5. `gameConfig.canvas.maxPixelRatio` (2) limita o DPR em Game.handleResize; GameLoop mede update e render com now injetado e publica medias por frame (janela de timingSampleFrames, 60). F3 mostra ms, sem mudar dt da simulacao.
 
 A regra `rules` nos parâmetros do duelo (`powers`) entra na v1.5, junto com o primeiro uso real.
 

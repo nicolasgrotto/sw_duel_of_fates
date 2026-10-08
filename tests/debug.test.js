@@ -76,3 +76,10 @@ describe('DebugOverlay', () => {
     assert.deepEqual(drawn, ['duel', 'pause']);
   });
 });
+
+it('shows average frame costs when loop timings are supplied', () => {
+  const overlay = new DebugOverlay({ ...layout, enabled: true }, () => 0);
+  const renderer = createFakeRenderer();
+  overlay.render(renderer, createFakeStates(), { updateMs: 1.234, renderMs: 4.567 });
+  assert.ok(renderer.texts.includes('update: 1.23 ms  render: 4.57 ms'));
+});
