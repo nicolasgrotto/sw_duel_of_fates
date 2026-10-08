@@ -15,7 +15,7 @@ Legenda: ✅ existe · ⏳ planejado (criar só quando a tarefa pedir)
 ```
 index.html                  ✅ página com o canvas (caminhos relativos: funciona em qualquer servidor estático e no GitHub Pages)
 .nojekyll                   ✅ desliga o Jekyll do GitHub Pages; os arquivos são servidos como estão
-media/                      ✅ capturas de tela usadas no README (não são carregadas pelo jogo)
+média/                      ✅ capturas de tela usadas no README (não são carregadas pelo jogo)
 styles/
   main.css                  ✅ layout da página e do canvas, @font-face da fonte do jogo
 design/                     ✅ direção de arte, sistema visual, UI, VFX, referências
@@ -27,13 +27,13 @@ src/
     Game.js                 ✅ monta e conecta os módulos
     GameLoop.js             ✅ loop com timestep fixo
     Input.js                ✅ teclado e gamepad → ações; uma instância por jogador (gamepadSlot)
-    KeyboardSource.js       eventos de teclado e bindings
-    GamepadSource.js        controle standard e rumble
+    KeyboardSource.js       ✅ eventos de teclado e bindings
+    GamepadSource.js        ✅ controle standard e rumble
     Renderer.js             ✅ canvas e primitivas de desenho
     StateMachine.js         ✅ pilha de estados
     Camera.js               ✅ screen shake (com limites)
     AudioManager.js         ✅ AudioContext, buses de sfx e música, liberação no primeiro input
-    saveStorage.js          save versionado com lista ordenada de migracoes
+    saveStorage.js          ✅ save versionado com lista ordenada de migrações
     settingsStorage.js      ✅ carrega e salva as opções (localStorage, tolerante a erro)
     keyBindings.js          ✅ preset personalizado: junta, troca teclas entre ações e valida o que vem do armazenamento
     AssetManager.js         ⏳ só quando houver assets externos
@@ -58,8 +58,8 @@ src/
     characterData.js        ✅ personagens: nome, arquétipo, perfil de IA, aparência
     characterFactory.js     ✅ cria um Fighter a partir dos dados
   modes/                    ✅ regras de modos de jogo, puras e testáveis (sem render)
-    DuelResult.js           resultado independente dos Fighters
-    duelOutcomes.js         resultado + escada -> tela e patch de progresso
+    DuelResult.js           ✅ resultado independente dos Fighters
+    duelOutcomes.js         ✅ resultado + escada -> tela e patch de progresso
     TutorialDirector.js     ✅ passos do tutorial: objetivo, progresso e comportamento do boneco
     ParryChallenge.js       ✅ desafio de parry: tempo, pontos e resumo
     arcade.js               ✅ escada do Arcade: adversários, dificuldade e arena por luta, chefe no fim
@@ -129,7 +129,7 @@ src/
     aiConfig.js             ✅ perfis, dificuldades e percepção da IA
     audioConfig.js          ✅ volumes, receitas de som, zumbido e música
     movesConfig.js          ✅ golpes por personagem: base de atributos, tipo, pose e cancelsInto
-    evadeConfig.js          flag e perfil global de esquiva de precisao
+    evadeConfig.js          ✅ flag e perfil global de esquiva de precisão
     fightersConfig.js       ✅ atributos por arquétipo (vida, stamina, corpo, movimento, ataques, esquiva)
     fighterVisualConfig.js  ✅ proporções, animação, poses de combate, sombra e estilo do sabre
     effectsConfig.js        ✅ limites e receitas de VFX
@@ -312,7 +312,7 @@ Arquivo: [src/core/Input.js](src/core/Input.js)
 
 ---
 
-`Input.pollGamepads()` roda antes de cada update do Game e lê o controle standard da posição `gamepadSlot` (0 para o jogador 1, 1 para o jogador 2), por API injetada. Converte botões/eixos em ações com deadzone; combina as a??es de todas as fontes e gera bordas pela uni?o anterior e libera tudo ao desconectar/perder foco. Gamepad e teclado podem coexistir. `Input.rumble` recebe somente um tipo de impacto do DuelState, com receita em controlsConfig, e tolera hardware sem atuador. Efeitos reduzidos diminuem vibração a 25%. Nenhum módulo de gameplay acessa navigator.
+`Input.pollGamepads()` roda antes de cada update do Game e lê o controle standard da posição `gamepadSlot` (0 para o jogador 1, 1 para o jogador 2), por API injetada. Converte botões/eixos em ações com deadzone; combina as ações de todas as fontes e gera bordas pela união anterior e libera tudo ao desconectar/perder foco. Gamepad e teclado podem coexistir. `Input.rumble` recebe somente um tipo de impacto do DuelState, com receita em controlsConfig, e tolera hardware sem atuador. Efeitos reduzidos diminuem vibração a 25%. Nenhum módulo de gameplay acessa navigator.
 
 O `Game` tem dois `Input`: `input` (jogador 1, com o preset das Opções e o 1º controle) e `secondInput` (jogador 2, `twoPlayerBindings.p2` e `gamepadSlot: 1`, o 2º controle standard conectado). Os dois ouvem o mesmo `window`, são lidos a cada update e limpos no fim do frame. No modo **2 Jogadores** (`DuelMode.LOCAL`), o `DuelState` troca as teclas do `input` para `twoPlayerBindings.p1` na entrada e chama `game.applySettings()` na saída; o oponente é um `PlayerController(game.secondInput)`. A pausa vale para os dois. Na seleção, a etapa do adversário lê o `secondInput`.
 
@@ -324,9 +324,9 @@ A pilha de estados chama `resume()` no estado que volta ao topo depois de um `po
 
 Fontes seguem o contrato `{ actions: Set, poll?(), reset?(), endFrame?(), destroy?() }`. `Input.addSource(source)` registra uma fonte. `poll()` (alias `pollGamepads`) combina fontes. Teclado preserva toques curtos entre polls; `endFrame` sincroniza a soma e limpa bordas. `reset` libera inputs no blur; `destroy` remove listeners. TouchInput deve implementar reset e destroy. Bindings e lastPressedCode pertencem ao teclado; gamepadSlot e rumble ao gamepad.
 
-Save: `saveStorage.js` usa a mesma chave e escreve `{ version: 2, settings }`. A lista `saveMigrations` transforma o objeto plano v1 no envelope v2; JSON corrompido, envelopes invalidos e versoes futuras retornam defaults sem sobrescrever dados. `settingsStorage.js` continua validando campos com `loadSettings` e delega leitura/escrita ao saveStorage. Teste com fixture completa do formato v1 cobre progresso, cores, recordes e bindings.
+Save: `saveStorage.js` usa a mesma chave e escreve `{ version: 2, settings }`. A lista `saveMigrations` transforma o objeto plano v1 no envelope v2; JSON corrompido, envelopes inválidos e versões futuras retornam defaults sem sobrescrever dados. `settingsStorage.js` continua validando campos com `loadSettings` e delega leitura/escrita ao saveStorage. Teste com fixture completa do formato v1 cobre progresso, cores, recordes e bindings.
 
-EVADE usa S/baixo e pode dividir tecla com MENU_DOWN; gamepad baixo e eixo Y positivo alimentam ambas as acoes. PlayerController captura o toque inclusive no hit stop. O IntentRecorder acrescenta evade no bit 10, preservando os bits v1; reset e boneco limpam a flag. No J2, Numpad2 agora e EVADE; o atalho numerico de forte mudou para Numpad4 (K continua), evitando duas acoes de combate na mesma tecla. Controles, remapeamento, lista de golpes e inputs de Treino incluem EVADE. A tabela de controles usa espacamento 25 para manter o rodape livre.
+EVADE usa S/baixo e pode dividir tecla com MENU_DOWN; gamepad baixo e eixo Y positivo alimentam ambas as ações. PlayerController captura o toque inclusive no hit stop. O IntentRecorder acrescenta evade no bit 10, preservando os bits v1; reset e boneco limpam a flag. No J2, Numpad2 agora é EVADE; o atalho numérico de forte mudou para Numpad4 (K continua), evitando duas ações de combate na mesma tecla. Controles, remapeamento, lista de golpes e inputs de Treino incluem EVADE. A tabela de controles usa espaçamento 25 para manter o rodapé livre.
 
 ## Estados (StateMachine)
 
@@ -377,7 +377,7 @@ Para adicionar um estado: crie a classe estendendo `GameState`, adicione o id em
 
 Menu → CharacterSelectState → DuelState: a seleção usa MenuList e previews de Fighter, com animação atualizada fora do render. Escolhe o jogador entre os dados existentes e passa playerCharacter/opponentCharacter no params, preservados pela pausa e revanche. DuelState usa esses ids na factory inicial e na recriação do controller entre rounds.
 
-`createDuelResult` copia o lado vencedor (0/1 ou null), modo, tempo, stats e dados escalares dos dois lutadores (vida, maximo e healthRatio). `resolveDuelOutcome` recebe resultado, params da escada, settings, personagem e config de cura; devolve `{ state, params, progress }` sem mutar os argumentos. Arcade, Sobrevivencia, cores e titulo local ficam nesse resolvedor. DuelState aplica o patch de progresso, salva uma vez e abre a tela. Modos importam apenas ids de estados/modos e formatacao pura de UI; nunca classes de estados.
+`createDuelResult` copia o lado vencedor (0/1 ou null), modo, tempo, stats e dados escalares dos dois lutadores (vida, máximo e healthRatio). `resolveDuelOutcome` recebe resultado, params da escada, settings, personagem e config de cura; devolve `{ state, params, progress }` sem mutar os argumentos. Arcade, Sobrevivência, cores e título local ficam nesse resolvedor. DuelState aplica o patch de progresso, salva uma vez e abre a tela. Modos importam apenas ids de estados/modos e formatação pura de UI; nunca classes de estados.
 
 ## UI
 
@@ -396,7 +396,7 @@ Modos com boneco (`duelModes.usesDummy`: Treino, Tutorial e Desafio de parry) n�
 
 **Arcade** (`DuelMode.ARCADE`): a seleção (só a etapa do lutador) cria a corrida com `createArcadeRun(jogador, selecionáveis, gameConfig.arcade)` e passa `params.arcade` (`playerCharacter`, `ladder`, `stage`). O `DuelState` lê `getArcadeStage` para escolher adversário, dificuldade da IA (`difficultyId`, em vez da dificuldade das Opções) e arena. A faixa do topo usa o `ModeBanner` (tipo `arcade`). No resultado, a primeira opção vira "Próxima luta" (`nextArcadeRun`) ou "Tentar de novo" (mesmos params). Vencer a última luta mostra o resumo "ARCADE CONCLUÍDO" e salva o personagem em `settings.arcadeCleared`. O chefe é um personagem com `selectable: false` (`shadowAwakened`, arquétipo próprio, golpes da Sombra). No chefe, `updateBossEnrage` troca a dificuldade da IA para `aiConfig.difficulties.boss` quando a vida cai abaixo de `enrageHealthRatio`, mostra a mensagem e pulsa o letterbox; volta ao normal a cada round.
 
-`ReplayBuffer.REPLAY_STATIC_FIELDS` lista dados invariantes e intent (gravado separadamente por frame). Teste percorre todos os personagens antes e depois de passos de simulacao e exige que todo campo proprio esteja nessa lista ou em captureFighter; verifica invariantes e roundtrip completo de restauracao. Novos timers devem ficar em combat, copiado integralmente.
+`ReplayBuffer.REPLAY_STATIC_FIELDS` lista dados invariantes e intent (gravado separadamente por frame). Teste percorre todos os personagens antes e depois de passos de simulação e exige que todo campo próprio esteja nessa lista ou em captureFighter; verifica invariantes e roundtrip completo de restauração. Novos timers devem ficar em combat, copiado integralmente.
 
 **Replay do golpe final** (determinístico, sem gravar imagem): a cada passo, antes de `simulation.step`, o `DuelState` chama `ReplayBuffer.record(fighters, dt)`. O buffer guarda, em arrays fixos, o intent de cada lutador (codificado como o `IntentRecorder`, com direção absoluta) e o `dt` do passo (`Float64Array`: com `Float32Array` o arredondamento do 1/60 mudava o frame em que golpes terminavam e o replay divergia) e, a cada `snapshotInterval` passos, uma foto do estado de cada lutador (`captureFighter`). O buffer é zerado a cada round, porque o reset de round acontece fora da simulação. No K.O. que decide o duelo, se `settings.finalReplay` não for `false`, o `DuelState` empilha o `ReplayState` com `createPlayback()` (a foto mais antiga da janela). O `ReplayState` cria clones dos lutadores (mesmos `stats` e golpes, estado restaurado por `restoreFighter`), uma `DuelSimulation`, efeitos e câmera próprios, e avança os passos gravados com os mesmos `dt`, no ritmo de `gameConfig.replay.speed`. Quando termina (ou com `Enter`/`Esc`), ele sai da pilha e o `DuelState`, de volta ao topo, mostra o resultado. Teste em `tests/replay.test.js`: re-simular a janela chega ao mesmo estado da luta original.
 
@@ -457,6 +457,12 @@ Arquivos: [src/combat/](src/combat/). Regras em [GAME_DESIGN.md](GAME_DESIGN.md#
 - Colisão física (corpos) fica no `CollisionSystem`.
 
 ---
+
+### Movimento v1.3
+
+`evadeConfig.js` define enabled e perfil global; stats.evade opcional substitui o perfil completo. CombatSystem.tryEvade reaproveita startDodge e DODGING, com combat.evading/evadeSucceeded no snapshot. Deslocamento para trás só durante movementTime. findContacts detecta hitbox contra hurtbox invulnerável do EVADE e captura evaded antes de resolver; marca hasHit do atacante e emite EVADE_SUCCESS, libera IDLE e zera velocidade. Dash comum continua ignorando contatos invulneráveis. EffectsSystem guarda timer visual por defensor; DuelRenderer e DodgeAfterimage usam esse sinal para uma silhueta inclinada curta, inclusive depois da liberação imediata. Audio reutiliza DODGE. Sem novas cores/assets ou estado de combate.
+
+Pulo duplo: MovementSystem incrementa combat.jumpsUsed (snapshot automático) no pulo terrestre e aéreo, com limite movement.maxJumps. PhysicsSystem zera no contato com chão, mesmo em estados de combate; resetForRound também zera. tryWallJump retorna se executou para dar prioridade ao pulo na parede e não muda jumpsUsed. Saltos de habilidade consomem o primeiro pulo. airJumpVelocityScale configura a velocidade do aéreo. Um voo continua permitindo um único ataque aéreo. F3 mostra contador e tempo do EVADE.
 
 ## Effects e Camera
 
@@ -570,6 +576,37 @@ Matriz v1.0 (perfil **próprio** de cada personagem, 60 duelos por par, seed 1, 
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | % | 51 | 51 | 52 | 57 | 45 | 52 | 49 | 51 | 51 | 45 |
 
+### Matriz v1.3 (movimento)
+
+
+`npm run matrix`: Normal e Difícil, perfis próprios, seed 1, 60 duelos por par ordenado (10.800 duelos). Percentuais arredondados nas células; média calculada antes de arredondar. Todas as médias por personagem ficaram dentro de +/-5 pontos da referência v1.0; maior desvio 3.1 pontos (Vespa, Difícil). Nenhum atributo existente de personagem foi recalibrado. EVADE usa chance 0,005/0,015/0,04 em Fácil/Normal/Difícil; Vespa usa jumpChance 0,005/0,008/0,01 e airJumpChance 0,5/0,7/0,85. As chances pequenas mantêm a mecânica como resposta ocasional, sem substituir o parry.
+
+| Normal v1.3 | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco | média | delta v1.0 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Guardião | -- | 45 | 25 | 58 | 45 | 27 | 65 | 43 | 72 | 52 | 48.0 | -0.3 |
+| Sombra | 58 | -- | 43 | 72 | 80 | 68 | 67 | 65 | 68 | 63 | 65.0 | +0.2 |
+| Bastião | 68 | 60 | -- | 78 | 77 | 33 | 80 | 67 | 63 | 65 | 65.7 | +1.6 |
+| Vespa | 35 | 37 | 37 | -- | 57 | 52 | 45 | 47 | 58 | 50 | 46.3 | -1.1 |
+| Espelho | 42 | 28 | 20 | 42 | -- | 20 | 37 | 22 | 38 | 28 | 30.7 | +0.1 |
+| Haste | 68 | 43 | 50 | 55 | 80 | -- | 82 | 65 | 78 | 73 | 66.1 | -0.2 |
+| Brasa | 32 | 38 | 30 | 47 | 48 | 23 | -- | 27 | 48 | 43 | 37.4 | -0.7 |
+| Forja | 67 | 38 | 42 | 47 | 75 | 38 | 82 | -- | 57 | 55 | 55.6 | +0.4 |
+| Garça | 32 | 27 | 32 | 42 | 58 | 25 | 58 | 57 | -- | 42 | 41.3 | +0.5 |
+| Eco | 53 | 32 | 33 | 40 | 63 | 40 | 55 | 52 | 55 | -- | 47.0 | -0.8 |
+
+| Difícil v1.3 | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco | média | delta v1.0 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Guardião | -- | 72 | 53 | 53 | 45 | 32 | 35 | 62 | 57 | 65 | 52.6 | -0.2 |
+| Sombra | 28 | -- | 40 | 40 | 30 | 55 | 28 | 35 | 33 | 52 | 38.0 | +0.8 |
+| Bastião | 52 | 57 | -- | 17 | 17 | 40 | 43 | 53 | 17 | 43 | 37.6 | -1.7 |
+| Vespa | 35 | 67 | 68 | -- | 57 | 80 | 47 | 70 | 67 | 78 | 63.2 | -3.1 |
+| Espelho | 60 | 75 | 78 | 43 | -- | 58 | 35 | 63 | 50 | 78 | 60.2 | +0.2 |
+| Haste | 62 | 33 | 55 | 20 | 32 | -- | 48 | 35 | 27 | 23 | 37.2 | +0.2 |
+| Brasa | 58 | 70 | 70 | 57 | 57 | 62 | -- | 65 | 50 | 77 | 62.8 | +2.4 |
+| Forja | 55 | 53 | 55 | 8 | 40 | 62 | 48 | -- | 33 | 47 | 44.6 | -2.2 |
+| Garça | 45 | 58 | 85 | 28 | 43 | 85 | 52 | 60 | -- | 77 | 59.3 | -1.4 |
+| Eco | 25 | 43 | 58 | 38 | 28 | 62 | 25 | 58 | 40 | -- | 42.0 | -0.4 |
+
 O equilíbrio depende da dificuldade, e isso foi aceito na v1.0: personagens de execução e leitura (Vespa, Espelho, Brasa, Garça) rendem mais com a IA Difícil, que completa sequências e apara melhor; os de força bruta (Bastião, Sombra, Haste) rendem mais com a Normal. Na média das duas dificuldades todos ficam entre 45% e 57%. A IA Normal apara com `parryChance` 0,38 e a Difícil com 0,5 para não ampliar essa diferença. Para reproduzir: `npm run matrix` (padrão: Normal e Difícil, 60 duelos por par; `--difficulties`, `--duels` e `--characters a,b,c` mudam isso). Ele roda o `simulate` para cada par, sem `--profile`.
 
 A Vespa é o personagem de execução: rende pouco com a IA Normal (que completa só 60% das sequências) e fica equilibrada no Difícil. Isso é intencional (dificuldade 4 no GAME_DESIGN). Rode a matriz de novo depois de mexer em atributos.
@@ -604,7 +641,7 @@ DuelSimulation → CombatSystem executa (igual ao jogador)
 - Perfil (`aiConfig.profiles`) vem de `characterData.aiProfile`. Dificuldade (`aiConfig.difficulties`) vem de `game.settings.difficulty`.
 - O RNG é injetado (o mesmo dos efeitos no jogo, seed fixa nos testes).
 - `decision` fica exposta para o debug (`ai: <decisão> (<dificuldade>)`).
-- O intervalo entre pensamentos é `reactionTime × (1 + reactionJitter × random)`. Sem a variação, duas IAs com a mesma dificuldade ficavam sincronizadas e sempre viam o ataque do outro no mesmo instante (o simulador media clashes e parries errados).
+- O intervalo entre pensamentos é `reactionTime × (1 + reactionJitter × random)`. Sem a variação, duas IAs com a mesma dificuldade ficavam sincronizadas e sempre viam o ataque do outro no mesmo instante (o simulador média clashes e parries errados).
 - **Parry**: contra um ataque forte ainda no startup, com `difficulty.parryChance`, a IA calcula quanto falta para o golpe ficar ativo e agenda o toque (`plan.parryDelay`) para cair no meio da janela (ou no começo, para o perfeito, com `perfectParryChance`). Se já for tarde, cai para bloqueio/esquiva. A contagem regressiva roda a cada frame em `updateParryTiming`, mas a decisão só nasce no pensamento: a IA continua limitada ao próprio tempo de reação.
 - **Empurrão**: com o oponente em `BLOCKING` no alcance do empurrão, `profile.shoveChance × difficulty.shoveMultiplier`. Contra um empurrão que está vindo, a IA tenta acertar um ataque rápido antes (é o que vence o empurrão).
 - **Comportamento por dificuldade** (`aiConfig.difficulties`):
@@ -620,6 +657,10 @@ DuelSimulation → CombatSystem executa (igual ao jogador)
 **Garantia testada:** a IA roda com os lutadores congelados (`Object.freeze`) sem erro, ou seja, ela nunca altera HP, stamina, posição ou estado.
 
 ---
+
+IA EVADE: getTimeUntilAttackActive expõe startup restante, zero no active ainda não conectado e Infinity fora da ameaça. No pensamento de defesa, a rolagem já existente escolhe EVADE por evadeChance e evadeWeight do perfil, somente contra active. evadeTimingJitter agenda atraso; a cada passo o plano valida se aquele golpe ainda existe e solicita intent.evade uma vez. Nenhuma mutação no lutador. Fora de blockstun, EVADE também pode sair de BLOCKING. Chances iniciais pequenas preservam o combate clássico; calibração final pela matriz.
+
+IA de movimento só pede intent.jump: inicia o salto ao aproximar/recuar/recuperar stamina com maxJumps > 1 e tenta o segundo a partir do ápice, respeitando jumpsUsed. O simulador usa os mesmos controllers/sistemas e agora informa pulos, pulos aéreos, tentativas e sucessos de EVADE. --set evade.enabled=false permite comparar sem EVADE, sem criar rules.
 
 ## Debug
 
@@ -642,6 +683,9 @@ Arquivo: [src/utils/debug.js](src/utils/debug.js)
 ---
 
 Verificação visual da v0.2: Chrome headless local, Canvas real, eventos de parry/perfeito/empurrão gerados pela simulação e tela de Controles inspecionada. Dessaturação cobre o mundo com shake de ±12 px; lâminas, anéis e flare mantêm a cor.
+
+Validação final: fixture `tests/fixtures/save-v1.json` foi produzida pelo saveSettings original do commit 305b59f, com progresso e remapeamento reais do esquema v1. Fontes de input não repetem a borda quando teclado assume uma ação já segurada por outra fonte; testes cobrem as duas ordens. Chrome headless local: DPR 3 limitado a 2, Canvas real, F3 com médias e pose inclinada do EVADE; nenhum erro de JavaScript. Servidor de teste encerrado ao finalizar.
+
 
 ## Testabilidade
 
@@ -685,13 +729,13 @@ Roteiro e tarefas em [versions/v2.md](versions/v2.md). Esta seção registra as 
 
 **Princípios.** Tudo novo que muda o resultado de uma luta roda dentro da `DuelSimulation` com o dt fixo, guarda estado em `fighter.combat` (copiado inteiro pelo snapshot do replay) e é configurado em `src/config/`. Game, Renderer, Audio, Effects e Input não contêm regra de gameplay. Os modos clássicos (Arcade, Sobrevivência, Tutorial, Treino) recebem `rules` padrão e ficam idênticos à v1.0.
 
-**Refactors da v1.1 (concluidos).**
+**Refactors da v1.1 (concluídos).**
 
-1. `Input` com fontes genéricas: teclado, gamepad e, depois, toque alimentam o mesmo conjunto de ações (o gamepad hoje é um caso especial com `padActions`).
+1. `Input` com fontes genéricas: teclado, gamepad e, depois, toque alimentam o mesmo conjunto de ações (teclado e gamepad já são fontes independentes).
 2. Save versionado (`saveStorage.js`): `{ version: 2, settings }` com lista de migrações; a v1 (objeto plano de settings) migra sem perda. Seções novas (story, protagonista) entram na task que precisar delas, com uma migração.
 3. `DuelResult` (objeto simples: vencedor, `healthRatio`, estatísticas, tempo) e `duelOutcomes` (roteamento por modo), tirando Arcade e Sobrevivência do `DuelState`. Story e finais leem o `DuelResult`, nunca o `Fighter`.
 4. Teste que falha se um campo mutável do `Fighter` ficar fora do `captureFighter`.
-5. `gameConfig.canvas.maxPixelRatio` (2) limita o DPR em Game.handleResize; GameLoop mede update e render com now injetado e publica medias por frame (janela de timingSampleFrames, 60). F3 mostra ms, sem mudar dt da simulacao.
+5. `gameConfig.canvas.maxPixelRatio` (2) limita o DPR em Game.handleResize; GameLoop mede update e render com now injetado e publica médias por frame (janela de timingSampleFrames, 60). F3 mostra ms, sem mudar dt da simulação.
 
 A regra `rules` nos parâmetros do duelo (`powers`) entra na v1.5, junto com o primeiro uso real.
 
@@ -721,8 +765,8 @@ ui/TouchControls.js           controles de toque desenhados no canvas
 - **Fluxo**: `powerLevel` (permanente) define potência, resistência, máximo do medidor e tier visual; `powerMeter` é o recurso da luta; `stamina` continua o recurso físico.
 - **Resistência**: `levelDiff = alvo.powerLevel − conjurador.powerLevel`; cada poder aponta para uma regra em dados (faixas → escala e resultado `normal`, `reduced`, `resisted`). Um único resolvedor puro, sem `if` por poder.
 - **Poderes** são definições com fases (startup, active, recovery), como os golpes, pagas com `powerMeter`. Estados novos: `CASTING` e `CHANNELING`. Sem projéteis na v2. Efeitos no alvo reaproveitam `HIT` e `STAGGERED`.
-- **EVADE** (esquiva de precisão) é uma ação nova no "baixo" (S/↓, direcional baixo, joystick baixo); o Shift continua o dash. Flag `evade` no intent (o `IntentRecorder` passa de 10 para 12 bits com `power`, cabe no `Uint16`).
-- **Pulo duplo**: `movement.maxJumps` com contador em `fighter.combat`; zera no chão; o pulo na parede não devolve o pulo aéreo.
+- **EVADE implementado na v1.3** (esquiva de precisão) é uma ação nova no "baixo" (S/↓, direcional baixo, joystick baixo); o Shift continua o dash. Flag `evade` no intent (o `IntentRecorder` passa de 10 para 12 bits com `power`, cabe no `Uint16`).
+- **Pulo duplo implementado na v1.3**: `movement.maxJumps` com contador em `fighter.combat`; zera no chão; o pulo na parede não devolve o pulo aéreo.
 - **Finais e condições** são dados (`{ condition: { type, threshold }, next }`) avaliados por um registro de condições contra o `DuelResult`.
 - **Protagonista** é dados gerados do save e entra na `createFighter`; não há sistema de animação novo.
 - **Skins** são overrides parciais de `appearance` (paleta e peças de silhueta existentes), sem efeito em stats; a escolha fica no save.
@@ -741,44 +785,3 @@ ui/TouchControls.js           controles de toque desenhados no canvas
 - Evitar criar objetos dentro do loop sem necessidade.
 - Listeners adicionados devem ter forma de remoção (`destroy()`).
 
-## Movimento v1.3 implementado
-
-`evadeConfig.js` define enabled e perfil global; stats.evade opcional substitui o perfil completo. CombatSystem.tryEvade reaproveita startDodge e DODGING, com combat.evading/evadeSucceeded no snapshot. Deslocamento para tras so durante movementTime. findContacts detecta hitbox contra hurtbox invulneravel do EVADE e captura evaded antes de resolver; marca hasHit do atacante e emite EVADE_SUCCESS, libera IDLE e zera velocidade. Dash comum continua ignorando contatos invulneraveis. EffectsSystem guarda timer visual por defensor; DuelRenderer e DodgeAfterimage usam esse sinal para uma silhueta inclinada curta, inclusive depois da liberacao imediata. Audio reutiliza DODGE. Sem novas cores/assets ou estado de combate.
-
-IA EVADE: getTimeUntilAttackActive expoe startup restante, zero no active ainda nao conectado e Infinity fora da ameaca. No pensamento de defesa, a rolagem ja existente escolhe EVADE por evadeChance e evadeWeight do perfil, somente contra active. evadeTimingJitter agenda atraso; a cada passo o plano valida se aquele golpe ainda existe e solicita intent.evade uma vez. Nenhuma mutacao no lutador. Fora de blockstun, EVADE tambem pode sair de BLOCKING. Chances iniciais pequenas preservam o combate classico; calibracao final pela matriz.
-
-Pulo duplo: MovementSystem incrementa combat.jumpsUsed (snapshot automatico) no pulo terrestre e aereo, com limite movement.maxJumps. PhysicsSystem zera no contato com chao, mesmo em estados de combate; resetForRound tambem zera. tryWallJump retorna se executou para dar prioridade ao pulo na parede e nao muda jumpsUsed. Saltos de habilidade consomem o primeiro pulo. airJumpVelocityScale configura a velocidade do aereo. Um voo continua permitindo um unico ataque aereo. F3 mostra contador e tempo do EVADE.
-
-## Matriz v1.3 (movimento)
-
-`npm run matrix`: Normal e Dificil, perfis proprios, seed 1, 60 duelos por par ordenado (10.800 duelos). Percentuais arredondados nas celulas; media calculada antes de arredondar. Todas as medias por personagem ficaram dentro de +/-5 pontos da referencia v1.0; maior desvio 3.1 pontos (Vespa, Dificil). Nenhum atributo existente de personagem foi recalibrado. EVADE usa chance 0,005/0,015/0,04 em Facil/Normal/Dificil; Vespa usa jumpChance 0,005/0,008/0,01 e airJumpChance 0,5/0,7/0,85. As chances pequenas mantem a mecanica como resposta ocasional, sem substituir o parry.
-
-| Normal v1.3 | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco | media | delta v1.0 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Guardião | -- | 45 | 25 | 58 | 45 | 27 | 65 | 43 | 72 | 52 | 48.0 | -0.3 |
-| Sombra | 58 | -- | 43 | 72 | 80 | 68 | 67 | 65 | 68 | 63 | 65.0 | +0.2 |
-| Bastião | 68 | 60 | -- | 78 | 77 | 33 | 80 | 67 | 63 | 65 | 65.7 | +1.6 |
-| Vespa | 35 | 37 | 37 | -- | 57 | 52 | 45 | 47 | 58 | 50 | 46.3 | -1.1 |
-| Espelho | 42 | 28 | 20 | 42 | -- | 20 | 37 | 22 | 38 | 28 | 30.7 | +0.1 |
-| Haste | 68 | 43 | 50 | 55 | 80 | -- | 82 | 65 | 78 | 73 | 66.1 | -0.2 |
-| Brasa | 32 | 38 | 30 | 47 | 48 | 23 | -- | 27 | 48 | 43 | 37.4 | -0.7 |
-| Forja | 67 | 38 | 42 | 47 | 75 | 38 | 82 | -- | 57 | 55 | 55.6 | +0.4 |
-| Garça | 32 | 27 | 32 | 42 | 58 | 25 | 58 | 57 | -- | 42 | 41.3 | +0.5 |
-| Eco | 53 | 32 | 33 | 40 | 63 | 40 | 55 | 52 | 55 | -- | 47.0 | -0.8 |
-
-| Dificil v1.3 | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco | media | delta v1.0 |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Guardião | -- | 72 | 53 | 53 | 45 | 32 | 35 | 62 | 57 | 65 | 52.6 | -0.2 |
-| Sombra | 28 | -- | 40 | 40 | 30 | 55 | 28 | 35 | 33 | 52 | 38.0 | +0.8 |
-| Bastião | 52 | 57 | -- | 17 | 17 | 40 | 43 | 53 | 17 | 43 | 37.6 | -1.7 |
-| Vespa | 35 | 67 | 68 | -- | 57 | 80 | 47 | 70 | 67 | 78 | 63.2 | -3.1 |
-| Espelho | 60 | 75 | 78 | 43 | -- | 58 | 35 | 63 | 50 | 78 | 60.2 | +0.2 |
-| Haste | 62 | 33 | 55 | 20 | 32 | -- | 48 | 35 | 27 | 23 | 37.2 | +0.2 |
-| Brasa | 58 | 70 | 70 | 57 | 57 | 62 | -- | 65 | 50 | 77 | 62.8 | +2.4 |
-| Forja | 55 | 53 | 55 | 8 | 40 | 62 | 48 | -- | 33 | 47 | 44.6 | -2.2 |
-| Garça | 45 | 58 | 85 | 28 | 43 | 85 | 52 | 60 | -- | 77 | 59.3 | -1.4 |
-| Eco | 25 | 43 | 58 | 38 | 28 | 62 | 25 | 58 | 40 | -- | 42.0 | -0.4 |
-
-IA de movimento so pede intent.jump: inicia o salto ao aproximar/recuar/recuperar stamina com maxJumps > 1 e tenta o segundo a partir do apice, respeitando jumpsUsed. O simulador usa os mesmos controllers/sistemas e agora informa pulos, pulos aereos, tentativas e sucessos de EVADE. --set evade.enabled=false permite comparar sem EVADE, sem criar rules.
-
-Validacao final: fixture `tests/fixtures/save-v1.json` foi produzida pelo saveSettings original do commit 305b59f, com progresso e remapeamento reais do esquema v1. Fontes de input nao repetem a borda quando teclado assume uma acao ja segurada por outra fonte; testes cobrem as duas ordens. Chrome headless local: DPR 3 limitado a 2, Canvas real, F3 com medias e pose inclinada do EVADE; nenhum erro de JavaScript. Servidor de teste encerrado ao finalizar.
