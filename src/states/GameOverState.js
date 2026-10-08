@@ -1,3 +1,4 @@
+import { Action } from '../config/controlsConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
 import { layout, texts } from '../config/uiConfig.js';
 import { formatText } from '../ui/formatText.js';
@@ -54,6 +55,10 @@ export class GameOverState extends GameState {
   }
 
   update() {
+    if (this.game.input.wasPressed(Action.BACK)) {
+      this.game.changeState(StateId.MENU);
+      return;
+    }
     const choice = this.menu.update(this.game.input);
 
     if (choice === GameOverOption.REMATCH) {

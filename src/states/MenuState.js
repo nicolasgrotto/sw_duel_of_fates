@@ -34,7 +34,7 @@ export class MenuState extends GameState {
         { id: MenuOption.TRAINING, label: texts.menu.training },
         { id: MenuOption.OPTIONS, label: texts.menu.options },
         { id: MenuOption.CONTROLS, label: texts.menu.controls },
-      ],
+      ].filter((item) => !this.game.coarsePointer || item.id !== MenuOption.LOCAL),
       layout.menu,
       this.game.audio,
     );
@@ -93,6 +93,6 @@ export class MenuState extends GameState {
     renderer.text(gameConfig.title.toUpperCase(), centerX, layout.menu.titleY, textStyles.title);
     renderer.text(texts.menu.tagline, centerX, layout.menu.taglineY, textStyles.tagline);
     this.menu.render(renderer, centerX);
-    renderer.text(this.footer, centerX, layout.menu.footerY, textStyles.hint);
+    renderer.text(this.game.input.lastInputKind === 'touch' ? texts.touch.navigation : this.footer, centerX, layout.menu.footerY, textStyles.hint);
   }
 }

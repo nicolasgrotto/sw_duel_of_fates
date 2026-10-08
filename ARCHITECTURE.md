@@ -112,6 +112,7 @@ src/
     DodgeAfterimage.js      ✅ silhuetas transparentes durante a esquiva
     effectsRenderer.js      ✅ partículas, luzes de impacto e flash
   ui/                       ✅ peças de interface desenhadas no canvas
+    TouchControls.js        ✅ desenho de joystick e botões sem alterar input
     MenuList.js             ✅ lista de opções navegável
     Hud.js                  ✅ nomes, barras de vida (com fantasma) e stamina
     CombatMessage.js        ✅ mensagens curtas (ROUND 1/2/FINAL, K.O.) com fade
@@ -413,6 +414,8 @@ Identidade no duelo: o `Letterbox` fica fechado (alvo 1) na intro e depois do K.
 No Treino, `DuelState.updateFrameData` lê os contatos do jogador e usa `combat/frameData.js`, puro e testável, para comparar os tempos de travamento restantes. Ataque em curso usa startup+active+recovery menos stateTime; bloqueio usa blockstun; hit/stun/stagger usam stunDuration menos stateTime. Parry cancelou o ataque: o stagger do atacante produz a desvantagem correta. Contatos de K.O. são ignorados, pois não há próxima ação. Texto em `uiConfig.training`, linha hint acima da pausa, limpa no próximo round.
 
 Treino: `IntentRecorder` guarda até 600 frames de intent em Uint16Array (10 s de simulação), sem objetos por frame. F5 grava; F6 reproduz no boneco em loop, movimento relativo ao facing; F4 para playback e volta ao boneco manual. Entre rounds a gravação fica e o cursor volta ao início. `trainingInputs` formata nomes de ações; a linha é atualizada quando a assinatura muda. F7 desenha hitboxes/hurtboxes sem exigir F3, usando a mesma transformação da câmera.
+
+Toque mobile (v1.2): Game injeta coarsePointer e tamanho do viewport, registra TouchInput e troca seu contexto ao mudar a pilha. MenuList calcula regiões de toque no update usando layout, sem mutar no render. Seleção lê as setas de cor; BACK reutiliza os fluxos existentes. TouchControls desenha somente após toque. Retrato suspende updates de estados, solta inputs e desenha orientação; voltar à paisagem retoma. CSS respeita safe areas. Efeitos reduzidos usam coarsePointer como default; loadSettings preserva qualquer booleano salvo, incluindo v1. Nenhum campo extra nem migração necessária.
 
 ## Renderer
 

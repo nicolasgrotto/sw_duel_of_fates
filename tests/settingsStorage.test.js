@@ -71,3 +71,14 @@ it('rejects future versions and invalid envelopes without overwriting storage', 
     assert.equal(storage.data[KEY], JSON.stringify(saved));
   }
 });
+
+it('uses coarse defaults only without a valid saved effects preference, including legacy saves', () => {
+  const coarse = { reducedEffects: true };
+  assert.equal(loadSettings(coarse, createStorage(), KEY).reducedEffects, true);
+  for (const value of [true, false]) {
+    for (const saved of [{ reducedEffects: value }, { version: 2, settings: { reducedEffects: value } }]) {
+      assert.equal(loadSettings(coarse, createStorage({ [KEY]: JSON.stringify(saved) }), KEY).reducedEffects, value);
+    }
+  }
+  assert.equal(loadSettings(coarse, createStorage({ [KEY]: JSON.stringify({ reducedEffects: 'invalid' }) }), KEY).reducedEffects, true);
+});

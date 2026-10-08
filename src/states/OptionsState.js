@@ -35,7 +35,7 @@ export class OptionsState extends GameState {
       [OptionId.REMAP]: { id: OptionId.REMAP, label: texts.options.remap },
       [OptionId.BACK]: { id: OptionId.BACK, label: texts.options.back },
     };
-    this.menu = new MenuList(Object.values(this.items), layout.options, this.game.audio);
+    this.menu = new MenuList(Object.values(this.items).filter((item) => !this.game.coarsePointer || ![OptionId.REMAP, OptionId.KEYBOARD].includes(item.id)), layout.options, this.game.audio);
     this.refreshLabels();
   }
 

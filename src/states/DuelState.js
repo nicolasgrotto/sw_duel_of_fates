@@ -661,7 +661,7 @@ export class DuelState extends GameState {
     if (this.isTraining && this.frameDataLine) {
       renderer.text(this.frameDataLine, renderer.width / 2, layout.hud.frameDataY, textStyles.hint);
     }
-    if (!this.outcome) {
+    if (!this.outcome && this.game.input.lastInputKind !== 'touch') {
       renderer.text(this.pauseHint, renderer.width / 2, layout.hud.pauseHintY, textStyles.hint);
     }
   }
@@ -684,6 +684,7 @@ export class DuelState extends GameState {
   getDebugInfo() {
     const lines = [
       `round: ${this.roundNumber}  wins: ${this.roundWins.join(" / ")}`,
+      `input: ${this.game.input.lastInputKind ?? 'keyboard'}  touch pointers: ${this.game.touch?.pointers.size ?? 0}`,
       `duel time: ${this.duelTime.toFixed(2)}s`,
       this.usesDummy
         ? `dummy (F4): ${this.opponentController.behavior}`

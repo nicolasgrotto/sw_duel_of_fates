@@ -1,3 +1,5 @@
+import { containsTouch } from '../core/TouchInput.js';
+import { touchLayoutConfig } from '../config/touchLayoutConfig.js';
 import { arenas } from '../arenas/arenaData.js';
 import { characters } from '../characters/characterData.js';
 import { createFighter } from '../characters/characterFactory.js';
@@ -86,7 +88,8 @@ export class CharacterSelectState extends GameState {
   }
 
   updateColorChoice(input) {
-    const step = (input.wasPressed(Action.MOVE_RIGHT) ? 1 : 0) - (input.wasPressed(Action.MOVE_LEFT) ? 1 : 0);
+    const taps = input.touchTaps ?? [];
+    const step = (input.wasPressed(Action.MOVE_RIGHT) || taps.some((tap) => containsTouch(tap, touchLayoutConfig.colorRight)) ? 1 : 0) - (input.wasPressed(Action.MOVE_LEFT) || taps.some((tap) => containsTouch(tap, touchLayoutConfig.colorLeft)) ? 1 : 0);
     if (step === 0) {
       return;
     }
@@ -168,7 +171,7 @@ export class CharacterSelectState extends GameState {
     } else {
       this.renderCharacterPreview(renderer);
     }
-    renderer.text(this.isLocal ? texts.characterSelect.localControls : this.footer, renderer.width / 2, layout.characterSelect.footerY, textStyles.hint);
+    renderer.text(this.game.input.lastInputKind === 'touch' ? texts.touch.navigation : this.isLocal ? texts.characterSelect.localControls : this.footer, renderer.width / 2, layout.characterSelect.footerY, textStyles.hint);
   }
 
   renderArenaPreview(renderer) {
@@ -190,6 +193,12 @@ export class CharacterSelectState extends GameState {
   }
 
   renderColorInfo(renderer, character, x, y) {
+    if (this.game.input.lastInputKind === 'touch') {
+      for (const [circle, label] of [[touchLayoutConfig.colorLeft, texts.touch.colorLeft], [touchLayoutConfig.colorRight, texts.touch.colorRight]]) {
+        renderer.strokeCircle(circle.x, circle.y, circle.radius, colors.accent);
+        renderer.text(label, circle.x, circle.y, textStyles.subtitle);
+      }
+    }
     const options = getSaberOptions(character, this.game.settings);
     const chosen = this.getChosenColor(character.id);
     const index = options.findIndex((option) => option.color === chosen);

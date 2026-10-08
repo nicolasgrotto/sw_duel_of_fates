@@ -844,3 +844,38 @@ it('does not activate recording tools outside training', () => {
   assert.equal(game.states.current.recorder.mode, 'idle');
   assert.equal(game.states.current.trainingHitboxes, false);
 });
+
+it('navigates character selection and colors using touch taps and hides desktop choices on coarse input', () => {
+  const game = createFakeGame();
+  game.coarsePointer = true;
+  game.changeState(StateId.MENU);
+  assert.equal(game.states.current.menu.items.some(i => i.id === 'local'), false);
+  game.input.touchTaps = [{ x: 640, y: layout.menu.firstItemY }];
+  game.step();
+  assert.equal(game.states.current.name, 'CharacterSelectState');
+  game.input.touchTaps = [{ x: 380, y: layout.characterSelect.firstItemY + layout.characterSelect.itemSpacing }];
+  game.step();
+  assert.equal(game.states.current.menu.selected.id, 'shadow');
+  assert.equal(game.states.current.step, 'player');
+  game.step();
+  assert.equal(game.states.current.step, 'opponent');
+  game.input.touchTaps = [{ x: 90, y: 55 }];
+  game.step(Action.BACK);
+  assert.equal(game.states.current.step, 'player');
+  game.pushState(StateId.OPTIONS);
+  assert.equal(game.states.current.menu.items.some(i => ['remap', 'keyboard'].includes(i.id)), false);
+});
+
+it('touch color arrows preserve the chosen saber color in the duel', () => {
+  const game = createFakeGame();
+  game.settings.arcadeCleared = ['guardian'];
+  game.changeState(StateId.CHARACTER_SELECT);
+  game.input.touchTaps = [{ x: 1170, y: 308 }];
+  game.step();
+  assert.equal(game.states.current.getChosenColor('guardian'), '#5f8bff');
+  game.input.touchTaps = [];
+  game.step(Action.CONFIRM);
+  game.step(Action.CONFIRM);
+  game.step(Action.CONFIRM);
+  assert.equal(game.states.current.player.appearance.saberColor, '#5f8bff');
+});

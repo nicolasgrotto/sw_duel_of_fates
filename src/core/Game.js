@@ -4,7 +4,10 @@ import { loadSettings, saveSettings } from './settingsStorage.js';
 import { Action, keyBindings, keyboardPresets, keyboardPresetOrder, remappableActions, twoPlayerBindings } from '../config/controlsConfig.js';
 import { createCustomBindings, sanitizeCustomBindings } from './keyBindings.js';
 import { gameConfig } from '../config/gameConfig.js';
-import { colors } from '../config/themeConfig.js';
+import { TouchInput } from './TouchInput.js';
+import { TouchControls } from '../ui/TouchControls.js';
+import { layout, texts } from '../config/uiConfig.js';
+import { colors, textStyles } from '../config/themeConfig.js';
 import { createState } from '../states/stateFactory.js';
 import { StateId } from '../states/stateIds.js';
 import { DebugOverlay } from '../utils/debug.js';
@@ -15,14 +18,20 @@ import { Renderer } from './Renderer.js';
 import { StateMachine } from './StateMachine.js';
 
 export class Game {
-  constructor(canvas) {
+  constructor(canvas, { coarsePointer = window.matchMedia?.('(pointer: coarse)').matches ?? false, getViewport = () => ({ width: window.innerWidth, height: window.innerHeight }) } = {}) {
+    this.coarsePointer = coarsePointer;
+    this.getViewport = getViewport;
+    this.portrait = false;
     this.renderer = new Renderer(canvas, gameConfig.canvas);
     const getGamepads = () => navigator.getGamepads?.() ?? [];
     this.input = new Input({ bindings: keyBindings, target: window, getGamepads });
     this.secondInput = new Input({ bindings: twoPlayerBindings.p2, target: window, getGamepads, gamepadSlot: 1 });
+    this.touch = new TouchInput({ target: canvas });
+    this.input.addSource(this.touch);
+    this.touchControls = new TouchControls(this.touch);
     this.states = new StateMachine();
     this.settings = loadSettings(
-      { keyboardPreset: 'classic', difficulty: aiConfig.defaultDifficulty, reducedEffects: false, sound: true, music: true, parryChallengeBest: 0, arcadeCleared: [], finalReplay: true, customBindings: {}, unlocks: {}, survivalBest: 0 },
+      { keyboardPreset: 'classic', difficulty: aiConfig.defaultDifficulty, reducedEffects: coarsePointer, sound: true, music: true, parryChallengeBest: 0, arcadeCleared: [], finalReplay: true, customBindings: {}, unlocks: {}, survivalBest: 0 },
       globalThis.localStorage,
       gameConfig.settingsStorageKey,
       { difficulty: aiConfig.difficultyOrder, keyboardPreset: keyboardPresetOrder },
@@ -69,18 +78,37 @@ export class Game {
   }
 
   changeState(id, params) {
-    this.states.change(createState(id, this, params));
+    const state = createState(id, this, params);
+    state.id = id;
+    this.touch.setContext(id === StateId.DUEL ? 'duel' : 'menu', id !== StateId.MENU);
+    this.states.change(state);
   }
 
   pushState(id, params) {
-    this.states.push(createState(id, this, params));
+    const state = createState(id, this, params);
+    state.id = id;
+    this.touch.setContext(id === StateId.DUEL ? 'duel' : 'menu', id !== StateId.MENU);
+    this.states.push(state);
   }
 
   popState() {
     this.states.pop();
+    const id = this.states.current?.id;
+    this.touch.setContext(id === StateId.DUEL ? 'duel' : 'menu', id !== StateId.MENU);
   }
 
   handleResize() {
+    const viewport = this.getViewport();
+    const wasPortrait = this.portrait;
+    this.portrait = this.coarsePointer && viewport.height > viewport.width;
+    this.touch.enabled = !this.portrait;
+    if (this.portrait) {
+      this.input.handleBlur();
+      this.secondInput.handleBlur();
+    } else if (wasPortrait) {
+      this.input.handleFocus();
+      this.secondInput.handleFocus();
+    }
     this.renderer.fitToDisplay(Math.min(window.devicePixelRatio || 1, gameConfig.canvas.maxPixelRatio));
   }
 
@@ -91,14 +119,20 @@ export class Game {
       this.debug.toggle();
     }
 
-    this.states.update(dt);
+    if (!this.portrait) this.states.update(dt);
     this.input.endFrame();
     this.secondInput.endFrame();
   }
 
   render() {
     this.renderer.clear(colors.background);
+    if (this.portrait) {
+      this.renderer.text(texts.touch.rotate, this.renderer.width / 2, layout.touch.rotateY, textStyles.heading);
+      this.renderer.text(texts.touch.landscape, this.renderer.width / 2, layout.touch.rotateHintY, textStyles.hint);
+      return;
+    }
     this.states.render(this.renderer);
+    this.touchControls.render(this.renderer, this.input.lastInputKind === 'touch');
     this.debug.render(this.renderer, this.states, this.loop.timings);
   }
 }

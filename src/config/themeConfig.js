@@ -50,6 +50,9 @@ export const colors = {
 };
 
 export const textStyles = {
+  touchLabel: { font: `18px ${FONT_FAMILY}`, color: colors.textMuted, align: 'center', baseline: 'middle' },
+  touchActive: { font: `18px ${FONT_FAMILY}`, color: colors.text, align: 'center', baseline: 'middle' },
+  touchHint: { font: `20px ${FONT_FAMILY}`, color: colors.textMuted, align: 'center', baseline: 'middle' },
   title: {
     font: `bold 88px ${FONT_FAMILY}`,
     color: colors.text,

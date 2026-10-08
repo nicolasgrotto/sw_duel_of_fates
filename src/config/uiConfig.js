@@ -1,4 +1,5 @@
 export const texts = {
+  touch: { back: 'Voltar', move: 'Mover', rotate: 'GIRE O APARELHO', landscape: 'Jogue em paisagem', navigation: 'Toque para escolher · toque novamente para confirmar', colorLeft: '‹', colorRight: '›', buttons: { lightAttack: 'Rápido', heavyAttack: 'Forte', block: 'Guarda', dodge: 'Esquiva', special: 'Habilidade', jump: 'Pulo', pause: 'Pausa' } },
   arenas: {
     refinery: 'Plataforma de Refino',
     sanctuary: 'Santuário Alagado',
@@ -245,6 +246,7 @@ export const controlsScreenRows = [
 export const keyComboSeparator = '  +  ';
 
 export const layout = {
+  touch: { rotateY: 300, rotateHintY: 380 },
   menu: {
     titleY: 140,
     taglineY: 202,

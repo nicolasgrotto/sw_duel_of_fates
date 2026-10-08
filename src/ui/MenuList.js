@@ -1,11 +1,13 @@
+import { touchLayoutConfig } from '../config/touchLayoutConfig.js';
 import { SoundName } from '../audio/soundNames.js';
 import { Action } from '../config/controlsConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
 import { layout } from '../config/uiConfig.js';
 
 export class MenuList {
-  constructor(items, { firstItemY, itemSpacing }, sounds = null) {
+  constructor(items, { firstItemY, itemSpacing, listX = touchLayoutConfig.width / 2 }, sounds = null) {
     this.items = items;
+    this.centerX = listX;
     this.sounds = sounds;
     this.firstItemY = firstItemY;
     this.itemSpacing = itemSpacing;
@@ -17,6 +19,17 @@ export class MenuList {
   }
 
   update(input) {
+    for (const tap of input.touchTaps ?? []) {
+      if (Math.abs(tap.x - this.centerX) > touchLayoutConfig.menuWidth / 2) continue;
+      const index = Math.floor((tap.y - this.firstItemY + this.itemSpacing / 2) / this.itemSpacing);
+      if (index < 0 || index >= this.items.length) continue;
+      if (index === this.selectedIndex) {
+        this.sounds?.play(SoundName.UI_CONFIRM);
+        return this.selected.id;
+      }
+      this.selectedIndex = index;
+      this.sounds?.play(SoundName.UI_MOVE);
+    }
     if (input.wasPressed(Action.MENU_UP)) {
       this.move(-1);
     }
