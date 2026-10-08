@@ -76,6 +76,8 @@ Habilidade do personagem: `I`. Gamepad: ataques nos botões frontais (X rápido,
 
 **Dois jogadores no mesmo teclado:** J1 usa `W A S D`, `F G H` (rápido, forte, guarda), `T` (habilidade) e `Shift` esquerdo; J2 usa as setas, `J K L`, `I` e `Shift` direito (ou o teclado numérico). Cada jogador também pode usar um controle.
 
+As teclas de luta podem ser trocadas em **Opções → Configurar teclas** (fica salvo no navegador).
+
 Os controles ficam em [src/config/controlsConfig.js](src/config/controlsConfig.js).
 
 ## Documentação

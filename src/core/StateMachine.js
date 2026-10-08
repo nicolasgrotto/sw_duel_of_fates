@@ -22,6 +22,7 @@ export class StateMachine {
   pop() {
     const state = this.stack.pop() ?? null;
     state?.exit();
+    this.current?.resume();
     return state;
   }
 

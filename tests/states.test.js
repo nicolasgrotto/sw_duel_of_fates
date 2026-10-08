@@ -32,6 +32,7 @@ function createFakeGame() {
       setBindings: (bindings) => {
         game.input.bindings = bindings;
       },
+      lastPressedCode: null,
     },
     secondInput: {
       wasPressed: (action) => secondPressed.has(action),
@@ -716,6 +717,31 @@ it('lets two players pick with their own controls and fight locally', () => {
   assert.equal(duel.opponentController.input, game.secondInput);
   assert.equal(duel.hud.names[1], 'J2 · Bastião');
   assert.equal(game.input.bindings.lightAttack[0], 'KeyF');
+});
+
+it('remaps a key from the options and switches to the custom preset', () => {
+  const game = createFakeGame();
+  game.applySettings = () => {
+    game.input.bindings = { ...keyboardPresets.classic, ...game.settings.customBindings };
+  };
+  game.changeState(StateId.KEY_REMAP);
+  const remap = game.states.current;
+
+  game.step(Action.MENU_DOWN);
+  game.step(Action.MENU_DOWN);
+  game.step(Action.MENU_DOWN);
+  game.step(Action.CONFIRM);
+  assert.equal(remap.capturing, 'lightAttack');
+
+  game.input.lastPressedCode = 'KeyU';
+  game.step();
+  game.input.lastPressedCode = null;
+
+  assert.equal(remap.capturing, null);
+  assert.equal(game.settings.keyboardPreset, 'custom');
+  assert.deepEqual(game.settings.customBindings.lightAttack, ['KeyU']);
+  assert.deepEqual(game.input.bindings.lightAttack, ['KeyU']);
+  assert.ok(remap.items[3].label.includes('U'));
 });
 
 it('goes back from the opponent step to the player step', () => {

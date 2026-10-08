@@ -1,7 +1,8 @@
 import { aiConfig } from '../config/aiConfig.js';
 import { audioConfig } from '../config/audioConfig.js';
 import { loadSettings, saveSettings } from './settingsStorage.js';
-import { Action, keyBindings, keyboardPresets, keyboardPresetOrder, twoPlayerBindings } from '../config/controlsConfig.js';
+import { Action, keyBindings, keyboardPresets, keyboardPresetOrder, remappableActions, twoPlayerBindings } from '../config/controlsConfig.js';
+import { createCustomBindings, sanitizeCustomBindings } from './keyBindings.js';
 import { gameConfig } from '../config/gameConfig.js';
 import { colors } from '../config/themeConfig.js';
 import { createState } from '../states/stateFactory.js';
@@ -21,11 +22,12 @@ export class Game {
     this.secondInput = new Input({ bindings: twoPlayerBindings.p2, target: window, getGamepads, gamepadSlot: 1 });
     this.states = new StateMachine();
     this.settings = loadSettings(
-      { keyboardPreset: 'classic', difficulty: aiConfig.defaultDifficulty, reducedEffects: false, sound: true, music: true, parryChallengeBest: 0, arcadeCleared: [], finalReplay: true },
+      { keyboardPreset: 'classic', difficulty: aiConfig.defaultDifficulty, reducedEffects: false, sound: true, music: true, parryChallengeBest: 0, arcadeCleared: [], finalReplay: true, customBindings: {} },
       globalThis.localStorage,
       gameConfig.settingsStorageKey,
       { difficulty: aiConfig.difficultyOrder, keyboardPreset: keyboardPresetOrder },
     );
+    this.settings.customBindings = sanitizeCustomBindings(this.settings.customBindings, remappableActions);
     this.audio = new AudioManager(audioConfig);
     this.applySettings();
     this.unlockAudio = () => this.audio.unlock();
@@ -49,9 +51,17 @@ export class Game {
   }
 
   applySettings() {
-    this.input.setBindings(keyboardPresets[this.settings.keyboardPreset]);
+    this.input.setBindings(this.getKeyboardBindings());
     this.audio.setSfxEnabled(this.settings.sound);
     this.audio.setMusicEnabled(this.settings.music);
+  }
+
+  getKeyboardBindings() {
+    const { keyboardPreset, customBindings } = this.settings;
+    if (keyboardPreset === 'custom') {
+      return createCustomBindings(keyBindings, customBindings, remappableActions);
+    }
+    return keyboardPresets[keyboardPreset];
   }
 
   saveSettings() {

@@ -7,6 +7,7 @@ function createState(name, log) {
     name,
     enter: () => log.push(`${name}:enter`),
     exit: () => log.push(`${name}:exit`),
+    resume: () => log.push(`${name}:resume`),
     update: (dt) => log.push(`${name}:update:${dt}`),
     render: () => log.push(`${name}:render`),
   };
@@ -54,7 +55,7 @@ describe('StateMachine', () => {
     machine.pop();
 
     assert.equal(machine.current, duel);
-    assert.equal(log.at(-1), 'pause:exit');
+    assert.deepEqual(log.slice(-2), ['pause:exit', 'duel:resume']);
   });
 
   it('updates only the state on top', () => {

@@ -43,6 +43,13 @@ Todos os textos ficam em `src/config/uiConfig.js` (`texts`). Para trocar o nome 
 - As escolhas ficam salvas no navegador (`localStorage`) e voltam na próxima vez.
 - Linha discreta no rodapé com a navegação (`↑ ↓  escolher · Enter  confirmar`).
 
+### Configurar teclas
+
+- Aberta pelas Opções. Lista vertical (MenuList) com "Ação:  teclas" para as ações de luta, mais **Restaurar padrão** e **Voltar**.
+- `Enter` escolhe a ação; a linha de dica embaixo pede a nova tecla ("Pressione a nova tecla para..."). `Esc` cancela.
+- Se a tecla já estava em outra ação de luta, as duas trocam. Teclas reservadas (Esc, Enter, Backspace, P, F3–F7) mostram um aviso.
+- Qualquer mudança ativa o preset **Personalizado**, salvo no navegador.
+
 ### Controles
 
 - Tabela simples de duas colunas: ação e teclas.

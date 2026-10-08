@@ -8,4 +8,5 @@ export const StateId = Object.freeze({
   OPTIONS: 'options',
   MOVE_LIST: 'moveList',
   REPLAY: 'replay',
+  KEY_REMAP: 'keyRemap',
 });

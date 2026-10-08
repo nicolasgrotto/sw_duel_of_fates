@@ -2,6 +2,7 @@ import { CharacterSelectState } from './CharacterSelectState.js';
 import { ControlsState } from './ControlsState.js';
 import { DuelState } from './DuelState.js';
 import { GameOverState } from './GameOverState.js';
+import { KeyRemapState } from './KeyRemapState.js';
 import { MenuState } from './MenuState.js';
 import { MoveListState } from './MoveListState.js';
 import { OptionsState } from './OptionsState.js';
@@ -19,6 +20,7 @@ const stateClasses = {
   [StateId.OPTIONS]: OptionsState,
   [StateId.MOVE_LIST]: MoveListState,
   [StateId.REPLAY]: ReplayState,
+  [StateId.KEY_REMAP]: KeyRemapState,
 };
 
 export function createState(id, game, params) {

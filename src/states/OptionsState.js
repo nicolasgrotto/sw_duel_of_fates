@@ -5,6 +5,7 @@ import { difficultyNames, layout, texts } from '../config/uiConfig.js';
 import { formatText } from '../ui/formatText.js';
 import { MenuList } from '../ui/MenuList.js';
 import { GameState } from './GameState.js';
+import { StateId } from './stateIds.js';
 
 export const OptionId = Object.freeze({
   DIFFICULTY: 'difficulty',
@@ -13,6 +14,7 @@ export const OptionId = Object.freeze({
   MUSIC: 'music',
   KEYBOARD: 'keyboard',
   REPLAY: 'replay',
+  REMAP: 'remap',
   BACK: 'back',
 });
 
@@ -30,9 +32,14 @@ export class OptionsState extends GameState {
       [OptionId.MUSIC]: { id: OptionId.MUSIC, label: '' },
       [OptionId.KEYBOARD]: { id: OptionId.KEYBOARD, label: '' },
       [OptionId.REPLAY]: { id: OptionId.REPLAY, label: '' },
+      [OptionId.REMAP]: { id: OptionId.REMAP, label: texts.options.remap },
       [OptionId.BACK]: { id: OptionId.BACK, label: texts.options.back },
     };
     this.menu = new MenuList(Object.values(this.items), layout.options, this.game.audio);
+    this.refreshLabels();
+  }
+
+  resume() {
     this.refreshLabels();
   }
 
@@ -57,6 +64,8 @@ export class OptionsState extends GameState {
     const choice = this.menu.update(this.game.input);
     if (choice === OptionId.BACK) {
       this.game.popState();
+    } else if (choice === OptionId.REMAP) {
+      this.game.pushState(StateId.KEY_REMAP);
     } else if (choice) {
       this.toggle(choice);
     }

@@ -31,7 +31,8 @@ export const texts = {
   options: {
     title: 'OPÇÕES',
     keyboard: 'Teclado: {preset}',
-    keyboardPresets: { classic: 'A/D + J/K/L/Shift', arrows: 'Setas + Z/X/C/V' },
+    keyboardPresets: { classic: 'A/D + J/K/L/Shift', arrows: 'Setas + Z/X/C/V', custom: 'Personalizado' },
+    remap: 'Configurar teclas',
     difficulty: 'Dificuldade: {level}',
     effects: 'Efeitos: {value}',
     sound: 'Som: {value}',
@@ -99,6 +100,15 @@ export const texts = {
       shove: 'desequilibrou',
       counter: 'contra-atacado',
     },
+  },
+  keyRemap: {
+    title: 'CONFIGURAR TECLAS',
+    row: '{action}:  {keys}',
+    reset: 'Restaurar padrão',
+    back: 'Voltar',
+    help: 'Enter escolhe a ação e depois a nova tecla. Teclas repetidas trocam de lugar.',
+    waiting: 'Pressione a nova tecla para "{action}"   ·   Esc cancela',
+    reserved: 'A tecla {key} é reservada. Escolha outra.',
   },
   replay: {
     label: 'REPLAY',
@@ -247,9 +257,15 @@ export const layout = {
     markerThickness: 2,
   },
   options: {
-    titleY: 180,
-    firstItemY: 300,
-    itemSpacing: 52,
+    titleY: 140,
+    firstItemY: 240,
+    itemSpacing: 50,
+  },
+  keyRemap: {
+    titleY: 100,
+    firstItemY: 180,
+    itemSpacing: 42,
+    hintY: 640,
   },
   controls: {
     titleY: 110,

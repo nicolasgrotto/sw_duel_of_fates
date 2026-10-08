@@ -14,6 +14,8 @@ export class GameState {
 
   exit() {}
 
+  resume() {}
+
   update() {}
 
   render() {}

@@ -108,7 +108,20 @@ export const twoPlayerBindings = {
   },
 };
 
-export const keyboardPresetOrder = ['classic', 'arrows'];
+export const remappableActions = [
+  Action.MOVE_LEFT,
+  Action.MOVE_RIGHT,
+  Action.JUMP,
+  Action.LIGHT_ATTACK,
+  Action.HEAVY_ATTACK,
+  Action.BLOCK,
+  Action.DODGE,
+  Action.SPECIAL,
+];
+
+export const reservedKeyCodes = ['Escape', 'Enter', 'NumpadEnter', 'Backspace', 'KeyP', 'F3', 'F4', 'F5', 'F6', 'F7'];
+
+export const keyboardPresetOrder = ['classic', 'arrows', 'custom'];
 
 export const keyboardPresets = {
   classic: keyBindings,

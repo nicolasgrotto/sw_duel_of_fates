@@ -36,6 +36,16 @@ describe('Input', () => {
     return event;
   }
 
+  it('remembers the last pressed key code, bound or not, until the end of the frame', () => {
+    press('KeyQ');
+    assert.equal(input.lastPressedCode, 'KeyQ');
+    press('KeyQ', { repeat: true });
+    assert.equal(input.lastPressedCode, 'KeyQ');
+
+    input.endFrame();
+    assert.equal(input.lastPressedCode, null);
+  });
+
   it('maps a key to its action while the key is held', () => {
     press('KeyA');
     assert.equal(input.isDown('moveLeft'), true);

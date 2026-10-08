@@ -30,6 +30,7 @@ export class Input {
     this.actionsByCode = mapActionsByCode(bindings);
     this.downCodes = new Set();
     this.pressedActions = new Set();
+    this.lastPressedCode = null;
 
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleKeyUp = this.handleKeyUp.bind(this);
@@ -54,6 +55,9 @@ export class Input {
   }
 
   handleKeyDown(event) {
+    if (!event.repeat) {
+      this.lastPressedCode = event.code;
+    }
     const actions = this.actionsByCode.get(event.code);
     if (!actions) {
       return;
@@ -181,6 +185,7 @@ export class Input {
 
   endFrame() {
     this.pressedActions.clear();
+    this.lastPressedCode = null;
   }
 
   destroy() {
