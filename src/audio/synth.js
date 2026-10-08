@@ -127,12 +127,25 @@ export function createMusic(context, output, music) {
     oscillator.start();
   }
 
+  const tension = music.tension;
+  const tensionOscillator = createOscillator(context, tension.wave, tension.frequency);
+  const tensionGain = context.createGain();
+  tensionGain.gain.value = 0;
+  tensionOscillator.connect(tensionGain);
+  tensionGain.connect(filter);
+  tensionOscillator.start();
+
   filter.connect(gain);
   gain.connect(output);
   gain.gain.setValueAtTime(0, context.currentTime);
   gain.gain.linearRampToValueAtTime(music.level, context.currentTime + music.fadeIn);
 
   return {
+    setTension(amount) {
+      const now = context.currentTime;
+      filter.frequency.setTargetAtTime(music.cutoff + tension.cutoff * amount, now, tension.smoothing);
+      tensionGain.gain.setTargetAtTime(tension.gain * amount, now, tension.smoothing);
+    },
     duck(duration) {
       const now = context.currentTime;
       gain.gain.cancelScheduledValues(now);

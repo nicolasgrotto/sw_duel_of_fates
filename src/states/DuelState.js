@@ -100,6 +100,8 @@ export class DuelState extends GameState {
       hum: audioConfig.hum,
       musicDuckDuration: audioConfig.music.duckDuration,
       perfectParryDuckDuration: audioConfig.music.perfectParryDuckDuration,
+      tension: audioConfig.music.tension,
+      heartbeat: audioConfig.music.heartbeat,
     });
     this.hud = this.createHud();
     this.message = new CombatMessage();
@@ -371,6 +373,7 @@ export class DuelState extends GameState {
     this.letterbox.update(dt);
     this.message.update(dt);
     this.duelAudio.update(this.fighters);
+    this.duelAudio.updateMusic(this.fighters, this.getHeartbeatFighter(), dt);
   }
 
   exit() {
@@ -554,6 +557,14 @@ export class DuelState extends GameState {
       opponentStats: { ...this.fighterStats[1] },
       names: this.fighters.map((fighter) => fighter.name),
     });
+  }
+
+  getHeartbeatFighter() {
+    if (!this.isLocal) {
+      return this.player;
+    }
+    const [first, second] = this.fighters;
+    return first.health <= second.health ? first : second;
   }
 
   getLocalTitle(playerWon) {

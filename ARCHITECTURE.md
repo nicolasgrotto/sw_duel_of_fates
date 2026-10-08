@@ -454,6 +454,7 @@ Arquivos: [src/core/AudioManager.js](src/core/AudioManager.js), [src/audio/](src
 - Todo som é **sintetizado** (osciladores, ruído e filtros). Cada som é uma lista de camadas em `audioConfig.sounds`, tocada por `synth.playSound`. Para criar um som novo: adicione a receita e o nome em `soundNames.js`.
 - O `AudioContext` só nasce no primeiro `keydown`/`pointerdown` (política de autoplay). Antes disso, e no Node, o `AudioManager` não faz nada, então estados e testes não precisam saber se há áudio.
 - `DuelAudio` só lê eventos e lutadores: toca o som do evento com pan pela posição, mantém um zumbido por lutador (mais forte e agudo na fase active, desligado na morte) e abaixa a música no golpe final.
+- Música dinâmica: `DuelAudio.updateMusic(fighters, heartbeatFighter, dt)` calcula a tensão (`1 − menor fração de vida`) e só chama `AudioManager.setMusicTension` quando ela muda mais que `music.tension.step`. O `createMusic` do synth tem uma camada extra (`music.tension`) cujo volume e o corte do filtro seguem a tensão com `setTargetAtTime` (sem cliques). A batida (`heartbeat`) é tocada pelo `DuelAudio` com dois toques por intervalo enquanto o lutador observado está abaixo de `heartbeat.healthRatio`. `DuelAudio.stop()` zera a tensão.
 - Interface: `MenuList` toca `uiMove` e `uiConfirm` quando recebe o `AudioManager`.
 
 ## Balanceamento

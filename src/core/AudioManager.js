@@ -80,6 +80,10 @@ export class AudioManager {
     this.music?.duck(duration);
   }
 
+  setMusicTension(amount) {
+    this.music?.setTension(amount);
+  }
+
   play(name, options = {}) {
     if (!this.isReady || !this.sfxEnabled) {
       return;

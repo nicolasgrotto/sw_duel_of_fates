@@ -119,6 +119,8 @@ Todo o som é **sintetizado** com a Web Audio API (osciladores, ruído e filtros
 - Esquiva: whoosh curto e agudo.
 - Interface: tique curto ao navegar, tom curto ao confirmar.
 - Música: drone ambiente grave e tenso, com filtro respirando devagar. Abaixa no golpe final (silêncio curto) e volta depois.
+- **Música dinâmica**: quanto menor a vida do lutador mais ferido, mais o drone abre (filtro mais claro) e mais aparece uma camada de tensão (uma nota a mais, áspera). Volta ao normal ao sair do duelo.
+- **Batida com vida baixa**: com o jogador abaixo de 25% de vida, um "tum-tum" grave toca a cada 0,9 s (em 2 jogadores, segue quem estiver com menos vida).
 - Som e música podem ser desligados nas Opções.
 - Se um dia entrar áudio gravado, ele precisa de registro em [ASSETS.md](ASSETS.md).
 

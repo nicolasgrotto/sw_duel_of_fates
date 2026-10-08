@@ -11,8 +11,11 @@ function createFakeAudio({ ready = true } = {}) {
     isReady: ready,
     hums: [],
     ducks: [],
-    play: () => {},
+    tensions: [],
+    played: [],
+    play: (name) => audio.played.push(name),
     duckMusic: (duration) => audio.ducks.push(duration),
+    setMusicTension: (amount) => audio.tensions.push(amount),
     createHum: (frequency) => {
       const hum = { frequency, modes: [], pans: [], stopped: false };
       hum.setMode = (level, cutoff, pitch) => hum.modes.push({ level, cutoff, pitch });
@@ -33,6 +36,8 @@ function createDuelAudio(audio) {
     stereoWidth: audioConfig.stereoWidth,
     hum: audioConfig.hum,
     musicDuckDuration: audioConfig.music.duckDuration,
+    tension: audioConfig.music.tension,
+    heartbeat: audioConfig.music.heartbeat,
   });
 }
 
@@ -101,5 +106,37 @@ describe('DuelAudio saber hum', () => {
     duelAudio.handleEvents([{ type: CombatEvent.DEATH, attacker, defender: null, attackType: 'light', x: 300, y: 500 }]);
 
     assert.deepEqual(audio.ducks, [audioConfig.music.duckDuration]);
+  });
+});
+
+describe('DuelAudio dynamic music', () => {
+  it('raises the music tension as the lowest health drops', () => {
+    const audio = createFakeAudio();
+    const duelAudio = createDuelAudio(audio);
+    const fighters = [spawnFighter(400, 1), spawnFighter(800, -1, 'shadow')];
+
+    duelAudio.updateMusic(fighters, fighters[0], 1 / 60);
+    assert.deepEqual(audio.tensions, []);
+
+    fighters[1].health = fighters[1].stats.maxHealth * 0.4;
+    duelAudio.updateMusic(fighters, fighters[0], 1 / 60);
+    assert.ok(Math.abs(audio.tensions[0] - 0.6) < 1e-9);
+
+    duelAudio.stop();
+    assert.equal(audio.tensions.at(-1), 0);
+  });
+
+  it('beats twice per interval while the watched fighter has low health', () => {
+    const audio = createFakeAudio();
+    const duelAudio = createDuelAudio(audio);
+    const fighters = [spawnFighter(400, 1), spawnFighter(800, -1, 'shadow')];
+    const { interval } = audioConfig.music.heartbeat;
+    fighters[0].health = fighters[0].stats.maxHealth * 0.1;
+
+    for (let time = 0; time < interval * 2 - 1e-6; time += 1 / 60) {
+      duelAudio.updateMusic(fighters, fighters[0], 1 / 60);
+    }
+
+    assert.equal(audio.played.filter((name) => name === 'heartbeat').length, 4);
   });
 });

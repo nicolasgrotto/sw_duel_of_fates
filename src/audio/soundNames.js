@@ -13,6 +13,7 @@ export const SoundName = Object.freeze({
   PERFECT_PARRY: 'perfectParry',
   SHOVE: 'shove',
   IGNITE: 'ignite',
+  HEARTBEAT: 'heartbeat',
   UI_MOVE: 'uiMove',
   UI_CONFIRM: 'uiConfirm',
 });

@@ -54,15 +54,53 @@ function getHumMode(fighter) {
 }
 
 export class DuelAudio {
-  constructor(audio, { arenaWidth, stereoWidth, hum, musicDuckDuration, perfectParryDuckDuration }) {
+  constructor(audio, { arenaWidth, stereoWidth, hum, musicDuckDuration, perfectParryDuckDuration, tension, heartbeat }) {
     this.audio = audio;
     this.arenaWidth = arenaWidth;
     this.stereoWidth = stereoWidth;
     this.humConfig = hum;
     this.musicDuckDuration = musicDuckDuration;
     this.perfectParryDuckDuration = perfectParryDuckDuration;
+    this.tension = tension;
+    this.heartbeat = heartbeat;
+    this.tensionLevel = 0;
+    this.heartbeatTime = heartbeat ? heartbeat.interval : 0;
+    this.secondBeatPending = false;
     this.playOptions = { pan: 0, intensity: 1 };
     this.hums = null;
+  }
+
+  updateMusic(fighters, heartbeatFighter, dt) {
+    const lowestRatio = Math.min(...fighters.map((fighter) => fighter.health / fighter.stats.maxHealth));
+    const level = clamp(1 - lowestRatio, 0, 1);
+    if (Math.abs(level - this.tensionLevel) >= this.tension.step) {
+      this.tensionLevel = level;
+      this.audio.setMusicTension(level);
+    }
+    this.updateHeartbeat(heartbeatFighter, dt);
+  }
+
+  updateHeartbeat(fighter, dt) {
+    const inDanger = fighter.isAlive && fighter.health / fighter.stats.maxHealth < this.heartbeat.healthRatio;
+    if (!inDanger) {
+      this.heartbeatTime = this.heartbeat.interval;
+      this.secondBeatPending = false;
+      return;
+    }
+    this.heartbeatTime += dt;
+    if (this.heartbeatTime >= this.heartbeat.interval) {
+      this.heartbeatTime = 0;
+      this.secondBeatPending = true;
+      this.playHeartbeat();
+    } else if (this.secondBeatPending && this.heartbeatTime >= this.heartbeat.secondBeat) {
+      this.secondBeatPending = false;
+      this.playHeartbeat();
+    }
+  }
+
+  playHeartbeat() {
+    this.playOptions.pan = 0;
+    this.audio.play(SoundName.HEARTBEAT, this.playOptions);
   }
 
   update(fighters) {
@@ -103,6 +141,7 @@ export class DuelAudio {
   }
 
   stop() {
+    this.audio.setMusicTension(0);
     for (const hum of this.hums ?? []) {
       hum.handle.stop();
     }

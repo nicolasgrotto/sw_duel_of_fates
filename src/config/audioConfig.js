@@ -28,6 +28,19 @@ export const audioConfig = {
     level: 0.6,
     fadeIn: 2,
     duckDuration: 1.6,
+    tension: {
+      frequency: 165,
+      wave: 'sawtooth',
+      gain: 0.12,
+      cutoff: 900,
+      smoothing: 0.8,
+      step: 0.02,
+    },
+    heartbeat: {
+      healthRatio: 0.25,
+      interval: 0.9,
+      secondBeat: 0.22,
+    },
     perfectParryDuckDuration: 0.3,
     duckFade: 0.05,
     returnFade: 0.6,
@@ -92,6 +105,9 @@ export const audioConfig = {
     shove: [
       { type: 'tone', wave: 'sine', from: 120, to: 55, duration: 0.18, attack: 0.002, gain: 0.32, filter: null },
       { type: 'noise', duration: 0.1, attack: 0.002, gain: 0.35, filter: { type: 'lowpass', from: 900, to: 300, q: 0.8 } },
+    ],
+    heartbeat: [
+      { type: 'tone', wave: 'sine', from: 70, to: 42, duration: 0.16, attack: 0.004, gain: 0.32, filter: null },
     ],
     ignite: [
       { type: 'noise', duration: 0.45, attack: 0.03, gain: 0.3, filter: { type: 'bandpass', from: 300, to: 2200, q: 1.4 } },
