@@ -1,198 +1,92 @@
-import { gamepadConfig } from '../config/controlsConfig.js';
-
-function mapActionsByCode(bindings) {
-  const actionsByCode = new Map();
-
-  for (const [action, codes] of Object.entries(bindings)) {
-    for (const code of codes) {
-      if (!actionsByCode.has(code)) {
-        actionsByCode.set(code, []);
-      }
-      actionsByCode.get(code).push(action);
-    }
-  }
-
-  return actionsByCode;
-}
+import { KeyboardSource } from './KeyboardSource.js';
+import { GamepadSource } from './GamepadSource.js';
 
 export class Input {
   constructor({ bindings, target, getGamepads = () => [], gamepadSlot = 0 }) {
     this.target = target;
-    this.getGamepads = getGamepads;
-    this.gamepadSlot = gamepadSlot;
-    this.padButtons = Object.entries(gamepadConfig.buttons);
-    this.padActions = new Set();
-    this.nextPadActions = new Set();
-    this.gamepad = null;
     this.focused = true;
-    this.bindings = bindings;
-    this.codesByAction = new Map(Object.entries(bindings));
-    this.actionsByCode = mapActionsByCode(bindings);
-    this.downCodes = new Set();
     this.pressedActions = new Set();
-    this.lastPressedCode = null;
-
-    this.handleKeyDown = this.handleKeyDown.bind(this);
-    this.handleKeyUp = this.handleKeyUp.bind(this);
+    this.polledActions = new Set();
+    this.nextActions = new Set();
+    this.keyboard = new KeyboardSource({ bindings, target, onPress: (action) => {
+      if (this.focused) this.pressedActions.add(action);
+    } });
+    this.pad = new GamepadSource({ getGamepads, gamepadSlot });
+    this.sources = [this.keyboard, this.pad];
     this.handleBlur = this.handleBlur.bind(this);
     this.handleFocus = this.handleFocus.bind(this);
-
-    target.addEventListener('keydown', this.handleKeyDown);
-    target.addEventListener('keyup', this.handleKeyUp);
     target.addEventListener('blur', this.handleBlur);
     target.addEventListener('focus', this.handleFocus);
   }
 
+  get bindings() { return this.keyboard.bindings; }
+  get lastPressedCode() { return this.keyboard.lastPressedCode; }
+  get gamepadSlot() { return this.pad.gamepadSlot; }
+  set gamepadSlot(value) { this.pad.gamepadSlot = value; }
+
+  addSource(source) {
+    if (!this.sources.includes(source)) this.sources.push(source);
+  }
+
   setBindings(bindings) {
-    if (this.bindings === bindings) {
-      return;
-    }
-    this.bindings = bindings;
-    this.codesByAction = new Map(Object.entries(bindings));
-    this.actionsByCode = mapActionsByCode(bindings);
-    this.downCodes.clear();
+    if (this.bindings === bindings) return;
+    this.keyboard.setBindings(bindings);
     this.pressedActions.clear();
-  }
-
-  handleKeyDown(event) {
-    if (!event.repeat) {
-      this.lastPressedCode = event.code;
-    }
-    const actions = this.actionsByCode.get(event.code);
-    if (!actions) {
-      return;
-    }
-
-    event.preventDefault();
-
-    if (event.repeat || this.downCodes.has(event.code)) {
-      return;
-    }
-
-    this.downCodes.add(event.code);
-    for (const action of actions) {
-      this.pressedActions.add(action);
+    this.polledActions.clear();
+    for (const source of this.sources) {
+      for (const action of source.actions) this.polledActions.add(action);
     }
   }
 
-  handleKeyUp(event) {
-    if (!this.actionsByCode.has(event.code)) {
-      return;
-    }
-
-    event.preventDefault();
-    this.downCodes.delete(event.code);
-  }
-
-  handleFocus() {
-    this.focused = true;
-  }
+  handleFocus() { this.focused = true; }
 
   handleBlur() {
     this.focused = false;
-    this.padActions.clear();
-    this.nextPadActions.clear();
-    this.gamepad = null;
-    this.downCodes.clear();
+    for (const source of this.sources) source.reset?.();
+    this.polledActions.clear();
+    this.nextActions.clear();
     this.pressedActions.clear();
   }
 
   isDown(action) {
-    if (this.padActions.has(action)) {
-      return true;
-    }
-    const codes = this.codesByAction.get(action);
-    if (!codes) {
-      return false;
-    }
-
-    for (const code of codes) {
-      if (this.downCodes.has(code)) {
-        return true;
-      }
-    }
-    return false;
+    return this.focused && this.sources.some((source) => source.actions.has(action));
   }
 
   pollGamepads() {
-    if (!this.focused) {
-      return;
-    }
-    this.nextPadActions.clear();
-    this.gamepad = null;
-    let slot = 0;
-    for (const pad of this.getGamepads() ?? []) {
-      if (!pad?.connected || pad.mapping !== 'standard') {
-        continue;
-      }
-      if (slot === this.gamepadSlot) {
-        this.gamepad = pad;
-        break;
-      }
-      slot += 1;
-    }
-    if (this.gamepad) {
-      const { axes, deadzone } = gamepadConfig;
-      for (const [index, actions] of this.padButtons) {
-        if (this.gamepad.buttons[index]?.pressed) {
-          for (const action of actions) {
-            this.nextPadActions.add(action);
-          }
-        }
-      }
-      for (const axis of axes) {
-        const value = this.gamepad.axes[axis.index] ?? 0;
-        if (value < -deadzone) {
-          this.nextPadActions.add(axis.negative);
-        } else if (value > deadzone) {
-          this.nextPadActions.add(axis.positive);
-        }
-      }
-    }
-    for (const action of this.nextPadActions) {
-      if (!this.padActions.has(action)) {
-        this.pressedActions.add(action);
-      }
-    }
-    const previous = this.padActions;
-    this.padActions = this.nextPadActions;
-    this.nextPadActions = previous;
+    this.poll();
   }
 
-  rumble(type, reduced = false) {
-    const recipe = gamepadConfig.rumble[type];
-    const actuator = this.gamepad?.vibrationActuator;
-    if (!recipe || !actuator?.playEffect) {
-      return;
+  poll() {
+    if (!this.focused) return;
+    this.nextActions.clear();
+    for (const source of this.sources) {
+      source.poll?.();
+      for (const action of source.actions) this.nextActions.add(action);
     }
-    const scale = reduced ? gamepadConfig.reducedRumbleScale : 1;
-    try {
-      const effect = actuator.playEffect('dual-rumble', {
-        duration: recipe.duration,
-        startDelay: 0,
-        strongMagnitude: recipe.strongMagnitude * scale,
-        weakMagnitude: recipe.weakMagnitude * scale,
-      });
-      effect?.catch?.(() => {});
-    } catch {
-      return;
+    for (const action of this.nextActions) {
+      if (!this.polledActions.has(action)) this.pressedActions.add(action);
     }
+    const previous = this.polledActions;
+    this.polledActions = this.nextActions;
+    this.nextActions = previous;
   }
 
-  wasPressed(action) {
-    return this.pressedActions.has(action);
-  }
+  rumble(type, reduced = false) { this.pad.rumble(type, reduced); }
+  wasPressed(action) { return this.pressedActions.has(action); }
 
   endFrame() {
     this.pressedActions.clear();
-    this.lastPressedCode = null;
+    for (const source of this.sources) source.endFrame?.();
+    this.polledActions.clear();
+    for (const source of this.sources) {
+      for (const action of source.actions) this.polledActions.add(action);
+    }
   }
 
   destroy() {
-    this.target.removeEventListener('keydown', this.handleKeyDown);
-    this.target.removeEventListener('keyup', this.handleKeyUp);
     this.target.removeEventListener('blur', this.handleBlur);
     this.target.removeEventListener('focus', this.handleFocus);
     this.handleBlur();
+    for (const source of this.sources) source.destroy?.();
   }
 }

@@ -228,3 +228,42 @@ describe('Input gamepad slots', () => {
     assert.equal(second.wasPressed(Action.LIGHT_ATTACK), false);
   });
 });
+
+ describe('generic input sources', () => {
+  it('combines held actions without repeating an edge when another source joins', () => {
+    const target = new EventTarget();
+    const input = new Input({ bindings, target });
+    const source = { actions: new Set(), reset() { this.actions.clear(); } };
+    input.addSource(source);
+    target.dispatchEvent(keyEvent('keydown', 'Space'));
+    input.poll();
+    input.endFrame();
+    source.actions.add('jump');
+    input.poll();
+    assert.equal(input.wasPressed('jump'), false);
+    target.dispatchEvent(keyEvent('keyup', 'Space'));
+    assert.equal(input.isDown('jump'), true);
+    source.actions.clear();
+    input.poll();
+    input.endFrame();
+    source.actions.add('jump');
+    input.poll();
+    assert.equal(input.wasPressed('jump'), true);
+    target.dispatchEvent(new Event('blur'));
+    assert.equal(source.actions.size, 0);
+    assert.equal(input.isDown('jump'), false);
+  });
+
+  it('keeps quick keyboard taps and destroys added sources', () => {
+    const target = new EventTarget();
+    const input = new Input({ bindings, target });
+    let destroyed = false;
+    input.addSource({ actions: new Set(), destroy() { destroyed = true; } });
+    target.dispatchEvent(keyEvent('keydown', 'Space'));
+    target.dispatchEvent(keyEvent('keyup', 'Space'));
+    input.poll();
+    assert.equal(input.wasPressed('jump'), true);
+    input.destroy();
+    assert.equal(destroyed, true);
+  });
+});
