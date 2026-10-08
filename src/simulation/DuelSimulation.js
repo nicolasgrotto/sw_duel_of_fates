@@ -6,10 +6,11 @@ import { PhysicsSystem } from '../systems/PhysicsSystem.js';
 import { StaminaSystem } from '../systems/StaminaSystem.js';
 
 export class DuelSimulation {
-  constructor({ arena, fighters, physicsConfig, combatConfig, animationConfig }) {
+  constructor({ arena, fighters, physicsConfig, combatConfig, animationConfig, rules = {} }) {
     this.arena = arena;
     this.fighters = fighters;
-    this.combat = new CombatSystem(arena, combatConfig);
+    this.rules = rules;
+    this.combat = new CombatSystem(arena, combatConfig, rules);
     this.movement = new MovementSystem(physicsConfig, arena);
     this.physics = new PhysicsSystem(physicsConfig, arena);
     this.collision = new CollisionSystem(arena);
@@ -35,6 +36,7 @@ export class DuelSimulation {
     this.movement.updateStates(fighters);
     this.combat.resolveHits(fighters);
     this.stamina.update(fighters, dt);
+    this.combat.powers.update(fighters, dt);
     this.animator.update(fighters, dt);
   }
 }

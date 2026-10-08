@@ -63,6 +63,7 @@ export class Fighter {
 
     this.health = stats.maxHealth;
     this.stamina = stats.maxStamina;
+    this.powerMeter = stats.power?.start ?? 0;
 
     this.state = FighterState.IDLE;
     this.stateTime = 0;
@@ -87,6 +88,7 @@ export class Fighter {
     this.grounded = true;
     this.health = this.stats.maxHealth;
     this.stamina = this.stats.maxStamina;
+    this.powerMeter = this.stats.power?.start ?? 0;
     this.restartState(FighterState.IDLE);
     Object.assign(this.combat, createCombat());
     this.clearIntent();

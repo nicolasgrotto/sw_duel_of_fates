@@ -1,6 +1,8 @@
 import { attributesConfig } from '../config/attributesConfig.js';
 import { evadeConfig } from '../config/evadeConfig.js';
+import { powersConfig } from '../config/powersConfig.js';
 import { applyAttributes } from './attributes.js';
+import { resolvePowerStats } from './powers.js';
 import { fighterArchetypes } from '../config/fightersConfig.js';
 import { Fighter } from '../entities/Fighter.js';
 import { characters } from './characterData.js';
@@ -36,7 +38,7 @@ export function createFighter(characterId, { x, y, facing }, { saberColor = null
   return new Fighter({
     id: character.id,
     name: character.name,
-    stats: derived,
+    stats: { ...derived, alignment: character.alignment, power: resolvePowerStats(derived.powerLevel, powersConfig) },
     appearance: saberColor ? { ...character.appearance, saberColor } : character.appearance,
     sound: character.sound,
     x,

@@ -42,7 +42,7 @@ src/
   states/                   ✅ telas do jogo
     GameState.js            ✅ classe base
     stateIds.js             ✅ ids dos estados
-    duelModes.js            ✅ modos do duelo (versus, local, arcade, sobrevivência, tutorial, desafio, treino)
+    duelModes.js            ✅ modos do duelo (versus, local, arcade, sobrevivência, tutorial, desafio, treino) e `createDuelRules`
     stateFactory.js         ✅ cria estados a partir do id
     MenuState.js            ✅ título + opções (MenuList)
     CharacterSelectState.js ✅ escolhe jogador, adversário (ou J2), cor da lâmina e arena; Arcade e Sobrevivência só pedem o jogador
@@ -59,6 +59,7 @@ src/
   characters/               ✅ dados e criação de personagens
     characterData.js        ✅ personagens: nome, arquétipo, perfil de IA, aparência
     attributes.js           ✅ deriva stats sem mutar base ou notas
+    powers.js               ✅ `resolvePowerStats`: máximo, início, ganho e potência do medidor pelo nível do Fluxo
     characterFactory.js     ✅ cria um Fighter a partir dos dados
   modes/                    ✅ regras de modos de jogo, puras e testáveis (sem render)
     DuelResult.js           ✅ resultado independente dos Fighters
@@ -92,6 +93,8 @@ src/
     actionBuffer.js         ✅ buffer de input: ação apertada fica guardada até o lutador poder agir
     hitboxes.js             ✅ hitbox, hurtbox, sobreposição, invulnerabilidade
     combatEvents.js         ✅ tipos e criação de eventos de combate
+    PowerSystem.js          ✅ medidor do Fluxo (ganhos e regeneração); desligado sem `rules.powers`
+    powerResistance.js      ✅ diferença de nível, `resolvePowerOutcome` (faixas em dados) e tier visual (puros)
   simulation/               ✅
     DuelSimulation.js       ✅ ordem dos sistemas em um passo do duelo
     ReplayBuffer.js         ✅ grava intents, dt e fotos do estado; alimenta o replay determinístico
@@ -137,6 +140,7 @@ src/
     touchLayoutConfig.js    ✅ geometria e limiares do toque
     evadeConfig.js          ✅ flag e perfil global de esquiva de precisão
     attributesConfig.js     ✅ tabela 1–9, bases na nota 5 e calibração por arquétipo
+    powersConfig.js         ✅ modos com poderes, medidor, regras de resistência e tiers visuais do Fluxo
     fightersConfig.js       ✅ estrutura por arquétipo (corpo, tempos, golpes, custos, traços e regras de mobilidade)
     fighterVisualConfig.js  ✅ proporções, animação, poses de combate, sombra e estilo do sabre
     effectsConfig.js        ✅ limites e receitas de VFX
@@ -531,6 +535,16 @@ Arquivos: [src/core/AudioManager.js](src/core/AudioManager.js), [src/audio/](src
 - Música dinâmica: `DuelAudio.updateMusic(fighters, heartbeatFighter, dt)` calcula a tensão (`1 − menor fração de vida`) e só chama `AudioManager.setMusicTension` quando ela muda mais que `music.tension.step`. O `createMusic` do synth tem uma camada extra (`music.tension`) cujo volume e o corte do filtro seguem a tensão com `setTargetAtTime` (sem cliques). A batida (`heartbeat`) é tocada pelo `DuelAudio` com dois toques por intervalo enquanto o lutador observado está abaixo de `heartbeat.healthRatio`. `DuelAudio.stop()` zera a tensão.
 - Interface: `MenuList` toca `uiMove` e `uiConfirm` quando recebe o `AudioManager`.
 
+### Fluxo e poderes (v1.5)
+
+Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 22).
+
+- **Regra por modo.** `createDuelRules(mode, settings, powersConfig.modes)` devolve `{ powers }`: ligado só em Duelar, 2 Jogadores e Treino, e só se `settings.powers` não for `false`. O `DuelState` guarda `this.rules` (ou usa `params.rules`, para o Story) e passa para a `DuelSimulation`, para a HUD e para o `ReplayState` (o replay re-simula com as mesmas regras). O simulador aceita `--rules powers` e a matriz repassa a opção.
+- **Medidor.** A `DuelSimulation` repassa `rules` ao `CombatSystem`, que cria o `PowerSystem` (desligado quando `rules.powers` não é `true`). O `PowerSystem` regenera `fighter.powerMeter` depois da stamina e soma ganhos nos ganchos do `CombatSystem` (`onHit` no `applyHit`, `onBlock` no `resolveBlock`, `onParry` no `resolveParry`). `powerMeter` fica no `Fighter` (como `stamina`), começa em `stats.power.start` e volta a esse valor no `resetForRound`; o snapshot do replay o inclui.
+- **Nível.** `stats.powerLevel` vem do atributo Fluxo. A factory soma `stats.alignment` (do `characterData`) e `stats.power` (`resolvePowerStats`): o nível muda o ganho do medidor e a potência dos poderes, não o máximo.
+- **Resistência.** `getLevelDifference(caster, target)` = nível do alvo − nível de quem lança. `resolvePowerOutcome(rule, diff)` percorre as faixas da regra (`powersConfig.resistance`) e devolve `{ scale, outcome }`. Cada poder aponta para uma regra pelo nome; nenhum `if` por poder.
+- **Tier visual.** `getPowerTier(level, powersConfig.tiers)` escolhe cor (`themeConfig`) e intensidade. A HUD desenha o medidor na cor do tier, abaixo da stamina, só com `rules.powers`.
+
 ## Balanceamento
 
 `npm run simulate` roda duelos IA × IA na `DuelSimulation` real, sem navegador, alternando os lados, e mostra vitórias, tempo médio, hits, bloqueios, clashes, quebras de guarda, parries (comuns e perfeitos) e empurrões.
@@ -791,21 +805,21 @@ Roteiro e tarefas em [versions/v2.md](versions/v2.md). Esta seção registra as 
 4. Teste que falha se um campo mutável do `Fighter` ficar fora do `captureFighter`.
 5. `gameConfig.canvas.maxPixelRatio` (2) limita o DPR em Game.handleResize; GameLoop mede update e render com now injetado e publica médias por frame (janela de timingSampleFrames, 60). F3 mostra ms, sem mudar dt da simulação.
 
-A regra `rules` nos parâmetros do duelo (`powers`) entra na v1.5, junto com o primeiro uso real.
+A regra `rules` nos parâmetros do duelo (`powers`) foi implementada na v1.5, junto com o medidor (ver Combat → Fluxo e poderes).
 
 **Módulos previstos.**
 
 ```
 core/TouchInput.js            IMPLEMENTADO v1.2: pointer events no canvas → ações (multitoque por pointerId, joystick com zona morta)
 core/textPrompt.js            input DOM temporário só na tela de nome (injetado)
-config/touchLayoutConfig.js, attributesConfig.js, powersConfig.js, powerTiersConfig.js,
+config/touchLayoutConfig.js, attributesConfig.js, powersConfig.js (com os tiers visuais),
        storyConfig.js, secretsConfig.js, introConfig.js
 characters/attributes.js      IMPLEMENTADO v1.4: applyAttributes(base, attributes, config) → stats derivados (puro)
 characters/protagonist.js     createProtagonistCharacter(save) → dados para a createFighter atual
 characters/skins.js           resolveAppearance(character, skinId)
-combat/powerResistance.js     resolvePowerOutcome(rule, levelDiff) → { scale, outcome } (puro)
+combat/powerResistance.js     IMPLEMENTADO v1.5: resolvePowerOutcome(rule, levelDiff) → { scale, outcome } e getPowerTier (puros)
 combat/powerEffects.js        registro { push, pull, lightning, barrier } → handler
-combat/PowerSystem.js         medidor, recargas, fases do poder, eventos
+combat/PowerSystem.js         IMPLEMENTADO v1.5 (medidor); recargas, fases do poder e eventos na v1.6
 modes/story/StoryDirector.js, modes/story/conditions.js
 modes/SecretUnlockSystem.js   casa sequências de teclas (lastPressedCode) e de ações; persiste o desbloqueio
 states/IntroState.js, StoryState.js, DialogueState.js, ProtagonistState.js
@@ -816,7 +830,7 @@ ui/TouchControls.js           IMPLEMENTADO v1.2: controles de toque desenhados n
 **Decisões.**
 
 - **Atributos implementados na v1.4** (1–9; só o `foretold` tem Fluxo 10) são a única fonte dos stats escalares: Vida → vida; Stamina → máximo e regeneração; Lâmina → escala de dano e bônus pequeno no parry perfeito; Defesa → guarda (custo do bloqueio, recuo, limite de quebra), não redução de dano; Agilidade → velocidade, pulo, dash e janela do EVADE; Fluxo → `powerLevel`. O arquétipo continua dono de tempos, golpes e traços.
-- **Fluxo**: `powerLevel` (permanente) define potência, resistência, máximo do medidor e tier visual; `powerMeter` é o recurso da luta; `stamina` continua o recurso físico.
+- **Fluxo implementado na v1.5**: `powerLevel` (permanente) define potência, ganho do medidor, resistência e tier visual (o máximo do medidor é igual para todos); `powerMeter` é o recurso da luta; `stamina` continua o recurso físico.
 - **Resistência**: `levelDiff = alvo.powerLevel − conjurador.powerLevel`; cada poder aponta para uma regra em dados (faixas → escala e resultado `normal`, `reduced`, `resisted`). Um único resolvedor puro, sem `if` por poder.
 - **Poderes** são definições com fases (startup, active, recovery), como os golpes, pagas com `powerMeter`. Estados novos: `CASTING` e `CHANNELING`. Sem projéteis na v2. Efeitos no alvo reaproveitam `HIT` e `STAGGERED`.
 - **EVADE implementado na v1.3** (esquiva de precisão) é uma ação nova no "baixo" (S/↓, direcional baixo, joystick baixo); o Shift continua o dash. Flag `evade` no intent (o `IntentRecorder` passa de 10 para 12 bits com `power`, cabe no `Uint16`).

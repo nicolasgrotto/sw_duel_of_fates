@@ -1,4 +1,5 @@
 import { evadeConfig } from '../config/evadeConfig.js';
+import { powersConfig } from '../config/powersConfig.js';
 import { FighterState } from '../entities/fighterStates.js';
 import { canAfford, spendStamina } from '../systems/StaminaSystem.js';
 import { CombatAction, clearActionBuffer, updateActionBuffer } from './actionBuffer.js';
@@ -6,6 +7,7 @@ import { clamp } from '../utils/math.js';
 import { ATTACK_STATES, AttackPhase, AttackType, getAttackDuration, getAttackPhase, getChargeLevel, isSaberAttack } from './attackPhases.js';
 import { CombatEvent, createCombatEvent } from './combatEvents.js';
 import { boxesOverlap, createBox, getAttackHitbox, getHurtbox, hasActiveHitbox, hasHurtbox, isInvulnerable } from './hitboxes.js';
+import { PowerSystem } from './PowerSystem.js';
 
 const PUNISHED_STATES = new Set([FighterState.STAGGERED, FighterState.STUNNED]);
 
@@ -54,7 +56,7 @@ function chooseFallDirection(fighter, arena, roomMargin) {
 }
 
 export class CombatSystem {
-  constructor(arena, { inputBuffer, fallRoomMargin, clash }) {
+  constructor(arena, { inputBuffer, fallRoomMargin, clash }, rules = {}) {
     this.arena = arena;
     this.inputBuffer = inputBuffer;
     this.fallRoomMargin = fallRoomMargin;
@@ -64,6 +66,7 @@ export class CombatSystem {
     this.hitbox = createBox();
     this.hurtbox = createBox();
     this.contacts = [];
+    this.powers = new PowerSystem(this, powersConfig, rules.powers === true);
   }
 
   update(fighters, dt) {
@@ -551,6 +554,7 @@ export class CombatSystem {
     }
     defender.setState(FighterState.IDLE);
 
+    this.powers.onParry(defender);
     this.emit(perfect ? CombatEvent.PERFECT_PARRY : CombatEvent.PARRY, contact);
   }
 
@@ -567,6 +571,7 @@ export class CombatSystem {
     if (canAfford(defender, staminaCost + (defender.stats.guardBreakThreshold ?? 0))) {
       spendStamina(defender, staminaCost);
       defender.combat.blockstun = attack.blockstun;
+      this.powers.onBlock(defender);
       this.emit(CombatEvent.BLOCK, contact);
       return;
     }
@@ -597,6 +602,7 @@ export class CombatSystem {
     contact.damage = Math.min(defender.health, damage);
     defender.health = Math.max(0, defender.health - damage);
     contact.armored = armored;
+    this.powers.onHit(attacker, defender);
     if (!armored) {
       defender.vx = attacker.facing * attack.knockback * attacker.stats.knockbackScale;
       defender.clearAttack();

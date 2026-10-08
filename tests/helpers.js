@@ -36,12 +36,13 @@ export function repeat(times, callback) {
   }
 }
 
-export function createSimulation(fighters) {
+export function createSimulation(fighters, rules = {}) {
   return new DuelSimulation({
     arena,
     fighters,
     physicsConfig,
     combatConfig,
     animationConfig: animationStyle,
+    rules,
   });
 }

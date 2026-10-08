@@ -102,3 +102,27 @@ it('mirrors round markers and fills only the won rounds', () => {
   assert.equal(marks[0].x, layout.hud.margin);
   assert.equal(marks[2].x + layout.hud.roundSize, 1280 - layout.hud.margin);
 });
+
+describe('Hud power meter', () => {
+  function renderColors(showPower) {
+    const left = spawnFighter(300, 1, 'mirror');
+    const right = spawnFighter(900, -1, 'shadow');
+    const hud = new Hud(left, right, null, null, showPower);
+    const fills = [];
+    hud.render({
+      width: 1280,
+      text: () => {},
+      save: () => {},
+      restore: () => {},
+      setAlpha: () => {},
+      strokeRect: () => {},
+      fillRect: (x, y, width, height, color) => fills.push(color),
+    });
+    return fills;
+  }
+
+  it('draws the meter in the tier color only when powers are on', () => {
+    assert.ok(!renderColors(false).includes(colors.powerTierSteady));
+    assert.ok(renderColors(true).includes(colors.powerTierSteady));
+  });
+});

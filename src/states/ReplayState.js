@@ -36,7 +36,7 @@ function cloneFighter(original, snapshot) {
 
 export class ReplayState extends GameState {
   enter() {
-    const { playback, fighters, arenaId } = this.params;
+    const { playback, fighters, arenaId, rules = {} } = this.params;
     this.playback = playback;
     this.step = playback.firstStep;
     this.pending = 0;
@@ -48,6 +48,7 @@ export class ReplayState extends GameState {
       physicsConfig: gameConfig.physics,
       combatConfig: gameConfig.combat,
       animationConfig: animationStyle,
+      rules,
     });
     const random = createRandom(playback.firstStep + 1);
     this.camera = new Camera(effectsConfig, random);

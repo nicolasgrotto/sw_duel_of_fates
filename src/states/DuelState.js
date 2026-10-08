@@ -14,6 +14,7 @@ import { Action, keyBindings, twoPlayerBindings } from '../config/controlsConfig
 import { effectsConfig } from '../config/effectsConfig.js';
 import { animation as animationStyle } from '../config/fighterVisualConfig.js';
 import { gameConfig } from '../config/gameConfig.js';
+import { powersConfig } from '../config/powersConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
 import { layout, texts } from '../config/uiConfig.js';
 import { ENCODED_INTENT_RANGE, IntentRecorder, encodeIntent } from '../controllers/IntentRecorder.js';
@@ -43,7 +44,7 @@ import { clamp } from '../utils/math.js';
 import { formatActionKeys } from '../ui/keyLabels.js';
 import { createRandom, createRandomSeed } from '../utils/random.js';
 import { GameState } from './GameState.js';
-import { DuelMode, hasRoundLimit, usesDummy } from './duelModes.js';
+import { DuelMode, createDuelRules, hasRoundLimit, usesDummy } from './duelModes.js';
 import { StateId } from './stateIds.js';
 
 function createFighterStats() {
@@ -77,6 +78,7 @@ export class DuelState extends GameState {
     this.playerCharacter = this.ladderStage ? this.ladderRun.playerCharacter : (this.params.playerCharacter ?? gameConfig.duel.playerCharacter);
     this.opponentCharacter = this.ladderStage ? this.ladderStage.opponentCharacter : (this.params.opponentCharacter ?? gameConfig.duel.opponentCharacter);
     this.difficultyId = this.ladderStage ? this.ladderStage.difficulty : this.game.settings.difficulty;
+    this.rules = this.params.rules ?? createDuelRules(this.mode, this.game.settings, powersConfig.modes);
     this.enraged = false;
     this.random = createRandom(createRandomSeed());
     if (this.isLocal) {
@@ -98,6 +100,7 @@ export class DuelState extends GameState {
       physicsConfig: gameConfig.physics,
       combatConfig: gameConfig.combat,
       animationConfig: animationStyle,
+      rules: this.rules,
     });
     this.camera = new Camera(effectsConfig, this.random);
     this.timeControl = new TimeControl();
@@ -223,7 +226,7 @@ export class DuelState extends GameState {
   createHud() {
     const rounds = this.hasRoundLimit ? { wins: this.roundWins, roundsToWin: this.roundsToWin } : null;
     const names = this.isLocal ? this.fighters.map((fighter, index) => formatText(texts.local.hudName, { player: index + 1, name: fighter.name })) : null;
-    return new Hud(this.fighters[0], this.fighters[1], rounds, names);
+    return new Hud(this.fighters[0], this.fighters[1], rounds, names, this.rules.powers);
   }
 
   showRoundIntro() {
@@ -240,6 +243,7 @@ export class DuelState extends GameState {
           playback: this.replayBuffer.createPlayback(),
           fighters: this.fighters,
           arenaId: this.arenaId,
+          rules: this.rules,
         });
         return;
       }
@@ -694,7 +698,7 @@ export class DuelState extends GameState {
 
     for (const fighter of this.fighters) {
       lines.push(
-        `${fighter.id}: ${fighter.state}  hp ${fighter.health.toFixed(0)}  st ${fighter.stamina.toFixed(0)}`,
+        `${fighter.id}: ${fighter.state}  hp ${fighter.health.toFixed(0)}  st ${fighter.stamina.toFixed(0)}  flow ${this.rules.powers ? fighter.powerMeter.toFixed(0) : 'off'}`,
         `  ratings ${Object.values(fighter.stats.attributes).join("/")}  flow ${fighter.powerLevel}`,
         `  jumps ${fighter.combat.jumpsUsed}/${fighter.stats.movement.maxJumps}  evade ${fighter.combat.evading ? fighter.stateTime.toFixed(2) : '-'}`,
         `  pos ${fighter.x.toFixed(0)}, ${fighter.y.toFixed(0)}  vel ${fighter.vx.toFixed(0)}, ${fighter.vy.toFixed(0)}`,

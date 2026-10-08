@@ -14,6 +14,7 @@ export const OptionId = Object.freeze({
   MUSIC: 'music',
   KEYBOARD: 'keyboard',
   REPLAY: 'replay',
+  POWERS: 'powers',
   REMAP: 'remap',
   BACK: 'back',
 });
@@ -32,6 +33,7 @@ export class OptionsState extends GameState {
       [OptionId.MUSIC]: { id: OptionId.MUSIC, label: '' },
       [OptionId.KEYBOARD]: { id: OptionId.KEYBOARD, label: '' },
       [OptionId.REPLAY]: { id: OptionId.REPLAY, label: '' },
+      [OptionId.POWERS]: { id: OptionId.POWERS, label: '' },
       [OptionId.REMAP]: { id: OptionId.REMAP, label: texts.options.remap },
       [OptionId.BACK]: { id: OptionId.BACK, label: texts.options.back },
     };
@@ -48,6 +50,7 @@ export class OptionsState extends GameState {
     const { options } = texts;
 
     this.items.difficulty.label = formatText(options.difficulty, { level: difficultyNames[settings.difficulty] });
+    this.items.powers.label = formatText(options.powers, { value: settings.powers === false ? options.offPlural : options.onPlural });
     this.items.effects.label = formatText(options.effects, { value: settings.reducedEffects ? options.reduced : options.full });
     this.items.sound.label = formatText(options.sound, { value: settings.sound ? options.on : options.off });
     this.items.keyboard.label = formatText(options.keyboard, { preset: options.keyboardPresets[settings.keyboardPreset ?? keyboardPresetOrder[0]] });
@@ -77,6 +80,9 @@ export class OptionsState extends GameState {
     switch (option) {
       case OptionId.DIFFICULTY:
         settings.difficulty = nextDifficulty(settings.difficulty);
+        break;
+      case OptionId.POWERS:
+        settings.powers = settings.powers === false;
         break;
       case OptionId.EFFECTS:
         settings.reducedEffects = !settings.reducedEffects;

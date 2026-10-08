@@ -1,4 +1,6 @@
 import { CombatEvent } from '../combat/combatEvents.js';
+import { getPowerTier } from '../combat/powerResistance.js';
+import { powersConfig } from '../config/powersConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
 import { layout } from '../config/uiConfig.js';
 import { approach } from '../utils/math.js';
@@ -20,7 +22,8 @@ function createSideState(fighter, side) {
 }
 
 export class Hud {
-  constructor(leftFighter, rightFighter, rounds = null, names = null) {
+  constructor(leftFighter, rightFighter, rounds = null, names = null, showPower = false) {
+    this.showPower = showPower;
     this.names = names ?? [leftFighter.name, rightFighter.name];
     this.sides = [createSideState(leftFighter, Side.LEFT), createSideState(rightFighter, Side.RIGHT)];
     this.time = 0;
@@ -110,10 +113,23 @@ export class Hud {
 
     renderer.fillRect(barX, staminaY, healthWidth, staminaHeight, colors.hudTrack);
     this.fillBar(renderer, barX, staminaY, healthWidth, staminaHeight, fighter.stamina / maxStamina, isLeft, this.getStaminaColor(state));
+    this.renderPower(renderer, state, barX, staminaY + staminaHeight, isLeft);
     this.renderRounds(renderer, isLeft);
     if (state.rejectTime > 0) {
       renderer.strokeRect(barX, staminaY, healthWidth, staminaHeight, this.getStaminaColor(state));
     }
+  }
+
+  renderPower(renderer, state, barX, y, isLeft) {
+    if (!this.showPower) {
+      return;
+    }
+    const { fighter } = state;
+    const { healthWidth, powerGap, powerHeight } = layout.hud;
+    const barY = y + powerGap;
+    const color = getPowerTier(fighter.powerLevel, powersConfig.tiers).color;
+    renderer.fillRect(barX, barY, healthWidth, powerHeight, colors.hudTrack);
+    this.fillBar(renderer, barX, barY, healthWidth, powerHeight, fighter.powerMeter / fighter.stats.power.max, isLeft, color);
   }
 
   renderRounds(renderer, isLeft) {

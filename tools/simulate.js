@@ -48,6 +48,7 @@ function readOptions(argv) {
     leftDifficulty: '',
     rightDifficulty: '',
     profile: '',
+    rules: '',
     seed: 1,
     overrides: [],
   };
@@ -76,7 +77,12 @@ function createController(self, opponent, { characterId, difficulty, profile }, 
   });
 }
 
-function runDuel(leftSetup, rightSetup, random) {
+function readRules(names) {
+  const enabled = new Set(names.split(',').filter(Boolean));
+  return { powers: enabled.has('powers') };
+}
+
+function runDuel(leftSetup, rightSetup, random, rules) {
   const leftId = leftSetup.characterId;
   const rightId = rightSetup.characterId;
   const arena = createArenaBounds(gameConfig);
@@ -95,6 +101,7 @@ function runDuel(leftSetup, rightSetup, random) {
     physicsConfig: gameConfig.physics,
     combatConfig: gameConfig.combat,
     animationConfig: animationStyle,
+    rules,
   });
   const counts = { hits: 0, blocks: 0, clashes: 0, guardBreaks: 0, parries: 0, perfectParries: 0, shoves: 0, evades: 0, evadeAttempts: 0, jumps: 0, airJumps: 0 };
 
@@ -142,6 +149,7 @@ function main() {
   const options = readOptions(process.argv.slice(2));
   options.overrides.forEach(applyOverride);
   const random = createRandom(options.seed);
+  const rules = readRules(options.rules);
   const results = [];
 
   const sides = [
@@ -151,7 +159,7 @@ function main() {
 
   for (let i = 0; i < options.duels; i += 1) {
     const [first, second] = i % 2 === 1 ? [sides[1], sides[0]] : sides;
-    results.push(runDuel(first, second, random));
+    results.push(runDuel(first, second, random, rules));
   }
 
   const wins = { A: 0, B: 0 };
@@ -165,7 +173,7 @@ function main() {
   const describe = ({ characterId, difficulty, profile }) =>
     `${characterId} (${difficulty}, ${profile || characters[characterId].aiProfile})`.padEnd(36);
 
-  console.log(`Duels: ${results.length}  seed: ${options.seed}${options.overrides.length ? `  set: ${options.overrides.join(', ')}` : ''}`);
+  console.log(`Duels: ${results.length}  seed: ${options.seed}${options.rules ? `  rules: ${options.rules}` : ''}${options.overrides.length ? `  set: ${options.overrides.join(', ')}` : ''}`);
   console.log(`A ${describe(sides[0])} wins: ${String(wins.A).padStart(4)}  (${percent(wins.A)})`);
   console.log(`B ${describe(sides[1])} wins: ${String(wins.B).padStart(4)}  (${percent(wins.B)})`);
   console.log(`timeouts  : ${String(timeouts).padStart(4)}  (${percent(timeouts)})`);
