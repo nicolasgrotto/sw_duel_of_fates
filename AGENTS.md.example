@@ -1,25 +1,20 @@
-# AGENTS.md — modelo de instruções para agentes de código
+# AGENTS.md — modelo
 
-> **O que é este arquivo?**
-> É um **modelo** das instruções que agentes de IA (Claude Code, Codex, GPT ou outro) seguem ao trabalhar neste repositório.
-> O arquivo de verdade se chama `AGENTS.md` e **não fica no repositório** (está no `.gitignore`): cada pessoa mantém o seu, com as próprias preferências.
+> Modelo das instruções que agentes de IA (Claude Code, Codex ou outro) seguem neste repositório. O arquivo de verdade, `AGENTS.md`, fica fora do git (`.gitignore`): cada pessoa mantém o seu.
 >
-> **Como usar (depois de clonar ou fazer fork):**
->
-> 1. Copie este arquivo para `AGENTS.md` na raiz do projeto:
->    `cp AGENTS.md.example AGENTS.md`
-> 2. Ajuste as seções marcadas com **[personalize]**. O resto descreve como o projeto funciona e vale para todos.
-> 3. Pronto. O Codex lê o `AGENTS.md` direto. O Claude Code lê o `CLAUDE.md`, que só contém `@AGENTS.md` (importa este arquivo).
->
-> Apague este bloco de explicação no seu `AGENTS.md` se quiser.
+> 1. `cp AGENTS.md.example AGENTS.md`
+> 2. Preencha as seções marcadas com **[personalize]**. As outras descrevem como o projeto funciona e valem para todos.
+> 3. O Codex lê o `AGENTS.md` direto; o Claude Code lê o `CLAUDE.md`, que importa este arquivo (`@AGENTS.md`).
 
 ---
 
 # Regras para agentes de código
 
-Você é o principal engenheiro de software deste projeto: um jogo 2D de duelo de sabres de energia, feito em JavaScript puro e Canvas 2D.
+Projeto: jogo 2D de duelo de lâminas de energia, em JavaScript puro e Canvas 2D. Vários agentes podem trabalhar nele ao mesmo tempo, então **os documentos do repositório são a fonte de verdade**, não a memória de um agente.
 
-Este arquivo vale para qualquer agente. Vários agentes podem trabalhar no mesmo projeto, às vezes em paralelo. Por isso, **os documentos do repositório são a fonte de verdade**, e não a memória de um agente.
+## Papel do agente **[personalize]**
+
+> Como o agente deve se ver e quanta autonomia tem. Ex.: engenheiro principal ou assistente; quando pode decidir sozinho e quando deve perguntar antes.
 
 ## Leitura obrigatória
 
@@ -29,9 +24,9 @@ Antes de implementar qualquer coisa, leia:
 2. [DESIGN.md](DESIGN.md): intenção, sensação e o que não fazer
 3. [GAME_DESIGN.md](GAME_DESIGN.md): regras de gameplay
 4. [ARCHITECTURE.md](ARCHITECTURE.md): como o código é organizado
-5. [TASKS.md](TASKS.md): índice e ponto de continuidade; as tarefas da versão atual ficam em `versions/` (hoje [versions/v2.md](versions/v2.md))
+5. [TASKS.md](TASKS.md): índice e ponto de continuidade; as tarefas da versão atual ficam em [versions/](versions/)
 
-Esses arquivos são a fonte de verdade. Não contradiga uma decisão registrada neles sem explicar o motivo e atualizar o documento. Em caso de conflito, siga a hierarquia definida em DESIGN.md:
+Não contradiga uma decisão registrada sem explicar o motivo e atualizar o documento. Em caso de conflito, vale a hierarquia do DESIGN.md:
 
 ```
 DESIGN.md → design/ART_DIRECTION.md → design/VISUAL_SYSTEM.md (+ UI, VFX) → GAME_DESIGN.md → ARCHITECTURE.md → código
@@ -39,100 +34,78 @@ DESIGN.md → design/ART_DIRECTION.md → design/VISUAL_SYSTEM.md (+ UI, VFX) �
 
 ## Regra visual
 
-**Antes de criar ou alterar qualquer elemento visual** (tela, HUD, personagem, sabre, efeito, cor, fonte, animação), leia [DESIGN.md](DESIGN.md), [design/ART_DIRECTION.md](design/ART_DIRECTION.md) e [design/VISUAL_SYSTEM.md](design/VISUAL_SYSTEM.md), além de [design/UI_GUIDELINES.md](design/UI_GUIDELINES.md) ou [design/VFX_GUIDELINES.md](design/VFX_GUIDELINES.md) quando for o caso.
+Antes de criar ou alterar qualquer elemento visual (tela, HUD, personagem, lâmina, efeito, cor, fonte, animação), leia DESIGN.md, design/ART_DIRECTION.md e design/VISUAL_SYSTEM.md, além de design/UI_GUIDELINES.md ou design/VFX_GUIDELINES.md quando for o caso.
 
-- Todo elemento visual novo deve ser consistente com esses documentos.
-- Se uma decisão visual importante ainda não estiver definida, proponha uma solução e atualize a documentação **antes** de implementar.
-- Nunca introduza um estilo visual novo de forma isolada.
-- Cores e estilos de texto só vêm de `src/config/themeConfig.js`. Não escreva cores direto no código.
+- Todo elemento visual novo segue esses documentos; nunca introduza um estilo isolado.
+- Decisão visual ainda não definida: proponha e atualize a documentação **antes** de implementar.
+- Cores e estilos de texto só vêm de `src/config/themeConfig.js`.
 
 ## Propriedade intelectual
 
-- Nenhum nome de personagem, logo, arte, música ou som oficial de franquias no código ou nos assets.
-- Código usa termos neutros: `Fighter`, `Saber`, `character`.
-- Nomes, título e textos ficam em `src/config/` e em `src/characters/`.
-- Todo asset novo precisa de uma linha em [ASSETS.md](ASSETS.md) no mesmo commit. Sem licença conhecida, o asset não entra.
+- Nenhum nome, termo, fala, logo, arte, música ou som oficial de franquias no código, nos textos ou nos assets.
+- Código usa termos neutros (`Fighter`, `Saber`, `character`); nomes e textos ficam em `src/config/` e `src/characters/`.
+- Todo asset novo ganha uma linha em [ASSETS.md](ASSETS.md) no mesmo commit. Sem licença conhecida, não entra.
 
 ## Stack
 
-- HTML5, CSS3, JavaScript moderno com ES Modules, Canvas 2D e APIs nativas do navegador.
-- Sem frameworks, engines ou bibliotecas sem autorização explícita.
-- Sem bundler. Node.js é usado apenas para o servidor local (`tools/server.js`), o simulador (`tools/simulate.js`) e os testes (`node --test`).
-- Nunca introduza uma dependência para resolver um problema pequeno.
+- HTML5, CSS3, JavaScript com ES Modules, Canvas 2D e APIs nativas do navegador.
+- Sem frameworks, engines, bibliotecas ou bundler sem autorização explícita.
+- Node.js só para `tools/` (servidor, simulador, matriz) e testes (`node --test`).
 
 ## Regras de arquitetura
 
 - Mantenha a separação entre Core, States, Modes, Entities, Systems, Combat, AI, Config, Rendering e Utils (ver ARCHITECTURE.md).
-- `Game.js` só monta e conecta módulos. Não vira um arquivo monolítico.
-- `update(dt)` altera o estado. `render()` só desenha. Nenhuma regra de gameplay no renderer.
-- O game loop usa timestep fixo. Não use o tempo real do frame dentro da lógica do jogo.
-- O resto do jogo conhece **ações** (`lightAttack`, `jump`), nunca teclas.
-- A IA só solicita ações. Nunca altera HP, stamina ou outros valores de combate diretamente.
-- Personagens são `Fighter` reutilizáveis, criados a partir de dados (`src/characters/`, `src/config/`). Jogador e inimigo só mudam o controlador (Input ou IA).
-- `CombatSystem` emite eventos. Efeitos ficam no `EffectsSystem` e screen shake na `Camera`.
+- `Game.js` só monta e conecta módulos.
+- `update(dt)` altera o estado; `render()` só desenha. Nenhuma regra de gameplay no renderer.
+- Timestep fixo. Não use o tempo real do frame na lógica do jogo.
+- O jogo conhece **ações** (`lightAttack`, `jump`), nunca teclas.
+- A IA só preenche o intent. Nunca altera vida, stamina ou outros valores de combate.
+- Personagens são `Fighter` criados a partir de dados (`src/characters/`, `src/config/`). Jogador e inimigo só mudam o controlador.
+- `CombatSystem` emite eventos; efeitos ficam no `EffectsSystem`, screen shake na `Camera`, som no `DuelAudio`.
 - Estados não importam outros estados: use `StateId` e `game.changeState` / `pushState` / `popState`.
-- Combate orientado a estados: `IDLE`, `WALKING`, `JUMPING`, `ATTACKING`, `HEAVY_ATTACK`, `BLOCKING`, `DODGING`, `HIT`, `STAGGERED`, `STUNNED`, `DEAD`.
-- Separar colisão física, hitbox, hurtbox, detecção de ataque e colisão entre sabres.
-- Balanceamento fica em `src/config/`. Sem números mágicos espalhados. Valide mudanças de atributos com `npm run simulate`.
-- Módulos de lógica não acessam `window`, `document` ou canvas, para que possam ser testados em Node.
+- Combate orientado a estados do lutador (`IDLE`, `WALKING`, `JUMPING`, `ATTACKING`, `HEAVY_ATTACK`, `BLOCKING`, `DODGING`, `HIT`, `STAGGERED`, `STUNNED`, `DEAD`).
+- Colisão física, hitbox, hurtbox, detecção de ataque e colisão entre lâminas são coisas separadas.
+- Regras que mudam o resultado da luta rodam dentro da `DuelSimulation` (determinística: replay e simulador dependem disso).
+- Balanceamento fica em `src/config/`, sem números mágicos. Valide mudanças com `npm run simulate` e `npm run matrix`.
+- Módulos de lógica não acessam `window`, `document` ou canvas (testáveis em Node).
 
 ## Regras de código
 
-- **Não escreva comentários no código.** Use nomes claros. Contexto e decisões vão para ARCHITECTURE.md.
+- Sem comentários no código: nomes claros; contexto e decisões vão para ARCHITECTURE.md.
 - Funções pequenas, classes coesas, baixo acoplamento.
-- Somente `export` nomeado. Imports com extensão `.js`.
-- Classes em `PascalCase.js`, demais módulos em `camelCase.js`.
-- Não crie arquivos vazios ou placeholders "para depois".
-- Evite criar objetos por frame dentro do loop, manipular o DOM durante o gameplay e deixar listeners sem remoção.
-- Mire em 60 FPS estáveis.
-- Não faça refactors grandes sem necessidade.
-- Arquivos de texto usam LF (o `.gitattributes` força isso).
+- Só `export` nomeado; imports com extensão `.js`; classes em `PascalCase.js`, o resto em `camelCase.js`.
+- Sem arquivos vazios ou placeholders "para depois".
+- Sem objetos criados por frame no loop, sem DOM durante o gameplay, sem listeners sem remoção. Alvo: 60 FPS estáveis.
+- Sem refactors grandes sem necessidade.
+- Arquivos de texto em LF (forçado pelo `.gitattributes`).
 
 ## Como trabalhar
 
-Trabalhe de forma incremental. Nunca tente implementar o projeto inteiro de uma vez.
-
-Antes de modificar um arquivo existente:
-
-1. Leia o arquivo.
-2. Entenda suas dependências.
-3. Confira ARCHITECTURE.md.
-4. Veja se já existe uma solução implementada.
-5. Faça a menor alteração necessária.
+Trabalhe de forma incremental. Antes de modificar um arquivo, leia-o, entenda quem depende dele e veja se a solução já existe; faça a menor alteração necessária.
 
 Para cada tarefa:
 
-1. Leia a documentação.
-2. Identifique os módulos responsáveis.
-3. Explique a abordagem em poucas linhas.
-4. Implemente.
-5. Teste (`npm test` e, quando houver mudança visual, rode o jogo com `npm start`).
-6. Marque a task no arquivo da versão em `versions/` e, se a etapa terminou, atualize o ponto de continuidade do TASKS.md.
-7. Atualize ARCHITECTURE.md se a estrutura ou a comunicação entre módulos mudou.
-8. Atualize os documentos de design se uma decisão visual foi tomada.
+1. Leia a documentação e identifique os módulos responsáveis.
+2. Implemente e teste (`npm test`; com mudança visual, rode o jogo com `npm start`).
+3. Marque a task no arquivo da versão em `versions/` e, se a etapa terminou, atualize o ponto de continuidade do TASKS.md.
+4. Atualize ARCHITECTURE.md se a estrutura ou a comunicação entre módulos mudou, e os docs de design se uma decisão visual foi tomada.
 
-Se uma decisão de arquitetura não estiver definida, escolha a solução mais simples, modular e extensível, e registre a decisão.
+Decisão de arquitetura não definida: escolha a solução mais simples, modular e extensível, e registre-a.
 
-## Debug
-
-Sempre que fizer sentido, exponha informação no overlay de debug (`F3`): hitboxes, hurtboxes, posição, velocidade, estado atual, FPS e decisões da IA. Estados fornecem linhas extras via `getDebugInfo()`.
+Sempre que fizer sentido, exponha informação no overlay de debug (`F3`): hitboxes, estado, velocidade, decisões da IA. Estados fornecem linhas extras via `getDebugInfo()`.
 
 ## Idioma **[personalize]**
 
-- Textos da interface e documentação em português (pt-BR).
-- Código, nomes de arquivos e mensagens de commit em inglês.
-- Responda ao usuário no idioma dele.
+> Idioma das respostas, da documentação, dos textos da interface, do código e das mensagens de commit.
 
 ## Commits **[personalize]**
 
-## Ao terminar uma tarefa, informe
+> Formato das mensagens (ex.: Conventional Commits), um commit por passo lógico ou não, se o agente pode commitar e fazer push sozinho, se deve fazer stage só dos próprios arquivos quando há outros agentes na mesma pasta, e regras de autoria ou atribuição.
 
-1. O que foi implementado.
-2. Quais arquivos foram alterados.
-3. Como a implementação funciona.
-4. Como foi testada.
-5. Próximos itens recomendados no arquivo da versão em `versions/`.
+## Ao terminar uma tarefa **[personalize]**
+
+> O que o agente deve relatar: por exemplo, o que foi feito, arquivos alterados, como funciona, como foi testado e os próximos passos.
 
 ## Regra principal
 
-Um agente que abrir o projeto pela primeira vez deve encontrar rapidamente onde estão o game loop, os personagens, o combate, a IA, as configurações, a renderização e os estados, e entender como adicionar uma nova funcionalidade sem ler centenas de arquivos.
+Um agente que abrir o projeto pela primeira vez deve achar rápido o game loop, os personagens, o combate, a IA, as configurações, a renderização e os estados, e entender como adicionar uma funcionalidade sem ler centenas de arquivos.
