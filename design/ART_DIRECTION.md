@@ -49,9 +49,17 @@ As duas silhuetas devem ser diferentes mesmo pintadas de preto: capuz, comprimen
 | Guarda | **haste longa**: cabo de mais de um metro, lâmina à frente | **empunhadura invertida**: lâmina para trás e para baixo | lâmina **muito larga** à frente |
 | Sabre | violeta | laranja-brasa | vermelho-forja; brilha mais conforme carrega |
 
+| | Garça | Eco |
+| --- | --- | --- |
+| Roupa | túnica curta azul-acinzentada e **cachecol longo** que voa atrás | túnica escura curta |
+| Cabeça | sem capuz | capuz e máscara lisa |
+| Postura | leve, inclinada, sempre pronta para pular | baixa e torta, imprevisível |
+| Guarda | lâmina alta, apontando para trás por cima do ombro | lâmina baixa à frente |
+| Sabre | verde-menta | rosa-pálido |
+
 O chefe **Sombra Desperta** usa a silhueta da Sombra com ombreiras (`pauldrons`), ombros mais largos, capa ainda mais escura e lâmina mais grossa. Continua magenta: é a mesma pessoa, mais perigosa.
 
-Recursos de silhueta disponíveis em `characterData.appearance`: `shoulderScale` (largura dos ombros), `pauldrons` (ombreiras), `masked` (máscara no lugar do rosto), `bladeWidthScale` (espessura da lâmina), `hiltScale` (comprimento do cabo; a Haste usa um cabo longo como uma lança) e `dualBlade` (segunda lâmina na mão de trás). Use-os para que cada personagem novo continue reconhecível pintado de preto.
+Recursos de silhueta disponíveis em `characterData.appearance`: `shoulderScale` (largura dos ombros), `pauldrons` (ombreiras), `masked` (máscara no lugar do rosto), `bladeWidthScale` (espessura da lâmina), `hiltScale` (comprimento do cabo; a Haste usa um cabo longo como uma lança), `scarf` (cachecol que voa com o movimento) e `dualBlade` (segunda lâmina na mão de trás). Use-os para que cada personagem novo continue reconhecível pintado de preto.
 
 ## Paleta
 

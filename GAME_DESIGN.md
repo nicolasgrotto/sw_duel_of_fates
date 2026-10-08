@@ -442,6 +442,8 @@ Armadura: durante o startup (e o active, quando indicado) o golpe aguenta N acer
 | **Haste** | ponto doce: acerto com a ponta (último terço do alcance) dá +50% de dano; de muito perto, 60% | **Varredura**: golpe de alcance enorme e startup lento |
 | **Brasa** | +20% de dano contra oponente em recovery, desequilibrado ou atordoado | **Brasa Viva**: postura de contra-golpe (0,5 s) com resposta forte |
 | **Forja** | knockback maior em tudo | **Forja**: forte carregável segurando `I` (até 3 níveis); o nível 3 quebra a guarda de quem bloquear |
+| **Garça** | **pulo na parede** (pular encostado na parede da arena lança para o outro lado); esquiva que atravessa o oponente; **dois aéreos**: rápido no ar é um corte, forte no ar é um mergulho | **Voo da Garça**: salto alto para a frente que passa por cima do oponente; dá para emendar um aéreo |
+| **Eco** | **finta**: tocar a guarda durante a preparação do forte cancela o golpe (custa 12 de stamina); bom para enganar quem espera para aparar | **Passo-reflexo**: passo muito curto e invulnerável na direção apertada (para trás se nenhuma) |
 
 Custos, tempos e números ficam em `src/config/movesConfig.js` e `fightersConfig.js`.
 
@@ -450,6 +452,10 @@ Custos, tempos e números ficam em `src/config/movesConfig.js` e `fightersConfig
 **Ponto doce (Haste)**: o dano depende da distância entre os corpos no acerto, em relação ao alcance do golpe. No último terço do alcance, +50%; no primeiro quarto (muito perto), 60%.
 
 **Brasa Viva (Brasa)**: postura de contra-golpe de 0,5 s; o contra-golpe é um corte rápido e forte (startup 0,08 s), não a riposta comum.
+
+**Finta (Eco)**: só no ataque forte e só antes de ficar ativo. A finta gasta stamina, volta o lutador para a guarda e emite o evento `feint` (som curto, sem faíscas). Contra a finta: não apertar a guarda cedo demais, ou empurrar.
+
+**Pulo na parede (Garça)**: no ar, encostado na parede da arena, apertar pulo lança a Garça para longe da parede. Um por vez: precisa tocar o chão ou a outra parede para repetir.
 
 ## 16. Tutorial e desafio de parry
 
@@ -504,7 +510,17 @@ Progressão só cosmética, sem grind: cada personagem tem a cor padrão e **dua
 - Quando um duelo libera uma cor, a tela de resultado avisa.
 - As liberações ficam salvas no navegador (`settings.unlocks` e `settings.arcadeCleared`).
 
-## 19. Dois jogadores (local)
+## 19. Sobrevivência
+
+Menu → Sobrevivência → escolha do lutador → adversários em sequência até perder.
+
+- Cada luta tem **um round**. A vida **não volta cheia**: a cada vitória o jogador recupera 30% da vida máxima.
+- Os adversários são sorteados entre os personagens selecionáveis. A dificuldade sobe com as vitórias: as 2 primeiras no Fácil, as 3 seguintes no Normal e depois Difícil. A cada 5 vitórias, o adversário é o chefe Sombra Desperta.
+- A arena muda a cada luta. Sem replay entre as lutas, para manter o ritmo.
+- A pontuação é o número de vitórias; o recorde fica salvo (`settings.survivalBest`).
+- A faixa do topo mostra "SOBREVIVÊNCIA · VITÓRIAS n · ADVERSÁRIO".
+
+## 20. Dois jogadores (local)
 
 Menu → 2 Jogadores → o Jogador 1 escolhe o lutador com os controles dele, o Jogador 2 escolhe o dele com os próprios controles, e o Jogador 1 escolhe a arena. Melhor de 3, com as mesmas regras do duelo contra a IA.
 
@@ -518,7 +534,7 @@ Menu → 2 Jogadores → o Jogador 1 escolhe o lutador com os controles dele, o 
 
 Os dois podem pausar (J1: Esc ou P; J2: P ou Start). A HUD mostra "J1" e "J2" antes dos nomes e o resultado diz qual jogador venceu.
 
-## 20. Modos e progressão planejados
+## 21. Modos e progressão planejados
 
 | Modo | Situação |
 | --- | --- |
@@ -527,7 +543,7 @@ Os dois podem pausar (J1: Esc ou P; J2: P ou Start). A HUD mostra "J1" e "J2" an
 | Tutorial / desafio de parry | existe |
 | Arcade (até 6 lutas + chefe) | existe |
 | 2P local | existe |
-| Sobrevivência | depois do Arcade |
+| Sobrevivência | existe |
 | Torneio, campanha, online | fora do escopo |
 
 Progressão sem grind: no build de portfólio tudo fica liberado. Desafios por personagem liberam só cores de sabre e paletas alternativas. Títulos por marcos de habilidade. Nada afeta atributos.

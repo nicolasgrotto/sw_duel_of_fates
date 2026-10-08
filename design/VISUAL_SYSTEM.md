@@ -37,6 +37,8 @@ Cores de sabre (ficam em `characterData`, por personagem; uma cor por personagem
 | violeta | `#a46bff` | Haste |
 | laranja-brasa | `#ff7a2a` | Brasa |
 | vermelho-forja | `#ff4038` | Forja |
+| verde-menta | `#5fffc0` | Garça |
+| rosa-pálido | `#ffa6e0` | Eco |
 | núcleo | `#ffffff` | todos |
 
 Não crie cores novas direto no código. Adicione um token aqui e no `themeConfig`.
@@ -114,6 +116,8 @@ Cores de personagem são **dados do personagem** e ficam em `src/characters/char
 | Haste | `#3b3348` | `#1c1924` | violeta `#a46bff` |
 | Brasa | `#5a2c1e` | `#24140f` | laranja-brasa `#ff7a2a` |
 | Forja | `#4a3a30` | `#211a15` | vermelho-forja `#ff4038` |
+| Garça | `#2f4a52` | `#16232a` | verde-menta `#5fffc0` |
+| Eco | `#23202b` | `#121017` | rosa-pálido `#ffa6e0` |
 
 `trimColor` (também dado do personagem) pinta ombreiras e máscara.
 
@@ -129,6 +133,8 @@ Cores alternativas de lâmina (dados do personagem, `altSaberColors`; cosmética
 | Haste | anil `#6b7cff` | fúcsia `#ff6bff` |
 | Brasa | ouro `#ffcf3f` | carmim `#ff3f5a` |
 | Forja | laranja-forno `#ff9a3f` | verde-escória `#b0ff3f` |
+| Garça | azul-gelo `#a6e8ff` | coral `#ff8a6b` |
+| Eco | lilás `#c9a6ff` | prata `#d6dbe6` |
 
 Cores compartilhadas (em `themeConfig`):
 
