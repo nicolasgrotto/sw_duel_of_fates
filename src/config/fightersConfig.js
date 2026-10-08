@@ -1,7 +1,5 @@
 export const fighterArchetypes = {
   guardian: {
-    maxHealth: 105,
-    maxStamina: 100,
     body: {
       width: 46,
       height: 150,
@@ -9,21 +7,17 @@ export const fighterArchetypes = {
     movement: {
       maxJumps: 1,
       airJumpVelocityScale: 0.8,
-      walkSpeed: 260,
       backwardSpeedMultiplier: 0.75,
       groundAcceleration: 2200,
       groundDeceleration: 2800,
       airAcceleration: 900,
-      jumpVelocity: 820,
     },
     stamina: {
-      regenPerSecond: 25,
       regenDelay: 0.6,
       blockingRegenMultiplier: 0.4,
     },
     attacks: {
       light: {
-        damage: 10,
         staminaCost: 8,
         startup: 0.1,
         active: 0.1,
@@ -37,7 +31,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 100, top: 0.8, bottom: 0.35 },
       },
       heavy: {
-        damage: 24,
         staminaCost: 24,
         startup: 0.32,
         active: 0.12,
@@ -51,7 +44,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 115, top: 0.9, bottom: 0.25 },
       },
       riposte: {
-        damage: 16,
         staminaCost: 0,
         startup: 0.06,
         active: 0.1,
@@ -65,7 +57,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 110, top: 0.85, bottom: 0.3 },
       },
       shove: {
-        damage: 0,
         staminaCost: 10,
         staminaDamage: 20,
         startup: 0.2,
@@ -81,7 +72,6 @@ export const fighterArchetypes = {
       },
     },
     parry: {
-      perfectWindow: 0.08,
       window: 0.2,
       lockout: 0.4,
       stagger: 0.3,
@@ -92,7 +82,6 @@ export const fighterArchetypes = {
     },
     dodge: {
       staminaCost: 20,
-      speed: 560,
       duration: 0.28,
       invulnerableTime: 0.18,
     },
@@ -107,8 +96,6 @@ export const fighterArchetypes = {
     guardBreakStun: 0.9,
   },
   shadow: {
-    maxHealth: 100,
-    maxStamina: 100,
     body: {
       width: 48,
       height: 154,
@@ -116,21 +103,17 @@ export const fighterArchetypes = {
     movement: {
       maxJumps: 1,
       airJumpVelocityScale: 0.8,
-      walkSpeed: 250,
       backwardSpeedMultiplier: 0.7,
       groundAcceleration: 2000,
       groundDeceleration: 2600,
       airAcceleration: 800,
-      jumpVelocity: 800,
     },
     stamina: {
-      regenPerSecond: 25,
       regenDelay: 0.6,
       blockingRegenMultiplier: 0.4,
     },
     attacks: {
       light: {
-        damage: 10,
         staminaCost: 8,
         startup: 0.1,
         active: 0.1,
@@ -144,7 +127,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 100, top: 0.75, bottom: 0.3 },
       },
       heavy: {
-        damage: 22,
         staminaCost: 25,
         startup: 0.34,
         active: 0.12,
@@ -158,7 +140,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 120, top: 0.85, bottom: 0.2 },
       },
       riposte: {
-        damage: 17,
         staminaCost: 0,
         startup: 0.06,
         active: 0.1,
@@ -172,7 +153,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 110, top: 0.85, bottom: 0.3 },
       },
       shove: {
-        damage: 0,
         staminaCost: 10,
         staminaDamage: 20,
         startup: 0.2,
@@ -188,7 +168,6 @@ export const fighterArchetypes = {
       },
     },
     parry: {
-      perfectWindow: 0.08,
       window: 0.2,
       lockout: 0.4,
       stagger: 0.3,
@@ -199,7 +178,6 @@ export const fighterArchetypes = {
     },
     dodge: {
       staminaCost: 22,
-      speed: 520,
       duration: 0.3,
       invulnerableTime: 0.18,
     },
@@ -214,8 +192,6 @@ export const fighterArchetypes = {
     guardBreakStun: 1,
   },
   bastion: {
-    maxHealth: 116,
-    maxStamina: 110,
     body: {
       width: 58,
       height: 160,
@@ -223,21 +199,17 @@ export const fighterArchetypes = {
     movement: {
       maxJumps: 1,
       airJumpVelocityScale: 0.8,
-      walkSpeed: 200,
       backwardSpeedMultiplier: 0.65,
       groundAcceleration: 1600,
       groundDeceleration: 2200,
       airAcceleration: 600,
-      jumpVelocity: 700,
     },
     stamina: {
-      regenPerSecond: 24,
       regenDelay: 0.6,
       blockingRegenMultiplier: 0.4,
     },
     attacks: {
       light: {
-        damage: 10,
         staminaCost: 9,
         startup: 0.12,
         active: 0.1,
@@ -251,7 +223,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 105, top: 0.8, bottom: 0.35 },
       },
       heavy: {
-        damage: 28,
         staminaCost: 26,
         startup: 0.4,
         active: 0.14,
@@ -265,7 +236,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 120, top: 0.9, bottom: 0.25 },
       },
       riposte: {
-        damage: 18,
         staminaCost: 0,
         startup: 0.07,
         active: 0.1,
@@ -279,7 +249,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 110, top: 0.85, bottom: 0.3 },
       },
       shove: {
-        damage: 0,
         staminaCost: 10,
         staminaDamage: 26,
         startup: 0.2,
@@ -295,7 +264,6 @@ export const fighterArchetypes = {
       },
     },
     parry: {
-      perfectWindow: 0.07,
       window: 0.18,
       lockout: 0.4,
       stagger: 0.3,
@@ -306,7 +274,6 @@ export const fighterArchetypes = {
     },
     dodge: {
       staminaCost: 26,
-      speed: 440,
       duration: 0.3,
       invulnerableTime: 0.16,
     },
@@ -321,8 +288,6 @@ export const fighterArchetypes = {
     guardBreakStun: 0.8,
   },
   wasp: {
-    maxHealth: 94,
-    maxStamina: 100,
     body: {
       width: 42,
       height: 138,
@@ -330,21 +295,17 @@ export const fighterArchetypes = {
     movement: {
       maxJumps: 2,
       airJumpVelocityScale: 0.8,
-      walkSpeed: 310,
       backwardSpeedMultiplier: 0.85,
       groundAcceleration: 2800,
       groundDeceleration: 3200,
       airAcceleration: 1100,
-      jumpVelocity: 880,
     },
     stamina: {
-      regenPerSecond: 30,
       regenDelay: 0.6,
       blockingRegenMultiplier: 0.4,
     },
     attacks: {
       light: {
-        damage: 7,
         staminaCost: 6,
         startup: 0.08,
         active: 0.08,
@@ -358,7 +319,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 86, top: 0.8, bottom: 0.35 },
       },
       heavy: {
-        damage: 18,
         staminaCost: 22,
         startup: 0.3,
         active: 0.1,
@@ -372,7 +332,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 95, top: 0.85, bottom: 0.25 },
       },
       riposte: {
-        damage: 14,
         staminaCost: 0,
         startup: 0.05,
         active: 0.08,
@@ -386,7 +345,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 95, top: 0.85, bottom: 0.3 },
       },
       shove: {
-        damage: 0,
         staminaCost: 10,
         staminaDamage: 18,
         startup: 0.2,
@@ -402,7 +360,6 @@ export const fighterArchetypes = {
       },
     },
     parry: {
-      perfectWindow: 0.08,
       window: 0.2,
       lockout: 0.4,
       stagger: 0.3,
@@ -413,7 +370,6 @@ export const fighterArchetypes = {
     },
     dodge: {
       staminaCost: 16,
-      speed: 640,
       duration: 0.24,
       invulnerableTime: 0.18,
     },
@@ -428,8 +384,6 @@ export const fighterArchetypes = {
     guardBreakStun: 1,
   },
   mirror: {
-    maxHealth: 95,
-    maxStamina: 100,
     body: {
       width: 46,
       height: 156,
@@ -437,21 +391,17 @@ export const fighterArchetypes = {
     movement: {
       maxJumps: 1,
       airJumpVelocityScale: 0.8,
-      walkSpeed: 240,
       backwardSpeedMultiplier: 0.8,
       groundAcceleration: 2100,
       groundDeceleration: 2700,
       airAcceleration: 850,
-      jumpVelocity: 800,
     },
     stamina: {
-      regenPerSecond: 26,
       regenDelay: 0.6,
       blockingRegenMultiplier: 0.4,
     },
     attacks: {
       light: {
-        damage: 9,
         staminaCost: 8,
         startup: 0.11,
         active: 0.1,
@@ -465,7 +415,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 100, top: 0.8, bottom: 0.35 },
       },
       heavy: {
-        damage: 24,
         staminaCost: 24,
         startup: 0.34,
         active: 0.12,
@@ -479,7 +428,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 115, top: 0.9, bottom: 0.25 },
       },
       riposte: {
-        damage: 14,
         staminaCost: 0,
         startup: 0.06,
         active: 0.1,
@@ -493,7 +441,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 112, top: 0.85, bottom: 0.3 },
       },
       shove: {
-        damage: 0,
         staminaCost: 10,
         staminaDamage: 20,
         startup: 0.2,
@@ -509,7 +456,6 @@ export const fighterArchetypes = {
       },
     },
     parry: {
-      perfectWindow: 0.1,
       window: 0.24,
       lockout: 0.35,
       stagger: 0.32,
@@ -520,7 +466,6 @@ export const fighterArchetypes = {
     },
     dodge: {
       staminaCost: 20,
-      speed: 560,
       duration: 0.28,
       invulnerableTime: 0.18,
     },
@@ -535,8 +480,6 @@ export const fighterArchetypes = {
     guardBreakStun: 0.9,
   },
   shadowAwakened: {
-    maxHealth: 150,
-    maxStamina: 100,
     body: {
       width: 48,
       height: 154,
@@ -544,21 +487,17 @@ export const fighterArchetypes = {
     movement: {
       maxJumps: 1,
       airJumpVelocityScale: 0.8,
-      walkSpeed: 250,
       backwardSpeedMultiplier: 0.7,
       groundAcceleration: 2000,
       groundDeceleration: 2600,
       airAcceleration: 800,
-      jumpVelocity: 800,
     },
     stamina: {
-      regenPerSecond: 30,
       regenDelay: 0.6,
       blockingRegenMultiplier: 0.4,
     },
     attacks: {
       light: {
-        damage: 10,
         staminaCost: 8,
         startup: 0.1,
         active: 0.1,
@@ -572,7 +511,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 100, top: 0.75, bottom: 0.3 },
       },
       heavy: {
-        damage: 28,
         staminaCost: 25,
         startup: 0.34,
         active: 0.12,
@@ -586,7 +524,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 120, top: 0.85, bottom: 0.2 },
       },
       riposte: {
-        damage: 17,
         staminaCost: 0,
         startup: 0.06,
         active: 0.1,
@@ -600,7 +537,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 110, top: 0.85, bottom: 0.3 },
       },
       shove: {
-        damage: 0,
         staminaCost: 10,
         staminaDamage: 20,
         startup: 0.2,
@@ -616,7 +552,6 @@ export const fighterArchetypes = {
       },
     },
     parry: {
-      perfectWindow: 0.08,
       window: 0.2,
       lockout: 0.4,
       stagger: 0.3,
@@ -627,7 +562,6 @@ export const fighterArchetypes = {
     },
     dodge: {
       staminaCost: 22,
-      speed: 520,
       duration: 0.3,
       invulnerableTime: 0.18,
     },
@@ -642,8 +576,6 @@ export const fighterArchetypes = {
     guardBreakStun: 1,
   },
   haste: {
-    maxHealth: 120,
-    maxStamina: 100,
     body: {
       width: 46,
       height: 158,
@@ -651,21 +583,17 @@ export const fighterArchetypes = {
     movement: {
       maxJumps: 1,
       airJumpVelocityScale: 0.8,
-      walkSpeed: 235,
       backwardSpeedMultiplier: 0.8,
       groundAcceleration: 2000,
       groundDeceleration: 2600,
       airAcceleration: 800,
-      jumpVelocity: 790,
     },
     stamina: {
-      regenPerSecond: 25,
       regenDelay: 0.6,
       blockingRegenMultiplier: 0.4,
     },
     attacks: {
       light: {
-        damage: 10,
         staminaCost: 9,
         startup: 0.12,
         active: 0.1,
@@ -680,7 +608,6 @@ export const fighterArchetypes = {
         sweetSpot: { tipFrom: 0.67, tipScale: 1.4, innerTo: 0.25, innerScale: 0.8 },
       },
       heavy: {
-        damage: 22,
         staminaCost: 25,
         startup: 0.36,
         active: 0.12,
@@ -695,7 +622,6 @@ export const fighterArchetypes = {
         sweetSpot: { tipFrom: 0.67, tipScale: 1.4, innerTo: 0.25, innerScale: 0.8 },
       },
       riposte: {
-        damage: 15,
         staminaCost: 0,
         startup: 0.07,
         active: 0.1,
@@ -710,7 +636,6 @@ export const fighterArchetypes = {
         sweetSpot: { tipFrom: 0.67, tipScale: 1.4, innerTo: 0.25, innerScale: 0.8 },
       },
       shove: {
-        damage: 0,
         staminaCost: 10,
         staminaDamage: 20,
         startup: 0.2,
@@ -726,7 +651,6 @@ export const fighterArchetypes = {
       },
     },
     parry: {
-      perfectWindow: 0.08,
       window: 0.2,
       lockout: 0.4,
       stagger: 0.3,
@@ -737,7 +661,6 @@ export const fighterArchetypes = {
     },
     dodge: {
       staminaCost: 20,
-      speed: 560,
       duration: 0.28,
       invulnerableTime: 0.18,
     },
@@ -752,8 +675,6 @@ export const fighterArchetypes = {
     guardBreakStun: 0.9,
   },
   ember: {
-    maxHealth: 95,
-    maxStamina: 100,
     body: {
       width: 46,
       height: 150,
@@ -761,21 +682,17 @@ export const fighterArchetypes = {
     movement: {
       maxJumps: 1,
       airJumpVelocityScale: 0.8,
-      walkSpeed: 255,
       backwardSpeedMultiplier: 0.8,
       groundAcceleration: 2200,
       groundDeceleration: 2800,
       airAcceleration: 900,
-      jumpVelocity: 820,
     },
     stamina: {
-      regenPerSecond: 26,
       regenDelay: 0.6,
       blockingRegenMultiplier: 0.4,
     },
     attacks: {
       light: {
-        damage: 8,
         staminaCost: 8,
         startup: 0.1,
         active: 0.1,
@@ -789,7 +706,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 96, top: 0.8, bottom: 0.35 },
       },
       heavy: {
-        damage: 23,
         staminaCost: 24,
         startup: 0.33,
         active: 0.12,
@@ -803,7 +719,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 112, top: 0.9, bottom: 0.25 },
       },
       riposte: {
-        damage: 18,
         staminaCost: 0,
         startup: 0.06,
         active: 0.1,
@@ -817,7 +732,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 110, top: 0.85, bottom: 0.3 },
       },
       shove: {
-        damage: 0,
         staminaCost: 10,
         staminaDamage: 20,
         startup: 0.2,
@@ -833,7 +747,6 @@ export const fighterArchetypes = {
       },
     },
     parry: {
-      perfectWindow: 0.08,
       window: 0.2,
       lockout: 0.4,
       stagger: 0.3,
@@ -844,7 +757,6 @@ export const fighterArchetypes = {
     },
     dodge: {
       staminaCost: 20,
-      speed: 560,
       duration: 0.28,
       invulnerableTime: 0.18,
     },
@@ -859,8 +771,6 @@ export const fighterArchetypes = {
     guardBreakStun: 0.9,
   },
   forge: {
-    maxHealth: 110,
-    maxStamina: 100,
     body: {
       width: 52,
       height: 156,
@@ -868,21 +778,17 @@ export const fighterArchetypes = {
     movement: {
       maxJumps: 1,
       airJumpVelocityScale: 0.8,
-      walkSpeed: 225,
       backwardSpeedMultiplier: 0.7,
       groundAcceleration: 1800,
       groundDeceleration: 2400,
       airAcceleration: 700,
-      jumpVelocity: 760,
     },
     stamina: {
-      regenPerSecond: 24,
       regenDelay: 0.6,
       blockingRegenMultiplier: 0.4,
     },
     attacks: {
       light: {
-        damage: 11,
         staminaCost: 9,
         startup: 0.12,
         active: 0.1,
@@ -896,7 +802,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 102, top: 0.8, bottom: 0.35 },
       },
       heavy: {
-        damage: 27,
         staminaCost: 26,
         startup: 0.38,
         active: 0.13,
@@ -910,7 +815,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 118, top: 0.9, bottom: 0.25 },
       },
       riposte: {
-        damage: 17,
         staminaCost: 0,
         startup: 0.07,
         active: 0.1,
@@ -924,7 +828,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 110, top: 0.85, bottom: 0.3 },
       },
       shove: {
-        damage: 0,
         staminaCost: 10,
         staminaDamage: 24,
         startup: 0.2,
@@ -940,7 +843,6 @@ export const fighterArchetypes = {
       },
     },
     parry: {
-      perfectWindow: 0.07,
       window: 0.18,
       lockout: 0.4,
       stagger: 0.3,
@@ -951,7 +853,6 @@ export const fighterArchetypes = {
     },
     dodge: {
       staminaCost: 24,
-      speed: 480,
       duration: 0.3,
       invulnerableTime: 0.17,
     },
@@ -966,8 +867,6 @@ export const fighterArchetypes = {
     guardBreakStun: 0.85,
   },
   heron: {
-    maxHealth: 105,
-    maxStamina: 100,
     body: {
       width: 44,
       height: 148,
@@ -975,21 +874,17 @@ export const fighterArchetypes = {
     movement: {
       maxJumps: 1,
       airJumpVelocityScale: 0.8,
-      walkSpeed: 290,
       backwardSpeedMultiplier: 0.85,
       groundAcceleration: 2500,
       groundDeceleration: 3000,
       airAcceleration: 500,
-      jumpVelocity: 900,
     },
     stamina: {
-      regenPerSecond: 27,
       regenDelay: 0.6,
       blockingRegenMultiplier: 0.4,
     },
     attacks: {
       light: {
-        damage: 9,
         staminaCost: 8,
         startup: 0.09,
         active: 0.1,
@@ -1003,7 +898,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 92, top: 0.8, bottom: 0.35 },
       },
       heavy: {
-        damage: 20,
         staminaCost: 23,
         startup: 0.32,
         active: 0.12,
@@ -1017,7 +911,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 108, top: 0.9, bottom: 0.25 },
       },
       riposte: {
-        damage: 15,
         staminaCost: 0,
         startup: 0.06,
         active: 0.1,
@@ -1031,7 +924,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 108, top: 0.85, bottom: 0.3 },
       },
       shove: {
-        damage: 0,
         staminaCost: 10,
         staminaDamage: 18,
         startup: 0.2,
@@ -1047,7 +939,6 @@ export const fighterArchetypes = {
       },
     },
     parry: {
-      perfectWindow: 0.08,
       window: 0.2,
       lockout: 0.4,
       stagger: 0.3,
@@ -1058,7 +949,6 @@ export const fighterArchetypes = {
     },
     dodge: {
       staminaCost: 18,
-      speed: 600,
       duration: 0.26,
       invulnerableTime: 0.18,
       passThrough: true,
@@ -1074,8 +964,6 @@ export const fighterArchetypes = {
     guardBreakStun: 1,
   },
   echo: {
-    maxHealth: 116,
-    maxStamina: 100,
     body: {
       width: 46,
       height: 150,
@@ -1083,21 +971,17 @@ export const fighterArchetypes = {
     movement: {
       maxJumps: 1,
       airJumpVelocityScale: 0.8,
-      walkSpeed: 270,
       backwardSpeedMultiplier: 0.85,
       groundAcceleration: 2400,
       groundDeceleration: 2900,
       airAcceleration: 850,
-      jumpVelocity: 830,
     },
     stamina: {
-      regenPerSecond: 27,
       regenDelay: 0.6,
       blockingRegenMultiplier: 0.4,
     },
     attacks: {
       light: {
-        damage: 10,
         staminaCost: 7,
         startup: 0.1,
         active: 0.1,
@@ -1111,7 +995,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 98, top: 0.8, bottom: 0.35 },
       },
       heavy: {
-        damage: 26,
         staminaCost: 22,
         startup: 0.34,
         active: 0.12,
@@ -1125,7 +1008,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 114, top: 0.9, bottom: 0.25 },
       },
       riposte: {
-        damage: 16,
         staminaCost: 0,
         startup: 0.06,
         active: 0.1,
@@ -1139,7 +1021,6 @@ export const fighterArchetypes = {
         hitbox: { reach: 110, top: 0.85, bottom: 0.3 },
       },
       shove: {
-        damage: 0,
         staminaCost: 10,
         staminaDamage: 20,
         startup: 0.2,
@@ -1155,7 +1036,6 @@ export const fighterArchetypes = {
       },
     },
     parry: {
-      perfectWindow: 0.08,
       window: 0.2,
       lockout: 0.4,
       stagger: 0.3,
@@ -1166,7 +1046,6 @@ export const fighterArchetypes = {
     },
     dodge: {
       staminaCost: 20,
-      speed: 560,
       duration: 0.28,
       invulnerableTime: 0.18,
     },

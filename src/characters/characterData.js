@@ -3,6 +3,7 @@ import { movesByCharacter } from '../config/movesConfig.js';
 export const characters = {
   guardian: {
     id: 'guardian',
+    attributes: {"health": 6, "stamina": 5, "blade": 5, "defense": 8, "agility": 5, "flow": 6},
     name: 'Guardião',
     archetype: 'guardian',
     selectable: true,
@@ -42,6 +43,7 @@ export const characters = {
   },
   shadow: {
     id: 'shadow',
+    attributes: {"health": 5, "stamina": 5, "blade": 6, "defense": 4, "agility": 5, "flow": 4},
     name: 'Sombra',
     archetype: 'shadow',
     selectable: true,
@@ -81,6 +83,7 @@ export const characters = {
   },
   bastion: {
     id: 'bastion',
+    attributes: {"health": 8, "stamina": 7, "blade": 8, "defense": 9, "agility": 2, "flow": 3},
     name: 'Bastião',
     archetype: 'bastion',
     selectable: true,
@@ -120,6 +123,7 @@ export const characters = {
   },
   wasp: {
     id: 'wasp',
+    attributes: {"health": 3, "stamina": 8, "blade": 2, "defense": 3, "agility": 9, "flow": 4},
     name: 'Vespa',
     archetype: 'wasp',
     selectable: true,
@@ -159,6 +163,7 @@ export const characters = {
   },
   mirror: {
     id: 'mirror',
+    attributes: {"health": 3, "stamina": 6, "blade": 5, "defense": 9, "agility": 4, "flow": 8},
     name: 'Espelho',
     archetype: 'mirror',
     selectable: true,
@@ -198,6 +203,7 @@ export const characters = {
   },
   haste: {
     id: 'haste',
+    attributes: {"health": 9, "stamina": 5, "blade": 5, "defense": 5, "agility": 4, "flow": 5},
     name: 'Haste',
     archetype: 'haste',
     selectable: true,
@@ -237,6 +243,7 @@ export const characters = {
   },
   ember: {
     id: 'ember',
+    attributes: {"health": 3, "stamina": 6, "blade": 6, "defense": 5, "agility": 5, "flow": 6},
     name: 'Brasa',
     archetype: 'ember',
     selectable: true,
@@ -276,6 +283,7 @@ export const characters = {
   },
   forge: {
     id: 'forge',
+    attributes: {"health": 7, "stamina": 4, "blade": 8, "defense": 6, "agility": 3, "flow": 3},
     name: 'Forja',
     archetype: 'forge',
     selectable: true,
@@ -315,6 +323,7 @@ export const characters = {
   },
   heron: {
     id: 'heron',
+    attributes: {"health": 6, "stamina": 7, "blade": 3, "defense": 3, "agility": 8, "flow": 6},
     name: 'Garça',
     archetype: 'heron',
     selectable: true,
@@ -354,6 +363,7 @@ export const characters = {
   },
   echo: {
     id: 'echo',
+    attributes: {"health": 8, "stamina": 7, "blade": 6, "defense": 4, "agility": 7, "flow": 7},
     name: 'Eco',
     archetype: 'echo',
     selectable: true,
@@ -393,6 +403,7 @@ export const characters = {
   },
   shadowAwakened: {
     id: 'shadowAwakened',
+    attributes: {"health": 9, "stamina": 7, "blade": 8, "defense": 6, "agility": 5, "flow": 9},
     name: 'Sombra Desperta',
     archetype: 'shadowAwakened',
     selectable: false,

@@ -1,3 +1,6 @@
+import { attributesConfig } from '../config/attributesConfig.js';
+import { evadeConfig } from '../config/evadeConfig.js';
+import { applyAttributes } from './attributes.js';
 import { fighterArchetypes } from '../config/fightersConfig.js';
 import { Fighter } from '../entities/Fighter.js';
 import { characters } from './characterData.js';
@@ -18,10 +21,22 @@ export function createFighter(characterId, { x, y, facing }, { saberColor = null
     moves[id] = { ...stats.attacks[definition.attack], ...definition };
   }
 
+  const scalars = attributesConfig.bases[character.archetype];
+  const derived = applyAttributes({
+    ...stats,
+    ...scalars,
+    movement: { ...stats.movement, ...scalars.movement },
+    stamina: { ...stats.stamina, ...scalars.stamina },
+    dodge: { ...stats.dodge, ...scalars.dodge },
+    parry: { ...stats.parry, ...scalars.parry },
+    evade: stats.evade ?? evadeConfig.profile,
+    attacks: moves,
+  }, character.attributes, attributesConfig);
+
   return new Fighter({
     id: character.id,
     name: character.name,
-    stats: { ...stats, attacks: moves },
+    stats: derived,
     appearance: saberColor ? { ...character.appearance, saberColor } : character.appearance,
     sound: character.sound,
     x,

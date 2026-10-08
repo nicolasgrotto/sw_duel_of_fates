@@ -4,7 +4,7 @@ export const movesByCharacter = {
     light2: { attack: 'light', type: 'light', pose: 'light', cancelsInto: [] },
     air: {
       attack: 'light', type: 'light', pose: 'light', airborne: true, cancelsInto: [],
-      damage: 12, staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
+      staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
       lunge: 0, hitstun: 0.2, knockback: 180, blockStaminaCost: 10,
     },
     forwardHeavy: {
@@ -16,7 +16,7 @@ export const movesByCharacter = {
     shove: { attack: 'shove', type: 'shove', pose: 'shove', cancelsInto: [] },
     special: {
       attack: 'heavy', type: 'stance', pose: 'stance', cancelsInto: [],
-      damage: 0, staminaCost: 15, startup: 0.35, active: 0, recovery: 0.35, lunge: 0,
+      staminaCost: 15, startup: 0.35, active: 0, recovery: 0.35, lunge: 0,
       hitbox: { reach: 0, top: 0.9, bottom: 0.3 },
       counter: { move: 'riposte', stagger: 0.45, event: 'counter' },
     },
@@ -27,7 +27,7 @@ export const movesByCharacter = {
     light3: { attack: 'light', type: 'light', pose: 'light', cancelsInto: [] },
     air: {
       attack: 'light', type: 'light', pose: 'light', airborne: true, cancelsInto: [],
-      damage: 12, staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
+      staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
       lunge: 0, hitstun: 0.2, knockback: 180, blockStaminaCost: 10,
     },
     forwardHeavy: {
@@ -39,7 +39,7 @@ export const movesByCharacter = {
     shove: { attack: 'shove', type: 'shove', pose: 'shove', cancelsInto: [] },
     special: {
       attack: 'heavy', type: 'heavy', pose: 'impetus', cancelsInto: [],
-      damage: 16, staminaCost: 28, startup: 0.28, active: 0.12, recovery: 0.45, lunge: 520,
+      staminaCost: 28, startup: 0.28, active: 0.12, recovery: 0.45, lunge: 520,
       armor: { hits: 1, damageScale: 1 },
     },
   },
@@ -48,7 +48,7 @@ export const movesByCharacter = {
     light2: { attack: 'light', type: 'light', pose: 'light', cancelsInto: [] },
     air: {
       attack: 'light', type: 'light', pose: 'light', airborne: true, cancelsInto: [],
-      damage: 12, staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
+      staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
       lunge: 0, hitstun: 0.2, knockback: 180, blockStaminaCost: 10,
     },
     forwardHeavy: {
@@ -60,7 +60,7 @@ export const movesByCharacter = {
     shove: { attack: 'shove', type: 'shove', pose: 'shove', cancelsInto: [] },
     special: {
       attack: 'heavy', type: 'heavy', pose: 'hammer', cancelsInto: [],
-      damage: 32, staminaCost: 32, startup: 0.55, active: 0.14, recovery: 0.6, lunge: 160,
+      staminaCost: 32, startup: 0.55, active: 0.14, recovery: 0.6, lunge: 160,
       knockback: 520, hitstun: 0.6, blockStaminaCost: 44,
       armor: { hits: 2, damageScale: 0.5 },
     },
@@ -73,7 +73,7 @@ export const movesByCharacter = {
     light5: { attack: 'light', type: 'light', pose: 'light', cancelsInto: [], knockback: 260 },
     air: {
       attack: 'light', type: 'light', pose: 'light', airborne: true, cancelsInto: [],
-      damage: 12, staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
+      staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
       lunge: 0, hitstun: 0.2, knockback: 180, blockStaminaCost: 10,
     },
     forwardHeavy: {
@@ -93,7 +93,7 @@ export const movesByCharacter = {
     light2: { attack: 'light', type: 'light', pose: 'light', cancelsInto: [] },
     air: {
       attack: 'light', type: 'light', pose: 'light', airborne: true, cancelsInto: [],
-      damage: 12, staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
+      staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
       lunge: 0, hitstun: 0.2, knockback: 180, blockStaminaCost: 10,
     },
     forwardHeavy: {
@@ -105,7 +105,7 @@ export const movesByCharacter = {
     shove: { attack: 'shove', type: 'shove', pose: 'shove', cancelsInto: [] },
     special: {
       attack: 'heavy', type: 'stance', pose: 'waitingStance', cancelsInto: [],
-      damage: 0, staminaCost: 26, startup: 0.7, active: 0, recovery: 0.4, lunge: 0,
+      staminaCost: 26, startup: 0.7, active: 0, recovery: 0.4, lunge: 0,
       hitbox: { reach: 0, top: 0.9, bottom: 0.3 },
       counter: { move: 'riposte', stagger: 0.6, event: 'perfectParry' },
     },
@@ -115,7 +115,7 @@ export const movesByCharacter = {
     light2: { attack: 'light', type: 'light', pose: 'light', cancelsInto: [] },
     air: {
       attack: 'light', type: 'light', pose: 'light', airborne: true, cancelsInto: [],
-      damage: 12, staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
+      staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
       lunge: 0, hitstun: 0.2, knockback: 180, blockStaminaCost: 10,
     },
     forwardHeavy: {
@@ -127,7 +127,7 @@ export const movesByCharacter = {
     shove: { attack: 'shove', type: 'shove', pose: 'shove', cancelsInto: [] },
     special: {
       attack: 'heavy', type: 'heavy', pose: 'sweep', cancelsInto: [],
-      damage: 24, staminaCost: 26, startup: 0.45, active: 0.14, recovery: 0.55, lunge: 120,
+      staminaCost: 26, startup: 0.45, active: 0.14, recovery: 0.55, lunge: 120,
       knockback: 420, hitbox: { reach: 230, top: 0.8, bottom: 0.3 },
     },
   },
@@ -137,7 +137,7 @@ export const movesByCharacter = {
     light3: { attack: 'light', type: 'light', pose: 'light', cancelsInto: [] },
     air: {
       attack: 'light', type: 'light', pose: 'light', airborne: true, cancelsInto: [],
-      damage: 12, staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
+      staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
       lunge: 0, hitstun: 0.2, knockback: 180, blockStaminaCost: 10,
     },
     forwardHeavy: {
@@ -149,11 +149,11 @@ export const movesByCharacter = {
     shove: { attack: 'shove', type: 'shove', pose: 'shove', cancelsInto: [] },
     counterStrike: {
       attack: 'heavy', type: 'heavy', pose: 'impetus', cancelsInto: [],
-      damage: 20, staminaCost: 0, startup: 0.08, active: 0.12, recovery: 0.4, lunge: 260,
+      staminaCost: 0, startup: 0.08, active: 0.12, recovery: 0.4, lunge: 260,
     },
     special: {
       attack: 'heavy', type: 'stance', pose: 'stance', cancelsInto: [],
-      damage: 0, staminaCost: 18, startup: 0.4, active: 0, recovery: 0.4, lunge: 0,
+      staminaCost: 18, startup: 0.4, active: 0, recovery: 0.4, lunge: 0,
       hitbox: { reach: 0, top: 0.9, bottom: 0.3 },
       counter: { move: 'counterStrike', stagger: 0.45, event: 'counter' },
     },
@@ -163,7 +163,7 @@ export const movesByCharacter = {
     light2: { attack: 'light', type: 'light', pose: 'light', cancelsInto: [] },
     air: {
       attack: 'light', type: 'light', pose: 'light', airborne: true, cancelsInto: [],
-      damage: 12, staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
+      staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
       lunge: 0, hitstun: 0.2, knockback: 180, blockStaminaCost: 10,
     },
     forwardHeavy: {
@@ -175,7 +175,7 @@ export const movesByCharacter = {
     shove: { attack: 'shove', type: 'shove', pose: 'shove', cancelsInto: [] },
     special: {
       attack: 'heavy', type: 'heavy', pose: 'hammer', cancelsInto: [],
-      damage: 22, staminaCost: 22, startup: 0.3, active: 0.14, recovery: 0.5, lunge: 200, knockback: 440,
+      staminaCost: 22, startup: 0.3, active: 0.14, recovery: 0.5, lunge: 200, knockback: 440,
       charge: { levelTime: 0.35, levels: 3, holdAt: 0.8, damageScales: [1, 1.35, 1.7], guardBreakLevel: 3 },
     },
   },
@@ -185,12 +185,12 @@ export const movesByCharacter = {
     light3: { attack: 'light', type: 'light', pose: 'light', cancelsInto: [] },
     air: {
       attack: 'light', type: 'light', pose: 'light', airborne: true, cancelsInto: [],
-      damage: 12, staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
+      staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
       lunge: 0, hitstun: 0.2, knockback: 180, blockStaminaCost: 10,
     },
     airHeavy: {
       attack: 'heavy', type: 'heavy', pose: 'heavy', airborne: true, cancelsInto: [],
-      damage: 16, staminaCost: 16, startup: 0.14, active: 0.16, recovery: 0.3,
+      staminaCost: 16, startup: 0.14, active: 0.16, recovery: 0.3,
       lunge: 120, dive: 900, hitstun: 0.4, knockback: 260, blockStaminaCost: 18,
     },
     forwardHeavy: {
@@ -210,7 +210,7 @@ export const movesByCharacter = {
     light2: { attack: 'light', type: 'light', pose: 'light', cancelsInto: [] },
     air: {
       attack: 'light', type: 'light', pose: 'light', airborne: true, cancelsInto: [],
-      damage: 12, staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
+      staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
       lunge: 0, hitstun: 0.2, knockback: 180, blockStaminaCost: 10,
     },
     forwardHeavy: {

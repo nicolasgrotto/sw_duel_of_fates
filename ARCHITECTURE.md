@@ -58,6 +58,7 @@ src/
     arenaData.js            ✅ camadas estáticas e partículas ambientes por arena
   characters/               ✅ dados e criação de personagens
     characterData.js        ✅ personagens: nome, arquétipo, perfil de IA, aparência
+    attributes.js           ✅ deriva stats sem mutar base ou notas
     characterFactory.js     ✅ cria um Fighter a partir dos dados
   modes/                    ✅ regras de modos de jogo, puras e testáveis (sem render)
     DuelResult.js           ✅ resultado independente dos Fighters
@@ -134,7 +135,8 @@ src/
     movesConfig.js          ✅ golpes por personagem: base de atributos, tipo, pose e cancelsInto
     touchLayoutConfig.js    ✅ geometria e limiares do toque
     evadeConfig.js          ✅ flag e perfil global de esquiva de precisão
-    fightersConfig.js       ✅ atributos por arquétipo (vida, stamina, corpo, movimento, ataques, esquiva)
+    attributesConfig.js     ✅ tabela 1–9, bases na nota 5 e calibração por arquétipo
+    fightersConfig.js       ✅ estrutura por arquétipo (corpo, tempos, golpes, custos, traços e regras de mobilidade)
     fighterVisualConfig.js  ✅ proporções, animação, poses de combate, sombra e estilo do sabre
     effectsConfig.js        ✅ limites e receitas de VFX
   utils/
@@ -181,10 +183,11 @@ O `DuelState` é dono do duelo: cria os lutadores, os controllers (IA, segundo j
 Personagens são **dados**:
 
 - `characterData.js`: id, nome, arquétipo e aparência (cores, capuz, capa, ângulo de guarda, tamanho da lâmina).
-- `fightersConfig.js`: atributos de cada arquétipo (vida, stamina, tamanho do corpo, movimento).
+- `fightersConfig.js`: corpo, tempos, custos, golpes e traços de cada arquétipo.
+- `attributesConfig.js`: tabela e bases dos stats escalares; `characterData.attributes`: seis notas.
 - `characterFactory.createFighter(id, spawn)` junta os dois e cria um `Fighter`.
 
-`characterData.moves` aponta para `movesConfig.movesByCharacter`. A factory resolve cada golpe combinando os atributos base de fightersConfig com a definição do personagem e cria um mapa independente por Fighter. `fighter.moves` é o catálogo; `stats.attacks` mantém o mesmo mapa para percepção, balanceamento e testes existentes. CombatSystem lê o catálogo e escolhe estado pelo tipo do golpe; o renderer escolhe pose pelo id da definição. Overrides do simulador continuam sendo aplicados antes da factory, sem snapshots de atributos no import.
+`characterData.moves` aponta para `movesConfig.movesByCharacter`. A factory resolve cada golpe combinando a estrutura de fightersConfig com a definição do personagem, depois aplica os atributos e cria um mapa independente por Fighter. `fighter.moves` é o catálogo; `stats.attacks` mantém o mesmo mapa para percepção, balanceamento e testes existentes. CombatSystem lê o catálogo e escolhe estado pelo tipo do golpe; o renderer escolhe pose pelo id da definição. Overrides do simulador continuam sendo aplicados antes da factory, sem snapshots de atributos no import.
 
 Trocar todos os personagens (ex.: versão com identidade própria) deve exigir apenas mudar dados e assets, nunca o combate. Para adicionar um personagem:
 
@@ -194,6 +197,16 @@ Trocar todos os personagens (ex.: versão com identidade própria) deve exigir a
 4. poses novas, se houver, em `fighterVisualConfig.combatPoses.attacks`, e os nomes dos golpes em `uiConfig.texts.training.attacks`.
 
 Personagens atuais: Guardião, Sombra, Bastião, Vespa, Espelho, Haste, Brasa, Forja, Garça e Eco, mais o chefe Sombra Desperta (`selectable: false`, só no Arcade). A seleção mostra só os personagens com `selectable: true`.
+
+### Atributos implementados na v1.4
+
+`applyAttributes(base, attributes, config)` é pura. Notas inteiras 1–9, padrão 5; 10 rejeitado nesta etapa e reservado ao secreto futuro. Multiplicadores 0,76 / 0,82 / 0,88 / 0,94 / 1 / 1,06 / 1,12 / 1,18 / 1,24. Bases na nota 5 ficam em attributesConfig.bases por arquétipo, calibradas dividindo os stats v1.3 pelo multiplicador da nota do elenco. Essa calibração preserva os valores escalares da v1.0 e a mobilidade adicionada na v1.3. Arredondamento em 9 casas evita alterações por ponto flutuante. Fixture stats-v1.3 foi capturada antes da migração e verifica todos os stats afetados, os 11 arquétipos e danos de cada golpe.
+
+Vida escala maxHealth; Stamina escala maxStamina e regenPerSecond; Lâmina escala o dano de todos os golpes e soma 0,002 s por nota acima de 5 ao parry perfeito (limitado à janela total). Defesa divide custo e recuo do bloqueio pelo multiplicador e muda guardBreakThreshold em 1 de stamina por nota, com piso zero. Bases de reserva compensam as notas atuais para preservar quebra somente quando faltar stamina. CombatSystem compara custo + reserva; dano recebido permanece igual. blockStaminaScale e blockPushbackScale no arquétipo continuam apenas como traços passivos (Guardião/Bastião), compostos com os fatores de Defesa.
+
+Agilidade escala caminhada, velocidade vertical de pulo, dash e invulnerabilidade do EVADE pelo perfil de evadeConfig. Coeficientes calibrados preservam a janela 0,066 s atual. Também escala avanços/saltos de habilidade e pulo na parede, sem alterar durações, maxJumps ou regras de ataque aéreo. Fluxo vira stats.powerLevel, acessível pelo getter Fighter.powerLevel, imutável na luta e coberto pelo snapshot via stats; sem medidor ou efeito nesta etapa.
+
+Factory junta estrutura, bases e golpes antes de aplicar notas; nenhum snapshot de stats é criado no import. Simulador aceita --set attributes.guardian.health=9, attributeBases.guardian.maxHealth=100 e attributeConfig.perfectParryBonus=0. Overrides ocorrem antes da factory; caminhos fighters continuam para tempos, custos e traços. Orçamento e teto do protagonista permanecem na v1.7.
 
 ### Controllers
 
@@ -523,7 +536,7 @@ Arquivos: [src/core/AudioManager.js](src/core/AudioManager.js), [src/audio/](src
 npm run simulate -- --duels 300 --difficulty hard
 npm run simulate -- --profile balanced                     # mesmo perfil nos dois: mede só os atributos
 npm run simulate -- --left shadow --right shadow --leftDifficulty hard --rightDifficulty normal
-npm run simulate -- --set fighters.shadow.maxHealth=120   # testa um valor sem editar arquivos
+npm run simulate -- --set attributes.shadow.health=7   # testa um valor sem editar arquivos
 ```
 
 Referência v0.2 (300 rounds por cenário, seed 1): o simulador mede um round por execução de duelo, sem as intros do melhor de 3. `avg hits` soma ambos os lados; `avg hits to KO` conta os hits recebidos pelo derrotado (exclui timeouts). O alvo de 6–9 é validado pela segunda métrica, coerente com 100 de vida, rápido 10, forte 24/26 e riposta 16/17. Bloquear forte custa 30/32 de stamina.
@@ -754,7 +767,7 @@ core/TouchInput.js            IMPLEMENTADO v1.2: pointer events no canvas → a�
 core/textPrompt.js            input DOM temporário só na tela de nome (injetado)
 config/touchLayoutConfig.js, attributesConfig.js, powersConfig.js, powerTiersConfig.js,
        storyConfig.js, secretsConfig.js, introConfig.js
-characters/attributes.js      applyAttributes(base, attributes, config) → stats derivados (puro)
+characters/attributes.js      IMPLEMENTADO v1.4: applyAttributes(base, attributes, config) → stats derivados (puro)
 characters/protagonist.js     createProtagonistCharacter(save) → dados para a createFighter atual
 characters/skins.js           resolveAppearance(character, skinId)
 combat/powerResistance.js     resolvePowerOutcome(rule, levelDiff) → { scale, outcome } (puro)
@@ -769,7 +782,7 @@ ui/TouchControls.js           IMPLEMENTADO v1.2: controles de toque desenhados n
 
 **Decisões.**
 
-- **Atributos** (1–9; só o `foretold` tem Fluxo 10) são a única fonte dos stats escalares: Vida → vida; Stamina → máximo e regeneração; Lâmina → escala de dano e bônus pequeno no parry perfeito; Defesa → guarda (custo do bloqueio, recuo, limite de quebra), não redução de dano; Agilidade → velocidade, pulo, dash e janela do EVADE; Fluxo → `powerLevel`. O arquétipo continua dono de tempos, golpes e traços.
+- **Atributos implementados na v1.4** (1–9; só o `foretold` tem Fluxo 10) são a única fonte dos stats escalares: Vida → vida; Stamina → máximo e regeneração; Lâmina → escala de dano e bônus pequeno no parry perfeito; Defesa → guarda (custo do bloqueio, recuo, limite de quebra), não redução de dano; Agilidade → velocidade, pulo, dash e janela do EVADE; Fluxo → `powerLevel`. O arquétipo continua dono de tempos, golpes e traços.
 - **Fluxo**: `powerLevel` (permanente) define potência, resistência, máximo do medidor e tier visual; `powerMeter` é o recurso da luta; `stamina` continua o recurso físico.
 - **Resistência**: `levelDiff = alvo.powerLevel − conjurador.powerLevel`; cada poder aponta para uma regra em dados (faixas → escala e resultado `normal`, `reduced`, `resisted`). Um único resolvedor puro, sem `if` por poder.
 - **Poderes** são definições com fases (startup, active, recovery), como os golpes, pagas com `powerMeter`. Estados novos: `CASTING` e `CHANNELING`. Sem projéteis na v2. Efeitos no alvo reaproveitam `HIT` e `STAGGERED`.

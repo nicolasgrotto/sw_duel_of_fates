@@ -1,3 +1,4 @@
+import { attributesConfig } from '../src/config/attributesConfig.js';
 import { EnemyAI } from '../src/ai/EnemyAI.js';
 import { characters } from '../src/characters/characterData.js';
 import { createFighter } from '../src/characters/characterFactory.js';
@@ -14,6 +15,9 @@ import { createRandom } from '../src/utils/random.js';
 const STEP = gameConfig.loop.fixedStep;
 const CONFIG_ROOTS = {
   fighters: fighterArchetypes,
+  attributes: Object.fromEntries(Object.entries(characters).map(([id, character]) => [id, character.attributes])),
+  attributeBases: attributesConfig.bases,
+  attributeConfig: attributesConfig,
   ai: aiConfig,
   game: gameConfig,
   evade: evadeConfig,

@@ -11,7 +11,7 @@ const spawn = { x: 400, y: 600, facing: 1 };
 describe('characterFactory', () => {
   it('creates a fighter with the stats of its archetype', () => {
     const fighter = createFighter('guardian', spawn);
-    const stats = fighterArchetypes.guardian;
+    const stats = fighter.stats;
 
     assert.equal(fighter.name, characters.guardian.name);
     assert.equal(fighter.health, stats.maxHealth);
@@ -128,7 +128,7 @@ it('creates move definitions per character without sharing mutable attacks', () 
   assert.notEqual(first.moves.heavy, second.moves.heavy);
   assert.equal(first.moves.heavy.pose, 'heavy');
   assert.equal(first.moves.heavy.type, 'heavy');
-  assert.equal(first.moves.heavy.damage, fighterArchetypes.guardian.attacks.heavy.damage);
+  assert.equal(first.moves.heavy.damage, 24);
   assert.equal(first.stats.attacks, first.moves);
   assert.deepEqual(first.moves.light.cancelsInto, ['light2']);
 });

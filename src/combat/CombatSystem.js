@@ -564,7 +564,7 @@ export class CombatSystem {
       this.breakGuard(defender, contact);
       return;
     }
-    if (canAfford(defender, staminaCost)) {
+    if (canAfford(defender, staminaCost + (defender.stats.guardBreakThreshold ?? 0))) {
       spendStamina(defender, staminaCost);
       defender.combat.blockstun = attack.blockstun;
       this.emit(CombatEvent.BLOCK, contact);

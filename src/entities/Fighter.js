@@ -96,6 +96,10 @@ export class Fighter {
     this.animation.airBlend = 0;
   }
 
+  get powerLevel() {
+    return this.stats.powerLevel;
+  }
+
   get moves() {
     return this.stats.attacks;
   }
