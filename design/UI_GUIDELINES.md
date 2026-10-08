@@ -43,6 +43,8 @@ Todos os textos ficam em `src/config/uiConfig.js` (`texts`). Para trocar o nome 
 - As escolhas ficam salvas no navegador (`localStorage`) e voltam na próxima vez.
 - Linha discreta no rodapé com a navegação (`↑ ↓  escolher · Enter  confirmar`).
 
+**Poderes** (Opções): ligados ou desligados. Vale para Duelar, 2 Jogadores e Treino; os outros modos não mudam.
+
 ### Configurar teclas
 
 - Aberta pelas Opções. Lista vertical (MenuList) com "Ação:  teclas" para as ações de luta, mais **Restaurar padrão** e **Voltar**.
@@ -71,6 +73,7 @@ NOME ESQUERDA                                         NOME DIREITA
 - Vida: cor neutra clara (`hudHealth`). Abaixo de 25%, vira `hudDanger` e pisca devagar (não depende só da cor).
 - Dano recebido: a parte perdida fica visível como barra "fantasma" (`hudGhost`) e encolhe depois de um pequeno atraso.
 - Stamina: barra mais fina abaixo da vida (`hudStamina`).
+- **Medidor do Fluxo**: só com poderes ligados. Barra ainda mais fina logo abaixo da stamina, na cor do tier do lutador. Poder recusado por falta de medidor ou recarga pisca a barra em `hudDanger`, como a stamina.
 - **Ação recusada**: quando o lutador tenta uma ação sem stamina, a barra de stamina dele fica `hudDanger` e pisca por ~0,3 s. Diz ao jogador por que nada aconteceu.
 - **Rounds**: quadrados pequenos embaixo da stamina, um por round necessário para vencer. Round vencido = cheio (`hudHealth`), não vencido = só contorno (`hudTrack`).
 - Fundo das barras: `hudTrack`, quase invisível.

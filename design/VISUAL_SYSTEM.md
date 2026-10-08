@@ -44,6 +44,15 @@ Cores de sabre (ficam em `characterData`, por personagem; uma cor por personagem
 
 Não crie cores novas direto no código. Adicione um token aqui e no `themeConfig`.
 
+Cores do Fluxo (energia dos poderes, por tier de nível; nunca usadas na lâmina e sem moral):
+
+| Token | Valor | Níveis |
+| --- | --- | --- |
+| `powerTierFaint` | `#9cc4ff` | 1–3 (azul pálido) |
+| `powerTierSteady` | `#5d8dff` | 4–7 (azul) |
+| `powerTierDeep` | `#b26bff` | 8–9 (roxo) |
+| `powerTierApex` | `#ff2b45` | 10 (vermelho; só o Predestinado) |
+
 ## Tipografia
 
 - Fonte: **Oxanium** (OFL), arquivo em `assets/fonts/Oxanium.ttf`, carregada por `@font-face` em `styles/main.css`. Até carregar, o canvas usa `system-ui` como reserva.
@@ -260,3 +269,14 @@ Vale também para os fungos da Floresta Lumínica (`crystalShape: 'fungus'`). Ca
 O centro acompanha suavemente o ponto médio dos corpos, respeitando os limites horizontais do mundo. Zoom adicional de enquadramento de até 4%, reduzido quando os lutadores se afastam; margem de 160 px para as lâminas. O chão é a âncora vertical. O punch-in de impacto se soma ao enquadramento, com foco no contato, e a UI continua fixa.
 
 O estilo trainingStatus usa system-ui 18 px, textMuted, alinhado à esquerda; status de gravação na borda inferior do Treino.
+
+## Fluxo (poderes)
+
+- A cor da energia vem do **tier** do nível de quem lança (`powerTiersConfig`), nunca da lâmina. Tiers mais altos ganham mais intensidade: glow maior, mais partículas e raio mais grosso.
+- Toda luz de poder usa os sprites de glow em cache do `Renderer.drawGlow` (um sprite por cor): nada de `shadowBlur`, `filter` ou gradiente criado por frame.
+- **Preparação**: um brilho na mão da frente durante a preparação, que cresce até o instante ativo. É o aviso para o oponente.
+- **Empurrão**: arcos que se abrem para a frente; **Puxão**: arcos que se fecham em direção a quem lança.
+- **Raio**: duas polilinhas (glow largo e translúcido + núcleo fino) da mão até o alvo ou até o alcance máximo, redesenhadas em intervalos curtos.
+- **Barreira**: elipse em volta de quem lança, com glow fraco que pulsa; clareia ao absorver.
+- **Resistido**: anel curto na cor do tier do **alvo**, como se o poder batesse numa parede.
+- Pose: ao lançar, a lâmina vai para trás e o corpo inclina para a frente; ao canalizar, o corpo treme de leve; na barreira, a lâmina sobe e o corpo abaixa.

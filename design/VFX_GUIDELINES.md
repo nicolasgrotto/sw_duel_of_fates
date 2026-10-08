@@ -4,10 +4,10 @@ Segue [ART_DIRECTION.md](ART_DIRECTION.md) e [VISUAL_SYSTEM.md](VISUAL_SYSTEM.md
 
 ## Princípios
 
-- Efeitos são **curtos e fortes**. Nenhum efeito de combate deve durar mais de 0,5 s, exceto o golpe final.
+- Efeitos são **curtos e fortes**. Nenhum efeito de combate deve durar mais de 0,5 s, exceto o golpe final e os canais de poder (raio e barreira), que duram enquanto o lutador está no estado de canal.
 - A intensidade acompanha a importância do evento.
 - O efeito nunca esconde o que o oponente está fazendo.
-- A cor do efeito vem do sabre envolvido. Faíscas de impacto são brancas ou amareladas.
+- A cor do efeito vem do sabre envolvido. Faíscas de impacto são brancas ou amareladas. Efeitos de poder usam a cor do tier do Fluxo (ver VISUAL_SYSTEM).
 
 ## Fluxo
 
@@ -37,6 +37,13 @@ Os valores reais ficam em `src/config/effectsConfig.js`.
 | `shove-impact` | `shove` | 4–6 faíscas baixas, luz pequena | muito leve | — |
 | `hit-flash` | `hit` | silhueta do atingido fica branca por ~0,06 s | — | — |
 | `dodge-afterimage` | (render) durante a esquiva | 3 silhuetas transparentes que somem rápido | — | — |
+| `power-charge` | (render) preparação de um poder | glow na mão da frente, na cor do tier | — | — |
+| `power-push` | `powerHit` do Empurrão | arcos que se abrem, 6–10 partículas na cor do tier | leve | — |
+| `power-pull` | `powerHit` do Puxão | arcos que se fecham, 6–10 partículas | leve | — |
+| `power-lightning` | (render) canal do Raio | polilinha dupla, glow no ponto atingido; 2–4 partículas por pulso | — | — |
+| `power-barrier` | (render) canal da Barreira | elipse com glow pulsando | — | — |
+| `power-resisted` | `powerResisted` | anel na cor do tier do alvo, 4–6 partículas | — | — |
+| `power-absorbed` | `powerAbsorbed` | anel na cor da barreira | — | — |
 
 ### Hit stop e câmera lenta
 
@@ -95,6 +102,8 @@ Camada de cor sobre a cena inteira (abaixo da UI), com blend aditivo e alpha que
 | Hit stop | 0,03 a 0,1 s |
 | Punch-in (zoom máximo) | 6% |
 | Dessaturação | 0,15 s |
+| Raio (polilinhas por lutador) | 2, com até 10 segmentos |
+| Canal de poder (raio, barreira) | dura o estado do lutador, no máximo 1,5 s |
 
 ## Implementação
 

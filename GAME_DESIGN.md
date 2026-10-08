@@ -557,3 +557,39 @@ Pulo duplo: todos os arquetipos usam movement.maxJumps = 1, exceto Vespa = 2. No
 ## Atributos v1.4
 
 Vida, Stamina, Lâmina, Defesa, Agilidade e Fluxo usam notas 1–9. Nota 5 tem multiplicador 1; cada nota muda 6%. Dez é reservado ao secreto futuro. As bases por arquétipo preservam os stats atuais do elenco, inclusive o chefe. Vida muda vida máxima; Stamina muda máximo e regeneração; Lâmina muda todos os danos e dá pequeno bônus de parry perfeito. Defesa muda custo da guarda, recuo e reserva de stamina para evitar quebra, sem reduzir dano recebido. Agilidade muda caminhada, pulo, avanços e janela do EVADE, sem devolver ataques aéreos. Fluxo guarda o nível para a v1.5 e ainda não afeta combate. Não há distribuição de pontos nesta etapa.
+
+## 22. Fluxo e poderes (v2)
+
+O Fluxo é a energia dos poderes. Nomes de tela em `uiConfig`; no código, `power`. Tudo roda na simulação e é testável no simulador.
+
+**Regra por modo.** Os poderes só valem quando `rules.powers` está ligado: Duelar, 2 Jogadores e Treino seguem a opção **Poderes** (ligada por padrão); Arcade, Sobrevivência, Tutorial e Desafio de parry continuam no duelo clássico da v1.0. Sem a regra, não há medidor nem poderes.
+
+**Nível e medidor.**
+
+- **Nível do Fluxo** (1–9; 10 reservado ao Predestinado) vem do atributo Fluxo. Ele define a potência, o ganho do medidor, a resistência e a cor da energia.
+- **Medidor** (0–100): começa cada round com 20, enche devagar com o tempo e mais rápido ao acertar, ao ser atingido, ao bloquear e ao aparar. É separado da stamina.
+- Depois de qualquer poder há uma recarga curta, igual para todos os poderes do lutador.
+
+**Resistência.** Diferença = nível do alvo − nível de quem lança. Cada poder aponta para uma regra em dados:
+
+| Diferença | Resultado padrão |
+| --- | --- |
+| até 1 | efeito normal |
+| 2 | efeito reduzido (metade) |
+| 3 ou mais | resistido: o poder bate numa barreira e não tem efeito |
+
+**Alinhamentos e poderes.** Cada personagem tem um alinhamento e dois poderes. Comando: `Poder` parado (ou com o direcional que não pede outro poder) usa o principal; com direção usa o secundário.
+
+| Poder | Alinhamento | Comando | Efeito |
+| --- | --- | --- | --- |
+| Empurrão | Aurora | Poder | onda à frente: afasta e desequilibra (STAGGERED); com guarda, só recua e gasta stamina |
+| Barreira | Aurora | trás + Poder (segurar) | domo enquanto segura e há medidor: absorve poderes e segura golpes de lâmina sem gastar stamina; o empurrão de corpo (shove) quebra |
+| Raio | Eclipse | Poder (segurar) | canalizado: dano em pulsos curtos com pequeno recuo; a guarda reduz o dano a um quarto e gasta stamina; entre pulsos o alvo pode agir |
+| Puxão | Eclipse | frente + Poder | traz o alvo para perto e o desequilibra: abre punição |
+
+- Quem lança fica vulnerável na preparação: um golpe interrompe o poder.
+- Esquiva e EVADE com invulnerabilidade fazem o poder passar.
+- A Barreira contra o Empurrão segura, mas o dono recua um pouco.
+- Poderes não têm projétil: o efeito é decidido no instante ativo (empurrão e puxão) ou em cada pulso (raio).
+
+**Elenco.** Aurora: Guardião, Bastião, Vespa, Espelho, Garça. Eclipse: Sombra, Haste, Brasa, Forja, Eco. Chefe do Arcade: Eclipse, nível 9.
