@@ -72,6 +72,9 @@ export class GameOverState extends GameState {
     renderer.text(this.winnerLine, centerX, winnerY, textStyles.subtitle);
     renderer.text(this.statsLine, centerX, statsY, textStyles.hint);
     this.renderTable(renderer, centerX);
+    if (this.params.unlockLine) {
+      renderer.text(this.params.unlockLine, centerX, layout.result.unlockY, textStyles.subtitle);
+    }
     this.menu.render(renderer, centerX);
   }
 

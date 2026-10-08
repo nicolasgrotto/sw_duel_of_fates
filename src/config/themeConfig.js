@@ -116,6 +116,12 @@ export const textStyles = {
     font: `18px ${FONT_FAMILY}`,
     color: colors.textMuted, align: 'left', baseline: 'middle',
   },
+  accentHint: {
+    font: `20px ${FONT_FAMILY}`,
+    color: colors.accent,
+    align: 'center',
+    baseline: 'middle',
+  },
   replayLabel: {
     font: `bold 22px ${FONT_FAMILY}`,
     color: colors.accent,

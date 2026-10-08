@@ -114,6 +114,13 @@ export const texts = {
     label: 'REPLAY',
     skip: '{confirm}  pular',
   },
+  unlocks: {
+    blade: 'Lâmina: {name}  ({index}/{total})   ←  →',
+    next: 'Próxima cor: {text}',
+    arcadeChallenge: 'vença o Arcade com este personagem',
+    allUnlocked: 'Todas as cores liberadas',
+    unlocked: 'Cor liberada: {color}',
+  },
   local: {
     hudName: 'J{player} · {name}',
     winner: 'JOGADOR {player} VENCE',
@@ -287,8 +294,9 @@ export const layout = {
     tableY: 268,
     tableRowSpacing: 30,
     tableColumnGap: 240,
-    firstItemY: 580,
-    itemSpacing: 48,
+    firstItemY: 590,
+    itemSpacing: 46,
+    unlockY: 548,
   },
   moveList: {
     titleY: 100,

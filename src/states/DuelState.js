@@ -24,6 +24,7 @@ import { ParryChallenge } from '../modes/ParryChallenge.js';
 import { TutorialDirector } from '../modes/TutorialDirector.js';
 import { BannerKind, ModeBanner } from '../ui/ModeBanner.js';
 import { getArcadeStage, isLastStage, nextArcadeRun } from '../modes/arcade.js';
+import { ARCADE_UNLOCK, addUnlocks, findChallengeUnlocks } from '../modes/unlocks.js';
 import { Camera } from '../core/Camera.js';
 import { PlayerController } from '../controllers/PlayerController.js';
 import { DuelRenderer } from '../rendering/DuelRenderer.js';
@@ -44,7 +45,7 @@ import { DuelMode, hasRoundLimit, usesDummy } from './duelModes.js';
 import { StateId } from './stateIds.js';
 
 function createFighterStats() {
-  return { hits: 0, damage: 0, blocks: 0, parries: 0, perfectParries: 0, guardBreaks: 0, shoves: 0, longestChain: 0 };
+  return { hits: 0, damage: 0, blocks: 0, parries: 0, perfectParries: 0, guardBreaks: 0, shoves: 0, counters: 0, longestChain: 0 };
 }
 
 export class DuelState extends GameState {
@@ -279,8 +280,9 @@ export class DuelState extends GameState {
     const centerX = (this.arena.left + this.arena.right) / 2;
     const { floorY } = this.arena;
 
-    const player = createFighter(playerCharacter, { x: centerX - spawnDistance / 2, y: floorY, facing: 1 });
-    const opponent = createFighter(opponentCharacter, { x: centerX + spawnDistance / 2, y: floorY, facing: -1 });
+    const playerSaberColor = this.arcadeStage ? this.params.arcade.playerSaberColor : this.params.playerSaberColor;
+    const player = createFighter(playerCharacter, { x: centerX - spawnDistance / 2, y: floorY, facing: 1 }, { saberColor: playerSaberColor });
+    const opponent = createFighter(opponentCharacter, { x: centerX + spawnDistance / 2, y: floorY, facing: -1 }, { saberColor: this.params.opponentSaberColor });
 
     return [
       { fighter: player, controller: new PlayerController(this.game.input) },
@@ -513,6 +515,9 @@ export class DuelState extends GameState {
       case CombatEvent.SHOVE:
         this.statsOf(event.attacker).shoves += 1;
         break;
+      case CombatEvent.COUNTER:
+        this.statsOf(event.defender).counters += 1;
+        break;
       default:
         break;
     }
@@ -548,6 +553,7 @@ export class DuelState extends GameState {
       return;
     }
     this.game.pushState(StateId.GAME_OVER, {
+      unlockLine: playerWon ? this.unlockChallengeColors() : '',
       ...this.getArcadeOptions(playerWon),
       ...this.getLocalTitle(playerWon),
       duelParams: this.params,
@@ -557,6 +563,20 @@ export class DuelState extends GameState {
       opponentStats: { ...this.fighterStats[1] },
       names: this.fighters.map((fighter) => fighter.name),
     });
+  }
+
+  unlockChallengeColors() {
+    if (this.mode !== DuelMode.VERSUS && !this.arcadeStage) {
+      return '';
+    }
+    const character = characters[this.playerCharacter];
+    const unlocked = findChallengeUnlocks(character, this.stats, this.game.settings);
+    if (unlocked.length === 0) {
+      return '';
+    }
+    this.game.settings.unlocks = addUnlocks(this.game.settings.unlocks, character.id, unlocked);
+    this.game.saveSettings();
+    return formatText(texts.unlocks.unlocked, { color: unlocked.map((alt) => alt.name).join(', ') });
   }
 
   getHeartbeatFighter() {
@@ -583,15 +603,20 @@ export class DuelState extends GameState {
 
   showArcadeComplete() {
     const cleared = this.game.settings.arcadeCleared ?? [];
+    const challengeLine = this.unlockChallengeColors();
+    let arcadeLine = '';
     if (!cleared.includes(this.playerCharacter)) {
       this.game.settings.arcadeCleared = [...cleared, this.playerCharacter];
       this.game.saveSettings();
+      const arcadeColor = characters[this.playerCharacter].altSaberColors.find((alt) => alt.id === ARCADE_UNLOCK);
+      arcadeLine = arcadeColor ? formatText(texts.unlocks.unlocked, { color: arcadeColor.name }) : '';
     }
     this.game.pushState(StateId.GAME_OVER, {
       duelParams: this.params,
       title: texts.arcade.completeTitle,
       subtitle: formatText(texts.arcade.completeSubtitle, { name: this.player.name }),
       summary: '',
+      unlockLine: [arcadeLine, challengeLine].filter(Boolean).join('   ·   '),
       rematchLabel: texts.arcade.playAgain,
       rematchParams: { mode: DuelMode.ARCADE, arcade: { ...this.params.arcade, stage: 0 } },
     });

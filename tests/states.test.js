@@ -507,6 +507,21 @@ describe('duel rounds', () => {
     assert.deepEqual(game.stateNames(), ['DuelState', 'GameOverState']);
   });
 
+  it('unlocks the challenge color when the player wins a duel meeting the challenge', () => {
+    const game = createFakeGame();
+    game.settings.unlocks = {};
+    game.settings.arcadeCleared = [];
+    game.changeState(StateId.DUEL, { playerCharacter: 'forge', opponentCharacter: 'guardian' });
+    const duel = game.states.current;
+    duel.stats.guardBreaks = 2;
+
+    winRound(game);
+    winRound(game);
+
+    assert.deepEqual(game.settings.unlocks, { forge: ['challenge'] });
+    assert.equal(game.states.current.params.unlockLine, 'Cor liberada: Verde-escória');
+  });
+
   it('runs the arcade ladder: next fight on a win, retry on a loss', () => {
     const game = createFakeGame();
     game.changeState(StateId.MENU);
@@ -742,6 +757,26 @@ it('remaps a key from the options and switches to the custom preset', () => {
   assert.deepEqual(game.settings.customBindings.lightAttack, ['KeyU']);
   assert.deepEqual(game.input.bindings.lightAttack, ['KeyU']);
   assert.ok(remap.items[3].label.includes('U'));
+});
+
+it('cycles through unlocked saber colors in the selection and passes the choice to the duel', () => {
+  const game = createFakeGame();
+  game.settings.arcadeCleared = ['guardian'];
+  game.settings.unlocks = {};
+  game.changeState(StateId.CHARACTER_SELECT);
+  const select = game.states.current;
+
+  game.step(Action.MOVE_RIGHT);
+  assert.equal(select.getChosenColor('guardian'), '#5f8bff');
+  game.step(Action.MOVE_RIGHT);
+  assert.equal(select.getChosenColor('guardian'), '#7fe4ff');
+  game.step(Action.MOVE_LEFT);
+
+  game.step(Action.CONFIRM);
+  game.step(Action.CONFIRM);
+  game.step(Action.CONFIRM);
+  const duel = game.states.current;
+  assert.equal(duel.player.appearance.saberColor, '#5f8bff');
 });
 
 it('goes back from the opponent step to the player step', () => {

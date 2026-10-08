@@ -117,6 +117,19 @@ Cores de personagem são **dados do personagem** e ficam em `src/characters/char
 
 `trimColor` (também dado do personagem) pinta ombreiras e máscara.
 
+Cores alternativas de lâmina (dados do personagem, `altSaberColors`; cosméticas, liberadas por progresso):
+
+| Personagem | Arcade | Desafio |
+| --- | --- | --- |
+| Guardião | azul-profundo `#5f8bff` | verde-água `#3fffc8` |
+| Sombra | violeta-escuro `#c23cff` | rubi `#ff2a3a` |
+| Bastião | ouro-pálido `#ffe08a` | azul-céu `#3fd0ff` |
+| Vespa | lima `#7cff6b` | rosa `#ff6bd5` |
+| Espelho | prata-azulada `#9fd8ff` | marfim `#ffe2b0` |
+| Haste | anil `#6b7cff` | fúcsia `#ff6bff` |
+| Brasa | ouro `#ffcf3f` | carmim `#ff3f5a` |
+| Forja | laranja-forno `#ff9a3f` | verde-escória `#b0ff3f` |
+
 Cores compartilhadas (em `themeConfig`):
 
 | Token | Valor | Uso |

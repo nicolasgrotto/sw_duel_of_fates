@@ -482,7 +482,29 @@ Menu → Arcade → escolha do lutador → uma sequência de duelos (melhor de 3
 - **Resultado**: vencer leva à próxima luta ("Próxima luta"); perder permite tentar a mesma luta de novo. Vencer o chefe mostra "ARCADE CONCLUÍDO" e salva no navegador que aquele personagem fechou o Arcade (`settings.arcadeCleared`), para a progressão futura (cores de sabre).
 - Uma linha no topo mostra a luta atual: "ARCADE · LUTA 2 DE 4 · BASTIÃO" ou "ARCADE · CHEFE · SOMBRA DESPERTA".
 
-## 18. Dois jogadores (local)
+## 18. Desafios e cores de lâmina
+
+Progressão só cosmética, sem grind: cada personagem tem a cor padrão e **duas cores alternativas**.
+
+- **Cor do Arcade**: liberada ao vencer o Arcade com o personagem.
+- **Cor do desafio**: liberada ao **vencer um duelo contra a IA** (Duelar ou Arcade, qualquer dificuldade) cumprindo o desafio do personagem no duelo inteiro:
+
+| Personagem | Desafio |
+| --- | --- |
+| Guardião | 3 parries perfeitos |
+| Sombra | 200 de dano causado |
+| Bastião | 12 defesas |
+| Vespa | acertar a sequência completa de 5 |
+| Espelho | 4 parries perfeitos |
+| Haste | 15 golpes acertados |
+| Brasa | 3 contra-golpes da postura |
+| Forja | 2 quebras de guarda |
+
+- Na seleção de personagem, `←`/`→` troca a cor entre as liberadas. Uma linha mostra a cor atual e o próximo desafio ainda bloqueado.
+- Quando um duelo libera uma cor, a tela de resultado avisa.
+- As liberações ficam salvas no navegador (`settings.unlocks` e `settings.arcadeCleared`).
+
+## 19. Dois jogadores (local)
 
 Menu → 2 Jogadores → o Jogador 1 escolhe o lutador com os controles dele, o Jogador 2 escolhe o dele com os próprios controles, e o Jogador 1 escolhe a arena. Melhor de 3, com as mesmas regras do duelo contra a IA.
 
@@ -496,7 +518,7 @@ Menu → 2 Jogadores → o Jogador 1 escolhe o lutador com os controles dele, o 
 
 Os dois podem pausar (J1: Esc ou P; J2: P ou Start). A HUD mostra "J1" e "J2" antes dos nomes e o resultado diz qual jogador venceu.
 
-## 19. Modos e progressão planejados
+## 20. Modos e progressão planejados
 
 | Modo | Situação |
 | --- | --- |

@@ -10,9 +10,14 @@ export const characters = {
     aiProfile: 'guardian',
     info: {
       style: 'Técnico · fundamentos',
+      saberName: 'Ciano-gelo',
       trait: 'Bloqueio custa menos stamina',
       ability: 'Contraguarda: postura curta que responde com a riposta',
     },
+    altSaberColors: [
+      { id: 'arcade', name: 'Azul-profundo', color: '#5f8bff', challenge: null },
+      { id: 'challenge', name: 'Verde-água', color: '#3fffc8', challenge: { stat: 'perfectParries', target: 3, text: 'vença com 3 parries perfeitos' } },
+    ],
     sound: {
       humFrequency: 74,
     },
@@ -43,9 +48,14 @@ export const characters = {
     aiProfile: 'shadow',
     info: {
       style: 'Agressiva · pressão',
+      saberName: 'Magenta',
       trait: 'Golpe que acerta devolve stamina',
       ability: 'Ímpeto: avanço com armadura contra um golpe',
     },
+    altSaberColors: [
+      { id: 'arcade', name: 'Violeta-escuro', color: '#c23cff', challenge: null },
+      { id: 'challenge', name: 'Rubi', color: '#ff2a3a', challenge: { stat: 'damage', target: 200, text: 'vença causando 200 de dano' } },
+    ],
     sound: {
       humFrequency: 62,
     },
@@ -76,9 +86,14 @@ export const characters = {
     aiProfile: 'bastion',
     info: {
       style: 'Tanque · peso',
+      saberName: 'Verde-ácido',
       trait: 'Anda bloqueando e não é empurrado',
       ability: 'Marreta: golpe lento com armadura contra dois golpes',
     },
+    altSaberColors: [
+      { id: 'arcade', name: 'Ouro-pálido', color: '#ffe08a', challenge: null },
+      { id: 'challenge', name: 'Azul-céu', color: '#3fd0ff', challenge: { stat: 'blocks', target: 12, text: 'vença com 12 defesas' } },
+    ],
     sound: {
       humFrequency: 52,
     },
@@ -109,9 +124,14 @@ export const characters = {
     aiProfile: 'wasp',
     info: {
       style: 'Velocidade · sequências',
+      saberName: 'Amarelo-âmbar',
       trait: 'Sequência de cinco golpes rápidos',
       ability: 'Zumbido: avanço que atravessa o oponente',
     },
+    altSaberColors: [
+      { id: 'arcade', name: 'Lima', color: '#7cff6b', challenge: null },
+      { id: 'challenge', name: 'Rosa', color: '#ff6bd5', challenge: { stat: 'longestChain', target: 5, text: 'vença acertando a sequência completa de 5' } },
+    ],
     sound: {
       humFrequency: 96,
     },
@@ -142,9 +162,14 @@ export const characters = {
     aiProfile: 'mirror',
     info: {
       style: 'Defensivo · parry',
+      saberName: 'Branco-prata',
       trait: 'Janelas de parry maiores',
       ability: 'Postura de Espera: apara e responde com a riposta',
     },
+    altSaberColors: [
+      { id: 'arcade', name: 'Prata-azulada', color: '#9fd8ff', challenge: null },
+      { id: 'challenge', name: 'Marfim', color: '#ffe2b0', challenge: { stat: 'perfectParries', target: 4, text: 'vença com 4 parries perfeitos' } },
+    ],
     sound: {
       humFrequency: 84,
     },
@@ -175,9 +200,14 @@ export const characters = {
     aiProfile: 'haste',
     info: {
       style: 'Alcance · controle de distância',
+      saberName: 'Violeta',
       trait: 'A ponta da lâmina dá mais dano; de perto, menos',
       ability: 'Varredura: golpe de alcance enorme e lento',
     },
+    altSaberColors: [
+      { id: 'arcade', name: 'Anil', color: '#6b7cff', challenge: null },
+      { id: 'challenge', name: 'Fúcsia', color: '#ff6bff', challenge: { stat: 'hits', target: 15, text: 'vença com 15 golpes acertados' } },
+    ],
     sound: {
       humFrequency: 68,
     },
@@ -208,9 +238,14 @@ export const characters = {
     aiProfile: 'ember',
     info: {
       style: 'Contra-ataque · leitura',
+      saberName: 'Laranja-brasa',
       trait: 'Mais dano em quem está aberto',
       ability: 'Brasa Viva: postura que responde com um corte forte',
     },
+    altSaberColors: [
+      { id: 'arcade', name: 'Ouro', color: '#ffcf3f', challenge: null },
+      { id: 'challenge', name: 'Carmim', color: '#ff3f5a', challenge: { stat: 'counters', target: 3, text: 'vença com 3 contra-golpes da postura' } },
+    ],
     sound: {
       humFrequency: 80,
     },
@@ -241,9 +276,14 @@ export const characters = {
     aiProfile: 'forge',
     info: {
       style: 'Pesada · carga',
+      saberName: 'Vermelho-forja',
       trait: 'Empurra mais longe a cada golpe',
       ability: 'Forja: segure para carregar; o nível 3 quebra a guarda',
     },
+    altSaberColors: [
+      { id: 'arcade', name: 'Laranja-forno', color: '#ff9a3f', challenge: null },
+      { id: 'challenge', name: 'Verde-escória', color: '#b0ff3f', challenge: { stat: 'guardBreaks', target: 2, text: 'vença quebrando a guarda 2 vezes' } },
+    ],
     sound: {
       humFrequency: 58,
     },
@@ -274,9 +314,11 @@ export const characters = {
     aiProfile: 'shadow',
     info: {
       style: 'Chefe',
+      saberName: 'Magenta',
       trait: 'Golpe que acerta devolve stamina',
       ability: 'Ímpeto: avanço com armadura contra um golpe',
     },
+    altSaberColors: [],
     sound: {
       humFrequency: 55,
     },

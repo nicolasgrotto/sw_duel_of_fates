@@ -204,7 +204,7 @@ As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e des
 - [x] Replay do golpe final (re-simulação determinística dos intents gravados, opção para desligar)
 - [x] Música dinâmica pela vida dos dois, batida grave com vida baixa
 - [x] Remapeamento de teclas (Opções → Configurar teclas, preset Personalizado salvo)
-- [ ] Desafios por personagem com cores de sabre desbloqueáveis
+- [x] Desafios por personagem com cores de sabre desbloqueáveis (Arcade + desafio próprio, troca de cor na seleção)
 - [ ] Garça e Eco, pulo na parede, Sobrevivência
 
 ### v1.0 — Portfólio
