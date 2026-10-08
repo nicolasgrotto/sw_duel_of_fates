@@ -12,7 +12,9 @@ import { drawFighterBody } from '../rendering/fighterRenderer.js';
 import { drawSaber } from '../rendering/saberRenderer.js';
 import { formatText } from '../ui/formatText.js';
 import { formatActionKeys } from '../ui/keyLabels.js';
+import { createArcadeRun } from '../modes/arcade.js';
 import { MenuList } from '../ui/MenuList.js';
+import { DuelMode } from './duelModes.js';
 import { GameState } from './GameState.js';
 import { StateId } from './stateIds.js';
 
@@ -24,7 +26,7 @@ export const SelectStep = Object.freeze({
 
 export class CharacterSelectState extends GameState {
   enter() {
-    this.characterIds = Object.keys(characters);
+    this.characterIds = Object.keys(characters).filter((id) => characters[id].selectable);
     this.step = SelectStep.PLAYER;
     this.playerChoice = null;
     this.opponentChoice = null;
@@ -75,6 +77,10 @@ export class CharacterSelectState extends GameState {
   }
 
   choose(choice) {
+    if (this.step === SelectStep.PLAYER && this.params.mode === DuelMode.ARCADE) {
+      this.game.changeState(StateId.DUEL, { mode: DuelMode.ARCADE, arcade: createArcadeRun(choice, this.characterIds, gameConfig.arcade) });
+      return;
+    }
     if (this.step === SelectStep.PLAYER) {
       this.playerChoice = choice;
       this.step = SelectStep.OPPONENT;

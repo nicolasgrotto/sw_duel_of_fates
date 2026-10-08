@@ -41,6 +41,8 @@ As duas silhuetas devem ser diferentes mesmo pintadas de preto: capuz, comprimen
 | Guarda | lâmina larga e quase horizontal | duas lâminas curtas: uma à frente, outra invertida para trás | lâmina vertical à frente do rosto |
 | Sabre | verde-ácido, lâmina mais grossa | amarelo-âmbar, lâminas finas | branco-prata |
 
+O chefe **Sombra Desperta** usa a silhueta da Sombra com ombreiras (`pauldrons`), ombros mais largos, capa ainda mais escura e lâmina mais grossa. Continua magenta: é a mesma pessoa, mais perigosa.
+
 Recursos de silhueta disponíveis em `characterData.appearance`: `shoulderScale` (largura dos ombros), `pauldrons` (ombreiras), `masked` (máscara no lugar do rosto), `bladeWidthScale` (espessura da lâmina) e `dualBlade` (segunda lâmina na mão de trás). Use-os para que cada personagem novo continue reconhecível pintado de preto.
 
 ## Paleta

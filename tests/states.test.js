@@ -85,6 +85,7 @@ describe('state flow', () => {
     game.step(Action.MENU_DOWN);
     game.step(Action.MENU_DOWN);
     game.step(Action.MENU_DOWN);
+    game.step(Action.MENU_DOWN);
     game.step(Action.CONFIRM);
 
     assert.equal(game.states.current.mode, DuelMode.TRAINING);
@@ -94,6 +95,7 @@ describe('state flow', () => {
     const game = createFakeGame();
     game.changeState(StateId.MENU);
 
+    game.step(Action.MENU_DOWN);
     game.step(Action.MENU_DOWN);
     game.step(Action.MENU_DOWN);
     game.step(Action.MENU_DOWN);
@@ -122,6 +124,7 @@ describe('state flow', () => {
     assert.equal(game.saved, 5);
 
     game.step(Action.BACK);
+    game.step(Action.MENU_UP);
     game.step(Action.MENU_UP);
     game.step(Action.MENU_UP);
     game.step(Action.MENU_UP);
@@ -455,6 +458,53 @@ describe('duel rounds', () => {
     assert.equal(game.states.current.params.stats.perfectParries, 1);
     assert.equal(game.states.current.params.stats.guardBreaks, 1);
     assert.equal(game.states.current.rows.find((row) => row.label === 'Parries perfeitos').left, '1');
+  });
+
+  it('runs the arcade ladder: next fight on a win, retry on a loss', () => {
+    const game = createFakeGame();
+    game.changeState(StateId.MENU);
+    game.step(Action.MENU_DOWN);
+    game.step(Action.CONFIRM);
+    assert.deepEqual(game.stateNames(), ['CharacterSelectState']);
+    game.step(Action.CONFIRM);
+
+    const first = game.states.current;
+    assert.equal(first.mode, DuelMode.ARCADE);
+    assert.equal(first.player.id, 'guardian');
+    assert.equal(first.fighters[1].id, 'shadow');
+    assert.equal(first.opponentController.difficulty, aiConfig.difficulties.easy);
+    assert.ok(first.banner.title.includes('LUTA 1'));
+
+    winRound(game);
+    winRound(game);
+    const result = game.states.current;
+    assert.equal(result.menu.items[0].label, 'Próxima luta');
+    game.step(Action.CONFIRM);
+
+    const second = game.states.current;
+    assert.equal(second.params.arcade.stage, 1);
+    assert.equal(second.fighters[1].id, 'bastion');
+    assert.notEqual(second.arenaId, first.arenaId);
+  });
+
+  it('wakes the boss up below half health and saves the cleared arcade', () => {
+    const game = createFakeGame();
+    const ladder = ['shadow', 'shadowAwakened'];
+    game.changeState(StateId.DUEL, { mode: DuelMode.ARCADE, arcade: { playerCharacter: 'guardian', ladder, stage: 1 } });
+    const duel = game.states.current;
+    assert.equal(duel.fighters[1].id, 'shadowAwakened');
+    assert.ok(duel.banner.title.includes('CHEFE'));
+
+    skipIntro(game);
+    duel.fighters[1].health = duel.fighters[1].stats.maxHealth * 0.4;
+    game.step();
+    assert.equal(duel.enraged, true);
+    assert.equal(duel.opponentController.difficulty, aiConfig.difficulties.boss);
+
+    winRound(game);
+    winRound(game);
+    assert.equal(game.states.current.title, 'ARCADE CONCLUÍDO');
+    assert.deepEqual(game.settings.arcadeCleared, ['guardian']);
   });
 });
 

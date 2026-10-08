@@ -463,14 +463,25 @@ No fim, a tela de resultado oferece o desafio de parry.
 
 **Desafio de parry** (menu → Desafio de parry, ou depois do tutorial): 45 segundos contra o boneco, que se aproxima e lança **só ataques fortes** (que dá para aparar por reação) em intervalos aleatórios. Parry vale 1 ponto, parry perfeito vale 2. Golpes recebidos não tiram pontos, mas aparecem no resumo. O recorde fica salvo no navegador (`settings.parryChallengeBest`).
 
-## 17. Modos e progressão planejados
+## 17. Arcade
+
+Menu → Arcade → escolha do lutador → uma sequência de duelos (melhor de 3 cada).
+
+- **Adversários**: todos os outros personagens selecionáveis, na ordem do elenco, até 6. Depois vem o **chefe**.
+- **Dificuldade crescente**: os dois primeiros duelos no Fácil, os dois seguintes no Normal e o resto no Difícil (`gameConfig.arcade.difficulties`).
+- **Arenas**: em rodízio pela lista de arenas.
+- **Chefe: Sombra Desperta.** Versão mais forte da Sombra: mais vida (150), forte mais pesado, silhueta com ombreiras. Joga no Difícil. Quando cai abaixo da metade da vida, **desperta**: aparece a mensagem "A SOMBRA DESPERTA", as barras do letterbox pulsam e a IA passa para a dificuldade `boss` (reage no limite humano, completa sequências, pune quase tudo). O chefe não aparece na seleção de personagem.
+- **Resultado**: vencer leva à próxima luta ("Próxima luta"); perder permite tentar a mesma luta de novo. Vencer o chefe mostra "ARCADE CONCLUÍDO" e salva no navegador que aquele personagem fechou o Arcade (`settings.arcadeCleared`), para a progressão futura (cores de sabre).
+- Uma linha no topo mostra a luta atual: "ARCADE · LUTA 2 DE 4 · BASTIÃO" ou "ARCADE · CHEFE · SOMBRA DESPERTA".
+
+## 18. Modos e progressão planejados
 
 | Modo | Situação |
 | --- | --- |
 | Versus contra a IA | existe |
 | Treino | existe; ganha dados de frame, boneco que grava e reproduz, hitboxes visíveis |
 | Tutorial / desafio de parry | existe |
-| Arcade (6 lutas + chefe) | planejado |
+| Arcade (até 6 lutas + chefe) | existe |
 | 2P local | planejado (depende do gamepad) |
 | Sobrevivência | depois do Arcade |
 | Torneio, campanha, online | fora do escopo |

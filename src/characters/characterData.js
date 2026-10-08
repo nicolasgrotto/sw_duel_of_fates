@@ -5,6 +5,7 @@ export const characters = {
     id: 'guardian',
     name: 'Guardião',
     archetype: 'guardian',
+    selectable: true,
     moves: movesByCharacter.guardian,
     aiProfile: 'balanced',
     info: {
@@ -36,6 +37,7 @@ export const characters = {
     id: 'shadow',
     name: 'Sombra',
     archetype: 'shadow',
+    selectable: true,
     moves: movesByCharacter.shadow,
     aiProfile: 'aggressive',
     info: {
@@ -67,6 +69,7 @@ export const characters = {
     id: 'bastion',
     name: 'Bastião',
     archetype: 'bastion',
+    selectable: true,
     moves: movesByCharacter.bastion,
     aiProfile: 'defensive',
     info: {
@@ -98,6 +101,7 @@ export const characters = {
     id: 'wasp',
     name: 'Vespa',
     archetype: 'wasp',
+    selectable: true,
     moves: movesByCharacter.wasp,
     aiProfile: 'aggressive',
     info: {
@@ -129,6 +133,7 @@ export const characters = {
     id: 'mirror',
     name: 'Espelho',
     archetype: 'mirror',
+    selectable: true,
     moves: movesByCharacter.mirror,
     aiProfile: 'defensive',
     info: {
@@ -153,6 +158,38 @@ export const characters = {
       guardAngleDegrees: -90,
       bladeLength: 96,
       bladeWidthScale: 1,
+      dualBlade: null,
+    },
+  },
+  shadowAwakened: {
+    id: 'shadowAwakened',
+    name: 'Sombra Desperta',
+    archetype: 'shadowAwakened',
+    selectable: false,
+    moves: movesByCharacter.shadow,
+    aiProfile: 'aggressive',
+    info: {
+      style: 'Chefe',
+      trait: 'Golpe que acerta devolve stamina',
+      ability: 'Ímpeto: avanço com armadura contra um golpe',
+    },
+    sound: {
+      humFrequency: 55,
+    },
+    appearance: {
+      cloakColor: '#14141c',
+      bodyColor: '#0a0a0f',
+      trimColor: '#3a1030',
+      saberColor: '#ff3f9e',
+      hoodUp: true,
+      longCape: true,
+      masked: false,
+      pauldrons: true,
+      shoulderScale: 1.2,
+      torsoLeanDegrees: 12,
+      guardAngleDegrees: 25,
+      bladeLength: 98,
+      bladeWidthScale: 1.25,
       dualBlade: null,
     },
   },

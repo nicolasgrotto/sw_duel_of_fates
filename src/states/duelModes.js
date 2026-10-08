@@ -1,5 +1,6 @@
 export const DuelMode = Object.freeze({
   VERSUS: 'versus',
+  ARCADE: 'arcade',
   TRAINING: 'training',
   TUTORIAL: 'tutorial',
   CHALLENGE: 'parryChallenge',

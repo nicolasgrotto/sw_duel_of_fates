@@ -13,6 +13,7 @@ export const AiProfile = Object.freeze({
 export const aiConfig = {
   defaultDifficulty: Difficulty.NORMAL,
   difficultyOrder: [Difficulty.EASY, Difficulty.NORMAL, Difficulty.HARD],
+  bossDifficulty: 'boss',
   difficulties: {
     [Difficulty.EASY]: {
       reactionTime: 0.45,
@@ -64,6 +65,23 @@ export const aiConfig = {
       specialMultiplier: 1,
       blockPunishChance: 0.85,
       recoveryGuardChance: 0.75,
+    },
+    boss: {
+      reactionTime: 0.15,
+      defenseMultiplier: 1,
+      mistakeChance: 0.02,
+      attackCooldown: 0.25,
+      parryChance: 0.65,
+      perfectParryChance: 0.3,
+      shoveMultiplier: 1,
+      attackTell: 0,
+      smartPunish: true,
+      whiffBaitChance: 0.25,
+      adaptation: 1,
+      chainChance: 1,
+      specialMultiplier: 1,
+      blockPunishChance: 0.9,
+      recoveryGuardChance: 0.8,
     },
   },
   profiles: {

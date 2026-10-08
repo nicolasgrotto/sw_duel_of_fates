@@ -8,6 +8,7 @@ export const texts = {
   menu: {
     tagline: 'UM DUELO DE LÂMINAS DE ENERGIA',
     duel: 'Duelar',
+    arcade: 'Arcade',
     tutorial: 'Tutorial',
     challenge: 'Desafio de parry',
     training: 'Treino',
@@ -83,6 +84,16 @@ export const texts = {
       shove: 'desequilibrou',
       counter: 'contra-atacado',
     },
+  },
+  arcade: {
+    banner: 'ARCADE  ·  LUTA {number} DE {total}  ·  {name}',
+    bossBanner: 'ARCADE  ·  CHEFE  ·  {name}',
+    enraged: 'A SOMBRA DESPERTA',
+    nextFight: 'Próxima luta',
+    retry: 'Tentar de novo',
+    completeTitle: 'ARCADE CONCLUÍDO',
+    completeSubtitle: '{name} venceu todos os duelos',
+    playAgain: 'Jogar de novo',
   },
   tutorial: {
     steps: {

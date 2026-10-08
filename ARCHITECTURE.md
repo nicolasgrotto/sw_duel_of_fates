@@ -52,6 +52,7 @@ src/
   modes/                    ✅ regras de modos de jogo, puras e testáveis (sem render)
     TutorialDirector.js     ✅ passos do tutorial: objetivo, progresso e comportamento do boneco
     ParryChallenge.js       ✅ desafio de parry: tempo, pontos e resumo
+    arcade.js               ✅ escada do Arcade: adversários, dificuldade e arena por luta, chefe no fim
   controllers/              ✅ quem controla um lutador
     PlayerController.js     ✅ Input → intent
     IntentRecorder.js       ✅ buffer Uint16 fixo: grava intents e reproduz movimento relativo
@@ -172,7 +173,7 @@ Trocar todos os personagens (ex.: versão com identidade própria) deve exigir a
 3. a entrada em `characterData.js` (nome, perfil de IA, textos `info` da seleção, som e aparência com todos os campos de silhueta);
 4. poses novas, se houver, em `fighterVisualConfig.combatPoses.attacks`, e os nomes dos golpes em `uiConfig.texts.training.attacks`.
 
-Personagens atuais: Guardião, Sombra, Bastião, Vespa e Espelho.
+Personagens atuais: Guardião, Sombra, Bastião, Vespa e Espelho, mais o chefe Sombra Desperta (`selectable: false`, só no Arcade). A seleção mostra só os personagens com `selectable: true`.
 
 ### Controllers
 
@@ -356,6 +357,8 @@ Arquivos: [src/ui/](src/ui/), [src/config/uiConfig.js](src/config/uiConfig.js). 
 ---
 
 Modos com boneco (`duelModes.usesDummy`: Treino, Tutorial e Desafio de parry) não têm limite de rounds (`hasRoundLimit`). Tutorial e desafio criam um **diretor** em `DuelState.createDirector()`: `TutorialDirector` ou `ParryChallenge`. O diretor só lê eventos (`handleEvents(events, player)`) e o jogador (`update(dt, player)`), e expõe `dummyBehavior` (o `DuelState` repassa ao `DummyController`) e `isFinished`. Enquanto há diretor, o `DuelState` devolve a vida dos dois ao máximo depois de cada passo. Quando o diretor termina, o `DuelState` empilha o `GameOverState` em modo resumo (`summary`, `title`, `subtitle`, `rematchLabel`, `rematchParams`), sem tabela. O recorde do desafio fica em `settings.parryChallengeBest`. Os objetivos dos passos são dados (`tutorialConfig.steps[].goal`: andar, ou eventos com papel do jogador, tipos de golpe e passo mínimo de sequência via `getChainStep`). O avanço da Vespa emite também `attackStart` com o tipo `special`, para o passo da habilidade valer para todos.
+
+**Arcade** (`DuelMode.ARCADE`): a seleção (só a etapa do lutador) cria a corrida com `createArcadeRun(jogador, selecionáveis, gameConfig.arcade)` e passa `params.arcade` (`playerCharacter`, `ladder`, `stage`). O `DuelState` lê `getArcadeStage` para escolher adversário, dificuldade da IA (`difficultyId`, em vez da dificuldade das Opções) e arena. A faixa do topo usa o `ModeBanner` (tipo `arcade`). No resultado, a primeira opção vira "Próxima luta" (`nextArcadeRun`) ou "Tentar de novo" (mesmos params). Vencer a última luta mostra o resumo "ARCADE CONCLUÍDO" e salva o personagem em `settings.arcadeCleared`. O chefe é um personagem com `selectable: false` (`shadowAwakened`, arquétipo próprio, golpes da Sombra). No chefe, `updateBossEnrage` troca a dificuldade da IA para `aiConfig.difficulties.boss` quando a vida cai abaixo de `enrageHealthRatio`, mostra a mensagem e pulsa o letterbox; volta ao normal a cada round.
 
 Identidade no duelo: o `Letterbox` fica fechado (alvo 1) na intro e depois do K.O. e abre quando o round está em jogo; o parry perfeito pede um pulso curto. É desenhado depois do mundo e da vinheta e antes da HUD. A ignição é só visual: `DuelState.getBladeExtension()` vai de 0 a 1 durante a intro (`layout.ignition`), o `DuelRenderer` copia o valor para `pose.bladeExtension` e o `saberRenderer` escala o comprimento da lâmina e as luzes por ele. O som `ignite` toca uma vez por round, quando a ignição começa.
 

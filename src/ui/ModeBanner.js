@@ -7,6 +7,7 @@ import { formatActionKeys } from './keyLabels.js';
 export const BannerKind = Object.freeze({
   TUTORIAL: 'tutorial',
   CHALLENGE: 'challenge',
+  ARCADE: 'arcade',
 });
 
 function createKeyNames(bindings) {
@@ -32,6 +33,10 @@ export class ModeBanner {
   }
 
   update() {
+    if (this.kind === BannerKind.ARCADE) {
+      this.describeArcade();
+      return;
+    }
     const signature = this.kind === BannerKind.TUTORIAL
       ? `${this.director.index}:${this.director.progress}`
       : `${Math.ceil(this.director.timeLeft)}:${this.director.score}`;
@@ -60,6 +65,20 @@ export class ModeBanner {
       done: progress,
       count: step.count,
     });
+  }
+
+  describeArcade() {
+    if (this.signature) {
+      return;
+    }
+    const stage = this.director;
+    this.signature = 'arcade';
+    this.title = formatText(stage.isBoss ? texts.arcade.bossBanner : texts.arcade.banner, {
+      number: stage.number,
+      total: stage.total - 1,
+      name: stage.opponentName.toUpperCase(),
+    });
+    this.detail = '';
   }
 
   describeChallenge() {

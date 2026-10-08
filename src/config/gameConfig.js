@@ -43,6 +43,14 @@ export const gameConfig = {
       approachGap: 40,
     },
   },
+  arcade: {
+    maxOpponents: 6,
+    difficulties: ['easy', 'easy', 'normal', 'normal', 'hard', 'hard'],
+    boss: 'shadowAwakened',
+    bossDifficulty: 'hard',
+    enragedDifficulty: 'boss',
+    enrageHealthRatio: 0.5,
+  },
   debug: {
     enabled: false,
     fpsSampleWindow: 0.5,

@@ -23,6 +23,7 @@ import { tutorialConfig } from '../config/tutorialConfig.js';
 import { ParryChallenge } from '../modes/ParryChallenge.js';
 import { TutorialDirector } from '../modes/TutorialDirector.js';
 import { BannerKind, ModeBanner } from '../ui/ModeBanner.js';
+import { getArcadeStage, isLastStage, nextArcadeRun } from '../modes/arcade.js';
 import { Camera } from '../core/Camera.js';
 import { PlayerController } from '../controllers/PlayerController.js';
 import { DuelRenderer } from '../rendering/DuelRenderer.js';
@@ -64,11 +65,14 @@ export class DuelState extends GameState {
     this.recorder = new IntentRecorder(gameConfig.duel.training.recordingFrames);
     this.debugBox = createBox();
     this.mode = this.params.mode ?? DuelMode.VERSUS;
-    this.playerCharacter = this.params.playerCharacter ?? gameConfig.duel.playerCharacter;
-    this.opponentCharacter = this.params.opponentCharacter ?? gameConfig.duel.opponentCharacter;
+    this.arcadeStage = this.mode === DuelMode.ARCADE ? getArcadeStage(this.params.arcade, gameConfig.arcade, gameConfig.duel.arenaOrder) : null;
+    this.playerCharacter = this.arcadeStage ? this.params.arcade.playerCharacter : (this.params.playerCharacter ?? gameConfig.duel.playerCharacter);
+    this.opponentCharacter = this.arcadeStage ? this.arcadeStage.opponentCharacter : (this.params.opponentCharacter ?? gameConfig.duel.opponentCharacter);
+    this.difficultyId = this.arcadeStage ? this.arcadeStage.difficulty : this.game.settings.difficulty;
+    this.enraged = false;
     this.random = createRandom(createRandomSeed());
     this.arena = createArenaBounds(gameConfig);
-    this.arenaId = this.params.arena ?? gameConfig.duel.arena;
+    this.arenaId = this.arcadeStage ? this.arcadeStage.arena : (this.params.arena ?? gameConfig.duel.arena);
     this.arenaDefinition = arenas[this.arenaId];
     this.ambients = this.arenaDefinition.ambient.map((config) => new AmbientSystem(config, this.arena, createRandom(createRandomSeed())));
     this.participants = this.createParticipants();
@@ -113,6 +117,9 @@ export class DuelState extends GameState {
     } else if (this.mode === DuelMode.CHALLENGE) {
       this.director = new ParryChallenge(tutorialConfig.challenge);
       this.banner = new ModeBanner(BannerKind.CHALLENGE, this.director, bindings);
+    } else if (this.arcadeStage) {
+      this.banner = new ModeBanner(BannerKind.ARCADE, { ...this.arcadeStage, opponentName: this.fighters[1].name }, bindings);
+      this.banner.update();
     }
     this.applyDummyBehavior();
   }
@@ -121,6 +128,20 @@ export class DuelState extends GameState {
     if (this.director) {
       this.opponentController.setBehavior(this.director.dummyBehavior);
     }
+  }
+
+  updateBossEnrage() {
+    const boss = this.fighters[1];
+    if (!this.arcadeStage?.isBoss || this.enraged || !this.isPlaying()) {
+      return;
+    }
+    if (boss.health / boss.stats.maxHealth >= gameConfig.arcade.enrageHealthRatio) {
+      return;
+    }
+    this.enraged = true;
+    this.opponentController.difficulty = aiConfig.difficulties[gameConfig.arcade.enragedDifficulty];
+    this.message.show(texts.arcade.enraged, layout.messages.knockoutDuration);
+    this.letterbox.pulse(layout.letterbox.perfectParryAmount, layout.messages.knockoutDuration);
   }
 
   updateDirector(dt) {
@@ -225,6 +246,7 @@ export class DuelState extends GameState {
     this.inputSignature = '';
     this.roundNumber += 1;
     this.ignited = false;
+    this.enraged = false;
     this.showRoundIntro();
   }
 
@@ -254,7 +276,7 @@ export class DuelState extends GameState {
       self: opponent,
       opponent: player,
       profile: aiConfig.profiles[characters[characterId].aiProfile],
-      difficulty: aiConfig.difficulties[this.game.settings.difficulty],
+      difficulty: aiConfig.difficulties[this.difficultyId],
       perception: aiConfig.perception,
       random: this.random,
     });
@@ -309,6 +331,7 @@ export class DuelState extends GameState {
 
     this.updateTrainingStatus();
     this.updateDirector(dt);
+    this.updateBossEnrage();
     for (const ambient of this.ambients) {
       ambient.update(dt);
     }
@@ -480,13 +503,45 @@ export class DuelState extends GameState {
   }
 
   showResult() {
+    const playerWon = this.outcome.winner === this.player;
+    if (this.arcadeStage && playerWon && isLastStage(this.params.arcade)) {
+      this.showArcadeComplete();
+      return;
+    }
     this.game.pushState(StateId.GAME_OVER, {
+      ...this.getArcadeOptions(playerWon),
       duelParams: this.params,
       playerWon: this.outcome.winner === this.player,
       winnerName: this.outcome.winner.name,
       stats: { time: this.duelTime, ...this.stats },
       opponentStats: { ...this.fighterStats[1] },
       names: this.fighters.map((fighter) => fighter.name),
+    });
+  }
+
+  getArcadeOptions(playerWon) {
+    if (!this.arcadeStage) {
+      return {};
+    }
+    return {
+      rematchLabel: playerWon ? texts.arcade.nextFight : texts.arcade.retry,
+      rematchParams: playerWon ? { mode: DuelMode.ARCADE, arcade: nextArcadeRun(this.params.arcade) } : this.params,
+    };
+  }
+
+  showArcadeComplete() {
+    const cleared = this.game.settings.arcadeCleared ?? [];
+    if (!cleared.includes(this.playerCharacter)) {
+      this.game.settings.arcadeCleared = [...cleared, this.playerCharacter];
+      this.game.saveSettings();
+    }
+    this.game.pushState(StateId.GAME_OVER, {
+      duelParams: this.params,
+      title: texts.arcade.completeTitle,
+      subtitle: formatText(texts.arcade.completeSubtitle, { name: this.player.name }),
+      summary: '',
+      rematchLabel: texts.arcade.playAgain,
+      rematchParams: { mode: DuelMode.ARCADE, arcade: { ...this.params.arcade, stage: 0 } },
     });
   }
 
