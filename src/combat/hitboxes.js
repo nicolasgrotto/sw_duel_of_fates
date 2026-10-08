@@ -41,6 +41,15 @@ export function hasActiveHitbox(fighter) {
   return !fighter.combat.hasHit && isAttackActive(fighter);
 }
 
+export function comesFromFront(defender, attacker) {
+  const attackerSide = Math.sign(attacker.x - defender.x);
+  return attackerSide === 0 || attackerSide === defender.facing;
+}
+
+export function isGuardingAgainst(defender, attacker) {
+  return defender.state === FighterState.BLOCKING && comesFromFront(defender, attacker);
+}
+
 export function isInvulnerable(fighter) {
   return fighter.state === FighterState.DODGING && fighter.stateTime < fighter.combat.dodgeProfile.invulnerableTime;
 }

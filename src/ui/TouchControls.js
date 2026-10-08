@@ -22,7 +22,9 @@ export class TouchControls {
       if (source.hasBack) this.button(renderer, source.config.back, texts.touch.back);
       return;
     }
-    for (const button of source.config.buttons) this.button(renderer, button, texts.touch.buttons[button.action]);
+    for (const button of source.config.buttons) {
+      if (source.hasButton(button)) this.button(renderer, button, texts.touch.buttons[button.action]);
+    }
     const { joystick: config, style } = source.config;
     const joystick = source.joystick;
     const x = joystick?.originX ?? config.idleX;

@@ -12,6 +12,8 @@ function createIntent() {
     evade: false,
     special: false,
     specialHeld: false,
+    power: false,
+    powerHeld: false,
   };
 }
 
@@ -42,6 +44,13 @@ function createCombat() {
     parryTime: 0,
     parryLockout: 0,
     riposteTime: 0,
+    power: null,
+    powerEndTime: 0,
+    powerTick: 0,
+    powerTargeted: false,
+    powerCooldown: 0,
+    powerTargetX: 0,
+    powerTargetY: 0,
   };
 }
 
@@ -157,6 +166,14 @@ export class Fighter {
     this.combat.hasHit = false;
     this.combat.attackConnected = false;
     this.combat.lungeApplied = false;
+    this.clearPower();
+  }
+
+  clearPower() {
+    this.combat.power = null;
+    this.combat.powerEndTime = 0;
+    this.combat.powerTick = 0;
+    this.combat.powerTargeted = false;
   }
 
   advanceStateTime(dt) {
@@ -175,5 +192,7 @@ export class Fighter {
     intent.evade = false;
     intent.special = false;
     intent.specialHeld = false;
+    intent.power = false;
+    intent.powerHeld = false;
   }
 }

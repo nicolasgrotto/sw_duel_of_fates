@@ -2,6 +2,7 @@ export const CombatAction = Object.freeze({
   DODGE: 'dodge',
   EVADE: 'evade',
   SHOVE: 'shove',
+  POWER: 'power',
   SPECIAL: 'special',
   HEAVY_ATTACK: 'heavyAttack',
   LIGHT_ATTACK: 'lightAttack',
@@ -15,6 +16,9 @@ export function readPressedAction(intent) {
   if (intent.evade) return CombatAction.EVADE;
   if (intent.lightAttack && intent.block) {
     return CombatAction.SHOVE;
+  }
+  if (intent.power) {
+    return CombatAction.POWER;
   }
   if (intent.special) {
     return CombatAction.SPECIAL;

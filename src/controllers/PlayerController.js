@@ -8,6 +8,7 @@ const PRESS_ACTIONS = [
   { action: Action.EVADE, intentKey: 'evade' },
   { action: Action.BLOCK, intentKey: 'blockPressed' },
   { action: Action.SPECIAL, intentKey: 'special' },
+  { action: Action.POWER, intentKey: 'power' },
 ];
 
 export class PlayerController {
@@ -42,6 +43,7 @@ export class PlayerController {
     intent.moveX = right - left;
     intent.block = input.isDown(Action.BLOCK);
     intent.specialHeld = input.isDown(Action.SPECIAL);
+    intent.powerHeld = input.isDown(Action.POWER);
     for (const { intentKey } of PRESS_ACTIONS) {
       intent[intentKey] = latched[intentKey];
       latched[intentKey] = false;

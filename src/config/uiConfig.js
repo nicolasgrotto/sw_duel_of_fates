@@ -1,6 +1,6 @@
 export const texts = {
   attributes: { health: 'Vida', stamina: 'Stamina', blade: 'Lâmina', defense: 'Defesa', agility: 'Agilidade', flow: 'Fluxo' },
-  touch: { back: 'Voltar', move: 'Mover', rotate: 'GIRE O APARELHO', landscape: 'Jogue em paisagem', navigation: 'Toque para escolher · toque novamente para confirmar', colorLeft: '‹', colorRight: '›', buttons: { lightAttack: 'Rápido', heavyAttack: 'Forte', block: 'Guarda', dodge: 'Esquiva', special: 'Habilidade', jump: 'Pulo', pause: 'Pausa' } },
+  touch: { back: 'Voltar', move: 'Mover', rotate: 'GIRE O APARELHO', landscape: 'Jogue em paisagem', navigation: 'Toque para escolher · toque novamente para confirmar', colorLeft: '‹', colorRight: '›', buttons: { lightAttack: 'Rápido', heavyAttack: 'Forte', block: 'Guarda', dodge: 'Esquiva', special: 'Habilidade', power: 'Poder', jump: 'Pulo', pause: 'Pausa' } },
   arenas: {
     refinery: 'Plataforma de Refino',
     sanctuary: 'Santuário Alagado',
@@ -70,6 +70,7 @@ export const texts = {
       riposte: 'Riposta (ataque rápido depois de aparar)',
       shove: 'Empurrar (quebra a defesa)',
       special: 'Habilidade do personagem',
+      power: 'Poder do Fluxo (com poderes ligados)',
       dodge: 'Esquivar',
       evade: 'Esquiva de precis\u00e3o',
       pause: 'Pausar',
@@ -95,7 +96,7 @@ export const texts = {
     inputs: 'Jogador: {player}   ·   Boneco: {dummy}',
     recorder: '{mode} · {seconds} s',
     recorderModes: { idle: 'Gravação parada', recording: 'Gravando', playing: 'Reproduzindo' },
-    inputNames: { idle: '—', left: '←', right: '→', jump: 'pulo', lightAttack: 'rápido', heavyAttack: 'forte', block: 'guarda', dodge: 'esquiva', evade: 'precis\u00e3o', special: 'habilidade' },
+    inputNames: { idle: '—', left: '←', right: '→', jump: 'pulo', lightAttack: 'rápido', heavyAttack: 'forte', block: 'guarda', dodge: 'esquiva', evade: 'precis\u00e3o', special: 'habilidade', power: 'poder' },
     frameData: '{attack} · {result} · {advantage} s',
     attacks: { air: 'Aéreo', forwardHeavy: 'Forte de avanço', light: 'Rápido', light2: 'Rápido 2', light3: 'Rápido 3', light4: 'Rápido 4', light5: 'Rápido 5', heavy: 'Forte', riposte: 'Riposta', shove: 'Empurrão', special: 'Habilidade', counterStrike: 'Contra-golpe', airHeavy: 'Mergulho' },
     results: {
@@ -240,6 +241,7 @@ export const controlsScreenRows = [
   { label: 'dodge', actions: ['dodge'] },
   { label: 'evade', actions: ['evade'] },
   { label: 'special', actions: ['special'] },
+  { label: 'power', actions: ['power'] },
   { label: 'pause', actions: ['pause'] },
   { label: 'toggleDebug', actions: ['toggleDebug'] },
   { label: 'recordDummy', actions: ['recordDummy'] },

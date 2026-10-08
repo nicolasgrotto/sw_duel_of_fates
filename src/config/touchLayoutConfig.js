@@ -5,6 +5,7 @@ export const touchLayoutConfig = {
   joystick: { halfWidth: 640, top: 360, radius: 76, knobRadius: 28, deadzone: 18, evadeThreshold: 44, idleX: 150, idleY: 600 },
   buttons: [
     { action: Action.SPECIAL, x: 980, y: 510, radius: 48 },
+    { action: Action.POWER, x: 860, y: 570, radius: 48, feature: 'powers' },
     { action: Action.HEAVY_ATTACK, x: 1100, y: 510, radius: 48 },
     { action: Action.JUMP, x: 1220, y: 510, radius: 48 },
     { action: Action.DODGE, x: 980, y: 630, radius: 48 },

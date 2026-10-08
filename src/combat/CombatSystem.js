@@ -6,19 +6,10 @@ import { CombatAction, clearActionBuffer, updateActionBuffer } from './actionBuf
 import { clamp } from '../utils/math.js';
 import { ATTACK_STATES, AttackPhase, AttackType, getAttackDuration, getAttackPhase, getChargeLevel, isSaberAttack } from './attackPhases.js';
 import { CombatEvent, createCombatEvent } from './combatEvents.js';
-import { boxesOverlap, createBox, getAttackHitbox, getHurtbox, hasActiveHitbox, hasHurtbox, isInvulnerable } from './hitboxes.js';
-import { PowerSystem } from './PowerSystem.js';
+import { boxesOverlap, comesFromFront, createBox, getAttackHitbox, getHurtbox, hasActiveHitbox, hasHurtbox, isGuardingAgainst, isInvulnerable } from './hitboxes.js';
+import { PowerSystem, isBarrierUp } from './PowerSystem.js';
 
 const PUNISHED_STATES = new Set([FighterState.STAGGERED, FighterState.STUNNED]);
-
-function comesFromFront(defender, attacker) {
-  const attackerSide = Math.sign(attacker.x - defender.x);
-  return attackerSide === 0 || attackerSide === defender.facing;
-}
-
-function isBlockingAttack(defender, attacker) {
-  return defender.state === FighterState.BLOCKING && comesFromFront(defender, attacker);
-}
 
 function isInCounterStance(defender, attacker) {
   const { attack } = defender.combat;
@@ -56,7 +47,7 @@ function chooseFallDirection(fighter, arena, roomMargin) {
 }
 
 export class CombatSystem {
-  constructor(arena, { inputBuffer, fallRoomMargin, clash }, rules = {}) {
+  constructor(arena, { inputBuffer, fallRoomMargin, clash }, { rules = {}, friction = 0 } = {}) {
     this.arena = arena;
     this.inputBuffer = inputBuffer;
     this.fallRoomMargin = fallRoomMargin;
@@ -66,7 +57,7 @@ export class CombatSystem {
     this.hitbox = createBox();
     this.hurtbox = createBox();
     this.contacts = [];
-    this.powers = new PowerSystem(this, powersConfig, rules.powers === true);
+    this.powers = new PowerSystem(this, powersConfig, rules.powers === true, friction);
   }
 
   update(fighters, dt) {
@@ -78,6 +69,7 @@ export class CombatSystem {
       this.startActions(fighter);
       this.applyActionMovement(fighter);
     }
+    this.powers.resolve(fighters, dt);
   }
 
   updateTimers(fighter, dt) {
@@ -234,7 +226,7 @@ export class CombatSystem {
       this.armParry(fighter);
       return false;
     }
-    if ((bufferedAction === CombatAction.SHOVE || bufferedAction === CombatAction.EVADE) && blockstun === 0 && fighter.grounded) {
+    if ((bufferedAction === CombatAction.SHOVE || bufferedAction === CombatAction.EVADE || bufferedAction === CombatAction.POWER) && blockstun === 0 && fighter.grounded) {
       return this.tryBufferedAction(fighter, bufferedAction);
     }
     return false;
@@ -242,9 +234,12 @@ export class CombatSystem {
 
   tryBufferedAction(fighter, action) {
     clearActionBuffer(fighter);
+    if (action === CombatAction.POWER && !this.powers.enabled) {
+      return false;
+    }
     const started = this.tryAction(fighter, action);
     if (!started) {
-      this.emitAction(CombatEvent.ACTION_REJECTED, fighter, null);
+      this.emitAction(CombatEvent.ACTION_REJECTED, fighter, action === CombatAction.POWER ? CombatAction.POWER : null);
     }
     return started;
   }
@@ -257,6 +252,8 @@ export class CombatSystem {
         return this.tryDodge(fighter);
       case CombatAction.SHOVE:
         return this.tryAttack(fighter, AttackType.SHOVE);
+      case CombatAction.POWER:
+        return this.powers.tryCast(fighter);
       case CombatAction.SPECIAL:
         return this.trySpecial(fighter);
       case CombatAction.HEAVY_ATTACK:
@@ -494,9 +491,11 @@ export class CombatSystem {
     }
     if (contact.attackType === AttackType.SHOVE) {
       this.applyShove(contact);
+    } else if (isBarrierUp(contact.defender)) {
+      this.resolveBarrierBlock(contact);
     } else if (isInCounterStance(contact.defender, contact.attacker)) {
       this.resolveCounter(contact);
-    } else if (!isBlockingAttack(contact.defender, contact.attacker)) {
+    } else if (!isGuardingAgainst(contact.defender, contact.attacker)) {
       this.applyHit(contact);
     } else if (contact.defender.combat.parryArmed) {
       this.resolveParry(contact);
@@ -516,6 +515,13 @@ export class CombatSystem {
     defender.combat.stunDuration = attack.hitstun;
     defender.restartState(FighterState.STAGGERED);
     this.emit(CombatEvent.SHOVE, contact);
+  }
+
+  resolveBarrierBlock(contact) {
+    const { attacker, defender, attack } = contact;
+    attacker.combat.attackConnected = true;
+    defender.vx = attacker.facing * attack.blockPushback * defender.combat.power.saberPushback;
+    this.emit(CombatEvent.POWER_ABSORBED, contact);
   }
 
   resolveCounter(contact) {
@@ -610,10 +616,7 @@ export class CombatSystem {
     this.emit(CombatEvent.HIT, contact);
 
     if (defender.health === 0) {
-      defender.clearAttack();
-      defender.combat.fallDirection = chooseFallDirection(defender, this.arena, this.fallRoomMargin);
-      defender.restartState(FighterState.DEAD);
-      this.emit(CombatEvent.DEATH, contact);
+      this.knockOut(defender, contact);
       return;
     }
     if (armored) {
@@ -623,6 +626,39 @@ export class CombatSystem {
 
     defender.combat.stunDuration = attack.hitstun;
     defender.restartState(FighterState.HIT);
+  }
+
+  knockOut(defender, contact) {
+    defender.clearAttack();
+    defender.combat.fallDirection = chooseFallDirection(defender, this.arena, this.fallRoomMargin);
+    defender.restartState(FighterState.DEAD);
+    this.emit(CombatEvent.DEATH, contact);
+  }
+
+  dealPowerDamage(caster, target, power, damage, type) {
+    const dealt = Math.min(target.health, damage);
+    target.health = Math.max(0, target.health - damage);
+    if (dealt > 0) {
+      this.powers.gain(target, this.powers.config.meter.gain.hitTaken);
+    }
+    const contact = this.createPowerContact(caster, target, power, dealt);
+    this.emit(type, contact);
+    if (target.health === 0) {
+      this.knockOut(target, contact);
+      return false;
+    }
+    return true;
+  }
+
+  createPowerContact(caster, target, power, damage) {
+    return {
+      attacker: caster,
+      defender: target,
+      attackType: power.id,
+      x: target.x,
+      y: target.y - target.height * this.powers.config.impactHeight,
+      damage,
+    };
   }
 
   emitAction(type, fighter, attackType) {

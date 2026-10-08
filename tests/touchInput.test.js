@@ -84,3 +84,13 @@ it('shows touch again when a held finger moves after keyboard activity', () => {
   pointer('pointermove', 1, 200, 500);
   assert.equal(input.lastInputKind, 'touch');
 });
+
+it('shows the power button only when the duel enables powers', () => {
+  const { input, touch, pointer } = setup();
+  pointer('pointerdown', 1, 860, 570);
+  assert.equal(input.isDown('power'), false);
+  pointer('pointerup', 1, 860, 570);
+  touch.setFeatures(['powers']);
+  pointer('pointerdown', 2, 860, 570);
+  assert.equal(input.isDown('power'), true);
+});

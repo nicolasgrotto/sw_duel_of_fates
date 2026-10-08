@@ -38,7 +38,7 @@ export function createFighter(characterId, { x, y, facing }, { saberColor = null
   return new Fighter({
     id: character.id,
     name: character.name,
-    stats: { ...derived, alignment: character.alignment, power: resolvePowerStats(derived.powerLevel, powersConfig) },
+    stats: { ...derived, alignment: character.alignment, power: resolvePowerStats(derived.powerLevel, powersConfig, character.alignment) },
     appearance: saberColor ? { ...character.appearance, saberColor } : character.appearance,
     sound: character.sound,
     x,

@@ -48,7 +48,7 @@ import { DuelMode, createDuelRules, hasRoundLimit, usesDummy } from './duelModes
 import { StateId } from './stateIds.js';
 
 function createFighterStats() {
-  return { hits: 0, damage: 0, blocks: 0, parries: 0, perfectParries: 0, guardBreaks: 0, shoves: 0, counters: 0, feints: 0, airHits: 0, longestChain: 0 };
+  return { hits: 0, damage: 0, blocks: 0, parries: 0, perfectParries: 0, guardBreaks: 0, shoves: 0, counters: 0, feints: 0, airHits: 0, longestChain: 0, powerHits: 0 };
 }
 
 export class DuelState extends GameState {
@@ -88,6 +88,7 @@ export class DuelState extends GameState {
     this.arenaId = this.ladderStage ? this.ladderStage.arena : (this.params.arena ?? gameConfig.duel.arena);
     this.arenaDefinition = arenas[this.arenaId];
     this.ambients = this.arenaDefinition.ambient.map((config) => new AmbientSystem(config, this.arena, createRandom(createRandomSeed())));
+    this.game.touch?.setFeatures(this.rules.powers ? ['powers'] : []);
     this.participants = this.createParticipants();
     this.opponentController = this.participants[1].controller;
     this.fighters = this.participants.map((participant) => participant.fighter);
@@ -528,6 +529,12 @@ export class DuelState extends GameState {
         stats.damage += event.damage;
         stats.longestChain = Math.max(stats.longestChain, getChainStep(event.attackType));
         stats.airHits += event.attackType?.startsWith('air') ? 1 : 0;
+        break;
+      }
+      case CombatEvent.POWER_HIT: {
+        const stats = this.statsOf(event.attacker);
+        stats.powerHits += 1;
+        stats.damage += event.damage;
         break;
       }
       case CombatEvent.BLOCK:

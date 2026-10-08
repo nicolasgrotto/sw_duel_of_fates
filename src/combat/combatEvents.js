@@ -13,6 +13,12 @@ export const CombatEvent = Object.freeze({
   SHOVE: 'shove',
   COUNTER: 'counter',
   FEINT: 'feint',
+  POWER_START: 'powerStart',
+  POWER_ACTIVE: 'powerActive',
+  POWER_HIT: 'powerHit',
+  POWER_BLOCKED: 'powerBlocked',
+  POWER_RESISTED: 'powerResisted',
+  POWER_ABSORBED: 'powerAbsorbed',
 });
 
 const CONTACT_EVENTS = new Set([

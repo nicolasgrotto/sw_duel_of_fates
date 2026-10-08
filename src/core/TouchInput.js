@@ -17,6 +17,7 @@ export class TouchInput {
     this.joystick = null;
     this.mode = 'menu';
     this.hasBack = false;
+    this.features = new Set();
     this.enabled = true;
     this.handleDown = this.handleDown.bind(this);
     this.handleMove = this.handleMove.bind(this);
@@ -34,6 +35,14 @@ export class TouchInput {
     this.hasBack = hasBack;
   }
 
+  setFeatures(features) {
+    this.features = new Set(features);
+  }
+
+  hasButton(button) {
+    return !button.feature || this.features.has(button.feature);
+  }
+
   point(event) {
     const rect = this.target.getBoundingClientRect();
     return { x: (event.clientX - rect.left) * this.config.width / rect.width, y: (event.clientY - rect.top) * this.config.height / rect.height };
@@ -47,7 +56,7 @@ export class TouchInput {
     this.target.setPointerCapture?.(event.pointerId);
     let action = null;
     if (this.mode === 'duel') {
-      action = this.config.buttons.find((button) => containsTouch(point, button))?.action ?? null;
+      action = this.config.buttons.find((button) => this.hasButton(button) && containsTouch(point, button))?.action ?? null;
       if (!action && !this.joystick && point.x < this.config.joystick.halfWidth && point.y >= this.config.joystick.top) {
         this.joystick = { id: event.pointerId, originX: point.x, originY: point.y, x: point.x, y: point.y, evaded: false };
       }

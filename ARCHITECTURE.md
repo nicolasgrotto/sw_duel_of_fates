@@ -59,7 +59,7 @@ src/
   characters/               ✅ dados e criação de personagens
     characterData.js        ✅ personagens: nome, arquétipo, perfil de IA, aparência
     attributes.js           ✅ deriva stats sem mutar base ou notas
-    powers.js               ✅ `resolvePowerStats`: máximo, início, ganho e potência do medidor pelo nível do Fluxo
+    powers.js               ✅ `resolvePowerStats`: medidor, ganho, potência e poderes do alinhamento (loadout)
     characterFactory.js     ✅ cria um Fighter a partir dos dados
   modes/                    ✅ regras de modos de jogo, puras e testáveis (sem render)
     DuelResult.js           ✅ resultado independente dos Fighters
@@ -93,7 +93,8 @@ src/
     actionBuffer.js         ✅ buffer de input: ação apertada fica guardada até o lutador poder agir
     hitboxes.js             ✅ hitbox, hurtbox, sobreposição, invulnerabilidade
     combatEvents.js         ✅ tipos e criação de eventos de combate
-    PowerSystem.js          ✅ medidor do Fluxo (ganhos e regeneração); desligado sem `rules.powers`
+    PowerSystem.js          ✅ medidor, recarga, escolha e fases dos poderes, alvo, resistência e Barreira; desligado sem `rules.powers`
+    powerEffects.js         ✅ registro de efeitos por poder (`push`, `pull`, `lightning`, `barrier`)
     powerResistance.js      ✅ diferença de nível, `resolvePowerOutcome` (faixas em dados) e tier visual (puros)
   simulation/               ✅
     DuelSimulation.js       ✅ ordem dos sistemas em um passo do duelo
@@ -544,6 +545,18 @@ Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 22).
 - **Nível.** `stats.powerLevel` vem do atributo Fluxo. A factory soma `stats.alignment` (do `characterData`) e `stats.power` (`resolvePowerStats`): o nível muda o ganho do medidor e a potência dos poderes, não o máximo.
 - **Resistência.** `getLevelDifference(caster, target)` = nível do alvo − nível de quem lança. `resolvePowerOutcome(rule, diff)` percorre as faixas da regra (`powersConfig.resistance`) e devolve `{ scale, outcome }`. Cada poder aponta para uma regra pelo nome; nenhum `if` por poder.
 - **Tier visual.** `getPowerTier(level, powersConfig.tiers)` escolhe cor (`themeConfig`) e intensidade. A HUD desenha o medidor na cor do tier, abaixo da stamina, só com `rules.powers`.
+
+### Poderes (v1.6)
+
+- **Estados e ação.** `CASTING` (poderes instantâneos) e `CHANNELING` (raio e barreira). A ação `power` (`intent.power`, segurar = `intent.powerHeld`) entra no buffer depois do empurrão e antes da habilidade, e também sai de dentro do `BLOCKING` fora do blockstun. Com os poderes desligados, a ação é descartada sem evento. Sem medidor ou em recarga, `actionRejected` sai com `attackType: 'power'`.
+- **Escolha.** `selectPower` lê `stats.power.loadout` (de `powersConfig.loadouts[alinhamento]`): direção relativa ao `facing` escolhe `forward`, `back` ou `neutral`, e um espaço vazio cai no `neutral`.
+- **Fases.** `PowerSystem.resolve` roda no fim de `CombatSystem.update`, antes do movimento. Instantâneo: no fim do startup aplica o efeito uma vez (`affect(..., 'active')`), emite `powerActive` e termina depois de active + recovery. Canal: depois do startup, enquanto `powerHeld`, há medidor e o tempo não passou de `maxChannel`, drena o medidor e chama `tick`; sempre há pelo menos um passo de canal (um toque dá um pulso). `powerEndTime` marca o fim do canal; a recuperação conta a partir dele. `finish` limpa o poder, volta a `IDLE` e liga `powerCooldown` (`powersConfig.cooldown`).
+- **Efeito.** `affect` confere alcance (`isInPowerRange`: à frente, gap ≤ `range`, mesma altura), invulnerabilidade (esquiva e EVADE passam), Barreira (`isBarrierUp` → `powerAbsorbed`, com recuo pequeno para empurrões), resistência (`powerResisted` quando a escala é 0) e guarda de frente (`isGuardingAgainst`). Depois chama o handler do registro `powerEffects[effect][fase]` com um contexto reaproveitado (sem objeto novo por chamada). O dano passa por `CombatSystem.dealPowerDamage`, que emite `powerHit` ou `powerBlocked`, dá medidor ao atingido e usa o mesmo `knockOut` do golpe de lâmina.
+- **Barreira na lâmina.** Em `resolveContact`, depois do empurrão de corpo e antes do counter: com a barreira de pé, `resolveBarrierBlock` segura o golpe sem gastar stamina e emite `powerAbsorbed`. O empurrão de corpo continua vencendo (`applyShove` limpa o poder).
+- **Interrupção.** `Fighter.clearAttack` também limpa o poder (`clearPower`), então qualquer golpe, empurrão ou desequilíbrio interrompe quem está lançando.
+- **Puxão.** A velocidade vem do atrito de ação da física (`friction`, repassado pela `DuelSimulation`): `√(2 × atrito × distância)` faz o alvo parar perto de `endGap`.
+- **Estado.** Tudo que muda fica em `fighter.combat` (`power`, `powerEndTime`, `powerTick`, `powerTargeted`, `powerCooldown`, `powerTargetX/Y`) e em `fighter.powerMeter`; o replay re-simula igual (teste dedicado). `powerTargetX/Y` guarda o ponto mirado para o render, sem lógica no renderer.
+- **Entrada.** Teclado `U` (preset de setas: `N`; 2 Jogadores: J1 `R`, J2 `O`/Numpad6), gamepad RT, botão de toque `Poder` (só aparece quando o `DuelState` chama `touch.setFeatures(['powers'])`). `POWER` está em `remappableActions`; o `IntentRecorder` grava `power` e `powerHeld` no fim da lista de flags.
 
 ## Balanceamento
 

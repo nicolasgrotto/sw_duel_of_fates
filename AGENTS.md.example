@@ -63,7 +63,7 @@ Antes de criar ou alterar qualquer elemento visual (tela, HUD, personagem, lâmi
 - Personagens são `Fighter` criados a partir de dados (`src/characters/`, `src/config/`). Jogador e inimigo só mudam o controlador.
 - `CombatSystem` emite eventos; efeitos ficam no `EffectsSystem`, screen shake na `Camera`, som no `DuelAudio`.
 - Estados não importam outros estados: use `StateId` e `game.changeState` / `pushState` / `popState`.
-- Combate orientado a estados do lutador (`IDLE`, `WALKING`, `JUMPING`, `ATTACKING`, `HEAVY_ATTACK`, `BLOCKING`, `DODGING`, `HIT`, `STAGGERED`, `STUNNED`, `DEAD`).
+- Combate orientado a estados do lutador (`IDLE`, `WALKING`, `JUMPING`, `ATTACKING`, `HEAVY_ATTACK`, `BLOCKING`, `DODGING`, `HIT`, `STAGGERED`, `STUNNED`, `DEAD`, e `CASTING` e `CHANNELING` para os poderes).
 - Colisão física, hitbox, hurtbox, detecção de ataque e colisão entre lâminas são coisas separadas.
 - Regras que mudam o resultado da luta rodam dentro da `DuelSimulation` (determinística: replay e simulador dependem disso).
 - Balanceamento fica em `src/config/`, sem números mágicos. Valide mudanças com `npm run simulate` e `npm run matrix`.
