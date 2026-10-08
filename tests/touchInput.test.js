@@ -73,3 +73,14 @@ it('switches input kind on touch and unbound keyboard activity without duplicate
   assert.equal(input.lastInputKind, 'keyboard');
   assert.equal(input.wasPressed('lightAttack'), false);
 });
+
+it('shows touch again when a held finger moves after keyboard activity', () => {
+  const { target, input, pointer } = setup();
+  pointer('pointerdown', 1, 150, 500);
+  const key = new Event('keydown');
+  Object.assign(key, { code: 'KeyQ', repeat: false });
+  target.dispatchEvent(key);
+  assert.equal(input.lastInputKind, 'keyboard');
+  pointer('pointermove', 1, 200, 500);
+  assert.equal(input.lastInputKind, 'touch');
+});

@@ -63,6 +63,7 @@ export class TouchInput {
   handleMove(event) {
     if (!this.pointers.has(event.pointerId)) return;
     event.preventDefault();
+    this.onActivity?.();
     if (this.joystick?.id !== event.pointerId) return;
     const point = this.point(event);
     this.joystick.x = point.x;

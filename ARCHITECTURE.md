@@ -14,7 +14,7 @@ Legenda: ✅ existe · ⏳ planejado (criar só quando a tarefa pedir)
 
 ```
 index.html                  ✅ página com o canvas (caminhos relativos: funciona em qualquer servidor estático e no GitHub Pages)
-manifest.webmanifest        ✅ instalação em paisagem, fullscreen e start_url relativo; sem service worker
+manifest.webmanifest        ✅ manifest para tela inicial em paisagem, fullscreen e start_url relativo; sem service worker
 .nojekyll                   ✅ desliga o Jekyll do GitHub Pages; os arquivos são servidos como estão
 média/                      ✅ capturas de tela usadas no README (não são carregadas pelo jogo)
 styles/
@@ -192,7 +192,7 @@ Personagens são **dados**:
 
 Trocar todos os personagens (ex.: versão com identidade própria) deve exigir apenas mudar dados e assets, nunca o combate. Para adicionar um personagem:
 
-1. um arquétipo em `fightersConfig.js` (atributos, ataques base, parry, esquiva e traços passivos);
+1. um arquétipo em `fightersConfig.js` (estrutura, tempos, ataques, esquiva e traços passivos), bases escalares em `attributesConfig.bases` e notas em `characterData.attributes`;
 2. os golpes em `movesConfig.js` (sequência de rápidos via `cancelsInto`, aéreo, forte de avanço e `special`);
 3. a entrada em `characterData.js` (nome, perfil de IA, textos `info` da seleção, som e aparência com todos os campos de silhueta);
 4. poses novas, se houver, em `fighterVisualConfig.combatPoses.attacks`, e os nomes dos golpes em `uiConfig.texts.training.attacks`.
@@ -346,7 +346,7 @@ Save: `saveStorage.js` usa a mesma chave e escreve `{ version: 2, settings }`. A
 
 EVADE usa S/baixo e pode dividir tecla com MENU_DOWN; gamepad baixo e eixo Y positivo alimentam ambas as ações. PlayerController captura o toque inclusive no hit stop. O IntentRecorder acrescenta evade no bit 10, preservando os bits v1; reset e boneco limpam a flag. No J2, Numpad2 agora é EVADE; o atalho numérico de forte mudou para Numpad4 (K continua), evitando duas ações de combate na mesma tecla. Controles, remapeamento, lista de golpes e inputs de Treino incluem EVADE. A tabela de controles usa espaçamento 25 para manter o rodapé livre.
 
-TouchInput implementa a fonte genérica via addSource. Eventos preservam toques curtos; reset libera todos os dedos no blur. Input.lastInputKind acompanha atividade nova de teclado, gamepad e toque; gamepad segurado não rouba o dispositivo atual. Coordenadas são lógicas pelo retângulo do alvo. Joystick pede EVADE uma vez por gesto; demais botões mantêm ações enquanto segurados.
+TouchInput implementa a fonte genérica via addSource. addSource conecta onPress/onActivity nas fontes por eventos, preservando bordas pela união. Eventos preservam toques curtos; reset libera todos os dedos no blur. Input.lastInputKind acompanha atividade nova de teclado, gamepad e toque; gamepad segurado não rouba o dispositivo atual. Coordenadas são lógicas pelo retângulo do alvo. Joystick pede EVADE uma vez por gesto; demais botões mantêm ações enquanto segurados.
 
 ## Estados (StateMachine)
 
@@ -631,6 +631,36 @@ Matriz v1.0 (perfil **próprio** de cada personagem, 60 duelos por par, seed 1, 
 | Garça | 45 | 58 | 85 | 28 | 43 | 85 | 52 | 60 | -- | 77 | 59.3 | -1.4 |
 | Eco | 25 | 43 | 58 | 38 | 28 | 62 | 25 | 58 | 40 | -- | 42.0 | -0.4 |
 
+### Matriz v1.4 (atributos)
+
+`npm run matrix`: Normal e Difícil, perfis próprios, seed 1, 60 duelos por par ordenado (10.800 duelos). Todas as células e médias reproduziram a matriz v1.3; delta máximo das médias: 0,0 ponto. A calibração preserva o comportamento clássico. Percentuais arredondados nas células, média antes de arredondar.
+
+| Normal v1.4 | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco | média | delta v1.3 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Guardião | -- | 45 | 25 | 58 | 45 | 27 | 65 | 43 | 72 | 52 | 48.0 | 0,0 |
+| Sombra | 58 | -- | 43 | 72 | 80 | 68 | 67 | 65 | 68 | 63 | 65.0 | 0,0 |
+| Bastião | 68 | 60 | -- | 78 | 77 | 33 | 80 | 67 | 63 | 65 | 65.7 | 0,0 |
+| Vespa | 35 | 37 | 37 | -- | 57 | 52 | 45 | 47 | 58 | 50 | 46.3 | 0,0 |
+| Espelho | 42 | 28 | 20 | 42 | -- | 20 | 37 | 22 | 38 | 28 | 30.7 | 0,0 |
+| Haste | 68 | 43 | 50 | 55 | 80 | -- | 82 | 65 | 78 | 73 | 66.1 | 0,0 |
+| Brasa | 32 | 38 | 30 | 47 | 48 | 23 | -- | 27 | 48 | 43 | 37.4 | 0,0 |
+| Forja | 67 | 38 | 42 | 47 | 75 | 38 | 82 | -- | 57 | 55 | 55.6 | 0,0 |
+| Garça | 32 | 27 | 32 | 42 | 58 | 25 | 58 | 57 | -- | 42 | 41.3 | 0,0 |
+| Eco | 53 | 32 | 33 | 40 | 63 | 40 | 55 | 52 | 55 | -- | 47.0 | 0,0 |
+
+| Difícil v1.4 | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco | média | delta v1.3 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Guardião | -- | 72 | 53 | 53 | 45 | 32 | 35 | 62 | 57 | 65 | 52.6 | 0,0 |
+| Sombra | 28 | -- | 40 | 40 | 30 | 55 | 28 | 35 | 33 | 52 | 38.0 | 0,0 |
+| Bastião | 52 | 57 | -- | 17 | 17 | 40 | 43 | 53 | 17 | 43 | 37.6 | 0,0 |
+| Vespa | 35 | 67 | 68 | -- | 57 | 80 | 47 | 70 | 67 | 78 | 63.2 | 0,0 |
+| Espelho | 60 | 75 | 78 | 43 | -- | 58 | 35 | 63 | 50 | 78 | 60.2 | 0,0 |
+| Haste | 62 | 33 | 55 | 20 | 32 | -- | 48 | 35 | 27 | 23 | 37.2 | 0,0 |
+| Brasa | 58 | 70 | 70 | 57 | 57 | 62 | -- | 65 | 50 | 77 | 62.8 | 0,0 |
+| Forja | 55 | 53 | 55 | 8 | 40 | 62 | 48 | -- | 33 | 47 | 44.6 | 0,0 |
+| Garça | 45 | 58 | 85 | 28 | 43 | 85 | 52 | 60 | -- | 77 | 59.3 | 0,0 |
+| Eco | 25 | 43 | 58 | 38 | 28 | 62 | 25 | 58 | 40 | -- | 42.0 | 0,0 |
+
 O equilíbrio depende da dificuldade, e isso foi aceito na v1.0: personagens de execução e leitura (Vespa, Espelho, Brasa, Garça) rendem mais com a IA Difícil, que completa sequências e apara melhor; os de força bruta (Bastião, Sombra, Haste) rendem mais com a Normal. Na média das duas dificuldades todos ficam entre 45% e 57%. A IA Normal apara com `parryChance` 0,38 e a Difícil com 0,5 para não ampliar essa diferença. Para reproduzir: `npm run matrix` (padrão: Normal e Difícil, 60 duelos por par; `--difficulties`, `--duels` e `--characters a,b,c` mudam isso). Ele roda o `simulate` para cada par, sem `--profile`.
 
 A Vespa é o personagem de execução: rende pouco com a IA Normal (que completa só 60% das sequências) e fica equilibrada no Difícil. Isso é intencional (dificuldade 4 no GAME_DESIGN). Rode a matriz de novo depois de mexer em atributos.
@@ -719,7 +749,7 @@ Testes rodam em Node (`npm test`), sem navegador. Por isso:
 - Quando um módulo do core precisa do navegador (`Input`, `GameLoop`), a dependência é injetada.
 - `computePose` é uma função pura e também é testada.
 
-Testes atuais: 369 testes em `tests/`, um arquivo por área (loop, input, estados e modos, combate, especiais, IA, simulação, replay, áudio, efeitos, UI, desbloqueios, Arcade, Sobrevivência, remapeamento). `tests/states.test.js` cobre o fluxo de telas; `goToMenuItem(game, id)` navega no menu pelo id, sem depender da posição dos itens. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
+Testes atuais: 384 testes em `tests/`, um arquivo por área (loop, input, estados e modos, combate, especiais, IA, simulação, replay, áudio, efeitos, UI, desbloqueios, Arcade, Sobrevivência, remapeamento). `tests/states.test.js` cobre o fluxo de telas; `goToMenuItem(game, id)` navega no menu pelo id, sem depender da posição dos itens. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
 
 ---
 
