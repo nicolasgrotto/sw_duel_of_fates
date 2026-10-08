@@ -64,16 +64,23 @@ export class MovementSystem {
   applyJump(fighter) {
     if (fighter.grounded) {
       fighter.combat.wallJumpSide = 0;
+      fighter.combat.jumpsUsed = 0;
     }
     if (!fighter.intent.jump) {
       return;
     }
     if (fighter.grounded) {
+      fighter.combat.jumpsUsed = 1;
       fighter.vy = -fighter.stats.movement.jumpVelocity;
       fighter.grounded = false;
       return;
     }
-    this.tryWallJump(fighter);
+    if (this.tryWallJump(fighter)) return;
+    const { movement } = fighter.stats;
+    const jumpsUsed = Math.max(1, fighter.combat.jumpsUsed);
+    if (jumpsUsed >= (movement.maxJumps ?? 1)) return;
+    fighter.combat.jumpsUsed = jumpsUsed + 1;
+    fighter.vy = -movement.jumpVelocity * movement.airJumpVelocityScale;
   }
 
   getTouchedWall(fighter) {
@@ -90,13 +97,14 @@ export class MovementSystem {
   tryWallJump(fighter) {
     const wall = this.getTouchedWall(fighter);
     if (wall === 0 || wall === fighter.combat.wallJumpSide) {
-      return;
+      return false;
     }
     const { wallJump, movement } = fighter.stats;
     fighter.combat.wallJumpSide = wall;
     fighter.combat.airAttackUsed = false;
     fighter.vx = -wall * wallJump.speed;
     fighter.vy = -movement.jumpVelocity * wallJump.heightScale;
+    return true;
   }
 
   applyHorizontalMovement(fighter, dt) {

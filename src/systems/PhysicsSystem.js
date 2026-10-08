@@ -41,6 +41,7 @@ export class PhysicsSystem {
       fighter.y = floorY;
       fighter.vy = Math.min(fighter.vy, 0);
       fighter.grounded = true;
+      fighter.combat.jumpsUsed = 0;
     } else {
       fighter.grounded = false;
     }

@@ -122,3 +122,62 @@ describe('MovementSystem', () => {
     assert.equal(player.state, FighterState.STUNNED);
   });
 });
+
+it('allows the wasp one air jump, rejects a third, and resets on landing', () => {
+  const fighter = spawnFighter(500, 1, 'wasp');
+  const movement = new MovementSystem(physicsConfig, arena);
+  const physics = new PhysicsSystem(physicsConfig, arena);
+  fighter.intent.jump = true;
+  movement.applyJump(fighter);
+  assert.equal(fighter.combat.jumpsUsed, 1);
+  fighter.y -= 150;
+  fighter.vy = 20;
+  fighter.combat.airAttackUsed = true;
+  movement.applyJump(fighter);
+  assert.equal(fighter.combat.jumpsUsed, 2);
+  assert.equal(fighter.vy, -fighter.stats.movement.jumpVelocity * fighter.stats.movement.airJumpVelocityScale);
+  assert.equal(fighter.combat.airAttackUsed, true);
+  fighter.vy = 30;
+  movement.applyJump(fighter);
+  assert.equal(fighter.vy, 30);
+  fighter.y = arena.floorY;
+  physics.resolveFloor(fighter);
+  assert.equal(fighter.combat.jumpsUsed, 0);
+  movement.applyJump(fighter);
+  assert.equal(fighter.combat.jumpsUsed, 1);
+});
+
+it('prioritizes wall jumps without restoring an already spent air jump', () => {
+  const fighter = spawnFighter(arena.left + 23, 1, 'heron');
+  fighter.stats.movement = { ...fighter.stats.movement, maxJumps: 2 };
+  fighter.grounded = false;
+  fighter.y -= 80;
+  fighter.combat.jumpsUsed = 2;
+  fighter.intent.jump = true;
+  const movement = new MovementSystem(physicsConfig, arena);
+  movement.applyJump(fighter);
+  assert.equal(fighter.combat.wallJumpSide, -1);
+  assert.equal(fighter.combat.jumpsUsed, 2);
+  assert.equal(fighter.vy, -fighter.stats.movement.jumpVelocity * fighter.stats.wallJump.heightScale);
+  fighter.x = 500;
+  fighter.vy = 50;
+  movement.applyJump(fighter);
+  assert.equal(fighter.vy, 50);
+});
+
+it('preserves an unused air jump after a wall jump and resets round counters', () => {
+  const fighter = spawnFighter(arena.left + 23, 1, 'heron');
+  fighter.stats.movement = { ...fighter.stats.movement, maxJumps: 2 };
+  fighter.grounded = false;
+  fighter.y -= 80;
+  fighter.combat.jumpsUsed = 1;
+  fighter.intent.jump = true;
+  const movement = new MovementSystem(physicsConfig, arena);
+  movement.applyJump(fighter);
+  assert.equal(fighter.combat.jumpsUsed, 1);
+  fighter.x = 500;
+  movement.applyJump(fighter);
+  assert.equal(fighter.combat.jumpsUsed, 2);
+  fighter.resetForRound(500, 1);
+  assert.equal(fighter.combat.jumpsUsed, 0);
+});

@@ -7,6 +7,8 @@ export const fighterArchetypes = {
       height: 150,
     },
     movement: {
+      maxJumps: 1,
+      airJumpVelocityScale: 0.8,
       walkSpeed: 260,
       backwardSpeedMultiplier: 0.75,
       groundAcceleration: 2200,
@@ -112,6 +114,8 @@ export const fighterArchetypes = {
       height: 154,
     },
     movement: {
+      maxJumps: 1,
+      airJumpVelocityScale: 0.8,
       walkSpeed: 250,
       backwardSpeedMultiplier: 0.7,
       groundAcceleration: 2000,
@@ -217,6 +221,8 @@ export const fighterArchetypes = {
       height: 160,
     },
     movement: {
+      maxJumps: 1,
+      airJumpVelocityScale: 0.8,
       walkSpeed: 200,
       backwardSpeedMultiplier: 0.65,
       groundAcceleration: 1600,
@@ -322,6 +328,8 @@ export const fighterArchetypes = {
       height: 138,
     },
     movement: {
+      maxJumps: 2,
+      airJumpVelocityScale: 0.8,
       walkSpeed: 310,
       backwardSpeedMultiplier: 0.85,
       groundAcceleration: 2800,
@@ -427,6 +435,8 @@ export const fighterArchetypes = {
       height: 156,
     },
     movement: {
+      maxJumps: 1,
+      airJumpVelocityScale: 0.8,
       walkSpeed: 240,
       backwardSpeedMultiplier: 0.8,
       groundAcceleration: 2100,
@@ -532,6 +542,8 @@ export const fighterArchetypes = {
       height: 154,
     },
     movement: {
+      maxJumps: 1,
+      airJumpVelocityScale: 0.8,
       walkSpeed: 250,
       backwardSpeedMultiplier: 0.7,
       groundAcceleration: 2000,
@@ -637,6 +649,8 @@ export const fighterArchetypes = {
       height: 158,
     },
     movement: {
+      maxJumps: 1,
+      airJumpVelocityScale: 0.8,
       walkSpeed: 235,
       backwardSpeedMultiplier: 0.8,
       groundAcceleration: 2000,
@@ -745,6 +759,8 @@ export const fighterArchetypes = {
       height: 150,
     },
     movement: {
+      maxJumps: 1,
+      airJumpVelocityScale: 0.8,
       walkSpeed: 255,
       backwardSpeedMultiplier: 0.8,
       groundAcceleration: 2200,
@@ -850,6 +866,8 @@ export const fighterArchetypes = {
       height: 156,
     },
     movement: {
+      maxJumps: 1,
+      airJumpVelocityScale: 0.8,
       walkSpeed: 225,
       backwardSpeedMultiplier: 0.7,
       groundAcceleration: 1800,
@@ -955,6 +973,8 @@ export const fighterArchetypes = {
       height: 148,
     },
     movement: {
+      maxJumps: 1,
+      airJumpVelocityScale: 0.8,
       walkSpeed: 290,
       backwardSpeedMultiplier: 0.85,
       groundAcceleration: 2500,
@@ -1061,6 +1081,8 @@ export const fighterArchetypes = {
       height: 150,
     },
     movement: {
+      maxJumps: 1,
+      airJumpVelocityScale: 0.8,
       walkSpeed: 270,
       backwardSpeedMultiplier: 0.85,
       groundAcceleration: 2400,

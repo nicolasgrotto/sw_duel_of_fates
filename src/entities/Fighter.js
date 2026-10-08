@@ -23,6 +23,7 @@ function createCombat() {
     attackConnected: false,
     airAttackUsed: false,
     wallJumpSide: 0,
+    jumpsUsed: 0,
     lungeApplied: false,
     stunDuration: 0,
     blockstun: 0,

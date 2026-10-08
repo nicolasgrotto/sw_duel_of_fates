@@ -551,3 +551,5 @@ Progressão sem grind: no build de portfólio tudo fica liberado. Desafios por p
 ## Movimento v1.3: esquiva de precisao
 
 EVADE (S/baixo) e separado do dash (Shift). No chao, consome zero stamina, recua poucos pixels, fica invulneravel por 0,066 s e recupera ate 0,4 s. Sem contato, a recuperacao e vulneravel. Quando uma hitbox cruza a hurtbox na janela, EVADE_SUCCESS consome esse contato e libera o defensor imediatamente para punir, sem dano nem ganho de stamina. Repetir a acao exige novo toque; nenhuma defesa passiva ao segurar baixo. Config global pode desligar a mecanica; arquetipos podem fornecer perfil completo em stats.evade.
+
+Pulo duplo: todos os arquetipos usam movement.maxJumps = 1, exceto Vespa = 2. Novo toque no ar aplica 80% da velocidade vertical do primeiro pulo. jumpsUsed zera ao tocar o chao ou reiniciar round. Pulo na parede tem prioridade e preserva quantos pulos ja foram gastos; nao devolve o aereo. Pulo duplo nao rearma ataque aereo (um por voo), evitando sequencias no ar.

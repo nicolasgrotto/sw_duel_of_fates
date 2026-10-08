@@ -286,6 +286,7 @@ export class CombatSystem {
     fighter.vx = fighter.facing * move.leap.speedX;
     fighter.vy = -move.leap.speedY;
     fighter.grounded = false;
+    fighter.combat.jumpsUsed = 1;
     fighter.combat.airAttackUsed = false;
     fighter.setState(FighterState.JUMPING);
     this.emitAction(CombatEvent.ATTACK_START, fighter, AttackType.SPECIAL);
