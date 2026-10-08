@@ -2,9 +2,24 @@
 
 **Academic Project / Prototype**
 
-Jogo 2D de duelo de sabres de luz para navegador, feito com HTML5, CSS3, JavaScript puro (ES Modules) e Canvas 2D. Sem frameworks, sem engine e sem bundler.
+Jogo 2D de duelo de lâminas de energia para navegador, feito com HTML5, CSS3, JavaScript puro (ES Modules) e Canvas 2D. Sem frameworks, sem engine e sem bundler.
 
 > Projeto acadêmico, sem fins comerciais, inspirado nos duelos de sabre de Star Wars. Não é um produto oficial e não tem afiliação com a Lucasfilm ou a Disney. O código usa termos neutros e não inclui assets oficiais, para que o jogo possa receber uma identidade própria no futuro (ver [DESIGN.md](DESIGN.md#propriedade-intelectual)).
+
+![Duelo na Mina de Cristal](media/duel-crystal-mine.png)
+
+| | |
+| --- | --- |
+| ![Menu principal](media/menu.png) | ![Seleção de personagem](media/character-select.png) |
+| ![Duelo no Telhado Neon](media/duel-rooftop.png) | |
+
+## O que tem no jogo
+
+- **10 personagens** com atributos, golpes, habilidade e IA próprios: Guardião, Sombra, Bastião, Vespa, Espelho, Haste, Brasa, Forja, Garça e Eco. Mais um chefe no Arcade e na Sobrevivência.
+- **6 arenas** desenhadas por código: Plataforma de Refino, Santuário Alagado, Mina de Cristal, Telhado Neon, Anel Orbital e Floresta Lumínica.
+- **Combate por timing**: rápido, forte, bloqueio, parry e parry perfeito com riposta, empurrão, esquiva, sequências, golpe aéreo e habilidade de cada personagem.
+- **Modos**: Duelar (contra a IA, em Fácil, Normal ou Difícil), Arcade, Sobrevivência, 2 Jogadores no mesmo teclado ou com dois controles, Tutorial, Desafio de parry e Treino (boneco configurável, gravação e reprodução de inputs, hitboxes).
+- **Apresentação**: replay em câmera lenta do golpe final, música e som sintetizados que reagem à luta, cores de lâmina desbloqueáveis, teclas configuráveis e suporte a gamepad.
 
 ## Requisitos
 
@@ -28,6 +43,16 @@ PORT=3000 npm start
 ```
 
 Qualquer outro servidor estático também funciona (`python -m http.server`, Live Server do VS Code etc.).
+
+## Publicar no GitHub Pages
+
+O jogo é um site estático: não tem build, e todos os caminhos são relativos. O arquivo `.nojekyll` faz o Pages servir os arquivos como estão.
+
+1. Envie o repositório para o GitHub.
+2. Em **Settings → Pages**, escolha **Deploy from a branch**, a branch `main` e a pasta `/ (root)`.
+3. O jogo fica em `https://<usuário>.github.io/<repositório>/`.
+
+As opções e o progresso (teclas, cores desbloqueadas, recorde) ficam no `localStorage` do navegador de cada jogador.
 
 ## Testes
 

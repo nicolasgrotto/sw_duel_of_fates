@@ -1,8 +1,8 @@
 {
   "name": "star-wars-duel-of-fates",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
-  "description": "2D lightsaber duel game made with HTML, CSS, JavaScript and Canvas 2D",
+  "description": "Duel of Fates: a 2D energy-blade duel game made with HTML, CSS, JavaScript and Canvas 2D",
   "type": "module",
   "scripts": {
     "start": "node tools/server.js",

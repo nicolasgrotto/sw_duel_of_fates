@@ -4,7 +4,7 @@ Registro de origem e licença de todo asset do projeto (imagens, sprites, áudio
 
 ## Situação atual
 
-O único asset externo é a fonte Oxanium (OFL). Todos os gráficos são desenhados por código no Canvas, e todos os sons e a música são sintetizados com a Web Audio API.
+O único asset externo é a fonte Oxanium (OFL). A pasta `media/` guarda capturas de tela do próprio jogo, usadas no README. Todos os gráficos são desenhados por código no Canvas, e todos os sons e a música são sintetizados com a Web Audio API.
 
 ## Regras
 
@@ -36,3 +36,4 @@ assets/
 | src/arenas/arenaData.js (rooftop, orbital, forest) | cenário procedural | geometria original do projeto | MIT | Telhado Neon (glifos inventados, sem texto real), Anel Orbital e Floresta Lumínica desenhados por código |
 | assets/fonts/Oxanium.ttf | fonte | The Oxanium Project Authors (github.com/sevmeyer/oxanium), via github.com/google/fonts | SIL OFL 1.1 | Fonte variável; licença completa em assets/fonts/Oxanium-OFL.txt |
 | assets/fonts/Oxanium-OFL.txt | licença | The Oxanium Project Authors | SIL OFL 1.1 | Texto da licença distribuído junto com a fonte |
+| media/menu.png, media/character-select.png, media/duel-crystal-mine.png, media/duel-rooftop.png | captura de tela | capturas do próprio jogo (Chrome headless, 1280×720) | MIT | Usadas só no README; o jogo não carrega esses arquivos |

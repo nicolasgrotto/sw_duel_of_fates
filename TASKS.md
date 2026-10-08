@@ -4,21 +4,17 @@ Atualize este arquivo ao terminar cada tarefa.
 
 ## Ponto de continuidade
 
-- Os cinco itens abertos da v0.2 foram implementados e verificados no Chrome headless local. O alvo de 6–9 é medido pelos hits recebidos pelo derrotado até K.O.; o total dos dois lados continua explícito no simulador.
-- v0.3: arenas como dados, Plataforma de Refino, câmera dinâmica, gamepad/vibração e preset alternativo prontos. Nome/fonte/letterbox/ignição e paleta ficam pendentes para o Opus, conforme a divisão autorizada.
-- v0.4: catálogo de moves, sequências confirmadas, aéreo/avanço, seleção de jogador e gravação/reprodução/inputs/hitboxes do Treino prontos.
-- Próximo item de implementação: IA da v0.4 (punição de bloqueio, iscas de whiff e memória curta no Difícil). Habilidades exclusivas e Bastião/Vespa/Espelho permanecem pendentes para o Opus.
-- v0.5 a v0.7 continuam abertas; nenhum desses modos ou sistemas foi marcado como concluído.
-- Validação atual: 264 testes; simulações de 300 rounds nas três dificuldades, com perfis próprios e balanced. Gamepad foi testado por API injetada; vibração física ainda requer um controle conectado.
-
+- **v1.0 concluída no código**: 10 personagens, 6 arenas, todos os modos das versões anteriores, 340 testes e balanceamento medido pela matriz do simulador (ARCHITECTURE → Balanceamento).
+- Falta só o que depende do autor: criar o repositório remoto, ativar o GitHub Pages (passos no README) e, se quiser, gravar GIFs para o README (hoje ele usa capturas em `media/`).
+- Próximas versões: cada uma em sua própria branch, a partir das ideias em "Depois da v1.0". Nenhuma está aprovada ainda.
 
 ## Projeto e publicação
 
 - [x] Documentação de design (DESIGN.md e design/)
 - [x] CREDITS.md e ASSETS.md
 - [x] Escolher a licença do código e criar LICENSE (MIT)
-- [ ] Definir nomes e visual dos personagens
-- [ ] Definir nome final do jogo (versão de portfólio)
+- [x] Definir nomes e visual dos personagens
+- [x] Definir nome final do jogo: Duel of Fates
 - [ ] Criar o repositório remoto no GitHub
 
 ## Fase 1 — Fundação
@@ -210,9 +206,12 @@ As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e des
 
 ### v1.0 — Portfólio
 
-- [ ] 8–10 personagens e 6–8 arenas
-- [ ] Deploy no GitHub Pages, README com GIFs
-- [ ] Revisão final da documentação de arquitetura
+- [x] 8–10 personagens e 6–8 arenas (10 personagens e 6 arenas)
+- [x] Preparar o deploy no GitHub Pages (site estático com caminhos relativos, `.nojekyll`, passos no README)
+- [x] README com capturas de tela, modos e personagens
+- [ ] Publicar no GitHub Pages (depende do repositório remoto)
+- [ ] GIFs de gameplay no README (opcional, gravados pelo autor)
+- [x] Revisão final da documentação de arquitetura (árvore de pastas, fluxo de telas, input, configurações, testes e dependências)
 
 ## Depois da v1.0 — ideias a avaliar
 
