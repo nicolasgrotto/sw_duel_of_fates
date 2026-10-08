@@ -27,6 +27,8 @@ src/
     Game.js                 ✅ monta e conecta os módulos
     GameLoop.js             ✅ loop com timestep fixo
     Input.js                ✅ teclado e gamepad → ações; uma instância por jogador (gamepadSlot)
+    KeyboardSource.js       eventos de teclado e bindings
+    GamepadSource.js        controle standard e rumble
     Renderer.js             ✅ canvas e primitivas de desenho
     StateMachine.js         ✅ pilha de estados
     Camera.js               ✅ screen shake (com limites)
@@ -316,7 +318,7 @@ A pilha de estados chama `resume()` no estado que volta ao topo depois de um `po
 
 `keyboardPresets` em controlsConfig oferece classic e arrows (setas + Z/X/C/V). `Game.settings.keyboardPreset` é validado e salvo no localStorage; aplicar opções chama `Input.setBindings`, que troca os mapas de teclas e limpa teclas/toques anteriores. Controles, dicas do duelo e rodapé do menu leem o mapa ativo. Opções permite alternar o preset. Gamepad não depende dessa seleção.
 
-Fontes seguem o contrato `{ actions: Set, poll?(), reset?(), endFrame?(), destroy?() }`. `Input.addSource(source)` registra uma fonte sem conhecer seu dispositivo. `poll()` (tamb?m chamado por `pollGamepads`) combina fontes; o teclado continua emitindo toques por eventos, inclusive press/release entre polls. `endFrame` sincroniza a uni?o e limpa bordas. `reset` solta a??es ao perder foco, `destroy` remove listeners. A fonte de toque da v1.2 deve implementar `reset` e `destroy`. Bindings e `lastPressedCode` s?o delegados ao teclado; `gamepadSlot` e rumble ao gamepad.
+Fontes seguem o contrato `{ actions: Set, poll?(), reset?(), endFrame?(), destroy?() }`. `Input.addSource(source)` registra uma fonte. `poll()` (alias `pollGamepads`) combina fontes. Teclado preserva toques curtos entre polls; `endFrame` sincroniza a soma e limpa bordas. `reset` libera inputs no blur; `destroy` remove listeners. TouchInput deve implementar reset e destroy. Bindings e lastPressedCode pertencem ao teclado; gamepadSlot e rumble ao gamepad.
 
 ## Estados (StateMachine)
 
