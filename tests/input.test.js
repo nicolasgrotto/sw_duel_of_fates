@@ -1,6 +1,6 @@
 import { beforeEach, describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { keyboardPresets } from '../src/config/controlsConfig.js';
+import { Action, keyboardPresets } from '../src/config/controlsConfig.js';
 import { Input } from '../src/core/Input.js';
 
 const bindings = {
@@ -195,4 +195,26 @@ it('switches keyboard presets and releases keys from the previous mapping', () =
   target.dispatchEvent(keyEvent('keydown', 'KeyC'));
   assert.equal(input.isDown('block'), true);
   assert.equal(input.wasPressed('block'), true);
+});
+
+describe('Input gamepad slots', () => {
+  it('reads the second connected standard gamepad when its slot is 1', () => {
+    const pad = (pressedIndex) => ({
+      connected: true,
+      mapping: 'standard',
+      axes: [0, 0],
+      buttons: Array.from({ length: 16 }, (_, index) => ({ pressed: index === pressedIndex })),
+    });
+    const target = new EventTarget();
+    const pads = [pad(2), pad(3)];
+    const first = new Input({ bindings: {}, target, getGamepads: () => pads });
+    const second = new Input({ bindings: {}, target, getGamepads: () => pads, gamepadSlot: 1 });
+
+    first.pollGamepads();
+    second.pollGamepads();
+
+    assert.equal(first.wasPressed(Action.LIGHT_ATTACK), true);
+    assert.equal(second.wasPressed(Action.HEAVY_ATTACK), true);
+    assert.equal(second.wasPressed(Action.LIGHT_ATTACK), false);
+  });
 });

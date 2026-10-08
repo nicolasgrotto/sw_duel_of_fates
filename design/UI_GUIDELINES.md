@@ -34,7 +34,7 @@ Todos os textos ficam em `src/config/uiConfig.js` (`texts`). Para trocar o nome 
 ### Menu
 
 - Título do jogo (`gameConfig.title`) centralizado, em maiúsculas, com letras espaçadas, e um subtítulo curto (`texts.menu.tagline`) em `accent`.
-- Opções: **Duelar** (contra a IA), **Arcade**, **Tutorial**, **Desafio de parry**, **Treino** (contra o boneco), **Opções**, **Controles**.
+- Opções: **Duelar** (contra a IA), **Arcade**, **2 Jogadores**, **Tutorial**, **Desafio de parry**, **Treino** (contra o boneco), **Opções**, **Controles**.
 
 ### Opções
 
@@ -71,6 +71,12 @@ NOME ESQUERDA                                         NOME DIREITA
 - No início de cada round há uma introdução curta (a mensagem do round), com os controles travados.
 - **Treino**: uma linha discreta (`hint`) no rodapé, acima da dica de pausa, com os dados de frame do último golpe do jogador (ex.: `Forte · bloqueado · −0,30 s`).
 - A dica `Esc  pausar` fica no rodapé.
+
+### Dois jogadores
+
+- Seleção: títulos "JOGADOR 1 · ESCOLHA" e "JOGADOR 2 · ESCOLHA"; o rodapé mostra as teclas dos dois jogadores no lugar da navegação.
+- HUD: "J1 · Nome" e "J2 · Nome".
+- Resultado: título "JOGADOR 1 VENCE" ou "JOGADOR 2 VENCE", com a mesma tabela.
 
 ### Arcade
 

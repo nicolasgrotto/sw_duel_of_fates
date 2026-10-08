@@ -296,6 +296,8 @@ Arquivo: [src/core/Input.js](src/core/Input.js)
 
 `Input.pollGamepads()` roda antes de cada update do Game e lê o primeiro controle conectado com mapping standard, por API injetada. Converte botões/eixos em ações com deadzone; guarda bordas de toque separadas do teclado e libera tudo ao desconectar/perder foco. Gamepad e teclado podem coexistir. `Input.rumble` recebe somente um tipo de impacto do DuelState, com receita em controlsConfig, e tolera hardware sem atuador. Efeitos reduzidos diminuem vibração a 25%. Nenhum módulo de gameplay acessa navigator.
 
+O `Game` tem dois `Input`: `input` (jogador 1, com o preset das Opções e o 1º controle) e `secondInput` (jogador 2, `twoPlayerBindings.p2` e `gamepadSlot: 1`, o 2º controle standard conectado). Os dois ouvem o mesmo `window`, são lidos a cada update e limpos no fim do frame. No modo **2 Jogadores** (`DuelMode.LOCAL`), o `DuelState` troca as teclas do `input` para `twoPlayerBindings.p1` na entrada e chama `game.applySettings()` na saída; o oponente é um `PlayerController(game.secondInput)`. A pausa vale para os dois. Na seleção, a etapa do adversário lê o `secondInput`.
+
 `keyboardPresets` em controlsConfig oferece classic e arrows (setas + Z/X/C/V). `Game.settings.keyboardPreset` é validado e salvo no localStorage; aplicar opções chama `Input.setBindings`, que troca os mapas de teclas e limpa teclas/toques anteriores. Controles, dicas do duelo e rodapé do menu leem o mapa ativo. Opções permite alternar o preset. Gamepad não depende dessa seleção.
 
 ## Estados (StateMachine)

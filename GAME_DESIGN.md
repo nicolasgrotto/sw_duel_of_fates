@@ -474,7 +474,21 @@ Menu → Arcade → escolha do lutador → uma sequência de duelos (melhor de 3
 - **Resultado**: vencer leva à próxima luta ("Próxima luta"); perder permite tentar a mesma luta de novo. Vencer o chefe mostra "ARCADE CONCLUÍDO" e salva no navegador que aquele personagem fechou o Arcade (`settings.arcadeCleared`), para a progressão futura (cores de sabre).
 - Uma linha no topo mostra a luta atual: "ARCADE · LUTA 2 DE 4 · BASTIÃO" ou "ARCADE · CHEFE · SOMBRA DESPERTA".
 
-## 18. Modos e progressão planejados
+## 18. Dois jogadores (local)
+
+Menu → 2 Jogadores → o Jogador 1 escolhe o lutador com os controles dele, o Jogador 2 escolhe o dele com os próprios controles, e o Jogador 1 escolhe a arena. Melhor de 3, com as mesmas regras do duelo contra a IA.
+
+| | Jogador 1 | Jogador 2 |
+| --- | --- | --- |
+| Mover / pular | A, D / W | ← → / ↑ |
+| Rápido, forte, guarda | F, G, H | J, K, L (ou Numpad 1, 2, 3) |
+| Esquiva | Shift esquerdo | Shift direito (ou Numpad 0) |
+| Habilidade | T | I (ou Numpad 5) |
+| Controle | o 1º conectado | o 2º conectado |
+
+Os dois podem pausar (J1: Esc ou P; J2: P ou Start). A HUD mostra "J1" e "J2" antes dos nomes e o resultado diz qual jogador venceu.
+
+## 19. Modos e progressão planejados
 
 | Modo | Situação |
 | --- | --- |
@@ -482,7 +496,7 @@ Menu → Arcade → escolha do lutador → uma sequência de duelos (melhor de 3
 | Treino | existe; ganha dados de frame, boneco que grava e reproduz, hitboxes visíveis |
 | Tutorial / desafio de parry | existe |
 | Arcade (até 6 lutas + chefe) | existe |
-| 2P local | planejado (depende do gamepad) |
+| 2P local | existe |
 | Sobrevivência | depois do Arcade |
 | Torneio, campanha, online | fora do escopo |
 

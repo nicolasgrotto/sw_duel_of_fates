@@ -188,7 +188,7 @@ As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e des
 
 - [x] Tutorial / desafio de parry (9 passos guiados, desafio de 45 s com recorde salvo)
 - [x] Arcade (até 6 lutas + chefe Sombra Desperta, dificuldade crescente, progresso salvo)
-- [ ] 2P local
+- [x] 2P local (teclado dividido ou dois controles, cada jogador escolhe com os próprios controles)
 - [x] Tela de resultado completa e lista de golpes na pausa (e IA que pune depois de bloquear e guarda ao sair do hitstun)
 - [x] Santuário Alagado e Mina de Cristal (reflexo na água, cristais na cor dos sabres, escolha de arena)
 

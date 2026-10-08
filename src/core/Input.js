@@ -16,9 +16,10 @@ function mapActionsByCode(bindings) {
 }
 
 export class Input {
-  constructor({ bindings, target, getGamepads = () => [] }) {
+  constructor({ bindings, target, getGamepads = () => [], gamepadSlot = 0 }) {
     this.target = target;
     this.getGamepads = getGamepads;
+    this.gamepadSlot = gamepadSlot;
     this.padButtons = Object.entries(gamepadConfig.buttons);
     this.padActions = new Set();
     this.nextPadActions = new Set();
@@ -115,11 +116,16 @@ export class Input {
     }
     this.nextPadActions.clear();
     this.gamepad = null;
+    let slot = 0;
     for (const pad of this.getGamepads() ?? []) {
-      if (pad?.connected && pad.mapping === 'standard') {
+      if (!pad?.connected || pad.mapping !== 'standard') {
+        continue;
+      }
+      if (slot === this.gamepadSlot) {
         this.gamepad = pad;
         break;
       }
+      slot += 1;
     }
     if (this.gamepad) {
       const { axes, deadzone } = gamepadConfig;

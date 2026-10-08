@@ -10,7 +10,7 @@ import { CombatEvent } from '../combat/combatEvents.js';
 import { createBox, getAttackHitbox, isAttackActive, isInvulnerable } from '../combat/hitboxes.js';
 import { aiConfig } from '../config/aiConfig.js';
 import { audioConfig } from '../config/audioConfig.js';
-import { Action, keyBindings } from '../config/controlsConfig.js';
+import { Action, keyBindings, twoPlayerBindings } from '../config/controlsConfig.js';
 import { effectsConfig } from '../config/effectsConfig.js';
 import { animation as animationStyle } from '../config/fighterVisualConfig.js';
 import { gameConfig } from '../config/gameConfig.js';
@@ -71,6 +71,9 @@ export class DuelState extends GameState {
     this.difficultyId = this.arcadeStage ? this.arcadeStage.difficulty : this.game.settings.difficulty;
     this.enraged = false;
     this.random = createRandom(createRandomSeed());
+    if (this.isLocal) {
+      this.game.input.setBindings(twoPlayerBindings.p1);
+    }
     this.arena = createArenaBounds(gameConfig);
     this.arenaId = this.arcadeStage ? this.arcadeStage.arena : (this.params.arena ?? gameConfig.duel.arena);
     this.arenaDefinition = arenas[this.arenaId];
@@ -203,7 +206,8 @@ export class DuelState extends GameState {
 
   createHud() {
     const rounds = this.hasRoundLimit ? { wins: this.roundWins, roundsToWin: gameConfig.duel.roundsToWin } : null;
-    return new Hud(this.fighters[0], this.fighters[1], rounds);
+    const names = this.isLocal ? this.fighters.map((fighter, index) => formatText(texts.local.hudName, { player: index + 1, name: fighter.name })) : null;
+    return new Hud(this.fighters[0], this.fighters[1], rounds, names);
   }
 
   showRoundIntro() {
@@ -266,6 +270,9 @@ export class DuelState extends GameState {
   }
 
   createOpponentController(opponent, player, characterId) {
+    if (this.isLocal) {
+      return new PlayerController(this.game.secondInput);
+    }
     if (this.usesDummy) {
       const dummy = new DummyController(gameConfig.duel.dummy, this.random);
       dummy.setFighters(opponent, player);
@@ -287,7 +294,7 @@ export class DuelState extends GameState {
   }
 
   update(dt) {
-    if (this.game.input.wasPressed(Action.PAUSE)) {
+    if (this.isPausePressed()) {
       this.game.pushState(StateId.PAUSE, { duelParams: this.params });
       return;
     }
@@ -351,6 +358,17 @@ export class DuelState extends GameState {
 
   exit() {
     this.duelAudio.stop();
+    if (this.isLocal) {
+      this.game.applySettings();
+    }
+  }
+
+  get isLocal() {
+    return this.mode === DuelMode.LOCAL;
+  }
+
+  isPausePressed() {
+    return this.game.input.wasPressed(Action.PAUSE) || (this.isLocal && this.game.secondInput.wasPressed(Action.PAUSE));
   }
 
   captureInputs() {
@@ -510,6 +528,7 @@ export class DuelState extends GameState {
     }
     this.game.pushState(StateId.GAME_OVER, {
       ...this.getArcadeOptions(playerWon),
+      ...this.getLocalTitle(playerWon),
       duelParams: this.params,
       playerWon: this.outcome.winner === this.player,
       winnerName: this.outcome.winner.name,
@@ -517,6 +536,10 @@ export class DuelState extends GameState {
       opponentStats: { ...this.fighterStats[1] },
       names: this.fighters.map((fighter) => fighter.name),
     });
+  }
+
+  getLocalTitle(playerWon) {
+    return this.isLocal ? { title: formatText(texts.local.winner, { player: playerWon ? 1 : 2 }) } : {};
   }
 
   getArcadeOptions(playerWon) {

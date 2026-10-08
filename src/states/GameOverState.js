@@ -41,7 +41,7 @@ export class GameOverState extends GameState {
 
   enterDuelResult() {
     const { playerWon, winnerName, stats } = this.params;
-    this.title = playerWon ? texts.result.victory : texts.result.defeat;
+    this.title = this.params.title ?? (playerWon ? texts.result.victory : texts.result.defeat);
     this.winnerLine = formatText(texts.result.winner, { name: winnerName });
     this.statsLine = formatText(texts.result.time, { time: formatSeconds(stats.time) });
     this.names = this.params.names ?? ['', ''];

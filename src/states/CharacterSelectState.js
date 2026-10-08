@@ -46,12 +46,28 @@ export class CharacterSelectState extends GameState {
     });
   }
 
+  get isLocal() {
+    return this.params.mode === DuelMode.LOCAL;
+  }
+
+  get activeInput() {
+    return this.isLocal && this.step === SelectStep.OPPONENT ? this.game.secondInput : this.game.input;
+  }
+
+  getTitle() {
+    if (this.isLocal && this.step !== SelectStep.ARENA) {
+      return texts.characterSelect.localTitles[this.step];
+    }
+    return texts.characterSelect.titles[this.step];
+  }
+
   update(dt) {
-    if (this.game.input.wasPressed(Action.BACK)) {
+    const input = this.activeInput;
+    if (input.wasPressed(Action.BACK)) {
       this.goBack();
       return;
     }
-    const choice = this.menu.update(this.game.input);
+    const choice = this.menu.update(input);
     if (choice) {
       this.choose(choice);
       return;
@@ -103,14 +119,14 @@ export class CharacterSelectState extends GameState {
 
   render(renderer) {
     renderer.clear(colors.background);
-    renderer.text(texts.characterSelect.titles[this.step], renderer.width / 2, layout.characterSelect.titleY, textStyles.heading);
+    renderer.text(this.getTitle(), renderer.width / 2, layout.characterSelect.titleY, textStyles.heading);
     this.menu.render(renderer, layout.characterSelect.listX);
     if (this.step === SelectStep.ARENA) {
       this.renderArenaPreview(renderer);
     } else {
       this.renderCharacterPreview(renderer);
     }
-    renderer.text(this.footer, renderer.width / 2, layout.characterSelect.footerY, textStyles.hint);
+    renderer.text(this.isLocal ? texts.characterSelect.localControls : this.footer, renderer.width / 2, layout.characterSelect.footerY, textStyles.hint);
   }
 
   renderArenaPreview(renderer) {

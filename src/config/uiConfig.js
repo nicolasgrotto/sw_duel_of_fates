@@ -9,6 +9,7 @@ export const texts = {
     tagline: 'UM DUELO DE LÂMINAS DE ENERGIA',
     duel: 'Duelar',
     arcade: 'Arcade',
+    local: '2 Jogadores',
     tutorial: 'Tutorial',
     challenge: 'Desafio de parry',
     training: 'Treino',
@@ -66,6 +67,8 @@ export const texts = {
   },
   characterSelect: {
     titles: { player: 'ESCOLHA SEU LUTADOR', opponent: 'ESCOLHA O ADVERSÁRIO', arena: 'ESCOLHA A ARENA' },
+    localTitles: { player: 'JOGADOR 1 · ESCOLHA', opponent: 'JOGADOR 2 · ESCOLHA' },
+    localControls: 'J1: W A S D · F G H · T · Shift esq.     J2: setas · J K L · I · Shift dir. (ou controles 1 e 2)',
     footer: '{up}  e  {down}  escolher · {confirm}  confirmar · {back}  voltar',
   },
   training: {
@@ -84,6 +87,10 @@ export const texts = {
       shove: 'desequilibrou',
       counter: 'contra-atacado',
     },
+  },
+  local: {
+    hudName: 'J{player} · {name}',
+    winner: 'JOGADOR {player} VENCE',
   },
   arcade: {
     banner: 'ARCADE  ·  LUTA {number} DE {total}  ·  {name}',

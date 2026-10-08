@@ -77,6 +77,37 @@ export const gamepadConfig = {
   },
 };
 
+export const twoPlayerBindings = {
+  p1: {
+    ...keyBindings,
+    [Action.MOVE_LEFT]: ['KeyA'],
+    [Action.MOVE_RIGHT]: ['KeyD'],
+    [Action.JUMP]: ['KeyW'],
+    [Action.LIGHT_ATTACK]: ['KeyF'],
+    [Action.HEAVY_ATTACK]: ['KeyG'],
+    [Action.BLOCK]: ['KeyH'],
+    [Action.DODGE]: ['ShiftLeft'],
+    [Action.SPECIAL]: ['KeyT'],
+    [Action.MENU_UP]: ['KeyW'],
+    [Action.MENU_DOWN]: ['KeyS'],
+  },
+  p2: {
+    [Action.MOVE_LEFT]: ['ArrowLeft'],
+    [Action.MOVE_RIGHT]: ['ArrowRight'],
+    [Action.JUMP]: ['ArrowUp'],
+    [Action.LIGHT_ATTACK]: ['KeyJ', 'Numpad1'],
+    [Action.HEAVY_ATTACK]: ['KeyK', 'Numpad2'],
+    [Action.BLOCK]: ['KeyL', 'Numpad3'],
+    [Action.DODGE]: ['ShiftRight', 'Numpad0'],
+    [Action.SPECIAL]: ['KeyI', 'Numpad5'],
+    [Action.CONFIRM]: ['Enter', 'NumpadEnter'],
+    [Action.BACK]: ['Backspace'],
+    [Action.MENU_UP]: ['ArrowUp'],
+    [Action.MENU_DOWN]: ['ArrowDown'],
+    [Action.PAUSE]: ['KeyP'],
+  },
+};
+
 export const keyboardPresetOrder = ['classic', 'arrows'];
 
 export const keyboardPresets = {

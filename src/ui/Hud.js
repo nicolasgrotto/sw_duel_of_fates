@@ -20,7 +20,8 @@ function createSideState(fighter, side) {
 }
 
 export class Hud {
-  constructor(leftFighter, rightFighter, rounds = null) {
+  constructor(leftFighter, rightFighter, rounds = null, names = null) {
+    this.names = names ?? [leftFighter.name, rightFighter.name];
     this.sides = [createSideState(leftFighter, Side.LEFT), createSideState(rightFighter, Side.RIGHT)];
     this.time = 0;
     this.rounds = rounds;
@@ -101,7 +102,7 @@ export class Hud {
     const staminaY = healthY + healthHeight + staminaGap;
     const { maxHealth, maxStamina } = fighter.stats;
 
-    renderer.text(fighter.name, isLeft ? margin : renderer.width - margin, nameY, isLeft ? textStyles.hudNameLeft : textStyles.hudNameRight);
+    renderer.text(this.names[isLeft ? 0 : 1], isLeft ? margin : renderer.width - margin, nameY, isLeft ? textStyles.hudNameLeft : textStyles.hudNameRight);
 
     renderer.fillRect(barX, healthY, healthWidth, healthHeight, colors.hudTrack);
     this.fillBar(renderer, barX, healthY, healthWidth, healthHeight, state.ghostHealth / maxHealth, isLeft, colors.hudGhost);

@@ -15,6 +15,7 @@ const STEP = 1 / 60;
 
 function createFakeGame() {
   const pressed = new Set();
+  const secondPressed = new Set();
   const game = {
     states: new StateMachine(),
     debug: { enabled: false },
@@ -28,6 +29,13 @@ function createFakeGame() {
     input: {
       wasPressed: (action) => pressed.has(action),
       isDown: () => false,
+      setBindings: (bindings) => {
+        game.input.bindings = bindings;
+      },
+    },
+    secondInput: {
+      wasPressed: (action) => secondPressed.has(action),
+      isDown: () => false,
     },
     changeState: (id, params) => game.states.change(createState(id, game, params)),
     pushState: (id, params) => game.states.push(createState(id, game, params)),
@@ -37,6 +45,11 @@ function createFakeGame() {
       actions.forEach((action) => pressed.add(action));
       game.states.update(STEP);
       pressed.clear();
+    },
+    stepSecond: (...actions) => {
+      actions.forEach((action) => secondPressed.add(action));
+      game.states.update(STEP);
+      secondPressed.clear();
     },
   };
   return game;
@@ -86,6 +99,7 @@ describe('state flow', () => {
     game.step(Action.MENU_DOWN);
     game.step(Action.MENU_DOWN);
     game.step(Action.MENU_DOWN);
+    game.step(Action.MENU_DOWN);
     game.step(Action.CONFIRM);
 
     assert.equal(game.states.current.mode, DuelMode.TRAINING);
@@ -95,6 +109,7 @@ describe('state flow', () => {
     const game = createFakeGame();
     game.changeState(StateId.MENU);
 
+    game.step(Action.MENU_DOWN);
     game.step(Action.MENU_DOWN);
     game.step(Action.MENU_DOWN);
     game.step(Action.MENU_DOWN);
@@ -124,6 +139,7 @@ describe('state flow', () => {
     assert.equal(game.saved, 5);
 
     game.step(Action.BACK);
+    game.step(Action.MENU_UP);
     game.step(Action.MENU_UP);
     game.step(Action.MENU_UP);
     game.step(Action.MENU_UP);
@@ -644,6 +660,32 @@ it('keeps both fighters at full health in the tutorial', () => {
   duel.fighters[1].health = 10;
   game.step();
   assert.equal(duel.fighters[1].health, duel.fighters[1].stats.maxHealth);
+});
+
+it('lets two players pick with their own controls and fight locally', () => {
+  const game = createFakeGame();
+  game.changeState(StateId.MENU);
+  game.step(Action.MENU_DOWN);
+  game.step(Action.MENU_DOWN);
+  game.step(Action.CONFIRM);
+  const select = game.states.current;
+  assert.equal(select.getTitle(), 'JOGADOR 1 · ESCOLHA');
+
+  game.step(Action.CONFIRM);
+  assert.equal(select.getTitle(), 'JOGADOR 2 · ESCOLHA');
+  game.step(Action.CONFIRM);
+  assert.equal(select.step, 'opponent');
+  game.stepSecond(Action.MENU_DOWN);
+  game.stepSecond(Action.CONFIRM);
+  game.step(Action.CONFIRM);
+
+  const duel = game.states.current;
+  assert.equal(duel.mode, DuelMode.LOCAL);
+  assert.equal(duel.fighters[1].id, 'bastion');
+  assert.equal(duel.opponentController.constructor.name, 'PlayerController');
+  assert.equal(duel.opponentController.input, game.secondInput);
+  assert.equal(duel.hud.names[1], 'J2 · Bastião');
+  assert.equal(game.input.bindings.lightAttack[0], 'KeyF');
 });
 
 it('goes back from the opponent step to the player step', () => {

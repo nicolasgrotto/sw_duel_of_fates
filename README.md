@@ -72,6 +72,10 @@ Roda duelos IA × IA sem navegador e mostra vitórias e estatísticas. Opções 
 
 O preset alternativo, selecionável em Opções, usa setas para mover/pular e Z/X/C/V para rápido/forte/guarda/esquiva. A escolha é salva no navegador e a tela de Controles acompanha o preset. Gamepad padrão: stick/direcional para mover, A pular/confirmar, X rápido, Y forte, LB/LT guarda, B esquiva/voltar e Start pausa.
 
+Habilidade do personagem: `I`. Gamepad: ataques nos botões frontais (X rápido, Y forte), guarda em LB/LT, habilidade em RB/RT, esquiva em B, pulo em A.
+
+**Dois jogadores no mesmo teclado:** J1 usa `W A S D`, `F G H` (rápido, forte, guarda), `T` (habilidade) e `Shift` esquerdo; J2 usa as setas, `J K L`, `I` e `Shift` direito (ou o teclado numérico). Cada jogador também pode usar um controle.
+
 Os controles ficam em [src/config/controlsConfig.js](src/config/controlsConfig.js).
 
 ## Documentação

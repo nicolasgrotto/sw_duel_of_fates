@@ -1,7 +1,7 @@
 import { aiConfig } from '../config/aiConfig.js';
 import { audioConfig } from '../config/audioConfig.js';
 import { loadSettings, saveSettings } from './settingsStorage.js';
-import { Action, keyBindings, keyboardPresets, keyboardPresetOrder } from '../config/controlsConfig.js';
+import { Action, keyBindings, keyboardPresets, keyboardPresetOrder, twoPlayerBindings } from '../config/controlsConfig.js';
 import { gameConfig } from '../config/gameConfig.js';
 import { colors } from '../config/themeConfig.js';
 import { createState } from '../states/stateFactory.js';
@@ -16,7 +16,9 @@ import { StateMachine } from './StateMachine.js';
 export class Game {
   constructor(canvas) {
     this.renderer = new Renderer(canvas, gameConfig.canvas);
-    this.input = new Input({ bindings: keyBindings, target: window, getGamepads: () => navigator.getGamepads?.() ?? [] });
+    const getGamepads = () => navigator.getGamepads?.() ?? [];
+    this.input = new Input({ bindings: keyBindings, target: window, getGamepads });
+    this.secondInput = new Input({ bindings: twoPlayerBindings.p2, target: window, getGamepads, gamepadSlot: 1 });
     this.states = new StateMachine();
     this.settings = loadSettings(
       { keyboardPreset: 'classic', difficulty: aiConfig.defaultDifficulty, reducedEffects: false, sound: true, music: true, parryChallengeBest: 0, arcadeCleared: [] },
@@ -74,12 +76,14 @@ export class Game {
 
   update(dt) {
     this.input.pollGamepads();
+    this.secondInput.pollGamepads();
     if (this.input.wasPressed(Action.TOGGLE_DEBUG)) {
       this.debug.toggle();
     }
 
     this.states.update(dt);
     this.input.endFrame();
+    this.secondInput.endFrame();
   }
 
   render() {
