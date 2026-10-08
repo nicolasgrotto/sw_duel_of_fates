@@ -157,3 +157,59 @@ describe('new characters', () => {
     assert.equal(left.combat.attackType, 'riposte');
   });
 });
+
+describe('second roster', () => {
+  it('holds the forge strike while the button is held and releases a charged level 3 that breaks the guard', () => {
+    const duel = createDuel('forge', 'guardian');
+    const { left, right } = duel;
+    const special = left.moves.special;
+    const holdTime = special.charge.levelTime * (special.charge.levels - 1);
+
+    duel.step({ special: true, specialHeld: true }, { block: true });
+    repeat(Math.ceil((special.startup * special.charge.holdAt + holdTime) / STEP) + 2, () => duel.step({ specialHeld: true }, { block: true }));
+    assert.ok(left.combat.chargeTime >= holdTime - 1e-9);
+    assert.equal(left.state, FighterState.HEAVY_ATTACK);
+
+    repeat(Math.ceil((special.startup + special.active) / STEP), () => duel.step({}, { block: true }));
+    assert.deepEqual(types(duel.events), [CombatEvent.GUARD_BREAK]);
+    assert.equal(right.state, FighterState.STUNNED);
+  });
+
+  it('releases an uncharged forge strike right away when the button is tapped', () => {
+    const duel = createDuel('forge', 'guardian');
+    const special = duel.left.moves.special;
+
+    duel.step({ special: true });
+    repeat(Math.ceil((special.startup + special.active) / STEP), () => duel.step());
+
+    assert.equal(duel.left.combat.chargeTime, 0);
+    assert.equal(duel.right.health, duel.right.stats.maxHealth - special.damage);
+  });
+
+  it('deals more damage with the tip of the haste blade than up close', () => {
+    const far = createDuel('haste', 'guardian', 190);
+    const close = createDuel('haste', 'guardian', 60);
+    const light = far.left.moves.light;
+
+    for (const duel of [far, close]) {
+      duel.step({ lightAttack: true });
+      repeat(Math.ceil((light.startup + light.active) / STEP), () => duel.step());
+    }
+
+    const farDamage = far.right.stats.maxHealth - far.right.health;
+    const closeDamage = close.right.stats.maxHealth - close.right.health;
+    assert.ok(Math.abs(farDamage - light.damage * light.sweetSpot.tipScale) < 1e-9);
+    assert.ok(Math.abs(closeDamage - light.damage * light.sweetSpot.innerScale) < 1e-9);
+  });
+
+  it('answers with the ember counter strike instead of a riposte', () => {
+    const duel = createDuel('ember', 'shadow');
+
+    duel.step({ special: true });
+    duel.step({}, { lightAttack: true });
+    repeat(Math.ceil(duel.right.moves.light.startup / STEP) + 1, () => duel.step());
+
+    assert.deepEqual(types(duel.events), [CombatEvent.COUNTER]);
+    assert.equal(duel.left.combat.attackType, 'counterStrike');
+  });
+});

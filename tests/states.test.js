@@ -251,7 +251,7 @@ describe('state flow', () => {
 
     assert.equal(duel.opponentController.constructor.name, 'EnemyAI');
     assert.equal(duel.opponentController.difficulty, aiConfig.difficulties.hard);
-    assert.equal(duel.opponentController.profile, aiConfig.profiles.aggressive);
+    assert.equal(duel.opponentController.profile, aiConfig.profiles.shadow);
   });
 
   it('keeps the duel mode when restarting from the pause', () => {
@@ -574,10 +574,10 @@ it('lets the player select Shadow and keeps the choice after restart and between
   assert.equal(duel.arenaId, 'sanctuary');
   assert.equal(duel.player.id, 'shadow');
   assert.equal(duel.fighters[1].id, 'guardian');
-  assert.equal(duel.opponentController.profile, aiConfig.profiles.balanced);
+  assert.equal(duel.opponentController.profile, aiConfig.profiles.guardian);
   duel.startNextRound();
   assert.equal(duel.player.id, 'shadow');
-  assert.equal(duel.opponentController.profile, aiConfig.profiles.balanced);
+  assert.equal(duel.opponentController.profile, aiConfig.profiles.guardian);
   game.step(Action.PAUSE);
   game.step(Action.MENU_DOWN);
   game.step(Action.MENU_DOWN);

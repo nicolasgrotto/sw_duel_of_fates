@@ -28,6 +28,7 @@ function createCombat() {
     dodgeProfile: null,
     passThrough: false,
     armorHits: 0,
+    chargeTime: 0,
     fallDirection: 0,
     staminaRegenDelay: 0,
     bufferedAction: null,

@@ -173,7 +173,7 @@ Trocar todos os personagens (ex.: versão com identidade própria) deve exigir a
 3. a entrada em `characterData.js` (nome, perfil de IA, textos `info` da seleção, som e aparência com todos os campos de silhueta);
 4. poses novas, se houver, em `fighterVisualConfig.combatPoses.attacks`, e os nomes dos golpes em `uiConfig.texts.training.attacks`.
 
-Personagens atuais: Guardião, Sombra, Bastião, Vespa e Espelho, mais o chefe Sombra Desperta (`selectable: false`, só no Arcade). A seleção mostra só os personagens com `selectable: true`.
+Personagens atuais: Guardião, Sombra, Bastião, Vespa, Espelho, Haste, Brasa e Forja, mais o chefe Sombra Desperta (`selectable: false`, só no Arcade). A seleção mostra só os personagens com `selectable: true`.
 
 ### Controllers
 
@@ -399,7 +399,8 @@ Arquivos: [src/combat/](src/combat/). Regras em [GAME_DESIGN.md](GAME_DESIGN.md#
   - `counter` (postura, tipo `stance`, estado `HEAVY_ATTACK`, sem active): golpe de frente durante o startup chama `resolveCounter`, que deixa o atacante `STAGGERED`, emite `counter.event` (`counter` ou `perfectParry`) e começa `counter.move` na hora;
   - `armor` (`hits`, `damageScale`): enquanto houver `combat.armorHits` e o golpe não estiver em recovery, `applyHit` aplica o dano (escalado) e marca o evento `armored`, mas não interrompe nem empurra. Parry, empurrão e quebra de guarda ignoram a armadura;
   - `breaksGuard`: um bloqueio desse golpe vira quebra de guarda direto;
-  - `sweetSpot` (`tipFrom`, `tipScale`, `innerTo`, `innerScale`): o dano depende da distância entre os corpos em relação ao alcance.
+  - `sweetSpot` (`tipFrom`, `tipScale`, `innerTo`, `innerScale`): o dano depende da distância entre os corpos em relação ao alcance;
+  - `charge` (`levelTime`, `levels`, `holdAt`, `damageScales`, `guardBreakLevel`): com `intent.specialHeld`, `updateCharge` segura o `stateTime` em `startup × holdAt` e acumula `combat.chargeTime` até o máximo. O nível (`getChargeLevel`) escala o dano e, no nível de `guardBreakLevel`, o bloqueio vira quebra de guarda. O `DuelRenderer` usa `getChargeRatio` como flare da lâmina durante a carga.
 - **Traços passivos** são atributos do arquétipo, presentes em todos (valor neutro quando o personagem não tem o traço): `blockStaminaScale`, `blockPushbackScale`, `blockWalkSpeed` (o `MovementSystem` deixa andar em `BLOCKING`), `staminaOnHit`, `punishDamageScale` (golpe em quem está em recovery, `STAGGERED` ou `STUNNED`) e `knockbackScale`.
 - **Riposta**: com `riposteTime > 0`, a ação de ataque rápido usa `attacks.riposte` (`AttackType.RIPOSTE`, estado `ATTACKING`). `isStrongAttack` (forte ou riposta) escolhe o impacto e o som fortes.
 - Na morte, escolhe a direção da queda: para trás se houver espaço até a parede, senão para a frente.
@@ -488,6 +489,32 @@ Matriz v0.4 (perfil balanced nos dois lados, 120 duelos por par, seed 1, % de vi
 | Vespa | 50 | 48 | 65 | — | 48 |
 | Espelho | 57 | 38 | 60 | 52 | — |
 
+Matriz v0.6 (perfil **próprio** de cada personagem, 100 duelos por par, seed 1, % de vitória da linha contra a coluna, média na última coluna). É o que o jogador enfrenta no Arcade.
+
+| Normal | Gua | Som | Bas | Ves | Esp | Has | Bra | For | média |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Guardião | — | 54 | 21 | 55 | 53 | 34 | 45 | 30 | 41,7 |
+| Sombra | 54 | — | 44 | 66 | 77 | 69 | 67 | 68 | 63,6 |
+| Bastião | 79 | 57 | — | 69 | 83 | 52 | 76 | 64 | 68,6 |
+| Vespa | 33 | 35 | 32 | — | 63 | 52 | 56 | 67 | 48,3 |
+| Espelho | 42 | 23 | 15 | 47 | — | 25 | 35 | 26 | 30,4 |
+| Haste | 57 | 37 | 42 | 63 | 83 | — | 55 | 65 | 57,4 |
+| Brasa | 53 | 29 | 34 | 60 | 53 | 35 | — | 33 | 42,4 |
+| Forja | 68 | 35 | 39 | 34 | 79 | 37 | 76 | — | 52,6 |
+
+| Difícil | Gua | Som | Bas | Ves | Esp | Has | Bra | For | média |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Guardião | — | 66 | 58 | 57 | 35 | 41 | 36 | 51 | 49,1 |
+| Sombra | 37 | — | 45 | 30 | 36 | 49 | 30 | 49 | 39,4 |
+| Bastião | 50 | 54 | — | 28 | 17 | 35 | 27 | 60 | 38,7 |
+| Vespa | 37 | 74 | 79 | — | 52 | 89 | 53 | 75 | 65,6 |
+| Espelho | 66 | 70 | 84 | 42 | — | 80 | 54 | 63 | 65,6 |
+| Haste | 55 | 39 | 63 | 13 | 27 | — | 24 | 32 | 36,1 |
+| Brasa | 62 | 76 | 69 | 57 | 53 | 74 | — | 66 | 65,3 |
+| Forja | 41 | 50 | 51 | 20 | 24 | 66 | 23 | — | 39,3 |
+
+O equilíbrio depende da dificuldade: personagens de execução (Vespa) e de leitura (Espelho, Brasa) rendem mais com a IA Difícil, e os de força bruta (Bastião, Sombra) com a Normal. O alvo é ficar entre 40% e 60% de média nas duas; o refinamento está no TASKS. Para reproduzir, rode `simulate` para cada par com `--left`, `--right` e `--difficulty`, sem `--profile`.
+
 A Vespa é o personagem de execução: rende pouco com a IA Normal (que completa só 60% das sequências) e fica equilibrada no Difícil. Isso é intencional (dificuldade 4 no GAME_DESIGN). Rode a matriz de novo depois de mexer em atributos.
 
 Nenhum timeout nos seis cenários. Com ambos balanced, Difícil vence Normal 98,7% e Normal vence Fácil 99,3%. Os perfis próprios também medem a vantagem tática do perfil equilibrado sobre o agressivo, não apenas atributos.
@@ -513,6 +540,8 @@ DuelSimulation → CombatSystem executa (igual ao jogador)
 
 - `EnemyAI` é um controller como o `PlayerController`: `updateIntent(intent, dt)`. Ela recebe `self` e `opponent` só para **ler**.
 - Além de defender ataques que estão vindo, a IA pode **guardar por antecipação** (`guardChance`) quando está no alcance do oponente e não pode atacar. É o que permite defender ataques rápidos, cujo startup é menor que o tempo de reação.
+- **IA por personagem**: cada personagem tem um perfil em `aiConfig.profiles` (mesmo id do personagem; os perfis genéricos `aggressive`, `defensive` e `balanced` continuam para testes e para `simulate --profile`). O perfil traz pesos (`attackChance`, `blockChance`, `specialChance`...), distância (`preferredGap`, `closeGapRatio`), `chargeHold` (quanto segurar uma habilidade de carga) e `priorities`: a ordem dos passos de `decide()` (`defend`, `counter`, `shove`, `recover`, `special`, `attack`, `guard`, `position`). O primeiro passo que devolve uma decisão vence; `position` não devolve nada quando a distância já está boa.
+- **Habilidade proativa** (`trySpecialAttack`): o tipo vem dos dados do golpe (`getSpecialKind`: `counter`, `armor`, `dash`, `charge`, `strike`). Postura de contra-golpe é usada como leitura quando o oponente está no alcance e parado; armadura, carga e golpe comum quando a habilidade alcança; o avanço só é usado como resposta (`trySpecialAnswer`). Na carga, `plan.chargeHoldTime` mantém `intent.specialHeld`.
 - `perception.js` tem funções puras (`getGap`, `canReach`, `isThreatening`, `isPunishable`).
 - O plano guarda direção, tempo de bloqueio e uma ação pontual (`pendingAction`), que vira intent por um frame só.
 - Perfil (`aiConfig.profiles`) vem de `characterData.aiProfile`. Dificuldade (`aiConfig.difficulties`) vem de `game.settings.difficulty`.

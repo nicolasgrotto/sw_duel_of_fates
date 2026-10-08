@@ -83,6 +83,22 @@ export const combatPoses = {
       windupLift: 0.16,
       strikeReach: 0,
     },
+    thrust: {
+      windupDegrees: -10,
+      strikeDegrees: 0,
+      windupLean: -6,
+      strikeLean: 14,
+      windupLift: 0.02,
+      strikeReach: 0.22,
+    },
+    sweep: {
+      windupDegrees: -130,
+      strikeDegrees: 10,
+      windupLean: -8,
+      strikeLean: 18,
+      windupLift: 0.04,
+      strikeReach: 0.3,
+    },
     stance: {
       windupDegrees: -20,
       strikeDegrees: -20,

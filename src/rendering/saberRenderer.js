@@ -22,7 +22,7 @@ const secondBlade = createBladeGeometry();
 function placeBlade(out, fighter, pose, angle, handX, handY, lengthScale) {
   const directionX = Math.cos(angle);
   const directionY = Math.sin(angle);
-  const hiltLength = fighter.height * proportions.hiltLength;
+  const hiltLength = fighter.height * proportions.hiltLength * fighter.appearance.hiltScale;
   const bladeLength = fighter.appearance.bladeLength * pose.bladeExtension * lengthScale;
 
   out.hiltStartX = handX - directionX * hiltLength * HILT_BEHIND_HAND;

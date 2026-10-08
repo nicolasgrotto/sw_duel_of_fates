@@ -2,7 +2,7 @@ import { FighterState } from '../entities/fighterStates.js';
 import { canAfford, spendStamina } from '../systems/StaminaSystem.js';
 import { CombatAction, clearActionBuffer, updateActionBuffer } from './actionBuffer.js';
 import { clamp } from '../utils/math.js';
-import { ATTACK_STATES, AttackPhase, AttackType, getAttackDuration, getAttackPhase, isSaberAttack } from './attackPhases.js';
+import { ATTACK_STATES, AttackPhase, AttackType, getAttackDuration, getAttackPhase, getChargeLevel, isSaberAttack } from './attackPhases.js';
 import { CombatEvent, createCombatEvent } from './combatEvents.js';
 import { boxesOverlap, createBox, getAttackHitbox, getHurtbox, hasActiveHitbox, hasHurtbox } from './hitboxes.js';
 
@@ -83,6 +83,7 @@ export class CombatSystem {
       combat.airAttackUsed = false;
     }
     this.updateParryTimers(fighter, dt);
+    this.updateCharge(fighter, dt);
     combat.riposteTime = Math.max(0, combat.riposteTime - dt);
 
     switch (fighter.state) {
@@ -115,6 +116,21 @@ export class CombatSystem {
       default:
         break;
     }
+  }
+
+  updateCharge(fighter, dt) {
+    const { combat } = fighter;
+    const { attack } = combat;
+    if (!attack?.charge || !fighter.intent.specialHeld) {
+      return;
+    }
+    const { charge } = attack;
+    const maxChargeTime = charge.levelTime * (charge.levels - 1);
+    if (combat.chargeTime >= maxChargeTime || fighter.stateTime < attack.startup * charge.holdAt) {
+      return;
+    }
+    combat.chargeTime += dt;
+    fighter.stateTime -= dt;
   }
 
   updateParryTimers(fighter, dt) {
@@ -275,6 +291,7 @@ export class CombatSystem {
     fighter.combat.attack = attack;
     fighter.combat.attackType = attackType;
     fighter.combat.armorHits = attack.armor ? attack.armor.hits : 0;
+    fighter.combat.chargeTime = 0;
     fighter.restartState(ATTACK_STATES[attack.type ?? attackType]);
     this.emitAction(CombatEvent.ATTACK_START, fighter, attackType);
     return true;
@@ -474,7 +491,7 @@ export class CombatSystem {
     attacker.combat.attackConnected = true;
     defender.vx = attacker.facing * attack.blockPushback * defender.stats.blockPushbackScale;
 
-    if (attack.breaksGuard) {
+    if (attack.breaksGuard || (attack.charge && getChargeLevel(attack, attacker.combat.chargeTime) >= attack.charge.guardBreakLevel)) {
       this.breakGuard(defender, contact);
       return;
     }
@@ -497,7 +514,8 @@ export class CombatSystem {
 
   getHitDamage(attacker, defender, attack) {
     const punishScale = isOpenToPunish(defender) ? attacker.stats.punishDamageScale : 1;
-    return attack.damage * punishScale * getSweetSpotScale(attacker, defender, attack);
+    const chargeScale = attack.charge ? attack.charge.damageScales[getChargeLevel(attack, attacker.combat.chargeTime) - 1] : 1;
+    return attack.damage * punishScale * chargeScale * getSweetSpotScale(attacker, defender, attack);
   }
 
   applyHit(contact) {

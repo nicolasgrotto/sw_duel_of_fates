@@ -24,6 +24,27 @@ export const AiDecision = Object.freeze({
 
 const STUN_STATES = new Set([FighterState.HIT, FighterState.STAGGERED]);
 
+export const SpecialKind = Object.freeze({
+  COUNTER: 'counter',
+  ARMOR: 'armor',
+  DASH: 'dash',
+  CHARGE: 'charge',
+  STRIKE: 'strike',
+});
+
+export function getSpecialKind(move) {
+  if (move.counter) {
+    return SpecialKind.COUNTER;
+  }
+  if (move.dash) {
+    return SpecialKind.DASH;
+  }
+  if (move.charge) {
+    return SpecialKind.CHARGE;
+  }
+  return move.armor ? SpecialKind.ARMOR : SpecialKind.STRIKE;
+}
+
 const PendingAction = Object.freeze({
   NONE: null,
   LIGHT_ATTACK: 'lightAttack',
@@ -52,6 +73,7 @@ export class EnemyAI {
       blockTime: 0,
       parryDelay: -1,
       punishAfterBlock: false,
+      chargeHoldTime: 0,
       pendingAction: PendingAction.NONE,
       delayedAction: PendingAction.NONE,
       actionDelay: 0,
@@ -61,6 +83,7 @@ export class EnemyAI {
   updateIntent(intent, dt) {
     this.attackCooldown = Math.max(0, this.attackCooldown - dt);
     this.plan.blockTime = Math.max(0, this.plan.blockTime - dt);
+    this.plan.chargeHoldTime = Math.max(0, this.plan.chargeHoldTime - dt);
     this.thinkTimer -= dt;
 
     if (this.thinkTimer <= 0) {
@@ -139,7 +162,7 @@ export class EnemyAI {
     intent.block = plan.blockTime > 0 || shoving;
     intent.blockPressed = plan.pendingAction === PendingAction.PARRY;
     intent.special = plan.pendingAction === PendingAction.SPECIAL;
-    intent.specialHeld = false;
+    intent.specialHeld = plan.chargeHoldTime > 0;
     intent.lightAttack = plan.pendingAction === PendingAction.LIGHT_ATTACK || shoving;
     intent.heavyAttack = plan.pendingAction === PendingAction.HEAVY_ATTACK;
     intent.dodge = plan.pendingAction === PendingAction.DODGE;
@@ -178,15 +201,60 @@ export class EnemyAI {
       return AiDecision.HESITATE;
     }
 
-    return (
-      this.tryDefend() ??
-      this.tryCounter() ??
-      this.tryShove() ??
-      this.tryRecoverStamina() ??
-      this.tryAttack() ??
-      this.tryGuard() ??
-      this.position()
-    );
+    for (const step of this.profile.priorities) {
+      const decision = this.runStep(step);
+      if (decision) {
+        return decision;
+      }
+    }
+    return AiDecision.WAIT;
+  }
+
+  runStep(step) {
+    switch (step) {
+      case 'defend':
+        return this.tryDefend();
+      case 'counter':
+        return this.tryCounter();
+      case 'shove':
+        return this.tryShove();
+      case 'recover':
+        return this.tryRecoverStamina();
+      case 'special':
+        return this.trySpecialAttack();
+      case 'attack':
+        return this.tryAttack();
+      case 'guard':
+        return this.tryGuard();
+      default:
+        return this.position();
+    }
+  }
+
+  trySpecialAttack() {
+    const special = this.self.moves.special;
+    if (!special || this.attackCooldown > 0 || this.self.combat.attack || !canAfford(this.self, special.staminaCost)) {
+      return null;
+    }
+    const kind = getSpecialKind(special);
+    if (kind === SpecialKind.DASH || !this.isSpecialInRange(kind)) {
+      return null;
+    }
+    if (this.random() >= this.profile.specialChance * this.difficulty.specialMultiplier) {
+      return null;
+    }
+    this.plan.blockTime = 0;
+    this.plan.pendingAction = PendingAction.SPECIAL;
+    this.plan.chargeHoldTime = kind === SpecialKind.CHARGE ? this.profile.chargeHold : 0;
+    this.attackCooldown = this.difficulty.attackCooldown;
+    return AiDecision.SPECIAL;
+  }
+
+  isSpecialInRange(kind) {
+    if (kind === SpecialKind.COUNTER) {
+      return !this.opponent.combat.attack && canReach(this.opponent, this.self, this.opponent.stats.attacks.light, -this.perception.threatMargin);
+    }
+    return this.canReachWith(AttackType.SPECIAL);
   }
 
   planRecoveryGuard() {
@@ -391,11 +459,11 @@ export class EnemyAI {
       this.plan.moveX = direction;
       return AiDecision.APPROACH;
     }
-    if (gap < preferredGap * this.perception.closeGapRatio) {
+    if (gap < preferredGap * this.profile.closeGapRatio) {
       this.plan.moveX = -direction;
       return AiDecision.BACK_OFF;
     }
-    return AiDecision.WAIT;
+    return null;
   }
 
   canReachWith(attackType) {

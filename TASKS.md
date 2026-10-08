@@ -194,12 +194,13 @@ As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e des
 
 ### v0.6 — Personagens II e arenas
 
-- [ ] Haste, Brasa e Forja
-- [ ] IA por personagem (prioridades e pesos como dados)
+- [x] Haste, Brasa e Forja (ponto doce, contra-golpe próprio, golpe carregável)
+- [x] IA por personagem (prioridades e pesos como dados; habilidade usada conforme o tipo do golpe)
 - [ ] Mais 2–3 arenas
 
 ### v0.7 — Polimento
 
+- [ ] Refinar o balanceamento do elenco de 8 (alvo: média de 40–60% por personagem no Normal e no Difícil; hoje o Normal vai de 30% a 69%, ver matriz na ARCHITECTURE)
 - [ ] Replay do golpe final (re-simulação determinística dos intents gravados)
 - [ ] Música dinâmica pela vida dos dois, batida grave com vida baixa
 - [ ] Remapeamento de teclas

@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { AiDecision, EnemyAI } from '../src/ai/EnemyAI.js';
+import { AiDecision, EnemyAI, SpecialKind, getSpecialKind } from '../src/ai/EnemyAI.js';
 import { canReach, getGap, isPunishable, isThreatening } from '../src/ai/perception.js';
 import { aiConfig, AiProfile, Difficulty } from '../src/config/aiConfig.js';
 import { FighterState } from '../src/entities/fighterStates.js';
@@ -395,6 +395,62 @@ describe('EnemyAI difficulty behaviors', () => {
 
     assert.equal(ai.decision, AiDecision.SPECIAL);
     assert.equal(intent.special, true);
+  });
+});
+
+describe('EnemyAI per character', () => {
+  function createCharacterAi(characterId, gap, difficulty = PERFECT) {
+    const self = spawnFighter(800, -1, characterId);
+    const opponent = spawnFighter(0, 1, 'guardian');
+    opponent.x = self.x - (self.width + opponent.width) / 2 - gap;
+    const ai = new EnemyAI({
+      self,
+      opponent,
+      profile: aiConfig.profiles[characterId],
+      difficulty,
+      perception: aiConfig.perception,
+      random: () => 0,
+    });
+    return { ai, self, opponent };
+  }
+
+  it('reads the kind of each special from the move data', () => {
+    const kinds = ['guardian', 'shadow', 'wasp', 'forge', 'haste'].map((id) => getSpecialKind(spawnFighter(0, 1, id).moves.special));
+    assert.deepEqual(kinds, [SpecialKind.COUNTER, SpecialKind.ARMOR, SpecialKind.DASH, SpecialKind.CHARGE, SpecialKind.STRIKE]);
+  });
+
+  it('keeps the haste at the tip of its reach', () => {
+    const { ai } = createCharacterAi('haste', 30);
+    ai.attackCooldown = 10;
+
+    const intent = think(ai);
+
+    assert.equal(ai.decision, AiDecision.BACK_OFF);
+    assert.equal(intent.moveX, 1);
+  });
+
+  it('holds the forge special to charge it', () => {
+    const { ai } = createCharacterAi('forge', 40, { ...PERFECT, specialMultiplier: 1 });
+
+    const intent = think(ai);
+
+    assert.equal(ai.decision, AiDecision.SPECIAL);
+    assert.equal(intent.special, true);
+    assert.equal(intent.specialHeld, true);
+    repeat(Math.ceil(aiConfig.profiles.forge.chargeHold / STEP) + 1, () => {
+      ai.thinkTimer = 10;
+      think(ai);
+    });
+    assert.equal(ai.self.intent.specialHeld, false);
+  });
+
+  it('prefers guarding over attacking with the mirror', () => {
+    const { ai } = createCharacterAi('mirror', 40);
+
+    const intent = think(ai);
+
+    assert.equal(ai.decision, AiDecision.GUARD);
+    assert.equal(intent.block, true);
   });
 });
 

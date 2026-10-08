@@ -1,6 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { createFighter } from '../src/characters/characterFactory.js';
+import { aiConfig } from '../src/config/aiConfig.js';
 import { characters } from '../src/characters/characterData.js';
 import { fighterArchetypes } from '../src/config/fightersConfig.js';
 import { FighterState } from '../src/entities/fighterStates.js';
@@ -130,4 +131,18 @@ it('creates move definitions per character without sharing mutable attacks', () 
   assert.equal(first.moves.heavy.damage, fighterArchetypes.guardian.attacks.heavy.damage);
   assert.equal(first.stats.attacks, first.moves);
   assert.deepEqual(first.moves.light.cancelsInto, ['light2']);
+});
+
+describe('roster data', () => {
+  it('gives every character an archetype, the full move set and a known AI profile', () => {
+    const required = ['light', 'heavy', 'forwardHeavy', 'air', 'riposte', 'shove', 'special'];
+
+    for (const character of Object.values(characters)) {
+      assert.ok(fighterArchetypes[character.archetype], character.id);
+      assert.ok(aiConfig.profiles[character.aiProfile], character.id);
+      for (const move of required) {
+        assert.ok(character.moves[move], `${character.id}.${move}`);
+      }
+    }
+  });
 });

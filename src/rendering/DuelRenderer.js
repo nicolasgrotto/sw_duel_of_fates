@@ -1,3 +1,4 @@
+import { AttackPhase, getAttackPhase, getChargeRatio } from '../combat/attackPhases.js';
 import { isSaberStrikeActive } from '../combat/hitboxes.js';
 import { colors } from '../config/themeConfig.js';
 import { effectsConfig } from '../config/effectsConfig.js';
@@ -8,6 +9,14 @@ import { computePose, createPose } from './fighterPose.js';
 import { drawFighterBody } from './fighterRenderer.js';
 import { SaberTrail } from './SaberTrail.js';
 import { drawSaber, drawSaberBodyLight, drawSaberFloorLight, getBladeWorldPoints } from './saberRenderer.js';
+
+function getChargeGlow(fighter) {
+  const { attack, chargeTime } = fighter.combat;
+  if (!attack?.charge || getAttackPhase(attack, fighter.stateTime) !== AttackPhase.STARTUP) {
+    return 0;
+  }
+  return getChargeRatio(attack, chargeTime);
+}
 
 export class DuelRenderer {
   constructor(arenaDefinition) {
@@ -83,7 +92,7 @@ export class DuelRenderer {
     for (const fighter of fighters) {
       renderer.save();
       renderer.translate(effects.getTremor(fighter), 0);
-      drawSaber(renderer, fighter, this.getPose(fighter), effects.getSaberFlare(fighter));
+      drawSaber(renderer, fighter, this.getPose(fighter), Math.max(effects.getSaberFlare(fighter), getChargeGlow(fighter)));
       renderer.restore();
     }
 

@@ -47,6 +47,22 @@ export function getChainStep(attackType) {
   return attackType?.startsWith(AttackType.LIGHT) ? Number(attackType.slice(AttackType.LIGHT.length)) : 0;
 }
 
+export function getChargeLevel(attack, chargeTime) {
+  if (!attack?.charge) {
+    return 0;
+  }
+  const { levelTime, levels } = attack.charge;
+  return Math.min(levels, 1 + Math.floor(chargeTime / levelTime));
+}
+
+export function getChargeRatio(attack, chargeTime) {
+  if (!attack?.charge) {
+    return 0;
+  }
+  const { levelTime, levels } = attack.charge;
+  return Math.min(1, chargeTime / (levelTime * (levels - 1)));
+}
+
 export function getAttackDuration(attack) {
   return attack.startup + attack.active + attack.recovery;
 }
