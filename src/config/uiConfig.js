@@ -36,6 +36,7 @@ export const texts = {
     effects: 'Efeitos: {value}',
     sound: 'Som: {value}',
     music: 'Música: {value}',
+    replay: 'Replay do golpe final: {value}',
     back: 'Voltar',
     full: 'Completos',
     reduced: 'Reduzidos',
@@ -98,6 +99,10 @@ export const texts = {
       shove: 'desequilibrou',
       counter: 'contra-atacado',
     },
+  },
+  replay: {
+    label: 'REPLAY',
+    skip: '{confirm}  pular',
   },
   local: {
     hudName: 'J{player} · {name}',
@@ -214,6 +219,9 @@ export const layout = {
     firstItemY: 290,
     itemSpacing: 42,
     footerY: 670,
+  },
+  replay: {
+    labelY: 690,
   },
   banner: {
     titleY: 120,

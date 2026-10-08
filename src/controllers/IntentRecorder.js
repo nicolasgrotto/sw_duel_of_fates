@@ -12,6 +12,13 @@ export function encodeIntent(intent, facing) {
   return value;
 }
 
+export function decodeIntent(value, intent, facing) {
+  intent.moveX = ((value & 3) - 1) * facing;
+  for (let index = 0; index < FLAGS.length; index += 1) {
+    intent[FLAGS[index]] = (value & (1 << (index + 2))) !== 0;
+  }
+}
+
 export class IntentRecorder {
   constructor(capacity) {
     this.frames = new Uint16Array(capacity);
@@ -59,11 +66,7 @@ export class IntentRecorder {
     if (this.mode !== 'playing') {
       return false;
     }
-    const value = this.frames[this.cursor];
-    intent.moveX = ((value & 3) - 1) * facing;
-    for (let index = 0; index < FLAGS.length; index += 1) {
-      intent[FLAGS[index]] = (value & (1 << (index + 2))) !== 0;
-    }
+    decodeIntent(this.frames[this.cursor], intent, facing);
     this.cursor = (this.cursor + 1) % this.length;
     return true;
   }

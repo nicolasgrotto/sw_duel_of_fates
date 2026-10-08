@@ -12,6 +12,7 @@ export const OptionId = Object.freeze({
   SOUND: 'sound',
   MUSIC: 'music',
   KEYBOARD: 'keyboard',
+  REPLAY: 'replay',
   BACK: 'back',
 });
 
@@ -28,6 +29,7 @@ export class OptionsState extends GameState {
       [OptionId.SOUND]: { id: OptionId.SOUND, label: '' },
       [OptionId.MUSIC]: { id: OptionId.MUSIC, label: '' },
       [OptionId.KEYBOARD]: { id: OptionId.KEYBOARD, label: '' },
+      [OptionId.REPLAY]: { id: OptionId.REPLAY, label: '' },
       [OptionId.BACK]: { id: OptionId.BACK, label: texts.options.back },
     };
     this.menu = new MenuList(Object.values(this.items), layout.options, this.game.audio);
@@ -42,6 +44,7 @@ export class OptionsState extends GameState {
     this.items.effects.label = formatText(options.effects, { value: settings.reducedEffects ? options.reduced : options.full });
     this.items.sound.label = formatText(options.sound, { value: settings.sound ? options.on : options.off });
     this.items.keyboard.label = formatText(options.keyboard, { preset: options.keyboardPresets[settings.keyboardPreset ?? keyboardPresetOrder[0]] });
+    this.items.replay.label = formatText(options.replay, { value: settings.finalReplay === false ? options.off : options.on });
     this.items.music.label = formatText(options.music, { value: settings.music ? options.onFeminine : options.offFeminine });
   }
 
@@ -74,6 +77,9 @@ export class OptionsState extends GameState {
         break;
       case OptionId.MUSIC:
         settings.music = !settings.music;
+        break;
+      case OptionId.REPLAY:
+        settings.finalReplay = settings.finalReplay === false;
         break;
       case OptionId.KEYBOARD: {
         const index = keyboardPresetOrder.indexOf(settings.keyboardPreset ?? keyboardPresetOrder[0]);

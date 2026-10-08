@@ -29,6 +29,7 @@ import { PlayerController } from '../controllers/PlayerController.js';
 import { DuelRenderer } from '../rendering/DuelRenderer.js';
 import { createArenaBounds } from '../simulation/arenaBounds.js';
 import { DuelSimulation } from '../simulation/DuelSimulation.js';
+import { ReplayBuffer } from '../simulation/ReplayBuffer.js';
 import { EffectsSystem } from '../systems/EffectsSystem.js';
 import { TimeControl } from '../systems/TimeControl.js';
 import { CombatMessage } from '../ui/CombatMessage.js';
@@ -104,6 +105,8 @@ export class DuelState extends GameState {
     this.message = new CombatMessage();
     this.letterbox = new Letterbox(layout.letterbox);
     this.ignited = false;
+    this.replayBuffer = new ReplayBuffer(gameConfig.replay, this.fighters.length);
+    this.replayShown = false;
     this.createDirector();
     this.showRoundIntro();
     this.pauseHint = formatText(texts.duel.pauseHint, { pause: formatActionKeys(this.game.input.bindings ?? keyBindings, Action.PAUSE) });
@@ -218,10 +221,23 @@ export class DuelState extends GameState {
 
   finishRound() {
     if (this.hasRoundLimit && this.outcome.winner && this.roundWins.some((wins) => wins >= gameConfig.duel.roundsToWin)) {
+      if (this.shouldShowReplay()) {
+        this.replayShown = true;
+        this.game.pushState(StateId.REPLAY, {
+          playback: this.replayBuffer.createPlayback(),
+          fighters: this.fighters,
+          arenaId: this.arenaId,
+        });
+        return;
+      }
       this.showResult();
       return;
     }
     this.startNextRound();
+  }
+
+  shouldShowReplay() {
+    return !this.replayShown && this.game.settings.finalReplay !== false && this.replayBuffer.hasReplay();
   }
 
   startNextRound() {
@@ -249,6 +265,7 @@ export class DuelState extends GameState {
     this.inputsLine = '';
     this.inputSignature = '';
     this.roundNumber += 1;
+    this.replayBuffer.clear();
     this.ignited = false;
     this.enraged = false;
     this.showRoundIntro();
@@ -390,6 +407,7 @@ export class DuelState extends GameState {
     if (this.isPlaying()) {
       this.updateTrainingInputs();
     }
+    this.replayBuffer.record(this.fighters, dt);
     this.simulation.step(dt);
     this.effects.handleEvents(this.simulation.events);
     this.duelAudio.handleEvents(this.simulation.events);

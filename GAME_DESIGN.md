@@ -191,6 +191,7 @@ O parry é a defesa ativa. Usa o mesmo botão do bloqueio: **tocar** abre a jane
 - Cada round começa com uma intro curta ("ROUND 1", "ROUND 2", "ROUND FINAL") com os controles travados. Vida, stamina e posições voltam ao início.
 - Quando um lutador morre, os controles param e aparece "K.O.". Depois da queda, começa o próximo round ou, se alguém venceu o duelo, aparece a tela de resultado (VITÓRIA ou DERROTA, vencedor, estatísticas do duelo inteiro, Revanche ou Menu principal).
 - A HUD mostra os rounds vencidos embaixo de cada nome.
+- **Replay do golpe final**: depois do K.O. que decide o duelo (contra a IA, no Arcade ou em 2 jogadores), os últimos ~3 segundos são reexibidos em câmera lenta (45%), com letterbox e o rótulo REPLAY. `Enter` pula. Pode ser desligado nas Opções ("Replay do golpe final").
 
 **Eventos de combate**
 

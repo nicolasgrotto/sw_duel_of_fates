@@ -43,6 +43,7 @@ src/
     PauseState.js           ✅ continuar, reiniciar, sair
     GameOverState.js        ✅ vitória/derrota, tabela de estatísticas dos dois lutadores, revanche
     MoveListState.js        ✅ lista de golpes do personagem do jogador (aberta pela pausa)
+    ReplayState.js          ✅ replay do golpe final: re-simula a janela gravada em câmera lenta
     OptionsState.js         ✅ dificuldade, efeitos, som, música
   arenas/                   ✅ dados visuais de arenas, sem regras de gameplay
     arenaData.js            ✅ camadas estáticas e partículas ambientes por arena
@@ -79,6 +80,7 @@ src/
     combatEvents.js         ✅ tipos e criação de eventos de combate
   simulation/               ✅
     DuelSimulation.js       ✅ ordem dos sistemas em um passo do duelo
+    ReplayBuffer.js         ✅ grava intents, dt e fotos do estado; alimenta o replay determinístico
     arenaBounds.js          ✅ limites da arena a partir do gameConfig
   audio/                    ✅ som sintetizado (Web Audio API, sem arquivos)
     synth.js                ✅ camadas de som, zumbido do sabre, drone de música
@@ -362,6 +364,8 @@ Modos com boneco (`duelModes.usesDummy`: Treino, Tutorial e Desafio de parry) n�
 
 **Arcade** (`DuelMode.ARCADE`): a seleção (só a etapa do lutador) cria a corrida com `createArcadeRun(jogador, selecionáveis, gameConfig.arcade)` e passa `params.arcade` (`playerCharacter`, `ladder`, `stage`). O `DuelState` lê `getArcadeStage` para escolher adversário, dificuldade da IA (`difficultyId`, em vez da dificuldade das Opções) e arena. A faixa do topo usa o `ModeBanner` (tipo `arcade`). No resultado, a primeira opção vira "Próxima luta" (`nextArcadeRun`) ou "Tentar de novo" (mesmos params). Vencer a última luta mostra o resumo "ARCADE CONCLUÍDO" e salva o personagem em `settings.arcadeCleared`. O chefe é um personagem com `selectable: false` (`shadowAwakened`, arquétipo próprio, golpes da Sombra). No chefe, `updateBossEnrage` troca a dificuldade da IA para `aiConfig.difficulties.boss` quando a vida cai abaixo de `enrageHealthRatio`, mostra a mensagem e pulsa o letterbox; volta ao normal a cada round.
 
+**Replay do golpe final** (determinístico, sem gravar imagem): a cada passo, antes de `simulation.step`, o `DuelState` chama `ReplayBuffer.record(fighters, dt)`. O buffer guarda, em arrays fixos, o intent de cada lutador (codificado como o `IntentRecorder`, com direção absoluta) e o `dt` do passo (`Float64Array`: com `Float32Array` o arredondamento do 1/60 mudava o frame em que golpes terminavam e o replay divergia) e, a cada `snapshotInterval` passos, uma foto do estado de cada lutador (`captureFighter`). O buffer é zerado a cada round, porque o reset de round acontece fora da simulação. No K.O. que decide o duelo, se `settings.finalReplay` não for `false`, o `DuelState` empilha o `ReplayState` com `createPlayback()` (a foto mais antiga da janela). O `ReplayState` cria clones dos lutadores (mesmos `stats` e golpes, estado restaurado por `restoreFighter`), uma `DuelSimulation`, efeitos e câmera próprios, e avança os passos gravados com os mesmos `dt`, no ritmo de `gameConfig.replay.speed`. Quando termina (ou com `Enter`/`Esc`), ele sai da pilha e o `DuelState`, de volta ao topo, mostra o resultado. Teste em `tests/replay.test.js`: re-simular a janela chega ao mesmo estado da luta original.
+
 Identidade no duelo: o `Letterbox` fica fechado (alvo 1) na intro e depois do K.O. e abre quando o round está em jogo; o parry perfeito pede um pulso curto. É desenhado depois do mundo e da vinheta e antes da HUD. A ignição é só visual: `DuelState.getBladeExtension()` vai de 0 a 1 durante a intro (`layout.ignition`), o `DuelRenderer` copia o valor para `pose.bladeExtension` e o `saberRenderer` escala o comprimento da lâmina e as luzes por ele. O som `ignite` toca uma vez por round, quando a ignição começa.
 
 No Treino, `DuelState.updateFrameData` lê os contatos do jogador e usa `combat/frameData.js`, puro e testável, para comparar os tempos de travamento restantes. Ataque em curso usa startup+active+recovery menos stateTime; bloqueio usa blockstun; hit/stun/stagger usam stunDuration menos stateTime. Parry cancelou o ataque: o stagger do atacante produz a desvantagem correta. Contatos de K.O. são ignorados, pois não há próxima ação. Texto em `uiConfig.training`, linha hint acima da pausa, limpa no próximo round.
@@ -607,7 +611,7 @@ ui            → config, utils
 ai            → combat (fases), entities (estados), systems/StaminaSystem (canAfford), config
 audio         → combat (eventos, fases), config, utils
 tools/simulate → characters, simulation, ai, config (sem navegador)
-simulation    → systems, combat
+simulation    → systems, combat, controllers/IntentRecorder (codificação dos intents do replay)
 systems/EffectsSystem → combat (tipos de evento), core/Camera (via construtor), config, utils
 characters    → entities, config
 controllers   → config

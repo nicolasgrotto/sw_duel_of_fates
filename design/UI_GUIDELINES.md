@@ -91,6 +91,11 @@ NOME ESQUERDA                                         NOME DIREITA
 - Sem quadrados de round.
 - Fim do tutorial e do desafio: a tela de resultado mostra título, uma frase e um resumo em uma linha (sem tabela). A primeira opção leva ao próximo passo (desafio de parry ou tentar de novo).
 
+### Replay do golpe final
+
+- Tela cheia, sem HUD: a cena re-simulada com letterbox fechado.
+- "REPLAY" (`replayLabel`, `accent`, letras espaçadas) à esquerda na barra de baixo e a dica de pular (`replaySkip`) à direita.
+
 ### Pausa
 
 - Overlay escuro sobre o duelo congelado.

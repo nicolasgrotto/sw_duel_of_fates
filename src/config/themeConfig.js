@@ -116,6 +116,19 @@ export const textStyles = {
     font: `18px ${FONT_FAMILY}`,
     color: colors.textMuted, align: 'left', baseline: 'middle',
   },
+  replayLabel: {
+    font: `bold 22px ${FONT_FAMILY}`,
+    color: colors.accent,
+    align: 'left',
+    baseline: 'middle',
+    letterSpacing: '6px',
+  },
+  replaySkip: {
+    font: `18px ${FONT_FAMILY}`,
+    color: colors.textMuted,
+    align: 'right',
+    baseline: 'middle',
+  },
   resultName: {
     font: `bold 22px ${FONT_FAMILY}`,
     color: colors.accent,

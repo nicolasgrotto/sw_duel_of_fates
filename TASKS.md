@@ -201,7 +201,7 @@ As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e des
 ### v0.7 — Polimento
 
 - [ ] Refinar o balanceamento do elenco de 8 (alvo: média de 40–60% por personagem no Normal e no Difícil; hoje o Normal vai de 30% a 69%, ver matriz na ARCHITECTURE)
-- [ ] Replay do golpe final (re-simulação determinística dos intents gravados)
+- [x] Replay do golpe final (re-simulação determinística dos intents gravados, opção para desligar)
 - [ ] Música dinâmica pela vida dos dois, batida grave com vida baixa
 - [ ] Remapeamento de teclas
 - [ ] Desafios por personagem com cores de sabre desbloqueáveis

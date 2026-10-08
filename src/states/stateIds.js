@@ -7,4 +7,5 @@ export const StateId = Object.freeze({
   GAME_OVER: 'gameOver',
   OPTIONS: 'options',
   MOVE_LIST: 'moveList',
+  REPLAY: 'replay',
 });

@@ -19,7 +19,7 @@ function createFakeGame() {
   const game = {
     states: new StateMachine(),
     debug: { enabled: false },
-    settings: { difficulty: 'normal', reducedEffects: false, sound: true, music: true },
+    settings: { difficulty: 'normal', reducedEffects: false, sound: true, music: true, finalReplay: false },
     saved: 0,
     applySettings: () => {},
     saveSettings: () => {
@@ -474,6 +474,36 @@ describe('duel rounds', () => {
     assert.equal(game.states.current.params.stats.perfectParries, 1);
     assert.equal(game.states.current.params.stats.guardBreaks, 1);
     assert.equal(game.states.current.rows.find((row) => row.label === 'Parries perfeitos').left, '1');
+  });
+
+  it('plays the replay of the final blow before the result and lets it be skipped', () => {
+    const game = createFakeGame();
+    game.settings.finalReplay = true;
+    game.changeState(StateId.DUEL);
+
+    winRound(game);
+    const duel = game.states.stack[0];
+    const [player, opponent] = duel.fighters;
+    skipIntro(game);
+    duel.participants[1].controller = { updateIntent: (intent) => { intent.lightAttack = false; } };
+    player.clearIntent();
+    opponent.x = player.x + 110;
+    opponent.health = 1;
+    game.step(Action.LIGHT_ATTACK);
+    for (let i = 0; i < 200 && game.states.current === duel; i += 1) {
+      game.step();
+    }
+
+    assert.deepEqual(game.stateNames(), ['DuelState', 'ReplayState']);
+    const replay = game.states.current;
+    for (let i = 0; i < 30; i += 1) {
+      game.step();
+    }
+    assert.ok(replay.step > replay.playback.firstStep);
+
+    game.step(Action.CONFIRM);
+    game.step();
+    assert.deepEqual(game.stateNames(), ['DuelState', 'GameOverState']);
   });
 
   it('runs the arcade ladder: next fight on a win, retry on a loss', () => {

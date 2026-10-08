@@ -43,6 +43,12 @@ export const gameConfig = {
       approachGap: 40,
     },
   },
+  replay: {
+    frames: 210,
+    snapshotInterval: 30,
+    speed: 0.45,
+    minDuration: 1,
+  },
   arcade: {
     maxOpponents: 6,
     difficulties: ['easy', 'easy', 'normal', 'normal', 'hard', 'hard'],
