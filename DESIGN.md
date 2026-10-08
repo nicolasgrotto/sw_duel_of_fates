@@ -160,7 +160,7 @@ Para essa troca não exigir reescrever o jogo:
 
 ## Identidade de portfólio (decidida na v0.3)
 
-- **Nome**: **VIGIL** (nome de trabalho). Curto, funciona em português e inglês e lembra a vigília dos duelistas. Fica só em `gameConfig.title`; trocar o nome é mudar uma linha.
+- **Nome**: **Duel of Fates** (decisão do autor). Fica só em `gameConfig.title` e no `<title>` do `index.html`; trocar o nome é mudar essas duas linhas.
 - **Fonte**: **Oxanium** (SIL Open Font License), embutida em `assets/fonts/`. É a única fonte da interface; a fonte mono fica só no debug.
 - **Letterbox**: barras pretas que entram em cima e embaixo na intro de cada round, no K.O. e, curtas, no parry perfeito. É o motivo cinematográfico do jogo.
 - **Ignição**: no começo de cada round as lâminas acendem, da base à ponta, com um som de ignição sintetizado.
@@ -168,6 +168,4 @@ Para essa troca não exigir reescrever o jogo:
 
 ## Decisões em aberto
 
-- Nome definitivo (VIGIL é o nome de trabalho).
-- Estilo dos sprites: desenho por código (formas e silhuetas) ou sprites desenhados/gerados.
 - Estilo dos sprites: desenho por código (formas e silhuetas) ou sprites desenhados/gerados.

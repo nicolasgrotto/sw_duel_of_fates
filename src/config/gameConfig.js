@@ -1,5 +1,5 @@
 export const gameConfig = {
-  title: 'Vigil',
+  title: 'Duel of Fates',
   settingsStorageKey: 'duel-of-fates.settings',
   canvas: {
     width: 1280,

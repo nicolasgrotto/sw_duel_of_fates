@@ -209,10 +209,10 @@ export const keyComboSeparator = '  +  ';
 
 export const layout = {
   menu: {
-    titleY: 180,
-    taglineY: 246,
-    firstItemY: 330,
-    itemSpacing: 44,
+    titleY: 150,
+    taglineY: 214,
+    firstItemY: 290,
+    itemSpacing: 42,
     footerY: 670,
   },
   banner: {

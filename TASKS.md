@@ -212,3 +212,19 @@ As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e des
 - [ ] 8–10 personagens e 6–8 arenas
 - [ ] Deploy no GitHub Pages, README com GIFs
 - [ ] Revisão final da documentação de arquitetura
+
+## Depois da v1.0 — ideias a avaliar
+
+Contexto registrado pelo autor. Nada aqui está aprovado: cada item será avaliado antes, em sua própria versão e branch. Usar sempre nomes neutros no código e nos textos (ver regra de propriedade intelectual).
+
+| Ideia | Notas de viabilidade e peso |
+| --- | --- |
+| Modo história / campanha | Cabe como novo `mode` com diretor (como o tutorial e o Arcade). O custo maior é conteúdo (textos, cenas, telas), não código. |
+| Atributos de personagem (dano, velocidade, stamina, vida, força) | Já são dados por arquétipo; o risco é balanceamento. Exige rodar a matriz do simulador a cada mudança. |
+| Personagens e chefes secretos | Barato: personagem com `selectable: false` desbloqueado por progresso (o Arcade já salva quem venceu). |
+| Refino do combate e animações mais bonitas | Animação por código escala bem; sprites desenhados aumentam muito o peso e o trabalho por personagem. |
+| Poderes de energia com dois alinhamentos e personagens separados por alinhamento | Novo tipo de habilidade em dados (projéteis, empurrão à distância). Atenção a IP: nomes e conceitos próprios, sem termos da franquia. |
+| Personalização de personagem no modo história | Aparência já é dado; cores e peças de silhueta são viáveis. Precisa de tela própria. |
+| Versão mobile (no fim, se viável) | Precisa de controles de toque com design próprio; o combate por timing fica difícil em botões virtuais. Avaliar por último. |
+
+**O que tende a pesar e deve ser evitado:** muitas partículas ou glows dinâmicos por frame (usar cache e pools, como hoje), `shadowBlur` no canvas, imagens grandes sem compressão, áudio gravado longo (manter síntese), alocar objetos no loop, e qualquer biblioteca ou engine para resolver algo pequeno.

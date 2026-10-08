@@ -1,4 +1,4 @@
-# Vigil — duelo 2D de lâminas de energia
+# Duel of Fates — duelo 2D de lâminas de energia
 
 **Academic Project / Prototype**
 
