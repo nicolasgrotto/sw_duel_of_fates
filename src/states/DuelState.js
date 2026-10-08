@@ -23,9 +23,10 @@ import { tutorialConfig } from '../config/tutorialConfig.js';
 import { ParryChallenge } from '../modes/ParryChallenge.js';
 import { TutorialDirector } from '../modes/TutorialDirector.js';
 import { BannerKind, ModeBanner } from '../ui/ModeBanner.js';
-import { getArcadeStage, isLastStage, nextArcadeRun } from '../modes/arcade.js';
-import { getSurvivalStage, nextSurvivalRun } from '../modes/survival.js';
-import { ARCADE_UNLOCK, addUnlocks, findChallengeUnlocks } from '../modes/unlocks.js';
+import { getArcadeStage } from '../modes/arcade.js';
+import { getSurvivalStage } from '../modes/survival.js';
+import { createDuelResult } from '../modes/DuelResult.js';
+import { resolveDuelOutcome } from '../modes/duelOutcomes.js';
 import { Camera } from '../core/Camera.js';
 import { PlayerController } from '../controllers/PlayerController.js';
 import { DuelRenderer } from '../rendering/DuelRenderer.js';
@@ -575,40 +576,19 @@ export class DuelState extends GameState {
   }
 
   showResult() {
-    const playerWon = this.outcome.winner === this.player;
-    if (this.survivalStage) {
-      this.showSurvivalResult(playerWon);
-      return;
-    }
-    if (this.arcadeStage && playerWon && isLastStage(this.params.arcade)) {
-      this.showArcadeComplete();
-      return;
-    }
-    this.game.pushState(StateId.GAME_OVER, {
-      unlockLine: playerWon ? this.unlockChallengeColors() : '',
-      ...this.getArcadeOptions(playerWon),
-      ...this.getLocalTitle(playerWon),
-      duelParams: this.params,
-      playerWon: this.outcome.winner === this.player,
-      winnerName: this.outcome.winner.name,
-      stats: { time: this.duelTime, ...this.stats },
-      opponentStats: { ...this.fighterStats[1] },
-      names: this.fighters.map((fighter) => fighter.name),
+    const result = createDuelResult({
+      fighters: this.fighters, winner: this.outcome.winner, stats: this.fighterStats,
+      duration: this.duelTime, mode: this.mode,
     });
-  }
-
-  unlockChallengeColors() {
-    if (this.mode !== DuelMode.VERSUS && !this.arcadeStage) {
-      return '';
+    const outcome = resolveDuelOutcome(result, {
+      params: this.params, settings: this.game.settings,
+      character: characters[this.playerCharacter], survivalConfig: gameConfig.survival,
+    });
+    if (Object.keys(outcome.progress).length) {
+      Object.assign(this.game.settings, outcome.progress);
+      this.game.saveSettings();
     }
-    const character = characters[this.playerCharacter];
-    const unlocked = findChallengeUnlocks(character, this.stats, this.game.settings);
-    if (unlocked.length === 0) {
-      return '';
-    }
-    this.game.settings.unlocks = addUnlocks(this.game.settings.unlocks, character.id, unlocked);
-    this.game.saveSettings();
-    return formatText(texts.unlocks.unlocked, { color: unlocked.map((alt) => alt.name).join(', ') });
+    this.game.pushState(outcome.state, outcome.params);
   }
 
   getHeartbeatFighter() {
@@ -617,70 +597,6 @@ export class DuelState extends GameState {
     }
     const [first, second] = this.fighters;
     return first.health <= second.health ? first : second;
-  }
-
-  getLocalTitle(playerWon) {
-    return this.isLocal ? { title: formatText(texts.local.winner, { player: playerWon ? 1 : 2 }) } : {};
-  }
-
-  showSurvivalResult(playerWon) {
-    const run = this.params.survival;
-    if (playerWon) {
-      const next = nextSurvivalRun(run, this.player.health, this.player.stats.maxHealth, gameConfig.survival.healRatio);
-      this.game.pushState(StateId.GAME_OVER, {
-        duelParams: this.params,
-        title: formatText(texts.survival.winTitle, { wins: next.wins }),
-        subtitle: formatText(texts.survival.health, { percent: Math.round((next.health / this.player.stats.maxHealth) * 100) }),
-        summary: '',
-        rematchLabel: texts.survival.next,
-        rematchParams: { mode: DuelMode.SURVIVAL, survival: next },
-      });
-      return;
-    }
-    const best = this.game.settings.survivalBest ?? 0;
-    if (run.wins > best) {
-      this.game.settings.survivalBest = run.wins;
-      this.game.saveSettings();
-    }
-    this.game.pushState(StateId.GAME_OVER, {
-      duelParams: this.params,
-      title: texts.survival.overTitle,
-      subtitle: formatText(run.wins > best ? texts.survival.newRecord : texts.survival.score, { wins: run.wins, best: Math.max(best, run.wins) }),
-      summary: '',
-      rematchLabel: texts.survival.retry,
-      rematchParams: { mode: DuelMode.SURVIVAL, survival: { ...run, wins: 0, health: null, seed: run.seed + 1 } },
-    });
-  }
-
-  getArcadeOptions(playerWon) {
-    if (!this.arcadeStage) {
-      return {};
-    }
-    return {
-      rematchLabel: playerWon ? texts.arcade.nextFight : texts.arcade.retry,
-      rematchParams: playerWon ? { mode: DuelMode.ARCADE, arcade: nextArcadeRun(this.params.arcade) } : this.params,
-    };
-  }
-
-  showArcadeComplete() {
-    const cleared = this.game.settings.arcadeCleared ?? [];
-    const challengeLine = this.unlockChallengeColors();
-    let arcadeLine = '';
-    if (!cleared.includes(this.playerCharacter)) {
-      this.game.settings.arcadeCleared = [...cleared, this.playerCharacter];
-      this.game.saveSettings();
-      const arcadeColor = characters[this.playerCharacter].altSaberColors.find((alt) => alt.id === ARCADE_UNLOCK);
-      arcadeLine = arcadeColor ? formatText(texts.unlocks.unlocked, { color: arcadeColor.name }) : '';
-    }
-    this.game.pushState(StateId.GAME_OVER, {
-      duelParams: this.params,
-      title: texts.arcade.completeTitle,
-      subtitle: formatText(texts.arcade.completeSubtitle, { name: this.player.name }),
-      summary: '',
-      unlockLine: [arcadeLine, challengeLine].filter(Boolean).join('   ·   '),
-      rematchLabel: texts.arcade.playAgain,
-      rematchParams: { mode: DuelMode.ARCADE, arcade: { ...this.params.arcade, stage: 0 } },
-    });
   }
 
   checkForDeath() {

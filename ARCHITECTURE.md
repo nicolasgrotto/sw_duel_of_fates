@@ -58,6 +58,8 @@ src/
     characterData.js        ✅ personagens: nome, arquétipo, perfil de IA, aparência
     characterFactory.js     ✅ cria um Fighter a partir dos dados
   modes/                    ✅ regras de modos de jogo, puras e testáveis (sem render)
+    DuelResult.js           resultado independente dos Fighters
+    duelOutcomes.js         resultado + escada -> tela e patch de progresso
     TutorialDirector.js     ✅ passos do tutorial: objetivo, progresso e comportamento do boneco
     ParryChallenge.js       ✅ desafio de parry: tempo, pontos e resumo
     arcade.js               ✅ escada do Arcade: adversários, dificuldade e arena por luta, chefe no fim
@@ -371,6 +373,8 @@ Pausa e resultado recebem `duelParams` e os repassam ao reiniciar, então "Reini
 Para adicionar um estado: crie a classe estendendo `GameState`, adicione o id em `stateIds.js` e registre em `stateFactory.js`.
 
 Menu → CharacterSelectState → DuelState: a seleção usa MenuList e previews de Fighter, com animação atualizada fora do render. Escolhe o jogador entre os dados existentes e passa playerCharacter/opponentCharacter no params, preservados pela pausa e revanche. DuelState usa esses ids na factory inicial e na recriação do controller entre rounds.
+
+`createDuelResult` copia o lado vencedor (0/1 ou null), modo, tempo, stats e dados escalares dos dois lutadores (vida, maximo e healthRatio). `resolveDuelOutcome` recebe resultado, params da escada, settings, personagem e config de cura; devolve `{ state, params, progress }` sem mutar os argumentos. Arcade, Sobrevivencia, cores e titulo local ficam nesse resolvedor. DuelState aplica o patch de progresso, salva uma vez e abre a tela. Modos importam apenas ids de estados/modos e formatacao pura de UI; nunca classes de estados.
 
 ## UI
 
