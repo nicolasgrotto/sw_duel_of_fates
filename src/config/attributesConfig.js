@@ -388,3 +388,5 @@ export const attributesConfig = {
     }
   }
 };
+
+export const attributeOrder = Object.freeze(['health', 'stamina', 'blade', 'defense', 'agility', 'flow']);

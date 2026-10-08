@@ -5,9 +5,10 @@ import { colors, textStyles } from '../config/themeConfig.js';
 import { layout } from '../config/uiConfig.js';
 
 export class MenuList {
-  constructor(items, { firstItemY, itemSpacing, listX = touchLayoutConfig.width / 2 }, sounds = null) {
+  constructor(items, { firstItemY, itemSpacing, listX = touchLayoutConfig.width / 2, touchWidth = touchLayoutConfig.menuWidth }, sounds = null) {
     this.items = items;
     this.centerX = listX;
+    this.touchWidth = touchWidth;
     this.sounds = sounds;
     this.firstItemY = firstItemY;
     this.itemSpacing = itemSpacing;
@@ -20,7 +21,7 @@ export class MenuList {
 
   update(input) {
     for (const tap of input.touchTaps ?? []) {
-      if (Math.abs(tap.x - this.centerX) > touchLayoutConfig.menuWidth / 2) continue;
+      if (Math.abs(tap.x - this.centerX) > this.touchWidth / 2) continue;
       const index = Math.floor((tap.y - this.firstItemY + this.itemSpacing / 2) / this.itemSpacing);
       if (index < 0 || index >= this.items.length) continue;
       if (index === this.selectedIndex) {

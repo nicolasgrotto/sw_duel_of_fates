@@ -1,3 +1,4 @@
+import { drawAttributeBars } from '../ui/attributeBars.js';
 import { containsTouch } from '../core/TouchInput.js';
 import { touchLayoutConfig } from '../config/touchLayoutConfig.js';
 import { arenas } from '../arenas/arenaData.js';
@@ -192,12 +193,15 @@ export class CharacterSelectState extends GameState {
     renderer.strokeRect(left, arenaPreviewY, width, height, colors.accent, 1);
   }
 
+  renderColorArrow(renderer, circle, label) {
+    renderer.strokeCircle(circle.x, circle.y, circle.radius, colors.accent);
+    renderer.text(label, circle.x, circle.y, textStyles.subtitle);
+  }
+
   renderColorInfo(renderer, character, x, y) {
     if (this.game.input.lastInputKind === 'touch') {
-      for (const [circle, label] of [[touchLayoutConfig.colorLeft, texts.touch.colorLeft], [touchLayoutConfig.colorRight, texts.touch.colorRight]]) {
-        renderer.strokeCircle(circle.x, circle.y, circle.radius, colors.accent);
-        renderer.text(label, circle.x, circle.y, textStyles.subtitle);
-      }
+      this.renderColorArrow(renderer, touchLayoutConfig.colorLeft, texts.touch.colorLeft);
+      this.renderColorArrow(renderer, touchLayoutConfig.colorRight, texts.touch.colorRight);
     }
     const options = getSaberOptions(character, this.game.settings);
     const chosen = this.getChosenColor(character.id);
@@ -211,7 +215,7 @@ export class CharacterSelectState extends GameState {
   }
 
   renderCharacterPreview(renderer) {
-    const { previewX, previewY, previewScale, infoY, infoLineSpacing } = layout.characterSelect;
+    const { previewX, previewY, infoY, infoLineSpacing } = layout.characterSelect;
     const character = characters[this.menu.selected.id];
 
     renderer.text(character.info.style, previewX, infoY, textStyles.subtitle);
@@ -222,8 +226,9 @@ export class CharacterSelectState extends GameState {
     const fighter = this.previews.get(character.id);
     computePose(fighter, this.pose);
     renderer.save();
-    renderer.translate(previewX, previewY);
-    renderer.scale(previewScale, previewScale);
+    drawAttributeBars(renderer, fighter.stats.attributes);
+    renderer.translate(layout.attributes.previewX, previewY);
+    renderer.scale(layout.attributes.previewScale, layout.attributes.previewScale);
     drawFighterBody(renderer, fighter, this.pose, 0);
     drawSaber(renderer, fighter, this.pose);
     renderer.restore();

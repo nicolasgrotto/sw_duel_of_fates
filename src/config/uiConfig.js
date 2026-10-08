@@ -1,4 +1,5 @@
 export const texts = {
+  attributes: { health: 'Vida', stamina: 'Stamina', blade: 'Lâmina', defense: 'Defesa', agility: 'Agilidade', flow: 'Fluxo' },
   touch: { back: 'Voltar', move: 'Mover', rotate: 'GIRE O APARELHO', landscape: 'Jogue em paisagem', navigation: 'Toque para escolher · toque novamente para confirmar', colorLeft: '‹', colorRight: '›', buttons: { lightAttack: 'Rápido', heavyAttack: 'Forte', block: 'Guarda', dodge: 'Esquiva', special: 'Habilidade', jump: 'Pulo', pause: 'Pausa' } },
   arenas: {
     refinery: 'Plataforma de Refino',
@@ -246,6 +247,7 @@ export const controlsScreenRows = [
 export const keyComboSeparator = '  +  ';
 
 export const layout = {
+  attributes: { firstRowY: 410, rowSpacing: 30, labelX: 620, barX: 745, valueX: 925, segmentWidth: 14, segmentHeight: 5, segmentGap: 4, previewX: 1080, previewScale: 1 },
   touch: { rotateY: 300, rotateHintY: 380 },
   menu: {
     titleY: 140,
@@ -264,6 +266,7 @@ export const layout = {
   characterSelect: {
     titleY: 110,
     listX: 380,
+    touchWidth: 320,
     firstItemY: 196,
     itemSpacing: 44,
     previewX: 880,

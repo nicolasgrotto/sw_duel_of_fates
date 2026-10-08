@@ -114,6 +114,7 @@ src/
     DodgeAfterimage.js      ✅ silhuetas transparentes durante a esquiva
     effectsRenderer.js      ✅ partículas, luzes de impacto e flash
   ui/                       ✅ peças de interface desenhadas no canvas
+    attributeBars.js        ✅ seis linhas de nove segmentos; somente leitura
     TouchControls.js        ✅ desenho de joystick e botões sem alterar input
     MenuList.js             ✅ lista de opções navegável
     Hud.js                  ✅ nomes, barras de vida (com fantasma) e stamina
@@ -430,6 +431,8 @@ No Treino, `DuelState.updateFrameData` lê os contatos do jogador e usa `combat/
 Treino: `IntentRecorder` guarda até 600 frames de intent em Uint16Array (10 s de simulação), sem objetos por frame. F5 grava; F6 reproduz no boneco em loop, movimento relativo ao facing; F4 para playback e volta ao boneco manual. Entre rounds a gravação fica e o cursor volta ao início. `trainingInputs` formata nomes de ações; a linha é atualizada quando a assinatura muda. F7 desenha hitboxes/hurtboxes sem exigir F3, usando a mesma transformação da câmera.
 
 Toque mobile (v1.2): Game injeta coarsePointer e tamanho do viewport, registra TouchInput e troca seu contexto ao mudar a pilha. MenuList calcula regiões de toque no update usando layout, sem mutar no render. Seleção lê as setas de cor; BACK reutiliza os fluxos existentes. TouchControls desenha somente após toque. Retrato suspende updates de estados, solta inputs e desenha orientação; voltar à paisagem retoma. CSS respeita safe areas. Efeitos reduzidos usam coarsePointer como default; loadSettings preserva qualquer booleano salvo, incluindo v1. Nenhum campo extra nem migração necessária.
+
+Seleção v1.4 desenha AttributeBars usando stats.attributes da factory, nove segmentos neutros e nota numérica. Geometria em uiConfig.layout.attributes; estilos em themeConfig. Preview do personagem fica à direita das barras; arena preserva seu layout. F3 mostra notas e powerLevel.
 
 ## Renderer
 

@@ -879,3 +879,15 @@ it('touch color arrows preserve the chosen saber color in the duel', () => {
   game.step(Action.CONFIRM);
   assert.equal(game.states.current.player.appearance.saberColor, '#5f8bff');
 });
+
+it('keeps color arrow taps separate from the character list, including a selected fourth row', () => {
+  const game = createFakeGame();
+  game.settings.arcadeCleared = ['wasp'];
+  game.changeState(StateId.CHARACTER_SELECT);
+  game.states.current.menu.selectedIndex = 3;
+  game.input.touchTaps = [{ x: 590, y: 308 }];
+  game.step();
+  assert.equal(game.states.current.step, 'player');
+  assert.equal(game.states.current.menu.selected.id, 'wasp');
+  assert.equal(game.states.current.getChosenColor('wasp'), '#7cff6b');
+});
