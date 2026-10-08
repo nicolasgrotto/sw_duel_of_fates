@@ -513,3 +513,42 @@ it('does not evade startup, connected attacks, or a disabled mechanic', () => {
   opponent.combat.hasHit = true;
   assert.equal(ai.tryEvade(0), false);
 });
+
+it('requests both wasp jumps to approach or retreat, without changing its velocity', () => {
+  for (const retreat of [false, true]) {
+    const self = spawnFighter(400, 1, 'wasp');
+    const opponent = spawnFighter(retreat ? 500 : 700, -1);
+    const ai = new EnemyAI({ self, opponent, profile: aiConfig.profiles.wasp, difficulty: { ...PERFECT, jumpChance: 1, airJumpChance: 1 }, perception: aiConfig.perception, random: () => 0 });
+    if (retreat) self.stamina = 1;
+    ai.updateIntent(self.intent, STEP);
+    assert.equal(self.intent.jump, true);
+    assert.equal(self.intent.moveX, retreat ? -1 : 1);
+    assert.equal(self.vy, 0);
+    const sim = createSimulation([self, opponent]);
+    sim.step(STEP);
+    self.clearIntent();
+    self.vy = 0;
+    ai.thinkTimer = 0;
+    ai.updateIntent(self.intent, STEP);
+    assert.equal(self.intent.jump, true);
+    sim.step(STEP);
+    assert.equal(self.combat.jumpsUsed, 2);
+    self.vy = 0;
+    assert.equal(ai.tryAirJump(), false);
+  }
+});
+
+it('uses configured hard evade through the actual simulation against an active strike', () => {
+  const self = spawnFighter(600, -1, 'guardian');
+  const opponent = spawnFighter(540, 1, 'shadow');
+  const simulation = createSimulation([opponent, self]);
+  simulation.combat.tryAttack(opponent, 'light');
+  opponent.stateTime = opponent.moves.light.startup;
+  const rolls = [0.5, 0.001, 0];
+  const ai = new EnemyAI({ self, opponent, profile: aiConfig.profiles.guardian, difficulty: aiConfig.difficulties.hard, perception: aiConfig.perception, random: () => rolls.shift() ?? 0.5 });
+  ai.updateIntent(self.intent, STEP);
+  assert.equal(self.intent.evade, true);
+  simulation.step(STEP);
+  assert.equal(self.health, self.stats.maxHealth);
+  assert.ok(simulation.events.some(event => event.type === 'evadeSuccess'));
+});

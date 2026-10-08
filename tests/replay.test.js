@@ -82,3 +82,21 @@ it('covers every own fighter field before and after simulation', () => {
     assert.deepEqual(captureFighter(clone(fighters[0], captureFighter(fighters[0]))), captureFighter(fighters[0]));
   }
 });
+
+it('replays both wasp jumps with all combat and animation fields intact', () => {
+  const fighters = [spawnFighter(420, 1, 'wasp'), spawnFighter(900, -1)];
+  const simulation = createSimulation(fighters);
+  const buffer = new ReplayBuffer({ frames: 180, snapshotInterval: 30 });
+  for (let step = 0; step < 150; step++) {
+    fighters[0].intent.jump = step === 0 || step === 23;
+    fighters[0].intent.moveX = step < 60 ? 1 : 0;
+    buffer.record(fighters, STEP);
+    simulation.step(STEP);
+    fighters.forEach(f => f.clearIntent());
+  }
+  const playback = buffer.createPlayback();
+  const clones = fighters.map((f, i) => clone(f, playback.snapshot.fighters[i]));
+  const replay = createSimulation(clones);
+  for (let step = playback.firstStep; step < playback.lastStep; step++) replay.step(buffer.readStep(step, clones));
+  assert.deepEqual(clones.map(captureFighter), fighters.map(captureFighter));
+});

@@ -2,6 +2,7 @@ import { EnemyAI } from '../src/ai/EnemyAI.js';
 import { characters } from '../src/characters/characterData.js';
 import { createFighter } from '../src/characters/characterFactory.js';
 import { CombatEvent } from '../src/combat/combatEvents.js';
+import { evadeConfig } from '../src/config/evadeConfig.js';
 import { aiConfig } from '../src/config/aiConfig.js';
 import { fighterArchetypes } from '../src/config/fightersConfig.js';
 import { animation as animationStyle } from '../src/config/fighterVisualConfig.js';
@@ -15,6 +16,7 @@ const CONFIG_ROOTS = {
   fighters: fighterArchetypes,
   ai: aiConfig,
   game: gameConfig,
+  evade: evadeConfig,
 };
 
 function applyOverride(assignment) {
@@ -29,7 +31,7 @@ function applyOverride(assignment) {
   if (!target || !(lastKey in target)) {
     throw new Error(`Unknown config path: ${path}`);
   }
-  target[lastKey] = Number.isNaN(Number(rawValue)) ? rawValue : Number(rawValue);
+  target[lastKey] = rawValue === 'true' ? true : rawValue === 'false' ? false : Number.isNaN(Number(rawValue)) ? rawValue : Number(rawValue);
 }
 const MAX_DUEL_SECONDS = 120;
 
@@ -90,15 +92,23 @@ function runDuel(leftSetup, rightSetup, random) {
     combatConfig: gameConfig.combat,
     animationConfig: animationStyle,
   });
-  const counts = { hits: 0, blocks: 0, clashes: 0, guardBreaks: 0, parries: 0, perfectParries: 0, shoves: 0 };
+  const counts = { hits: 0, blocks: 0, clashes: 0, guardBreaks: 0, parries: 0, perfectParries: 0, shoves: 0, evades: 0, evadeAttempts: 0, jumps: 0, airJumps: 0 };
 
   const hitsReceived = new Map([[left, 0], [right, 0]]);
   let time = 0;
   while (time < MAX_DUEL_SECONDS && left.isAlive && right.isAlive) {
     for (let i = 0; i < fighters.length; i += 1) {
       controllers[i].updateIntent(fighters[i].intent, STEP);
+      if (fighters[i].intent.evade) counts.evadeAttempts += 1;
     }
+    const jumpsBefore = fighters.map((fighter) => fighter.combat.jumpsUsed);
     simulation.step(STEP);
+    for (let i = 0; i < fighters.length; i++) {
+      if (fighters[i].combat.jumpsUsed > jumpsBefore[i]) {
+        counts.jumps += 1;
+        if (fighters[i].combat.jumpsUsed > 1) counts.airJumps += 1;
+      }
+    }
     for (const event of simulation.events) {
       if (event.type === CombatEvent.HIT) {
         counts.hits += 1;
@@ -109,6 +119,7 @@ function runDuel(leftSetup, rightSetup, random) {
       if (event.type === CombatEvent.GUARD_BREAK) counts.guardBreaks += 1;
       if (event.type === CombatEvent.PARRY) counts.parries += 1;
       if (event.type === CombatEvent.PERFECT_PARRY) counts.perfectParries += 1;
+      if (event.type === CombatEvent.EVADE_SUCCESS) counts.evades += 1;
       if (event.type === CombatEvent.SHOVE) counts.shoves += 1;
     }
     time += STEP;
@@ -161,6 +172,8 @@ function main() {
   console.log(`avg clash : ${average(results.map((result) => result.counts.clashes)).toFixed(2)}`);
   console.log(`avg guard breaks: ${average(results.map((result) => result.counts.guardBreaks)).toFixed(2)}`);
   console.log(`avg parries: ${average(results.map((result) => result.counts.parries)).toFixed(2)}  perfect: ${average(results.map((result) => result.counts.perfectParries)).toFixed(2)}`);
+  console.log(`avg evades : ${average(results.map((result) => result.counts.evades)).toFixed(2)}  attempts: ${average(results.map((result) => result.counts.evadeAttempts)).toFixed(2)}`);
+  console.log(`avg jumps  : ${average(results.map((result) => result.counts.jumps)).toFixed(2)}  air: ${average(results.map((result) => result.counts.airJumps)).toFixed(2)}`);
   console.log(`avg shoves : ${average(results.map((result) => result.counts.shoves)).toFixed(2)}`);
 }
 

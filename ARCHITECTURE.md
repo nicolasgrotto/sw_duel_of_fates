@@ -129,6 +129,7 @@ src/
     aiConfig.js             ✅ perfis, dificuldades e percepção da IA
     audioConfig.js          ✅ volumes, receitas de som, zumbido e música
     movesConfig.js          ✅ golpes por personagem: base de atributos, tipo, pose e cancelsInto
+    evadeConfig.js          flag e perfil global de esquiva de precisao
     fightersConfig.js       ✅ atributos por arquétipo (vida, stamina, corpo, movimento, ataques, esquiva)
     fighterVisualConfig.js  ✅ proporções, animação, poses de combate, sombra e estilo do sabre
     effectsConfig.js        ✅ limites e receitas de VFX
@@ -650,7 +651,7 @@ Testes rodam em Node (`npm test`), sem navegador. Por isso:
 - Quando um módulo do core precisa do navegador (`Input`, `GameLoop`), a dependência é injetada.
 - `computePose` é uma função pura e também é testada.
 
-Testes atuais: 340 testes em `tests/`, um arquivo por área (loop, input, estados e modos, combate, especiais, IA, simulação, replay, áudio, efeitos, UI, desbloqueios, Arcade, Sobrevivência, remapeamento). `tests/states.test.js` cobre o fluxo de telas; `goToMenuItem(game, id)` navega no menu pelo id, sem depender da posição dos itens. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
+Testes atuais: 368 testes em `tests/`, um arquivo por área (loop, input, estados e modos, combate, especiais, IA, simulação, replay, áudio, efeitos, UI, desbloqueios, Arcade, Sobrevivência, remapeamento). `tests/states.test.js` cobre o fluxo de telas; `goToMenuItem(game, id)` navega no menu pelo id, sem depender da posição dos itens. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
 
 ---
 
@@ -749,3 +750,35 @@ ui/TouchControls.js           controles de toque desenhados no canvas
 IA EVADE: getTimeUntilAttackActive exp?e startup restante, zero no active ainda nao conectado e Infinity fora da ameaca. No pensamento de defesa, a rolagem ja existente escolhe EVADE por evadeChance e evadeWeight do perfil, somente contra active. evadeTimingJitter agenda atraso; a cada passo o plano valida se aquele golpe ainda existe e solicita intent.evade uma vez. Nenhuma mutacao no lutador. Fora de blockstun, EVADE tambem pode sair de BLOCKING. Chances iniciais pequenas preservam o combate classico; calibracao final pela matriz.
 
 Pulo duplo: MovementSystem incrementa combat.jumpsUsed (snapshot automatico) no pulo terrestre e aereo, com limite movement.maxJumps. PhysicsSystem zera no contato com chao, mesmo em estados de combate; resetForRound tambem zera. tryWallJump retorna se executou para dar prioridade ao pulo na parede e nao muda jumpsUsed. Saltos de habilidade consomem o primeiro pulo. airJumpVelocityScale configura a velocidade do aereo. Um voo continua permitindo um unico ataque aereo. F3 mostra contador e tempo do EVADE.
+
+## Matriz v1.3 (movimento)
+
+`npm run matrix`: Normal e Dificil, perfis proprios, seed 1, 60 duelos por par ordenado (10.800 duelos). Percentuais arredondados nas celulas; media calculada antes de arredondar. Todas as medias por personagem ficaram dentro de +/-5 pontos da referencia v1.0; maior desvio 3.1 pontos (Vespa, Dificil). Nenhum atributo existente de personagem foi recalibrado. EVADE usa chance 0,005/0,015/0,04 em Facil/Normal/Dificil; Vespa usa jumpChance 0,005/0,008/0,01 e airJumpChance 0,5/0,7/0,85. As chances pequenas mantem a mecanica como resposta ocasional, sem substituir o parry.
+
+| Normal v1.3 | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco | media | delta v1.0 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Guardião | -- | 45 | 25 | 58 | 45 | 27 | 65 | 43 | 72 | 52 | 48.0 | -0.3 |
+| Sombra | 58 | -- | 43 | 72 | 80 | 68 | 67 | 65 | 68 | 63 | 65.0 | +0.2 |
+| Bastião | 68 | 60 | -- | 78 | 77 | 33 | 80 | 67 | 63 | 65 | 65.7 | +1.6 |
+| Vespa | 35 | 37 | 37 | -- | 57 | 52 | 45 | 47 | 58 | 50 | 46.3 | -1.1 |
+| Espelho | 42 | 28 | 20 | 42 | -- | 20 | 37 | 22 | 38 | 28 | 30.7 | +0.1 |
+| Haste | 68 | 43 | 50 | 55 | 80 | -- | 82 | 65 | 78 | 73 | 66.1 | -0.2 |
+| Brasa | 32 | 38 | 30 | 47 | 48 | 23 | -- | 27 | 48 | 43 | 37.4 | -0.7 |
+| Forja | 67 | 38 | 42 | 47 | 75 | 38 | 82 | -- | 57 | 55 | 55.6 | +0.4 |
+| Garça | 32 | 27 | 32 | 42 | 58 | 25 | 58 | 57 | -- | 42 | 41.3 | +0.5 |
+| Eco | 53 | 32 | 33 | 40 | 63 | 40 | 55 | 52 | 55 | -- | 47.0 | -0.8 |
+
+| Dificil v1.3 | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco | media | delta v1.0 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Guardião | -- | 72 | 53 | 53 | 45 | 32 | 35 | 62 | 57 | 65 | 52.6 | -0.2 |
+| Sombra | 28 | -- | 40 | 40 | 30 | 55 | 28 | 35 | 33 | 52 | 38.0 | +0.8 |
+| Bastião | 52 | 57 | -- | 17 | 17 | 40 | 43 | 53 | 17 | 43 | 37.6 | -1.7 |
+| Vespa | 35 | 67 | 68 | -- | 57 | 80 | 47 | 70 | 67 | 78 | 63.2 | -3.1 |
+| Espelho | 60 | 75 | 78 | 43 | -- | 58 | 35 | 63 | 50 | 78 | 60.2 | +0.2 |
+| Haste | 62 | 33 | 55 | 20 | 32 | -- | 48 | 35 | 27 | 23 | 37.2 | +0.2 |
+| Brasa | 58 | 70 | 70 | 57 | 57 | 62 | -- | 65 | 50 | 77 | 62.8 | +2.4 |
+| Forja | 55 | 53 | 55 | 8 | 40 | 62 | 48 | -- | 33 | 47 | 44.6 | -2.2 |
+| Garça | 45 | 58 | 85 | 28 | 43 | 85 | 52 | 60 | -- | 77 | 59.3 | -1.4 |
+| Eco | 25 | 43 | 58 | 38 | 28 | 62 | 25 | 58 | 40 | -- | 42.0 | -0.4 |
+
+IA de movimento so pede intent.jump: inicia o salto ao aproximar/recuar/recuperar stamina com maxJumps > 1 e tenta o segundo a partir do apice, respeitando jumpsUsed. O simulador usa os mesmos controllers/sistemas e agora informa pulos, pulos aereos, tentativas e sucessos de EVADE. --set evade.enabled=false permite comparar sem EVADE, sem criar rules.

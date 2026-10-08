@@ -123,7 +123,7 @@ export class DuelRenderer {
     for (const fighter of fighters) {
       const pose = computePose(fighter, this.getPose(fighter));
       pose.bladeExtension = bladeExtension;
-      this.getAfterimage(fighter).record(fighter, pose, effects?.hasEvadeAfterimage(fighter) ?? false);
+      this.getAfterimage(fighter).record(fighter, pose, effects?.hasEvadeAfterimage?.(fighter) ?? false);
 
       if (isSaberStrikeActive(fighter)) {
         getBladeWorldPoints(fighter, pose, this.bladePoints);

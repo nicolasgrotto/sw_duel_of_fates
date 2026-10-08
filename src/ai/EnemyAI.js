@@ -12,6 +12,7 @@ export const AiDecision = Object.freeze({
   PARRY: 'parry',
   DODGE: 'dodge',
   EVADE: 'evade',
+  JUMP: 'jump',
   COUNTER: 'counter',
   SHOVE: 'shove',
   SPECIAL: 'special',
@@ -60,6 +61,7 @@ const PendingAction = Object.freeze({
   PARRY: 'parry',
   DODGE: 'dodge',
   EVADE: 'evade',
+  JUMP: 'jump',
 });
 
 export class EnemyAI {
@@ -182,7 +184,7 @@ export class EnemyAI {
     const shoving = plan.pendingAction === PendingAction.SHOVE;
 
     intent.moveX = plan.moveX;
-    intent.jump = false;
+    intent.jump = plan.pendingAction === PendingAction.JUMP;
     intent.block = plan.blockTime > 0 || shoving;
     intent.blockPressed = plan.pendingAction === PendingAction.PARRY;
     intent.special = plan.pendingAction === PendingAction.SPECIAL;
@@ -219,6 +221,7 @@ export class EnemyAI {
     if (this.plan.delayedAction !== PendingAction.NONE) {
       return AiDecision.ATTACK;
     }
+    if (!self.grounded && self.canMove && this.tryAirJump()) return AiDecision.JUMP;
     if (!self.canAct && self.state !== FighterState.BLOCKING) {
       this.planRecoveryGuard();
       return AiDecision.BUSY;
@@ -478,6 +481,7 @@ export class EnemyAI {
     const safeGap = this.profile.preferredGap + this.perception.safeGapExtra;
     if (getGap(this.self, this.opponent) < safeGap) {
       this.plan.moveX = -getDirectionTo(this.self, this.opponent);
+      if (this.tryMovementJump()) return AiDecision.JUMP;
     }
     return AiDecision.RECOVER;
   }
@@ -516,13 +520,34 @@ export class EnemyAI {
 
     if (gap > preferredGap) {
       this.plan.moveX = direction;
+      if (this.tryMovementJump()) return AiDecision.JUMP;
       return AiDecision.APPROACH;
     }
     if (gap < preferredGap * this.profile.closeGapRatio) {
       this.plan.moveX = -direction;
+      if (this.tryMovementJump()) return AiDecision.JUMP;
       return AiDecision.BACK_OFF;
     }
     return null;
+  }
+
+  tryMovementJump() {
+    if (!this.self.canAct || this.self.stats.movement.maxJumps < 2 || !(this.difficulty.jumpChance > 0)) return false;
+    if (this.random() >= this.difficulty.jumpChance) return false;
+    this.plan.blockTime = 0;
+    this.plan.pendingAction = PendingAction.JUMP;
+    return true;
+  }
+
+  tryAirJump() {
+    const { self, opponent } = this;
+    if (self.stats.movement.maxJumps < 2 || Math.max(1, self.combat.jumpsUsed) >= self.stats.movement.maxJumps || self.vy < this.perception.airJumpFallSpeed) return false;
+    if (this.random() >= (this.difficulty.airJumpChance ?? 0)) return false;
+    const retreat = self.stamina / self.stats.maxStamina < this.profile.retreatStaminaRatio;
+    this.plan.moveX = getDirectionTo(self, opponent) * (retreat ? -1 : 1);
+    this.plan.blockTime = 0;
+    this.plan.pendingAction = PendingAction.JUMP;
+    return true;
   }
 
   canReachWith(attackType) {

@@ -18,6 +18,8 @@ export const aiConfig = {
     [Difficulty.EASY]: {
       reactionTime: 0.45,
       evadeChance: 0.005,
+      jumpChance: 0.005,
+      airJumpChance: 0.5,
       evadeTimingJitter: 0.06,
       defenseMultiplier: 0.35,
       mistakeChance: 0.3,
@@ -37,6 +39,8 @@ export const aiConfig = {
     [Difficulty.NORMAL]: {
       reactionTime: 0.28,
       evadeChance: 0.015,
+      jumpChance: 0.008,
+      airJumpChance: 0.7,
       evadeTimingJitter: 0.04,
       defenseMultiplier: 0.7,
       mistakeChance: 0.12,
@@ -56,6 +60,8 @@ export const aiConfig = {
     [Difficulty.HARD]: {
       reactionTime: 0.15,
       evadeChance: 0.04,
+      jumpChance: 0.01,
+      airJumpChance: 0.85,
       evadeTimingJitter: 0.025,
       defenseMultiplier: 1,
       mistakeChance: 0.04,
@@ -75,6 +81,8 @@ export const aiConfig = {
     boss: {
       reactionTime: 0.15,
       evadeChance: 0.04,
+      jumpChance: 0.01,
+      airJumpChance: 0.85,
       evadeTimingJitter: 0.025,
       defenseMultiplier: 1,
       mistakeChance: 0.02,
@@ -307,6 +315,7 @@ export const aiConfig = {
   perception: {
     reactionJitter: 0.4,
     evadeWeight: 1,
+    airJumpFallSpeed: 0,
     reachMargin: 10,
     threatMargin: 20,
     safeGapExtra: 80,
