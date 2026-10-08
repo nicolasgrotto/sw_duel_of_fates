@@ -231,7 +231,7 @@ export class CombatSystem {
       this.armParry(fighter);
       return false;
     }
-    if (bufferedAction === CombatAction.SHOVE && blockstun === 0) {
+    if ((bufferedAction === CombatAction.SHOVE || bufferedAction === CombatAction.EVADE) && blockstun === 0 && fighter.grounded) {
       return this.tryBufferedAction(fighter, bufferedAction);
     }
     return false;

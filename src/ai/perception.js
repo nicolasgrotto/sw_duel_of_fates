@@ -45,3 +45,9 @@ export function isPunishable(fighter) {
   const { attack } = fighter.combat;
   return attack !== null && getAttackPhase(attack, fighter.stateTime) === AttackPhase.RECOVERY;
 }
+
+export function getTimeUntilAttackActive(fighter) {
+  const { attack, hasHit } = fighter.combat;
+  if (!attack || hasHit || getAttackPhase(attack, fighter.stateTime) === AttackPhase.RECOVERY) return Infinity;
+  return Math.max(0, attack.startup - fighter.stateTime);
+}

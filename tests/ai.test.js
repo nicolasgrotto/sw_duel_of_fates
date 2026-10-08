@@ -1,7 +1,7 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { AiDecision, EnemyAI, SpecialKind, getSpecialKind } from '../src/ai/EnemyAI.js';
-import { canReach, getGap, isPunishable, isThreatening } from '../src/ai/perception.js';
+import { canReach, getGap, getTimeUntilAttackActive, isPunishable, isThreatening } from '../src/ai/perception.js';
 import { aiConfig, AiProfile, Difficulty } from '../src/config/aiConfig.js';
 import { FighterState } from '../src/entities/fighterStates.js';
 import { createRandom } from '../src/utils/random.js';
@@ -476,4 +476,40 @@ describe('EnemyAI in a duel', () => {
     assert.equal(player.state, FighterState.DEAD);
     assert.equal(enemy.health, enemy.stats.maxHealth);
   });
+});
+
+it('perceives time until active and requests a single timed evade without mutating fighters', () => {
+  const { ai, self, opponent } = createDuel(40, { roll: 0, difficulty: { ...PERFECT, evadeChance: 1, evadeTimingJitter: 0 } });
+  startAttack(opponent, 'light');
+  assert.equal(getTimeUntilAttackActive(opponent), opponent.moves.light.startup);
+  startAttack(opponent, 'light', opponent.moves.light.startup);
+  assert.equal(getTimeUntilAttackActive(opponent), 0);
+  const before = self.health;
+  const intent = think(ai);
+  assert.equal(ai.decision, AiDecision.EVADE);
+  assert.equal(intent.evade, true);
+  assert.equal(self.health, before);
+  assert.equal(self.state, FighterState.IDLE);
+  ai.updateIntent(intent, STEP);
+  assert.equal(intent.evade, false);
+});
+
+it('cancels a delayed evade when the observed attack disappears', () => {
+  const { ai, opponent } = createDuel(40, { roll: 0.5, difficulty: { ...PERFECT, evadeChance: 1, evadeTimingJitter: 0.2 } });
+  startAttack(opponent, 'light', opponent.moves.light.startup);
+  think(ai);
+  assert.ok(ai.plan.evadeDelay > 0);
+  opponent.clearAttack();
+  ai.updateIntent(ai.self.intent, STEP);
+  assert.equal(ai.plan.evadeDelay, -1);
+  assert.equal(ai.self.intent.evade, false);
+});
+
+it('does not evade startup, connected attacks, or a disabled mechanic', () => {
+  const { ai, opponent } = createDuel(40, { roll: 0, difficulty: { ...PERFECT, evadeChance: 1, evadeTimingJitter: 0 } });
+  startAttack(opponent, 'light');
+  assert.equal(ai.tryEvade(0), false);
+  opponent.stateTime = opponent.moves.light.startup;
+  opponent.combat.hasHit = true;
+  assert.equal(ai.tryEvade(0), false);
 });

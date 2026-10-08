@@ -1,8 +1,9 @@
 import { AttackPhase, AttackType, getAttackDuration, getAttackPhase, isHeavyAttack } from '../combat/attackPhases.js';
+import { evadeConfig } from '../config/evadeConfig.js';
 import { FighterState } from '../entities/fighterStates.js';
 import { canAfford } from '../systems/StaminaSystem.js';
 import { HabitMemory } from './HabitMemory.js';
-import { canReach, getDirectionTo, getGap, getVulnerableTime, isPunishable, isThreatening } from './perception.js';
+import { canReach, getDirectionTo, getGap, getVulnerableTime, getTimeUntilAttackActive, isPunishable, isThreatening } from './perception.js';
 
 export const AiDecision = Object.freeze({
   BUSY: 'busy',
@@ -10,6 +11,7 @@ export const AiDecision = Object.freeze({
   BLOCK: 'block',
   PARRY: 'parry',
   DODGE: 'dodge',
+  EVADE: 'evade',
   COUNTER: 'counter',
   SHOVE: 'shove',
   SPECIAL: 'special',
@@ -57,6 +59,7 @@ const PendingAction = Object.freeze({
   SPECIAL: 'special',
   PARRY: 'parry',
   DODGE: 'dodge',
+  EVADE: 'evade',
 });
 
 export class EnemyAI {
@@ -76,6 +79,8 @@ export class EnemyAI {
       moveX: 0,
       blockTime: 0,
       parryDelay: -1,
+      evadeDelay: -1,
+      evadeAttack: null,
       punishAfterBlock: false,
       chargeHoldTime: 0,
       feintDelay: -1,
@@ -99,6 +104,7 @@ export class EnemyAI {
     this.habits.observe(this.opponent, dt);
     this.updateBlockPunish();
     this.updateParryTiming(dt);
+    this.updateEvadeTiming(dt);
     this.updateDelayedAction(dt);
     this.updateFeint(dt);
     this.tryChain();
@@ -184,6 +190,7 @@ export class EnemyAI {
     intent.lightAttack = plan.pendingAction === PendingAction.LIGHT_ATTACK || shoving;
     intent.heavyAttack = plan.pendingAction === PendingAction.HEAVY_ATTACK;
     intent.dodge = plan.pendingAction === PendingAction.DODGE;
+    intent.evade = plan.pendingAction === PendingAction.EVADE;
     plan.pendingAction = PendingAction.NONE;
   }
 
@@ -205,6 +212,7 @@ export class EnemyAI {
       this.plan.parryDelay = -1;
       return AiDecision.WAIT;
     }
+    if (this.plan.evadeDelay >= 0) return AiDecision.EVADE;
     if (this.plan.parryDelay >= 0) {
       return AiDecision.PARRY;
     }
@@ -310,6 +318,7 @@ export class EnemyAI {
     }
 
     const roll = this.random();
+    if (this.tryEvade(roll)) return AiDecision.EVADE;
     const blockChance = this.profile.blockChance * this.difficulty.defenseMultiplier;
     const dodgeChance = this.profile.dodgeChance * this.difficulty.defenseMultiplier;
 
@@ -323,6 +332,35 @@ export class EnemyAI {
       return AiDecision.DODGE;
     }
     return null;
+  }
+
+  tryEvade(roll) {
+    const { self, opponent, difficulty } = this;
+    const profile = self.stats.evade ?? evadeConfig.profile;
+    const chance = (difficulty.evadeChance ?? 0) * (this.profile.evadeWeight ?? this.perception.evadeWeight);
+    if (!evadeConfig.enabled || profile.enabled === false || roll >= chance || getTimeUntilAttackActive(opponent) !== 0) return false;
+    if (!self.canAct && !(self.state === FighterState.BLOCKING && self.combat.blockstun === 0)) return false;
+    this.plan.blockTime = 0;
+    this.plan.punishAfterBlock = false;
+    this.plan.evadeDelay = this.random() * difficulty.evadeTimingJitter;
+    this.plan.evadeAttack = opponent.combat.attack;
+    return true;
+  }
+
+  updateEvadeTiming(dt) {
+    const { plan, self, opponent } = this;
+    if (plan.evadeDelay < 0) return;
+    if (!self.isAlive || !opponent.isAlive || opponent.combat.attack !== plan.evadeAttack || getTimeUntilAttackActive(opponent) !== 0 || (!self.canAct && self.state !== FighterState.BLOCKING)) {
+      plan.evadeDelay = -1;
+      plan.evadeAttack = null;
+      return;
+    }
+    plan.evadeDelay -= dt;
+    if (plan.evadeDelay <= 0) {
+      plan.evadeDelay = -1;
+      plan.evadeAttack = null;
+      plan.pendingAction = PendingAction.EVADE;
+    }
   }
 
   tryParry() {
