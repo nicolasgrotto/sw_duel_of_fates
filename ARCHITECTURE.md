@@ -13,7 +13,9 @@ Este documento está abaixo de [DESIGN.md](DESIGN.md), dos documentos em [design
 Legenda: ✅ existe · ⏳ planejado (criar só quando a tarefa pedir)
 
 ```
-index.html                  ✅ página com o canvas
+index.html                  ✅ página com o canvas (caminhos relativos: funciona em qualquer servidor estático e no GitHub Pages)
+.nojekyll                   ✅ desliga o Jekyll do GitHub Pages; os arquivos são servidos como estão
+media/                      ✅ capturas de tela usadas no README (não são carregadas pelo jogo)
 styles/
   main.css                  ✅ layout da página e do canvas, @font-face da fonte do jogo
 design/                     ✅ direção de arte, sistema visual, UI, VFX, referências
@@ -24,7 +26,7 @@ src/
   core/                     ✅ infraestrutura do jogo
     Game.js                 ✅ monta e conecta os módulos
     GameLoop.js             ✅ loop com timestep fixo
-    Input.js                ✅ teclado → ações
+    Input.js                ✅ teclado e gamepad → ações; uma instância por jogador (gamepadSlot)
     Renderer.js             ✅ canvas e primitivas de desenho
     StateMachine.js         ✅ pilha de estados
     Camera.js               ✅ screen shake (com limites)
@@ -35,10 +37,10 @@ src/
   states/                   ✅ telas do jogo
     GameState.js            ✅ classe base
     stateIds.js             ✅ ids dos estados
-    duelModes.js            ✅ modos do duelo (versus, treino)
+    duelModes.js            ✅ modos do duelo (versus, local, arcade, sobrevivência, tutorial, desafio, treino)
     stateFactory.js         ✅ cria estados a partir do id
     MenuState.js            ✅ título + opções (MenuList)
-    CharacterSelectState.js ✅ escolhe o jogador e mantém seleção nos parâmetros do duelo
+    CharacterSelectState.js ✅ escolhe jogador, adversário (ou J2), cor da lâmina e arena; Arcade e Sobrevivência só pedem o jogador
     ControlsState.js        ✅ tabela de controles gerada do controlsConfig
     DuelState.js            ✅ duelo: intro, simulação, efeitos, HUD, fim do duelo
     PauseState.js           ✅ continuar, reiniciar, sair
@@ -108,12 +110,13 @@ src/
     Hud.js                  ✅ nomes, barras de vida (com fantasma) e stamina
     CombatMessage.js        ✅ mensagens curtas (ROUND 1/2/FINAL, K.O.) com fade
     Letterbox.js            ✅ barras cinematográficas (alvo suave + pulso curto)
-    ModeBanner.js           ✅ instrução e progresso do tutorial, tempo e pontos do desafio
+    ModeBanner.js           ✅ instrução e progresso do tutorial, tempo e pontos do desafio, luta do Arcade e da Sobrevivência
     keyLabels.js            ✅ nomes de teclas a partir do controlsConfig
     formatText.js           ✅ textos com {placeholders}
     moveList.js             ✅ monta a lista de golpes a partir dos dados do personagem e das teclas ativas
+    trainingInputs.js       ✅ texto do intent gravado ou reproduzido no Treino
   config/                   ✅ valores e ajustes
-    gameConfig.js           ✅ canvas, loop, arena, física, duelo, debug
+    gameConfig.js           ✅ canvas, loop, arena, física, duelo, replay, Arcade, Sobrevivência, boneco, debug
     themeConfig.js          ✅ cores, estilos de texto, animação de UI
     controlsConfig.js       ✅ ações e teclas
     uiConfig.js             ✅ textos da interface e layout das telas
@@ -160,7 +163,7 @@ Core **não** conhece detalhes de personagens, ataques ou IA.
 
 Controlam a tela atual (Menu, Duelo, Pausa, Game Over). Cada estado tem `enter()`, `exit()`, `update(dt)`, `render(renderer)`, `renderDebug(renderer)` e `getDebugInfo()`.
 
-O `DuelState` é dono do duelo: cria os lutadores, os controllers (IA no modo versus, boneco no modo treino, via `params.mode`), a `DuelSimulation` e o `DuelRenderer`. Também cuida da pausa, do fim do duelo (resultado + `Enter` para o menu) e do boneco de treino (`F4` a `F7`, sem depender do debug).
+O `DuelState` é dono do duelo: cria os lutadores, os controllers (IA, segundo jogador ou boneco, via `params.mode`), a `DuelSimulation` e o `DuelRenderer`. Também cuida da pausa, do fim do duelo (resultado + `Enter` para o menu) e do boneco de treino (`F4` a `F7`, sem depender do debug).
 
 ### Characters
 
@@ -183,17 +186,18 @@ Personagens atuais: Guardião, Sombra, Bastião, Vespa, Espelho, Haste, Brasa, F
 
 ### Controllers
 
-Um controller escreve no `fighter.intent` o que o lutador **quer** fazer (`moveX`, `jump`, `lightAttack`, `heavyAttack`, `block`, `dodge`). Ele nunca altera posição, vida ou estado.
+Um controller escreve no `fighter.intent` o que o lutador **quer** fazer (`moveX`, `jump`, `lightAttack`, `heavyAttack`, `block`, `blockPressed`, `dodge`, `special`, `specialHeld`). Ele nunca altera posição, vida ou estado.
 
 - `PlayerController`: lê o `Input`. Durante o hit stop a simulação não roda, então o `DuelState` chama `captureInput()` a cada update: toques ficam guardados no controller até o próximo `updateIntent`. Assim, um ataque apertado no congelamento do impacto não se perde.
-- `EnemyAI`: oponente no modo versus (ver seção AI).
+- `EnemyAI`: oponente controlado pela máquina em Versus, Arcade, Sobrevivência e Tutorial (ver seção AI).
+- No modo 2 Jogadores o segundo lutador também usa `PlayerController`, lendo `game.secondInput`.
 - `DummyController`: boneco do modo treino.
 
 Todo controller tem `updateIntent(intent, dt)`. O `DuelState` guarda pares `{ fighter, controller }` em `participants`. Depois que o duelo termina, os controllers param e os intents ficam zerados.
 
 ### Entities
 
-Objetos do jogo (`Fighter`, `Saber`). Guardam dados e estado, mas não controlam o jogo inteiro e não desenham a si mesmos.
+Objetos do jogo (hoje só o `Fighter`). Guardam dados e estado, mas não controlam o jogo inteiro e não desenham a si mesmos.
 
 `Fighter` guarda posição (`x`, `y` nos **pés**, centro horizontal), velocidade, `facing` (1 = direita, -1 = esquerda), `grounded`, vida, stamina, estado (`FighterState`), `stateTime`, `intent`, `combat` (ataque atual, timers de stun e blockstun, direção da esquiva e da queda) e `animation`.
 
@@ -221,7 +225,8 @@ Todos os números de balanceamento, cores, textos e ajustes.
 main.js
   └─ new Game(canvas)
        ├─ Renderer
-       ├─ Input
+       ├─ Input e secondInput (2 Jogadores)
+       ├─ AudioManager
        ├─ StateMachine ── createState(StateId) → MenuState / DuelState / PauseState
        ├─ DebugOverlay
        └─ GameLoop
@@ -300,7 +305,7 @@ Arquivo: [src/core/Input.js](src/core/Input.js)
 
 ---
 
-`Input.pollGamepads()` roda antes de cada update do Game e lê o primeiro controle conectado com mapping standard, por API injetada. Converte botões/eixos em ações com deadzone; guarda bordas de toque separadas do teclado e libera tudo ao desconectar/perder foco. Gamepad e teclado podem coexistir. `Input.rumble` recebe somente um tipo de impacto do DuelState, com receita em controlsConfig, e tolera hardware sem atuador. Efeitos reduzidos diminuem vibração a 25%. Nenhum módulo de gameplay acessa navigator.
+`Input.pollGamepads()` roda antes de cada update do Game e lê o controle standard da posição `gamepadSlot` (0 para o jogador 1, 1 para o jogador 2), por API injetada. Converte botões/eixos em ações com deadzone; guarda bordas de toque separadas do teclado e libera tudo ao desconectar/perder foco. Gamepad e teclado podem coexistir. `Input.rumble` recebe somente um tipo de impacto do DuelState, com receita em controlsConfig, e tolera hardware sem atuador. Efeitos reduzidos diminuem vibração a 25%. Nenhum módulo de gameplay acessa navigator.
 
 O `Game` tem dois `Input`: `input` (jogador 1, com o preset das Opções e o 1º controle) e `secondInput` (jogador 2, `twoPlayerBindings.p2` e `gamepadSlot: 1`, o 2º controle standard conectado). Os dois ouvem o mesmo `window`, são lidos a cada update e limpos no fim do frame. No modo **2 Jogadores** (`DuelMode.LOCAL`), o `DuelState` troca as teclas do `input` para `twoPlayerBindings.p1` na entrada e chama `game.applySettings()` na saída; o oponente é um `PlayerController(game.secondInput)`. A pausa vale para os dois. Na seleção, a etapa do adversário lê o `secondInput`.
 
@@ -337,19 +342,23 @@ Estados podem receber parâmetros: `game.pushState(StateId.GAME_OVER, { playerWo
 Fluxo de telas:
 
 ```
-MenuState ──Duelar / Treino──▶ DuelState({ mode }) ──Esc──▶ PauseState (push) ──Continuar──▶ volta
-    │                     │                    ├─ Reiniciar ──▶ novo DuelState
-    └─Controles─▶ ControlsState (push)        └─ Sair ──▶ MenuState
-                          │
-                   K.O. + resultDelay
-                          ▼
-                   GameOverState (push) ──Revanche──▶ novo DuelState
-                                        └─Menu principal──▶ MenuState
+MenuState ─┬─ Duelar / Arcade / Sobrevivência / 2 Jogadores ──▶ CharacterSelectState ──▶ DuelState({ mode, ... })
+           ├─ Tutorial / Desafio de parry / Treino ─────────────────────────────────────▶ DuelState({ mode })
+           ├─ Opções ──▶ OptionsState (push) ──Configurar teclas──▶ KeyRemapState (push)
+           └─ Controles ──▶ ControlsState (push)
+
+DuelState ──Esc──▶ PauseState (push) ─┬─ Continuar ──▶ volta
+                                      ├─ Lista de golpes ──▶ MoveListState (push)
+                                      ├─ Reiniciar ──▶ novo DuelState
+                                      └─ Sair ──▶ MenuState
+DuelState ──K.O. decisivo──▶ ReplayState (push, opcional) ──▶ GameOverState (push)
+GameOverState ─┬─ Revanche / Próxima luta / Próximo adversário / Tentar de novo ──▶ novo DuelState
+               └─ Menu principal ──▶ MenuState
 ```
 
 Pausa e resultado recebem `duelParams` e os repassam ao reiniciar, então "Reiniciar" e "Revanche" mantêm o modo.
 
-`Game.settings` guarda as opções (`difficulty`, `reducedEffects`, `sound`, `music`). Elas são carregadas do `localStorage` ao abrir o jogo (valores inválidos são ignorados), alteradas na tela de Opções, aplicadas por `game.applySettings()` e salvas por `game.saveSettings()`.
+`Game.settings` guarda as opções e o progresso (`difficulty`, `reducedEffects`, `sound`, `music`, `keyboardPreset`, `customBindings`, `replay`, `unlocks`, `survivalBest`). Elas são carregadas do `localStorage` ao abrir o jogo (valores inválidos são ignorados), alteradas na tela de Opções, aplicadas por `game.applySettings()` e salvas por `game.saveSettings()`.
 
 Para adicionar um estado: crie a classe estendendo `GameState`, adicione o id em `stateIds.js` e registre em `stateFactory.js`.
 
@@ -602,7 +611,7 @@ Arquivo: [src/utils/debug.js](src/utils/debug.js)
 - Liga e desliga com `F3`. O valor inicial vem de `gameConfig.debug.enabled`.
 - Mostra FPS, a pilha de estados e as linhas de `getDebugInfo()` de cada estado.
 - Chama `renderDebug(renderer)` de cada estado para desenhos de debug. O `DuelState` desenha a hurtbox (verde, apagada durante a invulnerabilidade) e a hitbox ativa (vermelha), e mostra estado, vida, stamina, posição, velocidade, comportamento do boneco e o último evento de combate.
-- Futuro: decisões da IA.
+- Mostra a decisão atual da IA (`ai: <decisão> (<dificuldade>)`).
 
 ---
 
@@ -625,7 +634,7 @@ Testes rodam em Node (`npm test`), sem navegador. Por isso:
 - Quando um módulo do core precisa do navegador (`Input`, `GameLoop`), a dependência é injetada.
 - `computePose` é uma função pura e também é testada.
 
-Testes atuais: `gameLoop`, `input`, `stateMachine`, `states` (fluxo de telas, fim do duelo, boneco, debug de hitbox), `debug`, `math`, `fighter`, `playerController`, `dummyController`, `movement`, `physics` (inclui colisão), `animation` (inclui poses de combate), `combatActions` (ações, timers, stamina) e `combatHits` (hits, bloqueio, quebra de guarda, esquiva, morte, trade, clash), `effects` (RNG, pool, câmera, efeitos por evento, limites, hit stop, efeitos reduzidos), `timeControl`, `saberTrail`, `afterimage`, `audio` e `duelAudioHum` (mapeamento de sons, pan, zumbido, música), `settingsStorage`, `ui` (MenuList, nomes de teclas, textos), `hud`, `combatMessage` e `ai` (percepção, cada decisão, tempo de reação, dificuldade, IA não altera lutadores, IA vence um oponente parado na simulação real). O teste `states` cobre também controles, intro, pausa (continuar, reiniciar, sair), resultado e revanche. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
+Testes atuais: 340 testes em `tests/`, um arquivo por área (loop, input, estados e modos, combate, especiais, IA, simulação, replay, áudio, efeitos, UI, desbloqueios, Arcade, Sobrevivência, remapeamento). `tests/states.test.js` cobre o fluxo de telas; `goToMenuItem(game, id)` navega no menu pelo id, sem depender da posição dos itens. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
 
 ---
 
@@ -633,7 +642,8 @@ Testes atuais: `gameLoop`, `input`, `stateMachine`, `states` (fluxo de telas, fi
 
 ```
 core/Game     → core, states/stateFactory, config, utils
-states        → states/stateIds, simulation, combat, ai, controllers, characters, entities, rendering, ui, config
+modes         → combat (fases e eventos), utils (RNG com seed)
+states        → states/stateIds, modes, simulation, combat, ai, audio, controllers, characters, entities, rendering, ui, config
 ui            → config, utils
 ai            → combat (fases), entities (estados), systems/StaminaSystem (canAfford), config
 audio         → combat (eventos, fases), config, utils
