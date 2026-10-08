@@ -64,6 +64,19 @@ function drawTorso(renderer, fighter, pose, shoulderWidth, flare, cloakColor) {
   renderer.fillPolygon(torsoPoints, cloakColor);
 }
 
+const scarfPoints = [0, 0, 0, 0, 0, 0];
+
+function drawScarf(renderer, pose, trimColor, height) {
+  const sway = pose.clothSway;
+  setThreePoints(
+    scarfPoints,
+    pose.shoulderX - 2, pose.shoulderY + 2,
+    pose.shoulderX - height * 0.18 - sway, pose.shoulderY + height * 0.05,
+    pose.shoulderX - height * 0.34 - sway * 1.6, pose.shoulderY + height * 0.14,
+  );
+  renderer.polyline(scarfPoints, trimColor, height * 0.03);
+}
+
 function drawPauldrons(renderer, pose, shoulderWidth, trimColor) {
   const radius = shoulderWidth * 0.62;
   renderer.fillCircle(pose.shoulderX - shoulderWidth * 0.7, pose.shoulderY + radius * 0.4, radius, trimColor);
@@ -135,6 +148,9 @@ export function drawFighterBody(renderer, fighter, pose, floorY, withShadow = tr
   }
   drawLeg(renderer, pose, pose.backKneeX, pose.backKneeY, pose.backFootX, pose.backFootY, bodyColor, legWidth);
   drawLeg(renderer, pose, pose.frontKneeX, pose.frontKneeY, pose.frontFootX, pose.frontFootY, bodyColor, legWidth);
+  if (appearance.scarf) {
+    drawScarf(renderer, pose, trimColor, height);
+  }
   drawTorso(renderer, fighter, pose, shoulderWidth, flare, cloakColor);
   if (appearance.pauldrons) {
     drawPauldrons(renderer, pose, shoulderWidth, trimColor);

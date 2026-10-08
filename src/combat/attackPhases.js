@@ -5,6 +5,7 @@ export const AttackType = Object.freeze({
   HEAVY: 'heavy',
   FORWARD_HEAVY: 'forwardHeavy',
   AIR: 'air',
+  AIR_HEAVY: 'airHeavy',
   RIPOSTE: 'riposte',
   SHOVE: 'shove',
   SPECIAL: 'special',
@@ -25,7 +26,7 @@ export const ATTACK_STATES = Object.freeze({
   stance: FighterState.HEAVY_ATTACK,
 });
 
-const HEAVY_ATTACKS = new Set([AttackType.HEAVY, AttackType.FORWARD_HEAVY, AttackType.SPECIAL]);
+const HEAVY_ATTACKS = new Set([AttackType.HEAVY, AttackType.FORWARD_HEAVY, AttackType.AIR_HEAVY, AttackType.SPECIAL]);
 const STRONG_ATTACKS = new Set([...HEAVY_ATTACKS, AttackType.RIPOSTE]);
 
 export function isHeavyAttack(attackType) {

@@ -148,7 +148,7 @@ export class CombatSystem {
   }
 
   startActions(fighter) {
-    if (this.tryAttackChain(fighter)) {
+    if (this.tryFeint(fighter) || this.tryAttackChain(fighter)) {
       return;
     }
     if (fighter.state === FighterState.BLOCKING && this.startActionFromBlock(fighter)) {
@@ -168,6 +168,23 @@ export class CombatSystem {
     }
   }
 
+  tryFeint(fighter) {
+    const { combat, stats } = fighter;
+    if (!stats.feint || combat.bufferedAction !== CombatAction.PARRY || combat.attack?.type !== AttackType.HEAVY) {
+      return false;
+    }
+    if (getAttackPhase(combat.attack, fighter.stateTime) !== AttackPhase.STARTUP || !canAfford(fighter, stats.feint.staminaCost)) {
+      return false;
+    }
+    clearActionBuffer(fighter);
+    spendStamina(fighter, stats.feint.staminaCost);
+    const { attackType } = combat;
+    fighter.clearAttack();
+    fighter.setState(FighterState.IDLE);
+    this.emitAction(CombatEvent.FEINT, fighter, attackType);
+    return true;
+  }
+
   tryAirAttack(fighter) {
     const { bufferedAction } = fighter.combat;
     if (fighter.grounded || fighter.state !== FighterState.JUMPING || fighter.combat.airAttackUsed) {
@@ -177,10 +194,11 @@ export class CombatSystem {
       return;
     }
     clearActionBuffer(fighter);
-    if (this.tryAttack(fighter, AttackType.AIR)) {
+    const airType = bufferedAction === CombatAction.HEAVY_ATTACK && fighter.moves[AttackType.AIR_HEAVY] ? AttackType.AIR_HEAVY : AttackType.AIR;
+    if (this.tryAttack(fighter, airType)) {
       fighter.combat.airAttackUsed = true;
     } else {
-      this.emitAction(CombatEvent.ACTION_REJECTED, fighter, AttackType.AIR);
+      this.emitAction(CombatEvent.ACTION_REJECTED, fighter, airType);
     }
   }
 
@@ -250,7 +268,24 @@ export class CombatSystem {
     if (!move) {
       return false;
     }
+    if (move.leap) {
+      return this.tryLeap(fighter, move);
+    }
     return move.dash ? this.tryDash(fighter, move) : this.tryAttack(fighter, AttackType.SPECIAL);
+  }
+
+  tryLeap(fighter, move) {
+    if (!canAfford(fighter, move.staminaCost)) {
+      return false;
+    }
+    spendStamina(fighter, move.staminaCost);
+    fighter.vx = fighter.facing * move.leap.speedX;
+    fighter.vy = -move.leap.speedY;
+    fighter.grounded = false;
+    fighter.combat.airAttackUsed = false;
+    fighter.setState(FighterState.JUMPING);
+    this.emitAction(CombatEvent.ATTACK_START, fighter, AttackType.SPECIAL);
+    return true;
   }
 
   tryDash(fighter, move) {
@@ -258,7 +293,9 @@ export class CombatSystem {
       return false;
     }
     spendStamina(fighter, move.staminaCost);
-    this.startDodge(fighter, move.dash, fighter.facing, move.dash.passThrough);
+    const { moveX } = fighter.intent;
+    const direction = move.dash.followInput ? (moveX !== 0 ? Math.sign(moveX) : -fighter.facing) : fighter.facing;
+    this.startDodge(fighter, move.dash, direction, move.dash.passThrough);
     this.emitAction(CombatEvent.ATTACK_START, fighter, AttackType.SPECIAL);
     return true;
   }
@@ -305,7 +342,7 @@ export class CombatSystem {
 
     spendStamina(fighter, dodge.staminaCost);
     const { moveX } = fighter.intent;
-    this.startDodge(fighter, dodge, moveX !== 0 ? Math.sign(moveX) : -fighter.facing, false);
+    this.startDodge(fighter, dodge, moveX !== 0 ? Math.sign(moveX) : -fighter.facing, dodge.passThrough === true);
     return true;
   }
 
@@ -327,6 +364,9 @@ export class CombatSystem {
 
     if (combat.attack && !combat.lungeApplied && getAttackPhase(combat.attack, fighter.stateTime) === AttackPhase.ACTIVE) {
       fighter.vx = fighter.facing * combat.attack.lunge;
+      if (combat.attack.dive && !fighter.grounded) {
+        fighter.vy = combat.attack.dive;
+      }
       combat.lungeApplied = true;
     }
   }

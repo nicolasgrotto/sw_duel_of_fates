@@ -90,7 +90,7 @@ export const texts = {
     recorderModes: { idle: 'Gravação parada', recording: 'Gravando', playing: 'Reproduzindo' },
     inputNames: { idle: '—', left: '←', right: '→', jump: 'pulo', lightAttack: 'rápido', heavyAttack: 'forte', block: 'guarda', dodge: 'esquiva', special: 'habilidade' },
     frameData: '{attack} · {result} · {advantage} s',
-    attacks: { air: 'Aéreo', forwardHeavy: 'Forte de avanço', light: 'Rápido', light2: 'Rápido 2', light3: 'Rápido 3', light4: 'Rápido 4', light5: 'Rápido 5', heavy: 'Forte', riposte: 'Riposta', shove: 'Empurrão', special: 'Habilidade', counterStrike: 'Contra-golpe' },
+    attacks: { air: 'Aéreo', forwardHeavy: 'Forte de avanço', light: 'Rápido', light2: 'Rápido 2', light3: 'Rápido 3', light4: 'Rápido 4', light5: 'Rápido 5', heavy: 'Forte', riposte: 'Riposta', shove: 'Empurrão', special: 'Habilidade', counterStrike: 'Contra-golpe', airHeavy: 'Mergulho' },
     results: {
       hit: 'acertou',
       block: 'bloqueado',
@@ -247,8 +247,8 @@ export const layout = {
   characterSelect: {
     titleY: 110,
     listX: 380,
-    firstItemY: 214,
-    itemSpacing: 50,
+    firstItemY: 196,
+    itemSpacing: 44,
     previewX: 880,
     previewY: 590,
     previewScale: 1.3,

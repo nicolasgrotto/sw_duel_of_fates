@@ -4,7 +4,7 @@ import { getAttackDuration } from '../src/combat/attackPhases.js';
 import { CombatEvent, isContactEvent } from '../src/combat/combatEvents.js';
 import { isPunishable } from '../src/ai/perception.js';
 import { FighterState } from '../src/entities/fighterStates.js';
-import { STEP, createSimulation, repeat, spawnFighter } from './helpers.js';
+import { STEP, arena, createSimulation, repeat, spawnFighter } from './helpers.js';
 
 function createDuel(leftId, rightId, distance = 110) {
   const left = spawnFighter(500, 1, leftId);
@@ -213,3 +213,85 @@ describe('second roster', () => {
     assert.equal(duel.left.combat.attackType, 'counterStrike');
   });
 });
+
+describe('heron and echo', () => {
+  it('lets the heron jump off a wall once until it touches the other wall or the floor', () => {
+    const duel = createDuel('heron', 'guardian', 400);
+    const { left } = duel;
+    left.x = arenaLeftFor(left);
+
+    duel.step({ jump: true });
+    repeat(4, () => duel.step());
+    left.x = arenaLeftFor(left);
+    duel.step({ jump: true });
+    assert.ok(left.vx > 0);
+    assert.equal(left.combat.wallJumpSide, -1);
+
+    const vy = left.vy;
+    left.x = arenaLeftFor(left);
+    duel.step({ jump: true });
+    assert.ok(left.vy >= vy);
+  });
+
+  it('dives down with the heavy air attack', () => {
+    const duel = createDuel('heron', 'guardian', 400);
+    const { left } = duel;
+    const dive = left.moves.airHeavy;
+
+    duel.step({ jump: true });
+    repeat(6, () => duel.step());
+    duel.step({ heavyAttack: true });
+    assert.equal(left.combat.attackType, 'airHeavy');
+    repeat(Math.ceil(dive.startup / STEP) + 1, () => duel.step());
+
+    assert.ok(left.vy > 0);
+  });
+
+  it('leaps over the opponent with the heron special', () => {
+    const duel = createDuel('heron', 'guardian', 90);
+    const { left, right } = duel;
+
+    duel.step({ special: true });
+    assert.equal(left.state, FighterState.JUMPING);
+    repeat(60, () => duel.step());
+
+    assert.ok(left.x > right.x);
+  });
+
+  it('cancels the echo heavy startup with a feint that costs stamina', () => {
+    const duel = createDuel('echo', 'guardian', 400);
+    const { left } = duel;
+    const heavy = left.moves.heavy;
+
+    duel.step({ heavyAttack: true });
+    repeat(Math.floor(heavy.startup / STEP / 2), () => duel.step());
+    const stamina = left.stamina;
+    duel.step({ block: true, blockPressed: true });
+
+    assert.equal(left.combat.attack, null);
+    assert.notEqual(left.state, FighterState.HEAVY_ATTACK);
+    assert.ok(Math.abs(stamina - left.stamina - left.stats.feint.staminaCost) < 1e-9);
+  });
+
+  it('does not let other characters feint', () => {
+    const duel = createDuel('guardian', 'shadow', 400);
+    const heavy = duel.left.moves.heavy;
+
+    duel.step({ heavyAttack: true });
+    repeat(Math.floor(heavy.startup / STEP / 2), () => duel.step());
+    duel.step({ block: true, blockPressed: true });
+
+    assert.equal(duel.left.state, FighterState.HEAVY_ATTACK);
+  });
+
+  it('steps the echo in the held direction', () => {
+    const duel = createDuel('echo', 'guardian', 400);
+
+    duel.step({ special: true, moveX: 1 });
+    assert.equal(duel.left.combat.dodgeDirection, 1);
+  });
+});
+
+function arenaLeftFor(fighter) {
+  return arena.left + fighter.width / 2;
+}

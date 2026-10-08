@@ -205,7 +205,8 @@ As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e des
 - [x] Música dinâmica pela vida dos dois, batida grave com vida baixa
 - [x] Remapeamento de teclas (Opções → Configurar teclas, preset Personalizado salvo)
 - [x] Desafios por personagem com cores de sabre desbloqueáveis (Arcade + desafio próprio, troca de cor na seleção)
-- [ ] Garça e Eco, pulo na parede, Sobrevivência
+- [x] Garça e Eco, pulo na parede (finta, mergulho aéreo, salto, passo-reflexo)
+- [ ] Sobrevivência
 
 ### v1.0 — Portfólio
 

@@ -21,6 +21,7 @@ function createCombat() {
     hasHit: false,
     attackConnected: false,
     airAttackUsed: false,
+    wallJumpSide: 0,
     lungeApplied: false,
     stunDuration: 0,
     blockstun: 0,

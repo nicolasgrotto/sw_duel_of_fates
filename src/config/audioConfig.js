@@ -106,6 +106,9 @@ export const audioConfig = {
       { type: 'tone', wave: 'sine', from: 120, to: 55, duration: 0.18, attack: 0.002, gain: 0.32, filter: null },
       { type: 'noise', duration: 0.1, attack: 0.002, gain: 0.35, filter: { type: 'lowpass', from: 900, to: 300, q: 0.8 } },
     ],
+    feint: [
+      { type: 'noise', duration: 0.12, attack: 0.01, gain: 0.22, filter: { type: 'bandpass', from: 1800, to: 3200, q: 2 } },
+    ],
     heartbeat: [
       { type: 'tone', wave: 'sine', from: 70, to: 42, duration: 0.16, attack: 0.004, gain: 0.32, filter: null },
     ],

@@ -45,7 +45,7 @@ import { DuelMode, hasRoundLimit, usesDummy } from './duelModes.js';
 import { StateId } from './stateIds.js';
 
 function createFighterStats() {
-  return { hits: 0, damage: 0, blocks: 0, parries: 0, perfectParries: 0, guardBreaks: 0, shoves: 0, counters: 0, longestChain: 0 };
+  return { hits: 0, damage: 0, blocks: 0, parries: 0, perfectParries: 0, guardBreaks: 0, shoves: 0, counters: 0, feints: 0, airHits: 0, longestChain: 0 };
 }
 
 export class DuelState extends GameState {
@@ -498,6 +498,7 @@ export class DuelState extends GameState {
         stats.hits += 1;
         stats.damage += event.damage;
         stats.longestChain = Math.max(stats.longestChain, getChainStep(event.attackType));
+        stats.airHits += event.attackType?.startsWith('air') ? 1 : 0;
         break;
       }
       case CombatEvent.BLOCK:
@@ -517,6 +518,9 @@ export class DuelState extends GameState {
         break;
       case CombatEvent.COUNTER:
         this.statsOf(event.defender).counters += 1;
+        break;
+      case CombatEvent.FEINT:
+        this.statsOf(event.attacker).feints += 1;
         break;
       default:
         break;

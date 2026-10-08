@@ -179,4 +179,50 @@ export const movesByCharacter = {
       charge: { levelTime: 0.35, levels: 3, holdAt: 0.8, damageScales: [1, 1.35, 1.7], guardBreakLevel: 3 },
     },
   },
+  heron: {
+    light: { attack: 'light', type: 'light', pose: 'light', cancelsInto: ['light2'] },
+    light2: { attack: 'light', type: 'light', pose: 'lightReverse', cancelsInto: ['light3'] },
+    light3: { attack: 'light', type: 'light', pose: 'light', cancelsInto: [] },
+    air: {
+      attack: 'light', type: 'light', pose: 'light', airborne: true, cancelsInto: [],
+      damage: 12, staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
+      lunge: 0, hitstun: 0.2, knockback: 180, blockStaminaCost: 10,
+    },
+    airHeavy: {
+      attack: 'heavy', type: 'heavy', pose: 'heavy', airborne: true, cancelsInto: [],
+      damage: 16, staminaCost: 16, startup: 0.14, active: 0.16, recovery: 0.3,
+      lunge: 120, dive: 900, hitstun: 0.4, knockback: 260, blockStaminaCost: 18,
+    },
+    forwardHeavy: {
+      attack: 'heavy', type: 'heavy', pose: 'heavy', cancelsInto: [],
+      staminaCost: 30, startup: 0.38, recovery: 0.55, lunge: 450,
+    },
+    heavy: { attack: 'heavy', type: 'heavy', pose: 'heavy', cancelsInto: [] },
+    riposte: { attack: 'riposte', type: 'riposte', pose: 'riposte', cancelsInto: [] },
+    shove: { attack: 'shove', type: 'shove', pose: 'shove', cancelsInto: [] },
+    special: {
+      attack: 'light', type: 'light', pose: 'light', cancelsInto: [], staminaCost: 18,
+      leap: { speedX: 540, speedY: 1000 },
+    },
+  },
+  echo: {
+    light: { attack: 'light', type: 'light', pose: 'light', cancelsInto: ['light2'] },
+    light2: { attack: 'light', type: 'light', pose: 'light', cancelsInto: [] },
+    air: {
+      attack: 'light', type: 'light', pose: 'light', airborne: true, cancelsInto: [],
+      damage: 12, staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
+      lunge: 0, hitstun: 0.2, knockback: 180, blockStaminaCost: 10,
+    },
+    forwardHeavy: {
+      attack: 'heavy', type: 'heavy', pose: 'heavy', cancelsInto: [],
+      staminaCost: 30, startup: 0.38, recovery: 0.55, lunge: 450,
+    },
+    heavy: { attack: 'heavy', type: 'heavy', pose: 'heavy', cancelsInto: [] },
+    riposte: { attack: 'riposte', type: 'riposte', pose: 'riposte', cancelsInto: [] },
+    shove: { attack: 'shove', type: 'shove', pose: 'shove', cancelsInto: [] },
+    special: {
+      attack: 'light', type: 'light', pose: 'light', cancelsInto: [], staminaCost: 14,
+      dash: { speed: 1300, duration: 0.12, invulnerableTime: 0.12, passThrough: false, followInput: true },
+    },
+  },
 };

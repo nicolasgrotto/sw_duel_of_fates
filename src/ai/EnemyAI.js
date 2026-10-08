@@ -29,6 +29,7 @@ export const SpecialKind = Object.freeze({
   ARMOR: 'armor',
   DASH: 'dash',
   CHARGE: 'charge',
+  LEAP: 'leap',
   STRIKE: 'strike',
 });
 
@@ -38,6 +39,9 @@ export function getSpecialKind(move) {
   }
   if (move.dash) {
     return SpecialKind.DASH;
+  }
+  if (move.leap) {
+    return SpecialKind.LEAP;
   }
   if (move.charge) {
     return SpecialKind.CHARGE;
@@ -74,6 +78,7 @@ export class EnemyAI {
       parryDelay: -1,
       punishAfterBlock: false,
       chargeHoldTime: 0,
+      feintDelay: -1,
       pendingAction: PendingAction.NONE,
       delayedAction: PendingAction.NONE,
       actionDelay: 0,
@@ -95,6 +100,7 @@ export class EnemyAI {
     this.updateBlockPunish();
     this.updateParryTiming(dt);
     this.updateDelayedAction(dt);
+    this.updateFeint(dt);
     this.tryChain();
     this.writeIntent(intent);
   }
@@ -123,6 +129,18 @@ export class EnemyAI {
     if (plan.actionDelay <= 0) {
       plan.pendingAction = plan.delayedAction;
       plan.delayedAction = PendingAction.NONE;
+    }
+  }
+
+  updateFeint(dt) {
+    const { plan } = this;
+    if (plan.feintDelay < 0) {
+      return;
+    }
+    plan.feintDelay -= dt;
+    if (plan.feintDelay <= 0) {
+      plan.feintDelay = -1;
+      plan.pendingAction = PendingAction.PARRY;
     }
   }
 
@@ -251,6 +269,9 @@ export class EnemyAI {
   }
 
   isSpecialInRange(kind) {
+    if (kind === SpecialKind.LEAP) {
+      return getGap(this.self, this.opponent) < this.perception.leapGap;
+    }
     if (kind === SpecialKind.COUNTER) {
       return !this.opponent.combat.attack && canReach(this.opponent, this.self, this.opponent.stats.attacks.light, -this.perception.threatMargin);
     }
@@ -482,6 +503,9 @@ export class EnemyAI {
     const action = useHeavy ? PendingAction.HEAVY_ATTACK : PendingAction.LIGHT_ATTACK;
     this.plan.blockTime = 0;
     this.attackCooldown = this.difficulty.attackCooldown;
+    if (useHeavy && !isPunish && this.self.stats.feint && this.random() < this.profile.feintChance) {
+      this.plan.feintDelay = attacks.heavy.startup * this.perception.feintAt + this.difficulty.attackTell;
+    }
     if (!isPunish && this.difficulty.attackTell > 0) {
       this.plan.delayedAction = action;
       this.plan.actionDelay = this.difficulty.attackTell;

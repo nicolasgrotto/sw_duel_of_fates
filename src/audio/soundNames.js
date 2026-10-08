@@ -14,6 +14,7 @@ export const SoundName = Object.freeze({
   SHOVE: 'shove',
   IGNITE: 'ignite',
   HEARTBEAT: 'heartbeat',
+  FEINT: 'feint',
   UI_MOVE: 'uiMove',
   UI_CONFIRM: 'uiConfirm',
 });

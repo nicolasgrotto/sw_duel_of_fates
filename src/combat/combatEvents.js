@@ -11,6 +11,7 @@ export const CombatEvent = Object.freeze({
   PERFECT_PARRY: 'perfectParry',
   SHOVE: 'shove',
   COUNTER: 'counter',
+  FEINT: 'feint',
 });
 
 const CONTACT_EVENTS = new Set([

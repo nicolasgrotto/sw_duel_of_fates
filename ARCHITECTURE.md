@@ -178,7 +178,7 @@ Trocar todos os personagens (ex.: versão com identidade própria) deve exigir a
 3. a entrada em `characterData.js` (nome, perfil de IA, textos `info` da seleção, som e aparência com todos os campos de silhueta);
 4. poses novas, se houver, em `fighterVisualConfig.combatPoses.attacks`, e os nomes dos golpes em `uiConfig.texts.training.attacks`.
 
-Personagens atuais: Guardião, Sombra, Bastião, Vespa, Espelho, Haste, Brasa e Forja, mais o chefe Sombra Desperta (`selectable: false`, só no Arcade). A seleção mostra só os personagens com `selectable: true`.
+Personagens atuais: Guardião, Sombra, Bastião, Vespa, Espelho, Haste, Brasa, Forja, Garça e Eco, mais o chefe Sombra Desperta (`selectable: false`, só no Arcade). A seleção mostra só os personagens com `selectable: true`.
 
 ### Controllers
 
@@ -414,6 +414,12 @@ Arquivos: [src/combat/](src/combat/). Regras em [GAME_DESIGN.md](GAME_DESIGN.md#
   - `breaksGuard`: um bloqueio desse golpe vira quebra de guarda direto;
   - `sweetSpot` (`tipFrom`, `tipScale`, `innerTo`, `innerScale`): o dano depende da distância entre os corpos em relação ao alcance;
   - `charge` (`levelTime`, `levels`, `holdAt`, `damageScales`, `guardBreakLevel`): com `intent.specialHeld`, `updateCharge` segura o `stateTime` em `startup × holdAt` e acumula `combat.chargeTime` até o máximo. O nível (`getChargeLevel`) escala o dano e, no nível de `guardBreakLevel`, o bloqueio vira quebra de guarda. O `DuelRenderer` usa `getChargeRatio` como flare da lâmina durante a carga.
+- **Garça e Eco**:
+  - `airHeavy` (forte no ar, se o personagem tiver o golpe) é escolhido por `tryAirAttack`; `dive` no golpe dá velocidade vertical para baixo quando o active começa;
+  - `leap` na habilidade (`tryLeap`): salto com velocidade própria, rearma o aéreo e passa por cima do oponente, porque os corpos só colidem quando se sobrepõem na vertical;
+  - `dash.followInput`: o avanço vai na direção apertada (para trás sem direção); `dodge.passThrough` faz a esquiva comum atravessar;
+  - `stats.wallJump` (`speed`, `heightScale`, `wallMargin`): o `MovementSystem` (que agora recebe a arena) deixa pular encostado na parede, uma vez por parede até tocar o chão (`combat.wallJumpSide`);
+  - `stats.feint` (`staminaCost`): `tryFeint` cancela o forte ainda no startup quando o buffer tem a ação `parry` (toque na guarda) e emite `feint`. Todos os arquétipos têm `wallJump` e `feint` (nulos quando o personagem não usa).
 - **Traços passivos** são atributos do arquétipo, presentes em todos (valor neutro quando o personagem não tem o traço): `blockStaminaScale`, `blockPushbackScale`, `blockWalkSpeed` (o `MovementSystem` deixa andar em `BLOCKING`), `staminaOnHit`, `punishDamageScale` (golpe em quem está em recovery, `STAGGERED` ou `STUNNED`) e `knockbackScale`.
 - **Riposta**: com `riposteTime > 0`, a ação de ataque rápido usa `attacks.riposte` (`AttackType.RIPOSTE`, estado `ATTACKING`). `isStrongAttack` (forte ou riposta) escolhe o impacto e o som fortes.
 - Na morte, escolhe a direção da queda: para trás se houver espaço até a parede, senão para a frente.
@@ -555,7 +561,7 @@ DuelSimulation → CombatSystem executa (igual ao jogador)
 - `EnemyAI` é um controller como o `PlayerController`: `updateIntent(intent, dt)`. Ela recebe `self` e `opponent` só para **ler**.
 - Além de defender ataques que estão vindo, a IA pode **guardar por antecipação** (`guardChance`) quando está no alcance do oponente e não pode atacar. É o que permite defender ataques rápidos, cujo startup é menor que o tempo de reação.
 - **IA por personagem**: cada personagem tem um perfil em `aiConfig.profiles` (mesmo id do personagem; os perfis genéricos `aggressive`, `defensive` e `balanced` continuam para testes e para `simulate --profile`). O perfil traz pesos (`attackChance`, `blockChance`, `specialChance`...), distância (`preferredGap`, `closeGapRatio`), `chargeHold` (quanto segurar uma habilidade de carga) e `priorities`: a ordem dos passos de `decide()` (`defend`, `counter`, `shove`, `recover`, `special`, `attack`, `guard`, `position`). O primeiro passo que devolve uma decisão vence; `position` não devolve nada quando a distância já está boa.
-- **Habilidade proativa** (`trySpecialAttack`): o tipo vem dos dados do golpe (`getSpecialKind`: `counter`, `armor`, `dash`, `charge`, `strike`). Postura de contra-golpe é usada como leitura quando o oponente está no alcance e parado; armadura, carga e golpe comum quando a habilidade alcança; o avanço só é usado como resposta (`trySpecialAnswer`). Na carga, `plan.chargeHoldTime` mantém `intent.specialHeld`.
+- **Habilidade proativa** (`trySpecialAttack`): o tipo vem dos dados do golpe (`getSpecialKind`: `counter`, `armor`, `dash`, `charge`, `leap`, `strike`). O salto é usado perto do oponente (`perception.leapGap`). A finta usa `profile.feintChance`: ao decidir um forte, a IA agenda o toque na guarda para `heavy.startup × perception.feintAt` (só personagens com `stats.feint`). Postura de contra-golpe é usada como leitura quando o oponente está no alcance e parado; armadura, carga e golpe comum quando a habilidade alcança; o avanço só é usado como resposta (`trySpecialAnswer`). Na carga, `plan.chargeHoldTime` mantém `intent.specialHeld`.
 - `perception.js` tem funções puras (`getGap`, `canReach`, `isThreatening`, `isPunishable`).
 - O plano guarda direção, tempo de bloqueio e uma ação pontual (`pendingAction`), que vira intent por um frame só.
 - Perfil (`aiConfig.profiles`) vem de `characterData.aiProfile`. Dificuldade (`aiConfig.difficulties`) vem de `game.settings.difficulty`.
