@@ -275,7 +275,7 @@ O estilo trainingStatus usa system-ui 18 px, textMuted, alinhado à esquerda; st
 - A cor da energia vem do **tier** do nível de quem lança (`powerTiersConfig`), nunca da lâmina. Tiers mais altos ganham mais intensidade: glow maior, mais partículas e raio mais grosso.
 - Toda luz de poder usa os sprites de glow em cache do `Renderer.drawGlow` (um sprite por cor): nada de `shadowBlur`, `filter` ou gradiente criado por frame.
 - **Preparação**: um brilho na mão da frente durante a preparação, que cresce até o instante ativo. É o aviso para o oponente.
-- **Empurrão**: arcos que se abrem para a frente; **Puxão**: arcos que se fecham em direção a quem lança.
+- **Repulsão**: anel que se abre à frente de quem lança; **Puxão**: anel que se fecha no mesmo ponto, puxando o olhar para quem lança.
 - **Raio**: duas polilinhas (glow largo e translúcido + núcleo fino) da mão até o alvo ou até o alcance máximo, redesenhadas em intervalos curtos.
 - **Barreira**: elipse em volta de quem lança, com glow fraco que pulsa; clareia ao absorver.
 - **Resistido**: anel curto na cor do tier do **alvo**, como se o poder batesse numa parede.

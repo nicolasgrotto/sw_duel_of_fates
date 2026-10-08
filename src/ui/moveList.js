@@ -1,4 +1,5 @@
 import { Action } from '../config/controlsConfig.js';
+import { powersConfig } from '../config/powersConfig.js';
 import { keyComboSeparator, texts } from '../config/uiConfig.js';
 import { formatActionKeys } from './keyLabels.js';
 import { formatText } from './formatText.js';
@@ -17,10 +18,22 @@ function keys(bindings, ...actions) {
   return actions.map((action) => formatActionKeys(bindings, action)).join(keyComboSeparator);
 }
 
-export function buildMoveList(character, bindings) {
+const SLOT_DIRECTIONS = { neutral: null, forward: Action.MOVE_RIGHT, back: Action.MOVE_LEFT };
+
+function buildPowerRows(character, bindings) {
+  const slots = powersConfig.loadouts[character.alignment] ?? {};
+  return Object.entries(slots).map(([slot, id]) => {
+    const power = powersConfig.powers[id];
+    const label = formatText(power.channel ? texts.moveList.powerHeld : texts.moveList.power, { name: texts.powers[id] });
+    const direction = SLOT_DIRECTIONS[slot];
+    return { label, keys: direction ? keys(bindings, direction, Action.POWER) : keys(bindings, Action.POWER) };
+  });
+}
+
+export function buildMoveList(character, bindings, powers = false) {
   const labels = texts.moveList.moves;
   const forward = formatActionKeys(bindings, Action.MOVE_RIGHT);
-  return [
+  const rows = [
     { label: formatText(labels.lightChain, { count: countLightChain(character.moves) }), keys: keys(bindings, Action.LIGHT_ATTACK) },
     { label: labels.heavy, keys: keys(bindings, Action.HEAVY_ATTACK) },
     { label: labels.forwardHeavy, keys: `${forward}${keyComboSeparator}${formatActionKeys(bindings, Action.HEAVY_ATTACK)}` },
@@ -33,4 +46,5 @@ export function buildMoveList(character, bindings) {
     { label: character.info.ability, keys: keys(bindings, Action.SPECIAL) },
     { label: character.info.trait, keys: labels.passive },
   ];
+  return powers ? [...rows, ...buildPowerRows(character, bindings)] : rows;
 }

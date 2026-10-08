@@ -78,6 +78,7 @@ export const gamepadConfig = {
     clash: { duration: 100, strongMagnitude: 0.5, weakMagnitude: 0.6 },
     death: { duration: 160, strongMagnitude: 0.7, weakMagnitude: 0.7 },
     shove: { duration: 40, strongMagnitude: 0.2, weakMagnitude: 0.1 },
+    powerHit: { duration: 60, strongMagnitude: 0.3, weakMagnitude: 0.3 },
   },
 };
 

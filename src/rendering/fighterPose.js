@@ -85,6 +85,32 @@ function applyAttackPose(fighter, guardDegrees) {
   }
 }
 
+function getPowerPoseAmount(fighter, power) {
+  if (fighter.stateTime < power.startup) {
+    return easeOutCubic(clamp(fighter.stateTime / power.startup, 0, 1));
+  }
+  const releasedAt = power.channel ? fighter.combat.powerEndTime : power.startup + power.active;
+  if (power.channel && releasedAt === 0) {
+    return 1;
+  }
+  return 1 - easeInOutSine(clamp((fighter.stateTime - releasedAt) / power.recovery, 0, 1));
+}
+
+function applyPowerPose(fighter, guardDegrees) {
+  const { power } = fighter.combat;
+  if (!power) {
+    return;
+  }
+  const style = combatPoses.powers[power.pose];
+  const amount = getPowerPoseAmount(fighter, power);
+  const tremble = Math.sin(fighter.stateTime * style.trembleSpeed * TAU) * style.tremble;
+  combatPose.bladeDegrees = lerp(guardDegrees, style.bladeDegrees, amount);
+  combatPose.leanDegrees = (style.lean + tremble) * amount;
+  combatPose.crouch = style.crouch * amount;
+  combatPose.reach = style.reach * amount;
+  combatPose.lift = style.lift * amount;
+}
+
 function applyStunnedPose(fighter) {
   const style = combatPoses.stunned;
   const sway = Math.sin(fighter.stateTime * style.swaySpeed * TAU) * style.swayDegrees;
@@ -109,6 +135,10 @@ function resolveCombatPose(fighter, guardDegrees, forceEvade = false) {
     case FighterState.ATTACKING:
     case FighterState.HEAVY_ATTACK:
       applyAttackPose(fighter, guardDegrees);
+      break;
+    case FighterState.CASTING:
+    case FighterState.CHANNELING:
+      applyPowerPose(fighter, guardDegrees);
       break;
     case FighterState.BLOCKING: {
       const { block } = combatPoses;

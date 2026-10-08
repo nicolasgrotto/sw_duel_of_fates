@@ -1,5 +1,7 @@
 import { isStrongAttack } from '../combat/attackPhases.js';
 import { CombatEvent } from '../combat/combatEvents.js';
+import { getPowerTier } from '../combat/powerResistance.js';
+import { powersConfig } from '../config/powersConfig.js';
 import { degreesToRadians } from '../utils/math.js';
 import { pick, randomInt, randomRange } from '../utils/random.js';
 import { ParticlePool } from './ParticlePool.js';
@@ -14,7 +16,17 @@ export const EffectType = Object.freeze({
   PARRY_SPARK: 'parrySpark',
   PERFECT_PARRY: 'perfectParry',
   SHOVE_IMPACT: 'shoveImpact',
+  POWER_WAVE: 'powerWave',
+  POWER_IMPACT: 'powerImpact',
+  LIGHTNING_TICK: 'lightningTick',
+  POWER_BLOCKED: 'powerBlocked',
+  POWER_RESISTED: 'powerResisted',
+  POWER_ABSORBED: 'powerAbsorbed',
 });
+
+function getTierColor(fighter) {
+  return getPowerTier(fighter.powerLevel, powersConfig.tiers).color;
+}
 
 function createLight() {
   return {
@@ -43,6 +55,7 @@ function createRing() {
     alpha: 0,
     time: 0,
     duration: 0,
+    contract: false,
   };
 }
 
@@ -135,6 +148,26 @@ export class EffectsSystem {
         this.startTremor(attacker);
         this.spawnParry(EffectType.PERFECT_PARRY, defender, params);
         break;
+      case CombatEvent.POWER_ACTIVE:
+        this.spawnPowerWave(attacker, event.attackType === 'pull', params);
+        break;
+      case CombatEvent.POWER_HIT:
+        params.color = getTierColor(attacker);
+        if (this.flashScale > 0) {
+          this.hitFlashes.set(defender, this.config.hitFlashDuration);
+        }
+        this.spawn(event.attackType === 'lightning' ? EffectType.LIGHTNING_TICK : EffectType.POWER_IMPACT, params);
+        break;
+      case CombatEvent.POWER_BLOCKED:
+        params.color = getTierColor(attacker);
+        this.spawn(EffectType.POWER_BLOCKED, params);
+        break;
+      case CombatEvent.POWER_RESISTED:
+        this.spawnPowerRing(EffectType.POWER_RESISTED, defender, params);
+        break;
+      case CombatEvent.POWER_ABSORBED:
+        this.spawnPowerRing(EffectType.POWER_ABSORBED, defender, params);
+        break;
       default:
         break;
     }
@@ -152,6 +185,22 @@ export class EffectsSystem {
     if (recipe.desaturate) {
       this.startDesaturation(recipe.desaturate);
     }
+  }
+
+  spawnPowerWave(caster, contract, params) {
+    const recipe = this.config.recipes[EffectType.POWER_WAVE];
+    params.color = getTierColor(caster);
+    params.x = caster.x + caster.facing * (caster.width / 2 + powersConfig.render.waveOffset);
+    params.y = caster.y - caster.height * powersConfig.castHeight;
+    this.spawn(EffectType.POWER_WAVE, params);
+    this.spawnRing(recipe.ring, params.x, params.y, params.color, contract);
+  }
+
+  spawnPowerRing(type, owner, params) {
+    params.color = getTierColor(owner);
+    params.direction = -params.direction;
+    this.spawn(type, params);
+    this.spawnRing(this.config.recipes[type].ring, params.x, params.y, params.color);
   }
 
   startTremor(fighter) {
@@ -191,7 +240,7 @@ export class EffectsSystem {
   spawn(type, { x, y, direction, color, secondaryColor }) {
     const recipe = this.config.recipes[type];
 
-    this.spawnSparks(recipe, x, y, direction);
+    this.spawnSparks(recipe, x, y, direction, recipe.tinted ? color : null);
     if (recipe.light) {
       this.spawnLight(recipe.light, x, y, color);
       if (secondaryColor) {
@@ -215,7 +264,7 @@ export class EffectsSystem {
     }
   }
 
-  spawnSparks(recipe, x, y, direction) {
+  spawnSparks(recipe, x, y, direction, tint = null) {
     const count = randomInt(this.random, recipe.count);
     const upward = degreesToRadians(recipe.upwardDegrees);
     const baseAngle = direction >= 0 ? -upward : Math.PI + upward;
@@ -236,7 +285,7 @@ export class EffectsSystem {
       particle.maxLife = randomRange(this.random, recipe.life);
       particle.life = particle.maxLife;
       particle.size = randomRange(this.random, recipe.size);
-      particle.color = pick(this.random, this.config.sparkColors);
+      particle.color = tint && i % 2 === 0 ? tint : pick(this.random, this.config.sparkColors);
     }
   }
 
@@ -253,7 +302,7 @@ export class EffectsSystem {
     light.duration = duration;
   }
 
-  spawnRing({ radius, lineWidth, alpha, duration }, x, y, color) {
+  spawnRing({ radius, lineWidth, alpha, duration }, x, y, color, contract = false) {
     let ring = this.rings[0];
     for (const candidate of this.rings) {
       if (!candidate.active) {
@@ -270,7 +319,8 @@ export class EffectsSystem {
     ring.color = color;
     ring.startRadius = this.config.ringStartRadius;
     ring.maxRadius = radius;
-    ring.radius = ring.startRadius;
+    ring.contract = contract;
+    ring.radius = contract ? radius : ring.startRadius;
     ring.lineWidth = lineWidth;
     ring.alpha = alpha;
     ring.time = 0;
@@ -332,7 +382,10 @@ export class EffectsSystem {
         continue;
       }
       const progress = ring.time / ring.duration;
-      ring.radius = ring.startRadius + (ring.maxRadius - ring.startRadius) * (1 - (1 - progress) * (1 - progress));
+      const eased = 1 - (1 - progress) * (1 - progress);
+      ring.radius = ring.contract
+        ? ring.maxRadius - (ring.maxRadius - ring.startRadius) * eased
+        : ring.startRadius + (ring.maxRadius - ring.startRadius) * eased;
     }
   }
 

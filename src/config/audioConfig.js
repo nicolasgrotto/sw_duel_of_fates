@@ -106,6 +106,38 @@ export const audioConfig = {
       { type: 'tone', wave: 'sine', from: 120, to: 55, duration: 0.18, attack: 0.002, gain: 0.32, filter: null },
       { type: 'noise', duration: 0.1, attack: 0.002, gain: 0.35, filter: { type: 'lowpass', from: 900, to: 300, q: 0.8 } },
     ],
+    powerCharge: [
+      { type: 'tone', wave: 'sine', from: 180, to: 420, duration: 0.24, attack: 0.04, gain: 0.08, filter: null },
+      { type: 'noise', duration: 0.22, attack: 0.08, gain: 0.12, filter: { type: 'bandpass', from: 600, to: 1600, q: 2 } },
+    ],
+    powerWave: [
+      { type: 'noise', duration: 0.3, attack: 0.01, gain: 0.4, filter: { type: 'lowpass', from: 1800, to: 300, q: 0.9 } },
+      { type: 'tone', wave: 'sine', from: 160, to: 60, duration: 0.3, attack: 0.005, gain: 0.3, filter: null },
+    ],
+    powerPull: [
+      { type: 'noise', duration: 0.3, attack: 0.18, gain: 0.35, filter: { type: 'lowpass', from: 300, to: 1600, q: 0.9 } },
+      { type: 'tone', wave: 'sine', from: 60, to: 150, duration: 0.3, attack: 0.15, gain: 0.25, filter: null },
+    ],
+    powerImpact: [
+      { type: 'tone', wave: 'sine', from: 110, to: 45, duration: 0.22, attack: 0.002, gain: 0.32, filter: null },
+      { type: 'noise', duration: 0.12, attack: 0.002, gain: 0.3, filter: { type: 'lowpass', from: 1200, to: 400, q: 0.8 } },
+    ],
+    lightning: [
+      { type: 'noise', duration: 0.09, attack: 0.002, gain: 0.35, filter: { type: 'highpass', from: 2400, to: 3200, q: 0.7 } },
+      { type: 'tone', wave: 'square', from: 95, to: 70, duration: 0.09, attack: 0.002, gain: 0.05, filter: { type: 'lowpass', from: 1400, to: 700, q: 1 } },
+    ],
+    barrier: [
+      { type: 'tone', wave: 'triangle', from: 300, to: 520, duration: 0.35, attack: 0.03, gain: 0.1, filter: null },
+      { type: 'tone', wave: 'sine', from: 600, to: 1040, duration: 0.35, attack: 0.03, gain: 0.04, filter: null },
+    ],
+    powerResisted: [
+      { type: 'tone', wave: 'triangle', from: 900, to: 860, duration: 0.25, attack: 0.002, gain: 0.12, filter: null },
+      { type: 'noise', duration: 0.06, attack: 0.002, gain: 0.2, filter: { type: 'bandpass', from: 2600, to: 2600, q: 1.5 } },
+    ],
+    powerAbsorbed: [
+      { type: 'tone', wave: 'triangle', from: 700, to: 640, duration: 0.2, attack: 0.002, gain: 0.12, filter: null },
+      { type: 'noise', duration: 0.05, attack: 0.002, gain: 0.18, filter: { type: 'bandpass', from: 2000, to: 2000, q: 1.5 } },
+    ],
     feint: [
       { type: 'noise', duration: 0.12, attack: 0.01, gain: 0.22, filter: { type: 'bandpass', from: 1800, to: 3200, q: 2 } },
     ],

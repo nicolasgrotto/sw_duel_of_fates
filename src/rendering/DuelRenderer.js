@@ -4,6 +4,7 @@ import { colors } from '../config/themeConfig.js';
 import { effectsConfig } from '../config/effectsConfig.js';
 import { ArenaRenderer } from './arenaRenderer.js';
 import { DodgeAfterimage } from './DodgeAfterimage.js';
+import { PowerRenderer } from './PowerRenderer.js';
 import { drawDesaturation, drawFlash, drawImpactLights, drawParticles, drawRings } from './effectsRenderer.js';
 import { computePose, createPose } from './fighterPose.js';
 import { drawFighterBody } from './fighterRenderer.js';
@@ -24,6 +25,7 @@ export class DuelRenderer {
     this.poses = new Map();
     this.trails = new Map();
     this.afterimages = new Map();
+    this.powerView = new PowerRenderer();
     this.bladePoints = { baseX: 0, baseY: 0, tipX: 0, tipY: 0 };
   }
 
@@ -96,6 +98,7 @@ export class DuelRenderer {
       renderer.restore();
     }
 
+    this.powerView.draw(renderer, fighters);
     drawImpactLights(renderer, effects.lights);
     drawRings(renderer, effects.rings);
     drawParticles(renderer, effects.particles.particles, effectsConfig.particle.streakTime);

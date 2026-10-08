@@ -582,14 +582,15 @@ O Fluxo é a energia dos poderes. Nomes de tela em `uiConfig`; no código, `powe
 
 | Poder | Alinhamento | Comando | Efeito |
 | --- | --- | --- | --- |
-| Empurrão | Aurora | Poder | onda à frente: afasta e desequilibra (STAGGERED); com guarda, só recua e gasta stamina |
-| Barreira | Aurora | trás + Poder (segurar) | domo enquanto segura e há medidor: absorve poderes e segura golpes de lâmina sem gastar stamina; o empurrão de corpo (shove) quebra |
+| Repulsão | Aurora | Poder | onda à frente: afasta e desequilibra (STAGGERED); com guarda, só recua e gasta stamina |
+| Barreira | Aurora | trás + Poder (segurar) | domo enquanto segura e há medidor: absorve poderes e segura golpes de lâmina sem gastar stamina; o Empurrão de corpo quebra |
 | Raio | Eclipse | Poder (segurar) | canalizado: dano em pulsos curtos com pequeno recuo; a guarda reduz o dano a um quarto e gasta stamina; entre pulsos o alvo pode agir |
 | Puxão | Eclipse | frente + Poder | traz o alvo para perto e o desequilibra: abre punição |
 
 - Quem lança fica vulnerável na preparação: um golpe interrompe o poder.
 - Esquiva e EVADE com invulnerabilidade fazem o poder passar.
-- A Barreira contra o Empurrão segura, mas o dono recua um pouco.
-- Poderes não têm projétil: o efeito é decidido no instante ativo (empurrão e puxão) ou em cada pulso (raio).
+- A Barreira contra a Repulsão segura, mas o dono recua um pouco.
+- Poderes não têm projétil: o efeito é decidido no instante ativo (Repulsão e Puxão) ou em cada pulso (Raio).
+- Nomes de tela em `uiConfig.texts.powers`; os ids no código são `push`, `pull`, `lightning` e `barrier`.
 
 **Elenco.** Aurora: Guardião, Bastião, Vespa, Espelho, Garça. Eclipse: Sombra, Haste, Brasa, Forja, Eco. Chefe do Arcade: Eclipse, nível 9.

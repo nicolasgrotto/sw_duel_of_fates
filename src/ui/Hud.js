@@ -18,6 +18,7 @@ function createSideState(fighter, side) {
     ghostDelay: 0,
     lastHealth: fighter.health,
     rejectTime: 0,
+    powerRejectTime: 0,
   };
 }
 
@@ -35,20 +36,23 @@ export class Hud {
     for (const state of this.sides) {
       this.updateGhost(state, dt);
       state.rejectTime = Math.max(0, state.rejectTime - dt);
+      state.powerRejectTime = Math.max(0, state.powerRejectTime - dt);
     }
   }
 
   handleEvents(events) {
     for (const event of events) {
       if (event.type === CombatEvent.ACTION_REJECTED) {
-        this.flashRejected(event.attacker);
+        this.flashRejected(event.attacker, event.attackType === 'power');
       }
     }
   }
 
-  flashRejected(fighter) {
+  flashRejected(fighter, power = false) {
     for (const state of this.sides) {
-      if (state.fighter === fighter) {
+      if (state.fighter === fighter && power) {
+        state.powerRejectTime = layout.hud.rejectFlashDuration;
+      } else if (state.fighter === fighter) {
         state.rejectTime = layout.hud.rejectFlashDuration;
       }
     }
@@ -127,7 +131,9 @@ export class Hud {
     const { fighter } = state;
     const { healthWidth, powerGap, powerHeight } = layout.hud;
     const barY = y + powerGap;
-    const color = getPowerTier(fighter.powerLevel, powersConfig.tiers).color;
+    const tierColor = getPowerTier(fighter.powerLevel, powersConfig.tiers).color;
+    const period = layout.hud.rejectBlinkPeriod;
+    const color = state.powerRejectTime > 0 && state.powerRejectTime % period >= period / 2 ? colors.hudDanger : tierColor;
     renderer.fillRect(barX, barY, healthWidth, powerHeight, colors.hudTrack);
     this.fillBar(renderer, barX, barY, healthWidth, powerHeight, fighter.powerMeter / fighter.stats.power.max, isLeft, color);
   }

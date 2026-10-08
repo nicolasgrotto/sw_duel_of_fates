@@ -117,6 +117,7 @@ src/
     SaberTrail.js           ✅ rastro da lâmina na fase active
     DodgeAfterimage.js      ✅ silhuetas transparentes durante a esquiva
     effectsRenderer.js      ✅ partículas, luzes de impacto e flash
+    PowerRenderer.js        ✅ brilho de carga, raio (polilinhas) e domo da Barreira, só lendo o estado
   ui/                       ✅ peças de interface desenhadas no canvas
     attributeBars.js        ✅ seis linhas de nove segmentos; somente leitura
     TouchControls.js        ✅ desenho de joystick e botões sem alterar input
@@ -556,6 +557,7 @@ Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 22).
 - **Interrupção.** `Fighter.clearAttack` também limpa o poder (`clearPower`), então qualquer golpe, empurrão ou desequilíbrio interrompe quem está lançando.
 - **Puxão.** A velocidade vem do atrito de ação da física (`friction`, repassado pela `DuelSimulation`): `√(2 × atrito × distância)` faz o alvo parar perto de `endGap`.
 - **Estado.** Tudo que muda fica em `fighter.combat` (`power`, `powerEndTime`, `powerTick`, `powerTargeted`, `powerCooldown`, `powerTargetX/Y`) e em `fighter.powerMeter`; o replay re-simula igual (teste dedicado). `powerTargetX/Y` guarda o ponto mirado para o render, sem lógica no renderer.
+- **Apresentação.** O `PowerRenderer` (chamado pelo `DuelRenderer` depois das lâminas) só lê o estado: brilho de carga na mão durante o startup, domo da Barreira enquanto `isBarrierUp`, raio enquanto o canal está aberto, da mão até `powerTargetX/Y`. O raio guarda, por lutador, deslocamentos perpendiculares em `Float32Array` (RNG próprio com seed, renovados a cada `render.boltRefresh` do tempo de animação) e recalcula os pontos a cada frame sem alocar. Cores e intensidade vêm do tier (`getPowerTier`); toda luz usa `drawGlow` (sprite em cache por cor). O `EffectsSystem` trata `powerActive` (anel que abre ou, no Puxão, fecha: `ring.contract`), `powerHit`, `powerBlocked`, `powerResisted` (anel na cor do tier do alvo) e `powerAbsorbed`; receitas com `tinted` pintam metade das faíscas na cor do tier. Poses em `fighterVisualConfig.combatPoses.powers` (`cast`, `channel`, `barrier`), com entrada no startup e volta na recuperação. Sons sintetizados em `audioConfig.sounds` (carga, onda, puxão, impacto, raio, barreira, resistido, absorvido). A HUD pisca o medidor quando a rejeição vem com `attackType: 'power'`. A lista de golpes (aberta pela pausa, que recebe `rules`) mostra os poderes do alinhamento quando eles estão ligados.
 - **Entrada.** Teclado `U` (preset de setas: `N`; 2 Jogadores: J1 `R`, J2 `O`/Numpad6), gamepad RT, botão de toque `Poder` (só aparece quando o `DuelState` chama `touch.setFeatures(['powers'])`). `POWER` está em `remappableActions`; o `IntentRecorder` grava `power` e `powerHeld` no fim da lista de flags.
 
 ## Balanceamento

@@ -38,6 +38,18 @@ function getSoundForEvent(event) {
       return SoundName.PARRY;
     case CombatEvent.PERFECT_PARRY:
       return SoundName.PERFECT_PARRY;
+    case CombatEvent.POWER_START:
+      return event.attackType === 'barrier' ? SoundName.BARRIER : SoundName.POWER_CHARGE;
+    case CombatEvent.POWER_ACTIVE:
+      return event.attackType === 'pull' ? SoundName.POWER_PULL : SoundName.POWER_WAVE;
+    case CombatEvent.POWER_HIT:
+      return event.attackType === 'lightning' ? SoundName.LIGHTNING : SoundName.POWER_IMPACT;
+    case CombatEvent.POWER_BLOCKED:
+      return SoundName.BLOCK;
+    case CombatEvent.POWER_RESISTED:
+      return SoundName.POWER_RESISTED;
+    case CombatEvent.POWER_ABSORBED:
+      return SoundName.POWER_ABSORBED;
     default:
       return null;
   }

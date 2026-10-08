@@ -192,6 +192,15 @@ export const texts = {
       evade: 'Esquiva de precis\u00e3o (timing curto, sem stamina)',
       passive: 'sempre ativo',
     },
+    power: 'Poder: {name}',
+    powerHeld: 'Poder: {name} (segurar)',
+  },
+  powers: {
+    push: 'Repulsão',
+    pull: 'Puxão',
+    lightning: 'Raio',
+    barrier: 'Barreira',
+    alignments: { light: 'Aurora', dark: 'Eclipse' },
   },
   pause: {
     title: 'PAUSADO',
@@ -325,8 +334,8 @@ export const layout = {
   },
   moveList: {
     titleY: 100,
-    firstRowY: 180,
-    rowSpacing: 42,
+    firstRowY: 165,
+    rowSpacing: 36,
     keysX: 330,
     labelX: 370,
     footerY: 650,

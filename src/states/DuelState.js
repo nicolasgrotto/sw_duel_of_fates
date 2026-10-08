@@ -346,7 +346,7 @@ export class DuelState extends GameState {
 
   update(dt) {
     if (this.isPausePressed()) {
-      this.game.pushState(StateId.PAUSE, { duelParams: this.params });
+      this.game.pushState(StateId.PAUSE, { duelParams: this.params, rules: this.rules });
       return;
     }
 

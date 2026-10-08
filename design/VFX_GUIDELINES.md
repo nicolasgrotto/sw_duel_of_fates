@@ -38,8 +38,10 @@ Os valores reais ficam em `src/config/effectsConfig.js`.
 | `hit-flash` | `hit` | silhueta do atingido fica branca por ~0,06 s | — | — |
 | `dodge-afterimage` | (render) durante a esquiva | 3 silhuetas transparentes que somem rápido | — | — |
 | `power-charge` | (render) preparação de um poder | glow na mão da frente, na cor do tier | — | — |
-| `power-push` | `powerHit` do Empurrão | arcos que se abrem, 6–10 partículas na cor do tier | leve | — |
-| `power-pull` | `powerHit` do Puxão | arcos que se fecham, 6–10 partículas | leve | — |
+| `power-wave` | `powerActive` | anel à frente de quem lança: abre na Repulsão, fecha no Puxão; luz pequena | — | — |
+| `power-impact` | `powerHit` da Repulsão e do Puxão | 6–10 partículas (metade na cor do tier), luz média | leve | — |
+| `lightning-tick` | `powerHit` do Raio | 2–4 partículas, luz pequena, flash branco no atingido | — | — |
+| `power-blocked` | `powerBlocked` | 4–6 partículas, luz pequena | — | — |
 | `power-lightning` | (render) canal do Raio | polilinha dupla, glow no ponto atingido; 2–4 partículas por pulso | — | — |
 | `power-barrier` | (render) canal da Barreira | elipse com glow pulsando | — | — |
 | `power-resisted` | `powerResisted` | anel na cor do tier do alvo, 4–6 partículas | — | — |
