@@ -1,3 +1,5 @@
+import { loadSave, saveSave } from './saveStorage.js';
+
 function isValid(value, defaultValue, allowedValues) {
   if (typeof value !== typeof defaultValue) {
     return false;
@@ -9,7 +11,7 @@ export function loadSettings(defaults, storage, key, allowed = {}) {
   const settings = { ...defaults };
 
   try {
-    const saved = JSON.parse(storage?.getItem(key) ?? 'null');
+    const saved = loadSave(storage, key)?.settings;
     if (!saved || typeof saved !== 'object') {
       return settings;
     }
@@ -25,10 +27,5 @@ export function loadSettings(defaults, storage, key, allowed = {}) {
 }
 
 export function saveSettings(settings, storage, key) {
-  try {
-    storage?.setItem(key, JSON.stringify(settings));
-    return true;
-  } catch {
-    return false;
-  }
+  return saveSave(settings, storage, key);
 }

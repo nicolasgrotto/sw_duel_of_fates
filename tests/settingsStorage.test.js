@@ -52,3 +52,25 @@ describe('settingsStorage', () => {
     assert.equal(saveSettings(defaults, broken, KEY), false);
   });
 });
+
+it('migrates a complete v1 save without losing progress or bindings', () => {
+  const settings = {
+    difficulty: 'hard', sound: false, music: true, reducedEffects: true,
+    finalReplay: false, keyboardPreset: 'custom', customBindings: { jump: ['KeyQ'] },
+    arcadeCleared: ['guardian', 'wasp'], unlocks: { guardian: ['challenge'] },
+    survivalBest: 17, parryChallengeBest: 920,
+  };
+  const storage = createStorage({ [KEY]: JSON.stringify(settings) });
+  assert.deepEqual(loadSettings({ difficulty: 'normal', sound: true, music: false, reducedEffects: false, finalReplay: true, keyboardPreset: 'classic', customBindings: {}, arcadeCleared: [], unlocks: {}, survivalBest: 0, parryChallengeBest: 0 }, storage, KEY), settings);
+  saveSettings(settings, storage, KEY);
+  assert.deepEqual(JSON.parse(storage.data[KEY]), { version: 2, settings });
+  assert.deepEqual(loadSettings({ difficulty: 'normal', sound: true, music: false, reducedEffects: false, finalReplay: true, keyboardPreset: 'classic', customBindings: {}, arcadeCleared: [], unlocks: {}, survivalBest: 0, parryChallengeBest: 0 }, storage, KEY), settings);
+});
+
+it('rejects future versions and invalid envelopes without overwriting storage', () => {
+  for (const saved of [{ version: 3, settings: { sound: false } }, { version: 2, settings: [] }, { version: 0 }, []]) {
+    const storage = createStorage({ [KEY]: JSON.stringify(saved) });
+    assert.deepEqual(loadSettings(defaults, storage, KEY, allowed), defaults);
+    assert.equal(storage.data[KEY], JSON.stringify(saved));
+  }
+});

@@ -33,6 +33,7 @@ src/
     StateMachine.js         ✅ pilha de estados
     Camera.js               ✅ screen shake (com limites)
     AudioManager.js         ✅ AudioContext, buses de sfx e música, liberação no primeiro input
+    saveStorage.js          save versionado com lista ordenada de migracoes
     settingsStorage.js      ✅ carrega e salva as opções (localStorage, tolerante a erro)
     keyBindings.js          ✅ preset personalizado: junta, troca teclas entre ações e valida o que vem do armazenamento
     AssetManager.js         ⏳ só quando houver assets externos
@@ -319,6 +320,8 @@ A pilha de estados chama `resume()` no estado que volta ao topo depois de um `po
 `keyboardPresets` em controlsConfig oferece classic e arrows (setas + Z/X/C/V). `Game.settings.keyboardPreset` é validado e salvo no localStorage; aplicar opções chama `Input.setBindings`, que troca os mapas de teclas e limpa teclas/toques anteriores. Controles, dicas do duelo e rodapé do menu leem o mapa ativo. Opções permite alternar o preset. Gamepad não depende dessa seleção.
 
 Fontes seguem o contrato `{ actions: Set, poll?(), reset?(), endFrame?(), destroy?() }`. `Input.addSource(source)` registra uma fonte. `poll()` (alias `pollGamepads`) combina fontes. Teclado preserva toques curtos entre polls; `endFrame` sincroniza a soma e limpa bordas. `reset` libera inputs no blur; `destroy` remove listeners. TouchInput deve implementar reset e destroy. Bindings e lastPressedCode pertencem ao teclado; gamepadSlot e rumble ao gamepad.
+
+Save: `saveStorage.js` usa a mesma chave e escreve `{ version: 2, settings }`. A lista `saveMigrations` transforma o objeto plano v1 no envelope v2; JSON corrompido, envelopes invalidos e versoes futuras retornam defaults sem sobrescrever dados. `settingsStorage.js` continua validando campos com `loadSettings` e delega leitura/escrita ao saveStorage. Teste com fixture completa do formato v1 cobre progresso, cores, recordes e bindings.
 
 ## Estados (StateMachine)
 
