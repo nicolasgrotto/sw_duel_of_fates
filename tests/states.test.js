@@ -56,6 +56,12 @@ function createFakeGame() {
   return game;
 }
 
+function goToMenuItem(game, id) {
+  for (let i = 0; i < 20 && game.states.current.menu.selected.id !== id; i += 1) {
+    game.step(Action.MENU_DOWN);
+  }
+}
+
 function skipIntro(game) {
   for (let time = 0; time <= layout.messages.introDuration; time += STEP) {
     game.step();
@@ -96,11 +102,7 @@ describe('state flow', () => {
     const game = createFakeGame();
     game.changeState(StateId.MENU);
 
-    game.step(Action.MENU_DOWN);
-    game.step(Action.MENU_DOWN);
-    game.step(Action.MENU_DOWN);
-    game.step(Action.MENU_DOWN);
-    game.step(Action.MENU_DOWN);
+    goToMenuItem(game, 'training');
     game.step(Action.CONFIRM);
 
     assert.equal(game.states.current.mode, DuelMode.TRAINING);
@@ -110,12 +112,7 @@ describe('state flow', () => {
     const game = createFakeGame();
     game.changeState(StateId.MENU);
 
-    game.step(Action.MENU_DOWN);
-    game.step(Action.MENU_DOWN);
-    game.step(Action.MENU_DOWN);
-    game.step(Action.MENU_DOWN);
-    game.step(Action.MENU_DOWN);
-    game.step(Action.MENU_DOWN);
+    goToMenuItem(game, 'options');
     game.step(Action.CONFIRM);
     assert.deepEqual(game.stateNames(), ['MenuState', 'OptionsState']);
     const options = game.states.current;
@@ -140,12 +137,7 @@ describe('state flow', () => {
     assert.equal(game.saved, 5);
 
     game.step(Action.BACK);
-    game.step(Action.MENU_UP);
-    game.step(Action.MENU_UP);
-    game.step(Action.MENU_UP);
-    game.step(Action.MENU_UP);
-    game.step(Action.MENU_UP);
-    game.step(Action.MENU_UP);
+    goToMenuItem(game, 'duel');
     game.step(Action.CONFIRM);
     game.step(Action.CONFIRM);
     game.step(Action.CONFIRM);
@@ -522,6 +514,32 @@ describe('duel rounds', () => {
     assert.equal(game.states.current.params.unlockLine, 'Cor liberada: Verde-escória');
   });
 
+  it('plays survival fights in one round, carries the health and saves the best score', () => {
+    const game = createFakeGame();
+    game.settings.survivalBest = 0;
+    game.changeState(StateId.DUEL, { mode: DuelMode.SURVIVAL, survival: { playerCharacter: 'guardian', playerSaberColor: null, wins: 0, health: null, seed: 7 } });
+    const first = game.states.current;
+    assert.equal(first.roundsToWin, 1);
+    assert.ok(first.banner.title.includes('SOBREVIVÊNCIA'));
+
+    first.player.health = 50;
+    winRound(game);
+    const result = game.states.current;
+    assert.equal(result.title, 'VITÓRIA 1');
+    game.step(Action.CONFIRM);
+
+    const second = game.states.current;
+    assert.equal(second.params.survival.wins, 1);
+    assert.ok(Math.abs(second.player.health - (50 + second.player.stats.maxHealth * 0.3)) < 1e-9);
+
+    second.player.health = 0;
+    second.roundWins[1] = 1;
+    second.outcome = { winner: second.fighters[1], loser: second.player, time: 10 };
+    second.finishRound();
+    assert.equal(game.states.current.title, 'FIM DA SOBREVIVÊNCIA');
+    assert.equal(game.settings.survivalBest, 1);
+  });
+
   it('runs the arcade ladder: next fight on a win, retry on a loss', () => {
     const game = createFakeGame();
     game.changeState(StateId.MENU);
@@ -711,8 +729,7 @@ it('keeps both fighters at full health in the tutorial', () => {
 it('lets two players pick with their own controls and fight locally', () => {
   const game = createFakeGame();
   game.changeState(StateId.MENU);
-  game.step(Action.MENU_DOWN);
-  game.step(Action.MENU_DOWN);
+  goToMenuItem(game, 'local');
   game.step(Action.CONFIRM);
   const select = game.states.current;
   assert.equal(select.getTitle(), 'JOGADOR 1 · ESCOLHA');

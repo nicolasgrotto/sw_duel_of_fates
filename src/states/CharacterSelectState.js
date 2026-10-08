@@ -13,7 +13,9 @@ import { drawSaber } from '../rendering/saberRenderer.js';
 import { formatText } from '../ui/formatText.js';
 import { formatActionKeys } from '../ui/keyLabels.js';
 import { createArcadeRun } from '../modes/arcade.js';
+import { createSurvivalRun } from '../modes/survival.js';
 import { getSaberOptions } from '../modes/unlocks.js';
+import { createRandomSeed } from '../utils/random.js';
 import { MenuList } from '../ui/MenuList.js';
 import { DuelMode } from './duelModes.js';
 import { GameState } from './GameState.js';
@@ -126,6 +128,11 @@ export class CharacterSelectState extends GameState {
     if (this.step === SelectStep.PLAYER && this.params.mode === DuelMode.ARCADE) {
       const run = createArcadeRun(choice, this.characterIds, gameConfig.arcade);
       this.game.changeState(StateId.DUEL, { mode: DuelMode.ARCADE, arcade: { ...run, playerSaberColor: this.getChosenColorParam(choice) } });
+      return;
+    }
+    if (this.step === SelectStep.PLAYER && this.params.mode === DuelMode.SURVIVAL) {
+      const run = createSurvivalRun(choice, this.getChosenColorParam(choice), createRandomSeed());
+      this.game.changeState(StateId.DUEL, { mode: DuelMode.SURVIVAL, survival: run });
       return;
     }
     if (this.step === SelectStep.PLAYER) {

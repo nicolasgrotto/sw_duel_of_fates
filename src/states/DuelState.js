@@ -24,6 +24,7 @@ import { ParryChallenge } from '../modes/ParryChallenge.js';
 import { TutorialDirector } from '../modes/TutorialDirector.js';
 import { BannerKind, ModeBanner } from '../ui/ModeBanner.js';
 import { getArcadeStage, isLastStage, nextArcadeRun } from '../modes/arcade.js';
+import { getSurvivalStage, nextSurvivalRun } from '../modes/survival.js';
 import { ARCADE_UNLOCK, addUnlocks, findChallengeUnlocks } from '../modes/unlocks.js';
 import { Camera } from '../core/Camera.js';
 import { PlayerController } from '../controllers/PlayerController.js';
@@ -68,21 +69,28 @@ export class DuelState extends GameState {
     this.debugBox = createBox();
     this.mode = this.params.mode ?? DuelMode.VERSUS;
     this.arcadeStage = this.mode === DuelMode.ARCADE ? getArcadeStage(this.params.arcade, gameConfig.arcade, gameConfig.duel.arenaOrder) : null;
-    this.playerCharacter = this.arcadeStage ? this.params.arcade.playerCharacter : (this.params.playerCharacter ?? gameConfig.duel.playerCharacter);
-    this.opponentCharacter = this.arcadeStage ? this.arcadeStage.opponentCharacter : (this.params.opponentCharacter ?? gameConfig.duel.opponentCharacter);
-    this.difficultyId = this.arcadeStage ? this.arcadeStage.difficulty : this.game.settings.difficulty;
+    this.survivalStage = this.mode === DuelMode.SURVIVAL ? this.createSurvivalStage() : null;
+    this.ladderStage = this.arcadeStage ?? this.survivalStage;
+    this.ladderRun = this.params.arcade ?? this.params.survival ?? null;
+    this.roundsToWin = this.survivalStage ? 1 : gameConfig.duel.roundsToWin;
+    this.playerCharacter = this.ladderStage ? this.ladderRun.playerCharacter : (this.params.playerCharacter ?? gameConfig.duel.playerCharacter);
+    this.opponentCharacter = this.ladderStage ? this.ladderStage.opponentCharacter : (this.params.opponentCharacter ?? gameConfig.duel.opponentCharacter);
+    this.difficultyId = this.ladderStage ? this.ladderStage.difficulty : this.game.settings.difficulty;
     this.enraged = false;
     this.random = createRandom(createRandomSeed());
     if (this.isLocal) {
       this.game.input.setBindings(twoPlayerBindings.p1);
     }
     this.arena = createArenaBounds(gameConfig);
-    this.arenaId = this.arcadeStage ? this.arcadeStage.arena : (this.params.arena ?? gameConfig.duel.arena);
+    this.arenaId = this.ladderStage ? this.ladderStage.arena : (this.params.arena ?? gameConfig.duel.arena);
     this.arenaDefinition = arenas[this.arenaId];
     this.ambients = this.arenaDefinition.ambient.map((config) => new AmbientSystem(config, this.arena, createRandom(createRandomSeed())));
     this.participants = this.createParticipants();
     this.opponentController = this.participants[1].controller;
     this.fighters = this.participants.map((participant) => participant.fighter);
+    if (this.survivalStage) {
+      this.applySurvivalHealth();
+    }
     this.simulation = new DuelSimulation({
       arena: this.arena,
       fighters: this.fighters,
@@ -126,8 +134,9 @@ export class DuelState extends GameState {
     } else if (this.mode === DuelMode.CHALLENGE) {
       this.director = new ParryChallenge(tutorialConfig.challenge);
       this.banner = new ModeBanner(BannerKind.CHALLENGE, this.director, bindings);
-    } else if (this.arcadeStage) {
-      this.banner = new ModeBanner(BannerKind.ARCADE, { ...this.arcadeStage, opponentName: this.fighters[1].name }, bindings);
+    } else if (this.ladderStage) {
+      const kind = this.survivalStage ? BannerKind.SURVIVAL : BannerKind.ARCADE;
+      this.banner = new ModeBanner(kind, { ...this.ladderStage, opponentName: this.fighters[1].name }, bindings);
       this.banner.update();
     }
     this.applyDummyBehavior();
@@ -141,7 +150,7 @@ export class DuelState extends GameState {
 
   updateBossEnrage() {
     const boss = this.fighters[1];
-    if (!this.arcadeStage?.isBoss || this.enraged || !this.isPlaying()) {
+    if (!this.ladderStage?.isBoss || this.enraged || !this.isPlaying()) {
       return;
     }
     if (boss.health / boss.stats.maxHealth >= gameConfig.arcade.enrageHealthRatio) {
@@ -211,19 +220,19 @@ export class DuelState extends GameState {
   }
 
   createHud() {
-    const rounds = this.hasRoundLimit ? { wins: this.roundWins, roundsToWin: gameConfig.duel.roundsToWin } : null;
+    const rounds = this.hasRoundLimit ? { wins: this.roundWins, roundsToWin: this.roundsToWin } : null;
     const names = this.isLocal ? this.fighters.map((fighter, index) => formatText(texts.local.hudName, { player: index + 1, name: fighter.name })) : null;
     return new Hud(this.fighters[0], this.fighters[1], rounds, names);
   }
 
   showRoundIntro() {
-    const isFinal = this.hasRoundLimit && this.roundWins.every((wins) => wins === gameConfig.duel.roundsToWin - 1);
+    const isFinal = this.hasRoundLimit && this.roundsToWin > 1 && this.roundWins.every((wins) => wins === this.roundsToWin - 1);
     const text = isFinal ? texts.duel.finalRound : formatText(texts.duel.intro, { number: this.roundNumber });
     this.message.show(text, layout.messages.introDuration);
   }
 
   finishRound() {
-    if (this.hasRoundLimit && this.outcome.winner && this.roundWins.some((wins) => wins >= gameConfig.duel.roundsToWin)) {
+    if (this.hasRoundLimit && this.outcome.winner && this.roundWins.some((wins) => wins >= this.roundsToWin)) {
       if (this.shouldShowReplay()) {
         this.replayShown = true;
         this.game.pushState(StateId.REPLAY, {
@@ -239,8 +248,20 @@ export class DuelState extends GameState {
     this.startNextRound();
   }
 
+  createSurvivalStage() {
+    const roster = Object.keys(characters).filter((id) => characters[id].selectable);
+    return getSurvivalStage(this.params.survival, roster, gameConfig.survival, gameConfig.duel.arenaOrder);
+  }
+
+  applySurvivalHealth() {
+    const { health } = this.params.survival;
+    if (health !== null) {
+      this.player.health = health;
+    }
+  }
+
   shouldShowReplay() {
-    return !this.replayShown && this.game.settings.finalReplay !== false && this.replayBuffer.hasReplay();
+    return !this.survivalStage && !this.replayShown && this.game.settings.finalReplay !== false && this.replayBuffer.hasReplay();
   }
 
   startNextRound() {
@@ -248,6 +269,9 @@ export class DuelState extends GameState {
     const half = gameConfig.duel.spawnDistance / 2;
     this.fighters[0].resetForRound(centerX - half, 1);
     this.fighters[1].resetForRound(centerX + half, -1);
+    if (this.survivalStage) {
+      this.applySurvivalHealth();
+    }
     this.participants[0].controller.clearCapturedInput();
     if (this.usesDummy) {
       this.opponentController.attackTimer = 0;
@@ -280,7 +304,7 @@ export class DuelState extends GameState {
     const centerX = (this.arena.left + this.arena.right) / 2;
     const { floorY } = this.arena;
 
-    const playerSaberColor = this.arcadeStage ? this.params.arcade.playerSaberColor : this.params.playerSaberColor;
+    const playerSaberColor = this.ladderRun ? this.ladderRun.playerSaberColor : this.params.playerSaberColor;
     const player = createFighter(playerCharacter, { x: centerX - spawnDistance / 2, y: floorY, facing: 1 }, { saberColor: playerSaberColor });
     const opponent = createFighter(opponentCharacter, { x: centerX + spawnDistance / 2, y: floorY, facing: -1 }, { saberColor: this.params.opponentSaberColor });
 
@@ -552,6 +576,10 @@ export class DuelState extends GameState {
 
   showResult() {
     const playerWon = this.outcome.winner === this.player;
+    if (this.survivalStage) {
+      this.showSurvivalResult(playerWon);
+      return;
+    }
     if (this.arcadeStage && playerWon && isLastStage(this.params.arcade)) {
       this.showArcadeComplete();
       return;
@@ -593,6 +621,35 @@ export class DuelState extends GameState {
 
   getLocalTitle(playerWon) {
     return this.isLocal ? { title: formatText(texts.local.winner, { player: playerWon ? 1 : 2 }) } : {};
+  }
+
+  showSurvivalResult(playerWon) {
+    const run = this.params.survival;
+    if (playerWon) {
+      const next = nextSurvivalRun(run, this.player.health, this.player.stats.maxHealth, gameConfig.survival.healRatio);
+      this.game.pushState(StateId.GAME_OVER, {
+        duelParams: this.params,
+        title: formatText(texts.survival.winTitle, { wins: next.wins }),
+        subtitle: formatText(texts.survival.health, { percent: Math.round((next.health / this.player.stats.maxHealth) * 100) }),
+        summary: '',
+        rematchLabel: texts.survival.next,
+        rematchParams: { mode: DuelMode.SURVIVAL, survival: next },
+      });
+      return;
+    }
+    const best = this.game.settings.survivalBest ?? 0;
+    if (run.wins > best) {
+      this.game.settings.survivalBest = run.wins;
+      this.game.saveSettings();
+    }
+    this.game.pushState(StateId.GAME_OVER, {
+      duelParams: this.params,
+      title: texts.survival.overTitle,
+      subtitle: formatText(run.wins > best ? texts.survival.newRecord : texts.survival.score, { wins: run.wins, best: Math.max(best, run.wins) }),
+      summary: '',
+      rematchLabel: texts.survival.retry,
+      rematchParams: { mode: DuelMode.SURVIVAL, survival: { ...run, wins: 0, health: null, seed: run.seed + 1 } },
+    });
   }
 
   getArcadeOptions(playerWon) {

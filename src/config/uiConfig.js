@@ -20,6 +20,7 @@ export const texts = {
     tagline: 'UM DUELO DE LÂMINAS DE ENERGIA',
     duel: 'Duelar',
     arcade: 'Arcade',
+    survival: 'Sobrevivência',
     local: '2 Jogadores',
     tutorial: 'Tutorial',
     challenge: 'Desafio de parry',
@@ -124,6 +125,17 @@ export const texts = {
   local: {
     hudName: 'J{player} · {name}',
     winner: 'JOGADOR {player} VENCE',
+  },
+  survival: {
+    banner: 'SOBREVIVÊNCIA  ·  VITÓRIAS {wins}  ·  {name}',
+    bossBanner: 'SOBREVIVÊNCIA  ·  VITÓRIAS {wins}  ·  CHEFE  ·  {name}',
+    winTitle: 'VITÓRIA {wins}',
+    health: 'Vida para a próxima luta: {percent}%',
+    next: 'Próximo adversário',
+    overTitle: 'FIM DA SOBREVIVÊNCIA',
+    score: '{wins} vitórias   ·   Recorde  {best}',
+    newRecord: '{wins} vitórias   ·   NOVO RECORDE',
+    retry: 'Tentar de novo',
   },
   arcade: {
     banner: 'ARCADE  ·  LUTA {number} DE {total}  ·  {name}',
@@ -231,11 +243,11 @@ export const keyComboSeparator = '  +  ';
 
 export const layout = {
   menu: {
-    titleY: 150,
-    taglineY: 214,
-    firstItemY: 290,
-    itemSpacing: 42,
-    footerY: 670,
+    titleY: 140,
+    taglineY: 202,
+    firstItemY: 270,
+    itemSpacing: 40,
+    footerY: 680,
   },
   replay: {
     labelY: 690,

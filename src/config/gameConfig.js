@@ -49,6 +49,13 @@ export const gameConfig = {
     speed: 0.45,
     minDuration: 1,
   },
+  survival: {
+    healRatio: 0.3,
+    bossEvery: 5,
+    boss: 'shadowAwakened',
+    bossDifficulty: 'hard',
+    difficultyByWins: [[0, 'easy'], [2, 'normal'], [5, 'hard']],
+  },
   arcade: {
     maxOpponents: 6,
     difficulties: ['easy', 'easy', 'normal', 'normal', 'hard', 'hard'],

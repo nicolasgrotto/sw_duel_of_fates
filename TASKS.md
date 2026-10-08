@@ -206,7 +206,7 @@ As regras já estão definidas em GAME_DESIGN.md, design/VFX_GUIDELINES.md e des
 - [x] Remapeamento de teclas (Opções → Configurar teclas, preset Personalizado salvo)
 - [x] Desafios por personagem com cores de sabre desbloqueáveis (Arcade + desafio próprio, troca de cor na seleção)
 - [x] Garça e Eco, pulo na parede (finta, mergulho aéreo, salto, passo-reflexo)
-- [ ] Sobrevivência
+- [x] Sobrevivência (um round por luta, vida carregada, chefe a cada 5 vitórias, recorde salvo)
 
 ### v1.0 — Portfólio
 

@@ -8,6 +8,7 @@ export const BannerKind = Object.freeze({
   TUTORIAL: 'tutorial',
   CHALLENGE: 'challenge',
   ARCADE: 'arcade',
+  SURVIVAL: 'survival',
 });
 
 function createKeyNames(bindings) {
@@ -35,6 +36,10 @@ export class ModeBanner {
   update() {
     if (this.kind === BannerKind.ARCADE) {
       this.describeArcade();
+      return;
+    }
+    if (this.kind === BannerKind.SURVIVAL) {
+      this.describeSurvival();
       return;
     }
     const signature = this.kind === BannerKind.TUTORIAL
@@ -76,6 +81,19 @@ export class ModeBanner {
     this.title = formatText(stage.isBoss ? texts.arcade.bossBanner : texts.arcade.banner, {
       number: stage.number,
       total: stage.total - 1,
+      name: stage.opponentName.toUpperCase(),
+    });
+    this.detail = '';
+  }
+
+  describeSurvival() {
+    if (this.signature) {
+      return;
+    }
+    const stage = this.director;
+    this.signature = 'survival';
+    this.title = formatText(stage.isBoss ? texts.survival.bossBanner : texts.survival.banner, {
+      wins: stage.wins,
       name: stage.opponentName.toUpperCase(),
     });
     this.detail = '';
