@@ -17,4 +17,4 @@
 ## Ponto de continuidade
 
 - **v1.0** publicada: `main` e tag `v1.0.0` no GitHub. Falta ativar o GitHub Pages (passos no README) e, se o autor quiser, gravar GIFs para o README.
-- **v2.0** em andamento na `v2-development`. **v1.1 Fundação** e **v1.3 Movimento** concluídas, com tags locais `v1.1` e `v1.3`. Próximos itens: **v1.2 Mobile (Codex)**, ainda pendente, e **v1.4 Atributos (Codex)**. Codex continua Mobile e depois Atributos.
+- **v2.0** em andamento na `v2-development`. **v1.1 Fundação** e **v1.3 Movimento** concluídas, com tags locais `v1.1` e `v1.3`. **v1.2 Mobile (Codex)** implementada com tag local `v1.2`; teste em aparelho real pendente do autor (checklist em versions/v2.md). Próximo item: **v1.4 Atributos (Codex)**.

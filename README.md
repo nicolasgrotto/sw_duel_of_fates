@@ -23,7 +23,7 @@ Jogo 2D de duelo de lâminas de energia para navegador, feito com HTML5, CSS3, J
 
 ## Requisitos
 
-- Navegador moderno (Chrome, Edge ou Firefox)
+- Navegador moderno (Chrome, Edge ou Firefox; toque em paisagem no Android/iOS)
 - Node.js 20+ (só para o servidor local e os testes; o jogo não tem dependências)
 
 ## Como rodar
@@ -107,6 +107,10 @@ As teclas de luta podem ser trocadas em **Opções → Configurar teclas** (fica
 A esquiva de precisão evita um golpe com timing curto, sem stamina; se errar o tempo, a recuperação fica vulnerável. A Vespa pode pular uma segunda vez no ar. No teclado numérico do J2, `Numpad2` faz a esquiva de precisão e `Numpad4` aciona o forte.
 
 Os controles ficam em [src/config/controlsConfig.js](src/config/controlsConfig.js).
+
+## Mobile
+
+Use o aparelho em paisagem. Joystick na esquerda; rápido, forte, guarda, esquiva, habilidade e pulo na direita. Arraste para baixo para a esquiva de precisão. Toque uma opção para selecionar e novamente para confirmar. A pausa fica no topo. O manifest permite adicionar à tela inicial; não há suporte offline. QA em Chrome Android e Safari iOS reais ainda depende do autor (versions/v2.md).
 
 ## Documentação
 

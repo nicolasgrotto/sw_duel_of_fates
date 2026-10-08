@@ -14,6 +14,7 @@ Legenda: ✅ existe · ⏳ planejado (criar só quando a tarefa pedir)
 
 ```
 index.html                  ✅ página com o canvas (caminhos relativos: funciona em qualquer servidor estático e no GitHub Pages)
+manifest.webmanifest        ✅ instalação em paisagem, fullscreen e start_url relativo; sem service worker
 .nojekyll                   ✅ desliga o Jekyll do GitHub Pages; os arquivos são servidos como estão
 média/                      ✅ capturas de tela usadas no README (não são carregadas pelo jogo)
 styles/
@@ -749,7 +750,7 @@ A regra `rules` nos parâmetros do duelo (`powers`) entra na v1.5, junto com o p
 **Módulos previstos.**
 
 ```
-core/TouchInput.js            pointer events no canvas → ações (multitoque por pointerId, joystick com zona morta)
+core/TouchInput.js            IMPLEMENTADO v1.2: pointer events no canvas → ações (multitoque por pointerId, joystick com zona morta)
 core/textPrompt.js            input DOM temporário só na tela de nome (injetado)
 config/touchLayoutConfig.js, attributesConfig.js, powersConfig.js, powerTiersConfig.js,
        storyConfig.js, secretsConfig.js, introConfig.js
@@ -763,7 +764,7 @@ modes/story/StoryDirector.js, modes/story/conditions.js
 modes/SecretUnlockSystem.js   casa sequências de teclas (lastPressedCode) e de ações; persiste o desbloqueio
 states/IntroState.js, StoryState.js, DialogueState.js, ProtagonistState.js
 rendering/powerRenderer.js    aura em cache por tier, raio em polilinha, ondas
-ui/TouchControls.js           controles de toque desenhados no canvas
+ui/TouchControls.js           IMPLEMENTADO v1.2: controles de toque desenhados no canvas
 ```
 
 **Decisões.**
