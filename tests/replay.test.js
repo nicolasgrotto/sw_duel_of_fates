@@ -1,7 +1,8 @@
+import { characters } from '../src/characters/characterData.js';
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { Fighter } from '../src/entities/Fighter.js';
-import { ReplayBuffer, restoreFighter } from '../src/simulation/ReplayBuffer.js';
+import { ReplayBuffer, restoreFighter, captureFighter, REPLAY_STATIC_FIELDS } from '../src/simulation/ReplayBuffer.js';
 import { STEP, createSimulation, spawnFighter } from './helpers.js';
 
 function scriptedIntent(step, fighter, index) {
@@ -59,4 +60,25 @@ describe('ReplayBuffer', () => {
     buffer.clear();
     assert.equal(buffer.hasReplay(), false);
   });
+});
+
+it('covers every own fighter field before and after simulation', () => {
+  for (const id of Object.keys(characters)) {
+    const fighters = [spawnFighter(420, 1, id), spawnFighter(640, -1)];
+    const simulation = createSimulation(fighters);
+    const initial = Object.fromEntries(REPLAY_STATIC_FIELDS.filter((key) => key !== 'intent').map((key) => [key, fighters[0][key]]));
+    for (let step = 0; step < 180; step += 1) {
+      const snapshot = captureFighter(fighters[0]);
+      for (const key of Object.keys(fighters[0])) {
+        assert.ok(Object.hasOwn(snapshot, key) || REPLAY_STATIC_FIELDS.includes(key), `${id}: missing replay field ${key}`);
+      }
+      scriptedIntent(step, fighters[0], 0);
+      fighters[0].intent.jump = step === 1;
+      fighters[0].intent.dodge = step === 70;
+      simulation.step(STEP);
+      for (const [key, value] of Object.entries(initial)) assert.equal(fighters[0][key], value, key);
+      fighters.forEach((fighter) => fighter.clearIntent());
+    }
+    assert.deepEqual(captureFighter(clone(fighters[0], captureFighter(fighters[0]))), captureFighter(fighters[0]));
+  }
 });

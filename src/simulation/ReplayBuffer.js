@@ -1,5 +1,7 @@
 import { decodeIntent, encodeIntent } from '../controllers/IntentRecorder.js';
 
+export const REPLAY_STATIC_FIELDS = Object.freeze(['id', 'name', 'stats', 'appearance', 'sound', 'floorY', 'intent']);
+
 const ABSOLUTE_FACING = 1;
 
 export function captureFighter(fighter) {
