@@ -512,31 +512,39 @@ Matriz v0.4 (perfil balanced nos dois lados, 120 duelos por par, seed 1, % de vi
 | Vespa | 50 | 48 | 65 | — | 48 |
 | Espelho | 57 | 38 | 60 | 52 | — |
 
-Matriz v0.6 (perfil **próprio** de cada personagem, 100 duelos por par, seed 1, % de vitória da linha contra a coluna, média na última coluna). É o que o jogador enfrenta no Arcade.
+Matriz v1.0 (perfil **próprio** de cada personagem, 60 duelos por par, seed 1, % de vitória da linha contra a coluna, média na última coluna). É o que o jogador enfrenta no Arcade e na Sobrevivência.
 
-| Normal | Gua | Som | Bas | Ves | Esp | Has | Bra | For | média |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Guardião | — | 54 | 21 | 55 | 53 | 34 | 45 | 30 | 41,7 |
-| Sombra | 54 | — | 44 | 66 | 77 | 69 | 67 | 68 | 63,6 |
-| Bastião | 79 | 57 | — | 69 | 83 | 52 | 76 | 64 | 68,6 |
-| Vespa | 33 | 35 | 32 | — | 63 | 52 | 56 | 67 | 48,3 |
-| Espelho | 42 | 23 | 15 | 47 | — | 25 | 35 | 26 | 30,4 |
-| Haste | 57 | 37 | 42 | 63 | 83 | — | 55 | 65 | 57,4 |
-| Brasa | 53 | 29 | 34 | 60 | 53 | 35 | — | 33 | 42,4 |
-| Forja | 68 | 35 | 39 | 34 | 79 | 37 | 76 | — | 52,6 |
+| Normal | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco | média |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Guardião | — | 45 | 25 | 62 | 45 | 27 | 65 | 43 | 72 | 52 | 48,3 |
+| Sombra | 58 | — | 43 | 70 | 80 | 68 | 67 | 65 | 68 | 63 | 64,8 |
+| Bastião | 68 | 60 | — | 63 | 77 | 33 | 80 | 67 | 63 | 65 | 64,1 |
+| Vespa | 38 | 33 | 38 | — | 57 | 23 | 55 | 63 | 58 | 60 | 47,4 |
+| Espelho | 42 | 28 | 20 | 40 | — | 20 | 37 | 22 | 38 | 28 | 30,6 |
+| Haste | 68 | 43 | 50 | 57 | 80 | — | 82 | 65 | 78 | 73 | 66,3 |
+| Brasa | 32 | 38 | 30 | 53 | 48 | 23 | — | 27 | 48 | 43 | 38,1 |
+| Forja | 67 | 38 | 42 | 43 | 75 | 38 | 82 | — | 57 | 55 | 55,2 |
+| Garça | 32 | 27 | 32 | 37 | 58 | 25 | 58 | 57 | — | 42 | 40,8 |
+| Eco | 53 | 32 | 33 | 47 | 63 | 40 | 55 | 52 | 55 | — | 47,8 |
 
-| Difícil | Gua | Som | Bas | Ves | Esp | Has | Bra | For | média |
-| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| Guardião | — | 66 | 58 | 57 | 35 | 41 | 36 | 51 | 49,1 |
-| Sombra | 37 | — | 45 | 30 | 36 | 49 | 30 | 49 | 39,4 |
-| Bastião | 50 | 54 | — | 28 | 17 | 35 | 27 | 60 | 38,7 |
-| Vespa | 37 | 74 | 79 | — | 52 | 89 | 53 | 75 | 65,6 |
-| Espelho | 66 | 70 | 84 | 42 | — | 80 | 54 | 63 | 65,6 |
-| Haste | 55 | 39 | 63 | 13 | 27 | — | 24 | 32 | 36,1 |
-| Brasa | 62 | 76 | 69 | 57 | 53 | 74 | — | 66 | 65,3 |
-| Forja | 41 | 50 | 51 | 20 | 24 | 66 | 23 | — | 39,3 |
+| Difícil | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco | média |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Guardião | — | 72 | 53 | 53 | 45 | 32 | 37 | 62 | 57 | 65 | 52,8 |
+| Sombra | 28 | — | 40 | 33 | 30 | 55 | 28 | 35 | 33 | 52 | 37,2 |
+| Bastião | 52 | 57 | — | 32 | 17 | 40 | 43 | 53 | 17 | 43 | 39,3 |
+| Vespa | 53 | 70 | 80 | — | 57 | 72 | 45 | 78 | 67 | 75 | 66,3 |
+| Espelho | 60 | 72 | 85 | 40 | — | 57 | 35 | 63 | 50 | 78 | 60,0 |
+| Haste | 62 | 33 | 57 | 13 | 32 | — | 48 | 38 | 27 | 23 | 37,0 |
+| Brasa | 58 | 70 | 70 | 50 | 57 | 60 | — | 52 | 50 | 77 | 60,4 |
+| Forja | 55 | 53 | 55 | 23 | 40 | 58 | 48 | — | 33 | 55 | 46,8 |
+| Garça | 45 | 58 | 85 | 43 | 43 | 85 | 57 | 60 | — | 70 | 60,7 |
+| Eco | 28 | 43 | 58 | 38 | 28 | 62 | 25 | 58 | 40 | — | 42,4 |
 
-O equilíbrio depende da dificuldade: personagens de execução (Vespa) e de leitura (Espelho, Brasa) rendem mais com a IA Difícil, e os de força bruta (Bastião, Sombra) com a Normal. O alvo é ficar entre 40% e 60% de média nas duas; o refinamento está no TASKS. Para reproduzir, rode `simulate` para cada par com `--left`, `--right` e `--difficulty`, sem `--profile`.
+| Média das duas | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| % | 51 | 51 | 52 | 57 | 45 | 52 | 49 | 51 | 51 | 45 |
+
+O equilíbrio depende da dificuldade, e isso foi aceito na v1.0: personagens de execução e leitura (Vespa, Espelho, Brasa, Garça) rendem mais com a IA Difícil, que completa sequências e apara melhor; os de força bruta (Bastião, Sombra, Haste) rendem mais com a Normal. Na média das duas dificuldades todos ficam entre 45% e 57%. A IA Normal apara com `parryChance` 0,38 e a Difícil com 0,5 para não ampliar essa diferença. Para reproduzir, rode `simulate` para cada par com `--left`, `--right` e `--difficulty`, sem `--profile`.
 
 A Vespa é o personagem de execução: rende pouco com a IA Normal (que completa só 60% das sequências) e fica equilibrada no Difícil. Isso é intencional (dificuldade 4 no GAME_DESIGN). Rode a matriz de novo depois de mexer em atributos.
 

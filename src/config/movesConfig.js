@@ -39,7 +39,7 @@ export const movesByCharacter = {
     shove: { attack: 'shove', type: 'shove', pose: 'shove', cancelsInto: [] },
     special: {
       attack: 'heavy', type: 'heavy', pose: 'impetus', cancelsInto: [],
-      damage: 18, staminaCost: 28, startup: 0.28, active: 0.12, recovery: 0.45, lunge: 520,
+      damage: 16, staminaCost: 28, startup: 0.28, active: 0.12, recovery: 0.45, lunge: 520,
       armor: { hits: 1, damageScale: 1 },
     },
   },
@@ -149,11 +149,11 @@ export const movesByCharacter = {
     shove: { attack: 'shove', type: 'shove', pose: 'shove', cancelsInto: [] },
     counterStrike: {
       attack: 'heavy', type: 'heavy', pose: 'impetus', cancelsInto: [],
-      damage: 22, staminaCost: 0, startup: 0.08, active: 0.12, recovery: 0.4, lunge: 260,
+      damage: 20, staminaCost: 0, startup: 0.08, active: 0.12, recovery: 0.4, lunge: 260,
     },
     special: {
       attack: 'heavy', type: 'stance', pose: 'stance', cancelsInto: [],
-      damage: 0, staminaCost: 18, startup: 0.5, active: 0, recovery: 0.4, lunge: 0,
+      damage: 0, staminaCost: 18, startup: 0.4, active: 0, recovery: 0.4, lunge: 0,
       hitbox: { reach: 0, top: 0.9, bottom: 0.3 },
       counter: { move: 'counterStrike', stagger: 0.45, event: 'counter' },
     },
