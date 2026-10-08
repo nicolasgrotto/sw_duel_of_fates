@@ -11,6 +11,7 @@ export const effectsConfig = {
   framing: { maxZoom: 1.04, margin: 160, smoothing: 8 },
   maxPunchZoom: 0.06,
   maxPunchDuration: 0.25,
+  evadeAfterimageDuration: 0.1,
   hitFlashDuration: 0.06,
   hitStopTremor: { amplitude: 2.5, interval: 1 / 60 },
   maxShakeAmplitude: 12,

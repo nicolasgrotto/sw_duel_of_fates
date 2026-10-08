@@ -741,3 +741,7 @@ ui/TouchControls.js           controles de toque desenhados no canvas
 - **Sem comentários no código.** Nomes claros substituem comentários. Contexto e decisões ficam neste documento.
 - Evitar criar objetos dentro do loop sem necessidade.
 - Listeners adicionados devem ter forma de remoção (`destroy()`).
+
+## Movimento v1.3 implementado
+
+`evadeConfig.js` define enabled e perfil global; stats.evade opcional substitui o perfil completo. CombatSystem.tryEvade reaproveita startDodge e DODGING, com combat.evading/evadeSucceeded no snapshot. Deslocamento para tras so durante movementTime. findContacts detecta hitbox contra hurtbox invulneravel do EVADE e captura evaded antes de resolver; marca hasHit do atacante e emite EVADE_SUCCESS, libera IDLE e zera velocidade. Dash comum continua ignorando contatos invulneraveis. EffectsSystem guarda timer visual por defensor; DuelRenderer e DodgeAfterimage usam esse sinal para uma silhueta inclinada curta, inclusive depois da liberacao imediata. Audio reutiliza DODGE. Sem novas cores/assets ou estado de combate.

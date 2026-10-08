@@ -547,3 +547,7 @@ Os dois podem pausar (J1: Esc ou P; J2: P ou Start). A HUD mostra "J1" e "J2" an
 | Torneio, campanha, online | fora do escopo |
 
 Progressão sem grind: no build de portfólio tudo fica liberado. Desafios por personagem liberam só cores de sabre e paletas alternativas. Títulos por marcos de habilidade. Nada afeta atributos.
+
+## Movimento v1.3: esquiva de precisao
+
+EVADE (S/baixo) e separado do dash (Shift). No chao, consome zero stamina, recua poucos pixels, fica invulneravel por 0,066 s e recupera ate 0,4 s. Sem contato, a recuperacao e vulneravel. Quando uma hitbox cruza a hurtbox na janela, EVADE_SUCCESS consome esse contato e libera o defensor imediatamente para punir, sem dano nem ganho de stamina. Repetir a acao exige novo toque; nenhuma defesa passiva ao segurar baixo. Config global pode desligar a mecanica; arquetipos podem fornecer perfil completo em stats.evade.

@@ -26,6 +26,7 @@ function getSoundForEvent(event) {
       return SoundName.CLASH;
     case CombatEvent.DEATH:
       return SoundName.DEATH;
+    case CombatEvent.EVADE_SUCCESS:
     case CombatEvent.DODGE:
       return SoundName.DODGE;
     case CombatEvent.ACTION_REJECTED:

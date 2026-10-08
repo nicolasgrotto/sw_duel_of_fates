@@ -1,10 +1,11 @@
+import { evadeConfig } from '../config/evadeConfig.js';
 import { FighterState } from '../entities/fighterStates.js';
 import { canAfford, spendStamina } from '../systems/StaminaSystem.js';
 import { CombatAction, clearActionBuffer, updateActionBuffer } from './actionBuffer.js';
 import { clamp } from '../utils/math.js';
 import { ATTACK_STATES, AttackPhase, AttackType, getAttackDuration, getAttackPhase, getChargeLevel, isSaberAttack } from './attackPhases.js';
 import { CombatEvent, createCombatEvent } from './combatEvents.js';
-import { boxesOverlap, createBox, getAttackHitbox, getHurtbox, hasActiveHitbox, hasHurtbox } from './hitboxes.js';
+import { boxesOverlap, createBox, getAttackHitbox, getHurtbox, hasActiveHitbox, hasHurtbox, isInvulnerable } from './hitboxes.js';
 
 const PUNISHED_STATES = new Set([FighterState.STAGGERED, FighterState.STUNNED]);
 
@@ -97,6 +98,7 @@ export class CombatSystem {
       case FighterState.DODGING:
         if (fighter.stateTime >= combat.dodgeProfile.duration) {
           combat.passThrough = false;
+          combat.evading = false;
           fighter.setState(FighterState.IDLE);
         }
         break;
@@ -246,6 +248,8 @@ export class CombatSystem {
 
   tryAction(fighter, action) {
     switch (action) {
+      case CombatAction.EVADE:
+        return this.tryEvade(fighter);
       case CombatAction.DODGE:
         return this.tryDodge(fighter);
       case CombatAction.SHOVE:
@@ -334,6 +338,15 @@ export class CombatSystem {
     return true;
   }
 
+  tryEvade(fighter) {
+    if (!evadeConfig.enabled) return false;
+    const profile = fighter.stats.evade ?? evadeConfig.profile;
+    if (profile.enabled === false) return false;
+    this.startDodge(fighter, profile, -fighter.facing, false);
+    fighter.combat.evading = true;
+    return true;
+  }
+
   tryDodge(fighter) {
     const { dodge } = fighter.stats;
     if (!canAfford(fighter, dodge.staminaCost)) {
@@ -347,6 +360,8 @@ export class CombatSystem {
   }
 
   startDodge(fighter, profile, direction, passThrough) {
+    fighter.combat.evading = false;
+    fighter.combat.evadeSucceeded = false;
     fighter.combat.dodgeProfile = profile;
     fighter.combat.dodgeDirection = direction;
     fighter.combat.passThrough = passThrough;
@@ -358,7 +373,8 @@ export class CombatSystem {
     const { combat } = fighter;
 
     if (fighter.state === FighterState.DODGING) {
-      fighter.vx = combat.dodgeDirection * combat.dodgeProfile.speed;
+      const moving = !combat.evading || fighter.stateTime < combat.dodgeProfile.movementTime;
+      fighter.vx = moving ? combat.dodgeDirection * combat.dodgeProfile.speed : 0;
       return;
     }
 
@@ -438,7 +454,8 @@ export class CombatSystem {
       getAttackHitbox(attacker, attack, this.hitbox);
 
       for (const defender of fighters) {
-        if (defender === attacker || !hasHurtbox(defender)) {
+        const evaded = defender.combat.evading && isInvulnerable(defender);
+        if (defender === attacker || (!hasHurtbox(defender) && !(defender.isAlive && evaded))) {
           continue;
         }
         if (boxesOverlap(this.hitbox, getHurtbox(defender, this.hurtbox))) {
@@ -447,6 +464,7 @@ export class CombatSystem {
             defender,
             attack,
             attackType,
+            evaded,
             x: (Math.max(this.hitbox.left, this.hurtbox.left) + Math.min(this.hitbox.right, this.hurtbox.right)) / 2,
             y: (Math.max(this.hitbox.top, this.hurtbox.top) + Math.min(this.hitbox.bottom, this.hurtbox.bottom)) / 2,
           });
@@ -458,6 +476,16 @@ export class CombatSystem {
 
   resolveContact(contact) {
     if (!contact.defender.isAlive) {
+      return;
+    }
+    if (contact.evaded) {
+      const { defender } = contact;
+      defender.combat.evadeSucceeded = true;
+      defender.combat.evading = false;
+      defender.combat.passThrough = false;
+      defender.vx = 0;
+      defender.setState(FighterState.IDLE);
+      this.emit(CombatEvent.EVADE_SUCCESS, contact);
       return;
     }
     if (contact.attackType === AttackType.SHOVE) {

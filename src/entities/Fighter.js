@@ -28,6 +28,8 @@ function createCombat() {
     blockstun: 0,
     dodgeDirection: 0,
     dodgeProfile: null,
+    evading: false,
+    evadeSucceeded: false,
     passThrough: false,
     armorHits: 0,
     chargeTime: 0,

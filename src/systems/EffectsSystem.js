@@ -55,6 +55,7 @@ export class EffectsSystem {
     this.shakeScale = 1;
     this.flashScale = 1;
     this.punchScale = 1;
+    this.evadeAfterimages = new Map();
     this.hitFlashes = new Map();
     this.tremors = new Map();
     this.particles = new ParticlePool(config.maxParticles);
@@ -97,6 +98,9 @@ export class EffectsSystem {
     };
 
     switch (event.type) {
+      case CombatEvent.EVADE_SUCCESS:
+        this.evadeAfterimages.set(defender, this.config.evadeAfterimageDuration);
+        break;
       case CombatEvent.HIT:
         if (this.flashScale > 0) {
           this.hitFlashes.set(defender, this.config.hitFlashDuration);
@@ -156,6 +160,10 @@ export class EffectsSystem {
 
   getTremor(fighter) {
     return this.tremors.get(fighter)?.offset ?? 0;
+  }
+
+  hasEvadeAfterimage(fighter) {
+    return (this.evadeAfterimages.get(fighter) ?? 0) > 0;
   }
 
   hasHitFlash(fighter) {
@@ -308,6 +316,7 @@ export class EffectsSystem {
     this.updateRings(dt);
     this.updateTimers(this.saberFlares, dt);
     this.updateTimers(this.hitFlashes, dt);
+    this.updateTimers(this.evadeAfterimages, dt);
     this.updateTremors(dt);
     this.updateDesaturation(dt);
   }

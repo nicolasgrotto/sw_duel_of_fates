@@ -130,6 +130,7 @@ export const combatPoses = {
     lift: 0.06,
     crouch: 6,
   },
+  evade: { lean: -22, crouch: 8, releaseTime: 0.1 },
   dodge: {
     lean: 14,
     crouch: 14,
@@ -183,6 +184,7 @@ export const saberStyle = {
 };
 
 export const afterimage = {
+  evade: { interval: 0.05, duration: 0.12, alpha: 0.18 },
   count: 3,
   interval: 0.05,
   duration: 0.25,

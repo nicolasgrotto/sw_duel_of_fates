@@ -58,7 +58,7 @@ export class DuelRenderer {
     renderer.save();
     camera.applyTransform(renderer);
 
-    this.preparePoses(fighters, bladeExtension);
+    this.preparePoses(fighters, bladeExtension, effects);
     this.arenaView.renderBackground(renderer, arena, ambients, fighters);
     this.arenaView.renderFloor(renderer, arena);
     if (this.arenaView.definition.reflection) {
@@ -119,11 +119,11 @@ export class DuelRenderer {
     renderer.restore();
   }
 
-  preparePoses(fighters, bladeExtension) {
+  preparePoses(fighters, bladeExtension, effects) {
     for (const fighter of fighters) {
       const pose = computePose(fighter, this.getPose(fighter));
       pose.bladeExtension = bladeExtension;
-      this.getAfterimage(fighter).record(fighter, pose);
+      this.getAfterimage(fighter).record(fighter, pose, effects?.hasEvadeAfterimage(fighter) ?? false);
 
       if (isSaberStrikeActive(fighter)) {
         getBladeWorldPoints(fighter, pose, this.bladePoints);

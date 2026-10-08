@@ -104,3 +104,10 @@ describe('MenuList sounds', () => {
     );
   });
 });
+
+it('reuses the dodge sound for precision evade success', () => {
+  const audio = createRecordingAudio();
+  const duel = new DuelAudio(audio, { arenaWidth: 1280, stereoWidth: 0.6 });
+  duel.handleEvents([createEvent(CombatEvent.EVADE_SUCCESS, 640)]);
+  assert.equal(audio.played[0].name, SoundName.DODGE);
+});

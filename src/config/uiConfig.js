@@ -51,7 +51,7 @@ export const texts = {
     title: 'CONTROLES',
     or: ' ou ',
     back: '{back}  voltar',
-    gamepad: 'Controle: baixo precis\u00e3o \u00b7 direcional mover · A pular · X rápido · Y forte · LB/LT guarda · B esquiva · RB/RT habilidade · Start pausa · A confirmar',
+    gamepad: 'Controle: stick mover \u00b7 baixo precis\u00e3o \u00b7 A pulo/confirmar \u00b7 X/Y ataques \u00b7 LB/LT guarda \u00b7 B esquiva \u00b7 RB/RT habilidade \u00b7 Start pausa',
     actions: {
       moveLeft: 'Mover para a esquerda',
       moveRight: 'Mover para a direita',

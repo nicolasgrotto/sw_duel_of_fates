@@ -102,3 +102,7 @@ Camada de cor sobre a cena inteira (abaixo da UI), com blend aditivo e alpha que
 - `EffectsSystem.spawn(type, params)` é a única porta de entrada.
 - Efeitos são dados (tipo, posição, cor, tempo de vida). O desenho fica no código de render.
 - Screen shake só pela Camera.
+
+### EVADE (v1.3)
+
+A esquiva de precisao usa uma inclinacao breve para tras, joelhos baixos e recuo minimo. A pose vem de combatPoses.evade e volta suavemente durante a recuperacao. Silhueta permanece legivel; sem cor, anel, flash, shake ou camera lenta novos. Afterimage curto de 0,12 s com alpha 0,18 reaproveita o pool da esquiva. EVADE_SUCCESS pede esse afterimage ao EffectsSystem e reutiliza o som sintetizado de esquiva. Controles e lista de golpes incluem o gesto para baixo nos estilos existentes.

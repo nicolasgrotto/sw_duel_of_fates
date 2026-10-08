@@ -6,6 +6,7 @@ export const CombatEvent = Object.freeze({
   DEATH: 'death',
   ATTACK_START: 'attackStart',
   DODGE: 'dodge',
+  EVADE_SUCCESS: 'evadeSuccess',
   ACTION_REJECTED: 'actionRejected',
   PARRY: 'parry',
   PERFECT_PARRY: 'perfectParry',

@@ -306,3 +306,14 @@ it('frames both fighters inside the arena and reduces zoom as they separate', ()
   assert.ok(Math.abs(camera.framingZoom - 1) < 0.001);
   assert.equal(camera.anchorY, 600);
 });
+
+it('maps evade success to a short afterimage signal without camera or particles', () => {
+  const { effects, camera } = createEffects();
+  const event = createEvent(CombatEvent.EVADE_SUCCESS);
+  effects.handleEvents([event]);
+  assert.equal(effects.hasEvadeAfterimage(event.defender), true);
+  assert.equal(effects.particles.activeCount, 0);
+  assert.equal(effects.flash.alpha, 0);
+  effects.update(effectsConfig.evadeAfterimageDuration);
+  assert.equal(effects.hasEvadeAfterimage(event.defender), false);
+});
