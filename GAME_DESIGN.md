@@ -390,7 +390,7 @@ Este é um protótipo de estudo inspirado em Star Wars. Para publicação públi
 
 ## 15. Elenco planejado
 
-Conceitos aprovados. Entram aos poucos (ver TASKS). Escala de 1 a 5; "Dific." é a dificuldade de jogar com o personagem.
+Conceitos aprovados. Entram aos poucos (ver [TASKS.md](TASKS.md)). Escala de 1 a 5; "Dific." é a dificuldade de jogar com o personagem.
 
 | Personagem | Estilo | Vel. | Alcance | Dano | Defesa | Mobil. | Dific. | Diferencial mecânico |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |

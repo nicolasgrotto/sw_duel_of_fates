@@ -70,7 +70,7 @@ Os testes cobrem apenas módulos de lógica. Por isso, módulos de lógica não 
 npm run simulate -- --duels 300 --difficulty normal
 ```
 
-Roda duelos IA × IA sem navegador e mostra vitórias e estatísticas. Opções e exemplos em [ARCHITECTURE.md](ARCHITECTURE.md#balanceamento).
+Roda duelos IA × IA sem navegador e mostra vitórias e estatísticas. `npm run matrix` roda todos contra todos e mostra a média de vitórias de cada personagem. Opções e exemplos em [ARCHITECTURE.md](ARCHITECTURE.md#balanceamento).
 
 ## Controles
 
@@ -117,7 +117,8 @@ Os controles ficam em [src/config/controlsConfig.js](src/config/controlsConfig.j
 | [design/REFERENCES.md](design/REFERENCES.md) | Referências |
 | [GAME_DESIGN.md](GAME_DESIGN.md) | Regras de gameplay |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Como o código é organizado e como os módulos se comunicam |
-| [TASKS.md](TASKS.md) | Roadmap e progresso |
+| [TASKS.md](TASKS.md) | Índice do roadmap e ponto de continuidade |
+| [versions/](versions/) | Tarefas de cada versão (v1 fechada, v2 em andamento, backlog) |
 | [AGENTS.md.example](AGENTS.md.example) | Modelo de instruções para agentes de IA (Claude Code, Codex, GPT). Copie para `AGENTS.md` (ignorado pelo git) e personalize |
 | [CREDITS.md](CREDITS.md) | Créditos e aviso de marca |
 | [ASSETS.md](ASSETS.md) | Origem e licença de cada asset |

@@ -135,6 +135,7 @@ src/
 tools/
   server.js                 ✅ servidor estático para desenvolvimento
   simulate.js               ✅ simulador de duelos IA × IA para balanceamento (npm run simulate)
+  matrix.js                 ✅ matriz de vitórias de todos contra todos usando o simulate (npm run matrix)
 tests/                      ✅ testes com node --test
 ```
 
@@ -553,7 +554,7 @@ Matriz v1.0 (perfil **próprio** de cada personagem, 60 duelos por par, seed 1, 
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | % | 51 | 51 | 52 | 57 | 45 | 52 | 49 | 51 | 51 | 45 |
 
-O equilíbrio depende da dificuldade, e isso foi aceito na v1.0: personagens de execução e leitura (Vespa, Espelho, Brasa, Garça) rendem mais com a IA Difícil, que completa sequências e apara melhor; os de força bruta (Bastião, Sombra, Haste) rendem mais com a Normal. Na média das duas dificuldades todos ficam entre 45% e 57%. A IA Normal apara com `parryChance` 0,38 e a Difícil com 0,5 para não ampliar essa diferença. Para reproduzir, rode `simulate` para cada par com `--left`, `--right` e `--difficulty`, sem `--profile`.
+O equilíbrio depende da dificuldade, e isso foi aceito na v1.0: personagens de execução e leitura (Vespa, Espelho, Brasa, Garça) rendem mais com a IA Difícil, que completa sequências e apara melhor; os de força bruta (Bastião, Sombra, Haste) rendem mais com a Normal. Na média das duas dificuldades todos ficam entre 45% e 57%. A IA Normal apara com `parryChance` 0,38 e a Difícil com 0,5 para não ampliar essa diferença. Para reproduzir: `npm run matrix` (padrão: Normal e Difícil, 60 duelos por par; `--difficulties`, `--duels` e `--characters a,b,c` mudam isso). Ele roda o `simulate` para cada par, sem `--profile`.
 
 A Vespa é o personagem de execução: rende pouco com a IA Normal (que completa só 60% das sequências) e fica equilibrada no Difícil. Isso é intencional (dificuldade 4 no GAME_DESIGN). Rode a matriz de novo depois de mexer em atributos.
 
@@ -664,18 +665,19 @@ Evitar dependências circulares.
 
 ## v2 planejada
 
-Roteiro e tarefas no TASKS.md ("v2.0 — Duelo expandido e Story"). Esta seção registra as decisões de arquitetura aprovadas. Cada módulo só é criado na task que precisar dele e então entra na estrutura de pastas.
+Roteiro e tarefas em [versions/v2.md](versions/v2.md). Esta seção registra as decisões de arquitetura aprovadas. Cada módulo só é criado na task que precisar dele e então entra na estrutura de pastas.
 
 **Princípios.** Tudo novo que muda o resultado de uma luta roda dentro da `DuelSimulation` com o dt fixo, guarda estado em `fighter.combat` (copiado inteiro pelo snapshot do replay) e é configurado em `src/config/`. Game, Renderer, Audio, Effects e Input não contêm regra de gameplay. Os modos clássicos (Arcade, Sobrevivência, Tutorial, Treino) recebem `rules` padrão e ficam idênticos à v1.0.
 
 **Refactors da v1.1 (antes de qualquer feature).**
 
 1. `Input` com fontes genéricas: teclado, gamepad e, depois, toque alimentam o mesmo conjunto de ações (o gamepad hoje é um caso especial com `padActions`).
-2. Save versionado (`saveStorage.js`): `{ version, settings, unlocks, progression, story, protagonist }` com lista de migrações; a v1 (objeto plano de settings) migra sem perda.
+2. Save versionado (`saveStorage.js`): `{ version: 2, settings }` com lista de migrações; a v1 (objeto plano de settings) migra sem perda. Seções novas (story, protagonista) entram na task que precisar delas, com uma migração.
 3. `DuelResult` (objeto simples: vencedor, `healthRatio`, estatísticas, tempo) e `duelOutcomes` (roteamento por modo), tirando Arcade e Sobrevivência do `DuelState`. Story e finais leem o `DuelResult`, nunca o `Fighter`.
-4. `rules` nos parâmetros do duelo (`powers`, `attributes`), repassadas à simulação.
-5. Teste que falha se um campo mutável do `Fighter` ficar fora do `captureFighter`.
-6. `maxPixelRatio` no `Renderer.fitToDisplay` e tempo de frame no F3.
+4. Teste que falha se um campo mutável do `Fighter` ficar fora do `captureFighter`.
+5. `maxPixelRatio` no `Renderer.fitToDisplay` e tempo de frame no F3.
+
+A regra `rules` nos parâmetros do duelo (`powers`) entra na v1.5, junto com o primeiro uso real.
 
 **Módulos previstos.**
 

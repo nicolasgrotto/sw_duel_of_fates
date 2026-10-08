@@ -29,7 +29,7 @@ Antes de implementar qualquer coisa, leia:
 2. [DESIGN.md](DESIGN.md): intenção, sensação e o que não fazer
 3. [GAME_DESIGN.md](GAME_DESIGN.md): regras de gameplay
 4. [ARCHITECTURE.md](ARCHITECTURE.md): como o código é organizado
-5. [TASKS.md](TASKS.md): o que já foi feito e o que vem a seguir
+5. [TASKS.md](TASKS.md): índice e ponto de continuidade; as tarefas da versão atual ficam em `versions/` (hoje [versions/v2.md](versions/v2.md))
 
 Esses arquivos são a fonte de verdade. Não contradiga uma decisão registrada neles sem explicar o motivo e atualizar o documento. Em caso de conflito, siga a hierarquia definida em DESIGN.md:
 
@@ -107,7 +107,7 @@ Para cada tarefa:
 3. Explique a abordagem em poucas linhas.
 4. Implemente.
 5. Teste (`npm test` e, quando houver mudança visual, rode o jogo com `npm start`).
-6. Atualize TASKS.md.
+6. Marque a task no arquivo da versão em `versions/` e, se a etapa terminou, atualize o ponto de continuidade do TASKS.md.
 7. Atualize ARCHITECTURE.md se a estrutura ou a comunicação entre módulos mudou.
 8. Atualize os documentos de design se uma decisão visual foi tomada.
 
@@ -125,20 +125,13 @@ Sempre que fizer sentido, exponha informação no overlay de debug (`F3`): hitbo
 
 ## Commits **[personalize]**
 
-- Mensagens em inglês simples e direto, no formato Conventional Commits: `feat(scope): message`, `fix(scope): message`, `docs: message`, `test(scope): message`, `chore: message`.
-- Um commit por passo lógico. Commite o trabalho terminado.
-- Faça o stage só dos arquivos da sua tarefa (evite `git add -A`): outro agente ou a pessoa podem ter arquivos em andamento na árvore.
-- Opcional: definir data e hora de cada commit (`GIT_AUTHOR_DATE` e `GIT_COMMITTER_DATE`), sempre depois do último commit existente.
-- Opcional: sem linhas `Co-Authored-By` ou outra atribuição.
-- Não faça push sem pedido explícito.
-
 ## Ao terminar uma tarefa, informe
 
 1. O que foi implementado.
 2. Quais arquivos foram alterados.
 3. Como a implementação funciona.
 4. Como foi testada.
-5. Próximos itens recomendados em TASKS.md.
+5. Próximos itens recomendados no arquivo da versão em `versions/`.
 
 ## Regra principal
 
