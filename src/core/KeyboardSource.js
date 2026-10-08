@@ -14,9 +14,10 @@ function mapActionsByCode(bindings) {
 }
 
 export class KeyboardSource {
-  constructor({ bindings, target, onPress }) {
+  constructor({ bindings, target, onPress, onActivity }) {
     this.target = target;
     this.onPress = onPress;
+    this.onActivity = onActivity;
     this.actions = new Set();
     this.downCodes = new Set();
     this.lastPressedCode = null;
@@ -34,7 +35,10 @@ export class KeyboardSource {
   }
 
   handleKeyDown(event) {
-    if (!event.repeat) this.lastPressedCode = event.code;
+    if (!event.repeat) {
+      this.lastPressedCode = event.code;
+      this.onActivity?.();
+    }
     const actions = this.actionsByCode.get(event.code);
     if (!actions) return;
     event.preventDefault();

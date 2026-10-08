@@ -6,11 +6,16 @@ export class GamepadSource {
     this.gamepadSlot = gamepadSlot;
     this.padButtons = Object.entries(gamepadConfig.buttons);
     this.actions = new Set();
+    this.previousActions = new Set();
+    this.activity = false;
     this.gamepad = null;
   }
 
   poll() {
+    this.previousActions.clear();
+    for (const action of this.actions) this.previousActions.add(action);
     this.actions.clear();
+    this.activity = false;
     this.gamepad = null;
     let slot = 0;
     for (const pad of this.getGamepads() ?? []) {
@@ -41,6 +46,7 @@ export class GamepadSource {
         }
       }
     }
+    for (const action of this.actions) if (!this.previousActions.has(action)) this.activity = true;
   }
 
   addAxisActions(actions) {

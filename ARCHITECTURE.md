@@ -28,6 +28,7 @@ src/
     GameLoop.js             ✅ loop com timestep fixo
     Input.js                ✅ teclado e gamepad → ações; uma instância por jogador (gamepadSlot)
     KeyboardSource.js       ✅ eventos de teclado e bindings
+    TouchInput.js           ✅ alvo injetado, pointerId e joystick; libera listeners no destroy
     GamepadSource.js        ✅ controle standard e rumble
     Renderer.js             ✅ canvas e primitivas de desenho
     StateMachine.js         ✅ pilha de estados
@@ -129,6 +130,7 @@ src/
     aiConfig.js             ✅ perfis, dificuldades e percepção da IA
     audioConfig.js          ✅ volumes, receitas de som, zumbido e música
     movesConfig.js          ✅ golpes por personagem: base de atributos, tipo, pose e cancelsInto
+    touchLayoutConfig.js    ✅ geometria e limiares do toque
     evadeConfig.js          ✅ flag e perfil global de esquiva de precisão
     fightersConfig.js       ✅ atributos por arquétipo (vida, stamina, corpo, movimento, ataques, esquiva)
     fighterVisualConfig.js  ✅ proporções, animação, poses de combate, sombra e estilo do sabre
@@ -327,6 +329,8 @@ Fontes seguem o contrato `{ actions: Set, poll?(), reset?(), endFrame?(), destro
 Save: `saveStorage.js` usa a mesma chave e escreve `{ version: 2, settings }`. A lista `saveMigrations` transforma o objeto plano v1 no envelope v2; JSON corrompido, envelopes inválidos e versões futuras retornam defaults sem sobrescrever dados. `settingsStorage.js` continua validando campos com `loadSettings` e delega leitura/escrita ao saveStorage. Teste com fixture completa do formato v1 cobre progresso, cores, recordes e bindings.
 
 EVADE usa S/baixo e pode dividir tecla com MENU_DOWN; gamepad baixo e eixo Y positivo alimentam ambas as ações. PlayerController captura o toque inclusive no hit stop. O IntentRecorder acrescenta evade no bit 10, preservando os bits v1; reset e boneco limpam a flag. No J2, Numpad2 agora é EVADE; o atalho numérico de forte mudou para Numpad4 (K continua), evitando duas ações de combate na mesma tecla. Controles, remapeamento, lista de golpes e inputs de Treino incluem EVADE. A tabela de controles usa espaçamento 25 para manter o rodapé livre.
+
+TouchInput implementa a fonte genérica via addSource. Eventos preservam toques curtos; reset libera todos os dedos no blur. Input.lastInputKind acompanha atividade nova de teclado, gamepad e toque; gamepad segurado não rouba o dispositivo atual. Coordenadas são lógicas pelo retângulo do alvo. Joystick pede EVADE uma vez por gesto; demais botões mantêm ações enquanto segurados.
 
 ## Estados (StateMachine)
 

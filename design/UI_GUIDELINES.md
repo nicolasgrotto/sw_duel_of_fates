@@ -27,7 +27,7 @@ Todos os textos ficam em `src/config/uiConfig.js` (`texts`). Para trocar o nome 
 - `W`/`S` ou setas para cima/baixo mudam a opção. A lista dá a volta (do último vai para o primeiro).
 - `Enter` confirma. `Esc` volta (na pausa, continua o duelo).
 - Opção selecionada: cor `text` e um traço curto de destaque (`accent`) à esquerda. As outras ficam em `textMuted`.
-- Sem mouse por enquanto.
+- Toque usa seleção e confirmação em dois contatos.
 
 ## Telas
 
@@ -150,3 +150,13 @@ Duelar abre a seleção em três etapas: ESCOLHA SEU LUTADOR, ESCOLHA O ADVERSÁ
 ### Ferramentas do Treino
 
 Inputs do jogador e do boneco aparecem em uma linha hint no rodapé (acima dos dados de frame), usando nomes de ações. F5 alterna gravação dos intents do jogador; F6 reproduz a gravação no boneco em loop, espelhando movimento pela direção de guarda. Estado e duração da gravação ficam na borda inferior esquerda. Hitboxes podem ser ligadas por F7 sem ligar todo o debug. As três teclas constam em Controles. Sem painel DOM ou elementos no centro da luta.
+
+## Controles de toque v1.2
+
+Resolução lógica 1280×720. Joystick flutuante na metade esquerda abaixo de y=360: origem no primeiro contato, raio 76, zona morta 18 e limite de EVADE 44 com eixo vertical dominante. Indicador de repouso em (150, 600). Arrasto horizontal move; para baixo pede esquiva de precisão uma vez por gesto.
+
+Seis botões circulares de raio 48 na direita: habilidade (980, 510), forte (1100, 510), pulo (1220, 510), esquiva (980, 630), guarda (1100, 630) e rápido (1220, 630). Guarda e habilidade acompanham o dedo segurado. Pausa no topo central (640, 44), raio 34. Fundo usa background, borda accent e rótulo textMuted; pressionado usa text. Opacidade de repouso 0,45 e pressionado 0,85; fundo 0,55. Sem glow, cores novas ou gradientes. Estilos touchLabel e touchHint em themeConfig, Oxanium 18/20 px.
+
+Controles aparecem apenas após toque e somem ao usar teclado/gamepad. Botão Voltar em (90, 55), raio 42, nas telas secundárias; no replay permite pular. MenuList usa região de 520 px de largura e altura igual ao espaçamento da linha: tocar seleciona e tocar a selecionada confirma. Setas de cor ficam em (590, 308) e (1170, 308), raio 32. Dica de toque substitui as teclas no rodapé. Em ponteiro coarse, 2 Jogadores e configuração de teclado ficam ocultos.
+
+Em retrato, o canvas mostra GIRE O APARELHO e pede paisagem; simulação suspensa e inputs soltos até voltar. A área do canvas respeita safe areas; nenhum controle vai para o DOM. Ícone instalável: duas lâminas geométricas cruzadas em accent/text sobre background, original do projeto, sem logo de franquia.

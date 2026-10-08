@@ -5,10 +5,11 @@ export class Input {
   constructor({ bindings, target, getGamepads = () => [], gamepadSlot = 0 }) {
     this.target = target;
     this.focused = true;
+    this.lastInputKind = 'keyboard';
     this.pressedActions = new Set();
     this.polledActions = new Set();
     this.nextActions = new Set();
-    this.keyboard = new KeyboardSource({ bindings, target, onPress: (action) => {
+    this.keyboard = new KeyboardSource({ bindings, target, onActivity: () => { this.lastInputKind = 'keyboard'; }, onPress: (action) => {
       const heldElsewhere = this.sources.some((source) => source !== this.keyboard && source.actions.has(action));
       if (this.focused && !heldElsewhere) this.pressedActions.add(action);
     } });
@@ -26,8 +27,15 @@ export class Input {
   set gamepadSlot(value) { this.pad.gamepadSlot = value; }
 
   addSource(source) {
-    if (!this.sources.includes(source)) this.sources.push(source);
+    if (this.sources.includes(source)) return;
+    source.onActivity = () => { this.lastInputKind = source.kind ?? this.lastInputKind; };
+    source.onPress = (action) => {
+      if (this.focused && !this.sources.some((other) => other !== source && other.actions.has(action))) this.pressedActions.add(action);
+    };
+    this.sources.push(source);
   }
+
+  get touchTaps() { return this.sources.find((source) => source.kind === 'touch')?.taps ?? []; }
 
   setBindings(bindings) {
     if (this.bindings === bindings) return;
@@ -62,6 +70,7 @@ export class Input {
     this.nextActions.clear();
     for (const source of this.sources) {
       source.poll?.();
+      if (source === this.pad && source.activity) this.lastInputKind = 'gamepad';
       for (const action of source.actions) this.nextActions.add(action);
     }
     for (const action of this.nextActions) {
