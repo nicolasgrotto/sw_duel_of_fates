@@ -1,3 +1,4 @@
+import { captureProjectiles } from '../combat/ProjectileSystem.js';
 import { decodeIntent, encodeIntent } from '../controllers/IntentRecorder.js';
 
 export const REPLAY_STATIC_FIELDS = Object.freeze(['id', 'name', 'stats', 'appearance', 'sound', 'floorY', 'intent']);
@@ -40,10 +41,10 @@ export class ReplayBuffer {
     this.count = 0;
   }
 
-  record(fighters, dt) {
+  record(fighters, dt, projectiles = null) {
     if (this.count % this.snapshotInterval === 0) {
       const slot = (this.count / this.snapshotInterval) % this.snapshots.length;
-      this.snapshots[slot] = { step: this.count, fighters: fighters.map(captureFighter) };
+      this.snapshots[slot] = { step: this.count, fighters: fighters.map(captureFighter), projectiles: projectiles ? captureProjectiles(projectiles) : null };
     }
     const index = this.count % this.frames;
     for (let i = 0; i < fighters.length; i += 1) {

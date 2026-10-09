@@ -5,6 +5,7 @@ import { effectsConfig } from '../config/effectsConfig.js';
 import { ArenaRenderer } from './arenaRenderer.js';
 import { DodgeAfterimage } from './DodgeAfterimage.js';
 import { PowerRenderer } from './PowerRenderer.js';
+import { ProjectileRenderer } from './ProjectileRenderer.js';
 import { drawDesaturation, drawFlash, drawImpactLights, drawParticles, drawRings } from './effectsRenderer.js';
 import { computePose, createPose } from './fighterPose.js';
 import { drawFighterBody } from './fighterRenderer.js';
@@ -26,6 +27,7 @@ export class DuelRenderer {
     this.trails = new Map();
     this.afterimages = new Map();
     this.powerView = new PowerRenderer();
+    this.projectileView = new ProjectileRenderer();
     this.bladePoints = { baseX: 0, baseY: 0, tipX: 0, tipY: 0 };
   }
 
@@ -56,7 +58,7 @@ export class DuelRenderer {
     return afterimage;
   }
 
-  render(renderer, arena, fighters, effects, camera, ambients = [], bladeExtension = 1) {
+  render(renderer, arena, fighters, effects, camera, ambients = [], bladeExtension = 1, projectiles = null) {
     renderer.save();
     camera.applyTransform(renderer);
 
@@ -98,6 +100,7 @@ export class DuelRenderer {
       renderer.restore();
     }
 
+    this.projectileView.draw(renderer, projectiles, fighters);
     this.powerView.draw(renderer, fighters);
     drawImpactLights(renderer, effects.lights);
     drawRings(renderer, effects.rings);

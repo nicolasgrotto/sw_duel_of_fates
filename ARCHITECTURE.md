@@ -105,7 +105,8 @@ src/
     hitboxes.js             ✅ hitbox, hurtbox, sobreposição, invulnerabilidade
     combatEvents.js         ✅ tipos e criação de eventos de combate
     PowerSystem.js          ✅ medidor, recarga, escolha e fases dos poderes, alvo, resistência e Barreira; desligado sem `rules.powers`
-    powerEffects.js         ✅ registro de efeitos por poder (`push`, `pull`, `lightning`, `barrier`)
+    powerEffects.js         ✅ registro de efeitos por poder (`push`, `pull`, `lightning`, `barrier`, `throw`)
+    ProjectileSystem.js     ✅ pool fixo de projéteis (Arremesso e lâmina arremessada), voo, retorno, impacto e snapshot
     flowInteractions.js     ✅ diferença de Fluxo, `resolveInteraction` (faixas por habilidade em dados) e tier visual (puros)
   simulation/               ✅
     DuelSimulation.js       ✅ ordem dos sistemas em um passo do duelo
@@ -129,6 +130,7 @@ src/
     DodgeAfterimage.js      ✅ silhuetas transparentes durante a esquiva
     effectsRenderer.js      ✅ partículas, luzes de impacto e flash
     PowerRenderer.js        ✅ brilho de carga, raio (polilinhas) e domo da Barreira, só lendo o estado
+    ProjectileRenderer.js   ✅ fragmento do Arremesso e lâmina girando, só lendo o pool
   ui/                       ✅ peças de interface desenhadas no canvas
     attributeBars.js        ✅ seis linhas de nove segmentos (dez para nota 10); posição por parâmetro; somente leitura
     TouchControls.js        ✅ desenho de joystick e botões sem alterar input
@@ -155,6 +157,7 @@ src/
     airDashConfig.js        ✅ flag e perfil global do dash aéreo (override por arquétipo em `stats.airDash`)
     attributesConfig.js     ✅ tabela 1–10 (escala 7/8/9/10), bases na nota 4, calibração por arquétipo e regra de conversão da escala antiga
     powersConfig.js         ✅ modos com poderes, medidor, tabelas de interação por habilidade e tiers visuais do Fluxo
+    projectilesConfig.js    ✅ capacidade do pool, faixas de tamanho do Arremesso, voo da lâmina e estilo do render
     storyConfig.js          ✅ regras da História, opções do protagonista, encontros (rotas, recompensas, liberações) e finais
     storyTexts.js           ✅ títulos e falas dos encontros e finais
     introConfig.js          ✅ linha do tempo e desenho da intro
@@ -305,6 +308,7 @@ PhysicsSystem               → gravidade, integração, chão, paredes         
 CollisionSystem             → separa corpos sobrepostos                                    ✅
 MovementSystem.updateStates → IDLE / WALKING / JUMPING                                     ✅
 CombatSystem.resolveHits    → hitbox × hurtbox, bloqueio, dano, knockback → eventos        ✅
+ProjectileSystem.update     → voo, retorno da lâmina, impacto (pool fixo)                  ✅
 StaminaSystem               → regeneração                                                  ✅
 AnimationSystem             → tempo, ciclo de passos, blends                               ✅
 ```
@@ -581,6 +585,7 @@ Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 22).
 - **Estados e ação.** `CASTING` (poderes instantâneos) e `CHANNELING` (raio e barreira). A ação `power` (`intent.power`, segurar = `intent.powerHeld`) entra no buffer depois do empurrão e antes da habilidade, e também sai de dentro do `BLOCKING` fora do blockstun. Com os poderes desligados, a ação é descartada sem evento. Sem medidor ou em recarga, `actionRejected` sai com `attackType: 'power'`.
 - **Escolha.** `getIntentSlot` converte a direção relativa ao `facing` em `forward`, `back` ou `neutral`. `selectPower` lê `stats.power.loadout` e cai no `neutral` com espaço vazio; `selectTechnique` lê `stats.techniques` e devolve `null` com espaço vazio (a habilidade própria continua no neutro).
 - **Catálogo e loadout (v1.15).** `powersConfig.categories` lista as habilidades de cada categoria e os alinhamentos que a abrem. Cada personagem tem `characterData.loadout = { powers: { slot: id }, techniques: { slot: id } }`; `findLoadoutProblems` (em `characters/powers.js`, puro) aponta id desconhecido ou categoria fora do alinhamento, e um teste roda isso no elenco inteiro. A factory monta `stats.power.loadout` (`resolvePowerStats` com os espaços do personagem, filtrados por `powerSlots` no protagonista), `stats.techniques` (ids por espaço) e acrescenta os golpes das técnicas em `fighter.moves` a partir de `movesConfig.bladeTechniques`. O dano de técnica vem de `damage` da própria definição (base na nota 4), multiplicado pela Lâmina em `applyAttributes`. O protagonista recebe `loadout` em `createProtagonistCharacter`: poderes de `storyConfig.protagonist.loadouts[caminho]` (que também alimenta a liberação do segundo espaço na campanha) e técnicas do personagem-base do estilo.
+- **Projéteis (v1.16).** `ProjectileSystem` é criado pelo `CombatSystem` (exposto como `simulation.projectiles`) e roda logo depois de `resolveHits`. O pool tem `projectilesConfig.capacity` objetos criados uma vez; cada um guarda só dados simples (`kind`, índice do dono em `fighters`, id de origem, posição, velocidade, raio, dano, empurrão, desequilíbrio, idade, `returning`, `hit`). Pool cheio descarta o lançamento. **Arremesso:** poder instantâneo com `projectile: true`; no fim do startup o `PowerSystem` chama `spawnThrow` em vez de `affect`. A faixa do Fluxo de quem lança (`resolveLevelBand`, o mesmo algoritmo dos tiers) define raio, dano, velocidade, empurrão, desequilíbrio, custo (`PowerSystem.getCost`) e recarga (`finish`). No contato com a hurtbox, `PowerSystem.strike` (a parte de `affect` depois do alcance) aplica invulnerabilidade, Barreira, interação (tabela `throw`), guarda e chama `powerEffects.throw.impact`, que lê dano e empurrão do projétil. Sai do pool ao acertar, na parede ou no tempo máximo. **Arremesso da lâmina:** técnica com `projectile: true`; no início do ativo, `applyActionMovement` chama `spawnSaber` e liga `combat.saberThrown`. O golpe não tem hitbox corpo a corpo nem rastro (`hasActiveHitbox` e `isSaberStrikeActive` ignoram golpes de projétil); o `hitbox.reach` só informa a IA. A lâmina vai até `saber.range`, vira (`returning`, libera um novo acerto se ainda não acertou), persegue o dono e sai do pool ao chegar, desligando `saberThrown`. No contato: Barreira → `powerAbsorbed`; guarda de frente (pelo sentido do voo) → `resolveBlock`; senão `applyHit`, com o dono como atacante. Com `saberThrown`, `tryAttack` recusa golpes de lâmina e `startParry`/guarda não entram. O render esconde a lâmina do dono (`pose.bladeVisible`). **Replay:** `ReplayBuffer.record(fighters, dt, projectiles)` guarda `captureProjectiles` na foto e o `ReplayState` chama `restoreProjectiles`; o `DuelState` limpa o pool a cada round. O F3 mostra quantos projéteis estão ativos.
 - **Técnicas.** `CombatSystem.trySpecial` consulta `selectTechnique` só com `rules.powers`; havendo técnica, chama o `tryAttack` comum com o id dela (estado pelo `type`, pose própria, stamina, rastro, som e impacto de forte). O giro usa `hitbox.around` (`getAttackHitbox` estende a caixa para os dois lados). A IA (`tryTechnique`, no passo `special`, só com `rules.powers`) escolhe uma técnica que alcança (`hitbox.reach + lunge × active`) com `profile.techniqueChance` ou `perception.techniqueChance` × `difficulty.specialMultiplier` e aponta `moveX` para o espaço. A lista de golpes lê o loadout do personagem e encolhe o espaçamento para caber (`layout.moveList.lastRowY`).
 - **Fases.** `PowerSystem.resolve` roda no fim de `CombatSystem.update`, antes do movimento. Instantâneo: no fim do startup aplica o efeito uma vez (`affect(..., 'active')`), emite `powerActive` e termina depois de active + recovery. Canal: depois do startup, enquanto `powerHeld`, há medidor e o tempo não passou de `maxChannel`, drena o medidor e chama `tick`; sempre há pelo menos um passo de canal (um toque dá um pulso). `powerEndTime` marca o fim do canal; a recuperação conta a partir dele. `finish` limpa o poder, volta a `IDLE` e liga `powerCooldown` (`powersConfig.cooldown`).
 - **Efeito.** `affect` confere alcance (`isInPowerRange`: à frente, gap ≤ `range`; na vertical, uma altura de corpo com os dois no chão e `powersConfig.airReach` quando um deles está no ar), invulnerabilidade (esquiva e EVADE passam), Barreira (`isBarrierUp` → `powerAbsorbed`, com recuo pequeno para empurrões), interação (`powerResisted` quando a faixa é `resisted`) e guarda de frente (`isGuardingAgainst`, só se a faixa for `blockable`). Depois chama o handler do registro `powerEffects[effect][fase]` com um contexto reaproveitado (sem objeto novo por chamada), que carrega a faixa em `context.interaction` e o modificador aéreo em `context.air` (`table.air` com o alvo no ar; um objeto neutro congelado no chão). Cada tabela é `{ air, bands }`: `air.scale` multiplica a escala do efeito, `air.duration` o stun do Raio e `air.stagger` o desequilíbrio. O dano passa por `CombatSystem.dealPowerDamage`, que emite `powerHit` ou `powerBlocked`, dá medidor ao atingido e usa o mesmo `knockOut` do golpe de lâmina.
@@ -917,6 +922,10 @@ Secretos e chefes depois do movimento novo (40 duelos): Ancião 61,5/77,3, Sober
 
 Clássico idêntico célula a célula à v1.13 (técnicas só com `rules.powers`). Com poderes (60 por par), média das duas dificuldades: Guardião 45,2 · Sombra 56,4 · Bastião 54,0 · Vespa 49,6 · Espelho 50,6 · Haste 50,7 · Brasa 48,9 · Forja 51,4 · Garça 45,8 · Eco 52,5 (faixa 45–56%). Na primeira versão o Avanço com corte (17 de dano, 28 de stamina) puxava Guardião, Brasa e Sombra para 54–59% e o Giro (15) deixava Haste e Forja em 45–47%; ajustado para Avanço 13/34 com recuperação 0,62 e Giro 18/24 com startup 0,26, e a Garça trocou o Avanço pelo Giro (36% → 46%).
 
+### Projéteis (v1.16)
+
+Clássico idêntico à v1.15. Com poderes (60 por par), média das duas dificuldades: Guardião 47,6 · Sombra 55,9 · Bastião 50,3 · Vespa 50,3 · Espelho 50,2 · Haste 49,2 · Brasa 50,1 · Forja 56,1 · Garça 49,1 · Eco 51,2 (faixa 47,6–56,1%). Na primeira versão o Arremesso da lâmina (11 de dano, 22 de stamina) levava a Forja a 63% e os projéteis no ar derrubavam a Garça a 38%; ajustado para 9 de dano, 28 de stamina e recuperação 0,4, e a Garça ganhou o Arremesso (frente).
+
 ## AI
 
 Arquivos: [src/ai/](src/ai/), [src/config/aiConfig.js](src/config/aiConfig.js). Regras em [GAME_DESIGN.md](GAME_DESIGN.md#7-ia).
@@ -989,7 +998,7 @@ Testes rodam em Node (`npm test`), sem navegador. Por isso:
 - Quando um módulo do core precisa do navegador (`Input`, `TouchInput`, `GameLoop`, `textPrompt`), a dependência é injetada.
 - `computePose` é uma função pura e também é testada.
 
-Testes atuais: 485 testes em `tests/`, um arquivo por área (loop, input e toque, estados e modos, combate, especiais, EVADE, atributos, Fluxo e poderes, IA, simulação, replay, áudio, efeitos, UI, desbloqueios e skins, Arcade, Sobrevivência, História, segredos, remapeamento, save). `tests/states.test.js` cobre o fluxo de telas; `goToMenuItem(game, id)` navega no menu pelo id, sem depender da posição dos itens. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
+Testes atuais: 495 testes em `tests/`, um arquivo por área (loop, input e toque, estados e modos, combate, especiais, EVADE, atributos, Fluxo e poderes, IA, simulação, replay, áudio, efeitos, UI, desbloqueios e skins, Arcade, Sobrevivência, História, segredos, remapeamento, save). `tests/states.test.js` cobre o fluxo de telas; `goToMenuItem(game, id)` navega no menu pelo id, sem depender da posição dos itens. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
 
 ---
 
@@ -1009,7 +1018,7 @@ systems/EffectsSystem → combat (tipos de evento), core/Camera (via construtor)
 characters    → entities, config
 controllers   → config
 systems / combat / ai → entities, config, utils (combat também usa StaminaSystem; a IA lê PowerSystem e flowInteractions só para decidir)
-rendering     → config, utils, entities, combat/attackPhases, PowerSystem e flowInteractions (só leitura)
+rendering     → config, utils, entities, combat/attackPhases, PowerSystem e flowInteractions (só leitura); recebe o pool de projéteis por parâmetro
 entities      → config, utils
 core (resto)  → config, utils (saveStorage usa legacyRatings na migração v4 → v5)
 ```

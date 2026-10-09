@@ -92,20 +92,22 @@ describe('AI powers', () => {
   });
 
   it('plays full duels with powers without timeouts', () => {
-    const fighters = [spawnFighter(420, 1, 'guardian'), spawnFighter(860, -1, 'echo')];
-    const simulation = createSimulation(fighters, { powers: true });
-    const random = createRandom(5);
-    const controllers = fighters.map((self, index) => new EnemyAI({
-      self, opponent: fighters[1 - index], profile: aiConfig.profiles[self.id], difficulty: aiConfig.difficulties.hard,
-      perception: aiConfig.perception, random, rules: { powers: true },
-    }));
     let casts = 0;
-    for (let index = 0; index < 60 * 120 && fighters.every((fighter) => fighter.isAlive); index += 1) {
-      controllers.forEach((controller, side) => controller.updateIntent(fighters[side].intent, STEP));
-      simulation.step(STEP);
-      casts += simulation.events.filter((event) => event.type === 'powerStart').length;
+    for (const seed of [5, 6, 7]) {
+      const fighters = [spawnFighter(420, 1, 'guardian'), spawnFighter(860, -1, 'echo')];
+      const simulation = createSimulation(fighters, { powers: true });
+      const random = createRandom(seed);
+      const controllers = fighters.map((self, index) => new EnemyAI({
+        self, opponent: fighters[1 - index], profile: aiConfig.profiles[self.id], difficulty: aiConfig.difficulties.hard,
+        perception: aiConfig.perception, random, rules: { powers: true },
+      }));
+      for (let index = 0; index < 60 * 120 && fighters.every((fighter) => fighter.isAlive); index += 1) {
+        controllers.forEach((controller, side) => controller.updateIntent(fighters[side].intent, STEP));
+        simulation.step(STEP);
+        casts += simulation.events.filter((event) => event.type === 'powerStart').length;
+      }
+      assert.ok(fighters.some((fighter) => !fighter.isAlive), `seed ${seed}`);
     }
-    assert.ok(fighters.some((fighter) => !fighter.isAlive));
     assert.ok(casts > 0);
   });
 });

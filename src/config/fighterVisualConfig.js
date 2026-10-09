@@ -43,6 +43,14 @@ export const combatPoses = {
       windupLift: 0.06,
       strikeReach: 0.04,
     },
+    saberThrow: {
+      windupDegrees: -150,
+      strikeDegrees: 10,
+      windupLean: -8,
+      strikeLean: 14,
+      windupLift: 0.12,
+      strikeReach: 0.24,
+    },
     dashSlash: {
       windupDegrees: 35,
       strikeDegrees: -80,

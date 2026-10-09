@@ -25,6 +25,7 @@ function createCombat() {
     attackConnected: false,
     airAttackUsed: false,
     airDashUsed: false,
+    saberThrown: false,
     wallJumpSide: 0,
     jumpsUsed: 0,
     lungeApplied: false,

@@ -237,7 +237,7 @@ export function computePose(fighter, pose, forceEvade = false) {
   pose.handX = pose.shoulderX + height * (proportions.handForward + combatPose.reach);
   pose.handY = pose.hipY - height * (proportions.handHeight + combatPose.lift) - breath / 2;
   pose.bladeAngle = degreesToRadians(combatPose.bladeDegrees + breathWave * animationStyle.saberSwayDegrees);
-  pose.bladeVisible = combatPose.bladeVisible;
+  pose.bladeVisible = combatPose.bladeVisible && !fighter.combat.saberThrown;
   pose.bodyRotation = degreesToRadians(combatPose.bodyRotationDegrees);
   pose.bodyLift = combatPose.bodyLift;
 

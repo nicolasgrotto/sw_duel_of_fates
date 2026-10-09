@@ -283,6 +283,7 @@ export class DuelState extends GameState {
     const half = gameConfig.duel.spawnDistance / 2;
     this.fighters[0].resetForRound(centerX - half, 1);
     this.fighters[1].resetForRound(centerX + half, -1);
+    this.simulation.projectiles.clear();
     if (this.survivalStage) {
       this.applySurvivalHealth();
     }
@@ -456,7 +457,7 @@ export class DuelState extends GameState {
     if (this.isPlaying()) {
       this.updateTrainingInputs();
     }
-    this.replayBuffer.record(this.fighters, dt);
+    this.replayBuffer.record(this.fighters, dt, this.simulation.projectiles);
     this.simulation.step(dt);
     this.effects.handleEvents(this.simulation.events);
     this.duelAudio.handleEvents(this.simulation.events);
@@ -674,7 +675,7 @@ export class DuelState extends GameState {
   }
 
   render(renderer) {
-    this.view.render(renderer, this.arena, this.fighters, this.effects, this.camera, this.ambients, this.getBladeExtension());
+    this.view.render(renderer, this.arena, this.fighters, this.effects, this.camera, this.ambients, this.getBladeExtension(), this.simulation.projectiles.pool);
     if (this.isTraining && this.trainingHitboxes && !this.game.debug.enabled) {
       this.renderDebug(renderer);
     }
@@ -714,7 +715,7 @@ export class DuelState extends GameState {
     const lines = [
       `round: ${this.roundNumber}  wins: ${this.roundWins.join(" / ")}`,
       `input: ${this.game.input.lastInputKind ?? 'keyboard'}  touch pointers: ${this.game.touch?.pointers.size ?? 0}`,
-      `duel time: ${this.duelTime.toFixed(2)}s`,
+      `duel time: ${this.duelTime.toFixed(2)}s  projectiles: ${this.simulation.projectiles.activeCount}`,
       this.usesDummy
         ? `dummy (F4): ${this.opponentController.behavior}`
         : `ai: ${this.opponentController.decision} (${this.game.settings.difficulty})`,

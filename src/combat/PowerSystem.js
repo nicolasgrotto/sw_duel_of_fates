@@ -3,7 +3,8 @@ import { FighterState } from '../entities/fighterStates.js';
 import { CombatEvent } from './combatEvents.js';
 import { isGuardingAgainst, isInvulnerable } from './hitboxes.js';
 import { powerEffects } from './powerEffects.js';
-import { getFlowDifference, resolveInteraction } from './flowInteractions.js';
+import { getFlowDifference, resolveInteraction, resolveLevelBand } from './flowInteractions.js';
+import { projectilesConfig } from '../config/projectilesConfig.js';
 
 const POWER_STATES = new Set([FighterState.CASTING, FighterState.CHANNELING]);
 const GROUNDED = Object.freeze({ scale: 1, duration: 1, stagger: 1 });
@@ -51,7 +52,7 @@ export class PowerSystem {
     this.config = config;
     this.enabled = enabled;
     this.friction = friction;
-    this.context = { system: this, combat, caster: null, target: null, power: null, interaction: null, air: GROUNDED, scale: 1, guarded: false };
+    this.context = { system: this, combat, caster: null, target: null, power: null, interaction: null, air: GROUNDED, scale: 1, guarded: false, projectile: null };
   }
 
   update(fighters, dt) {
@@ -87,8 +88,16 @@ export class PowerSystem {
     this.gain(defender, this.config.meter.gain.parried);
   }
 
+  getVariant(fighter, power) {
+    return power.sizes ? resolveLevelBand(fighter.flowLevel, projectilesConfig[power.sizes].sizes) : null;
+  }
+
+  getCost(fighter, power) {
+    return this.getVariant(fighter, power)?.cost ?? power.cost;
+  }
+
   canCast(fighter, power) {
-    return this.enabled && power !== null && fighter.combat.powerCooldown === 0 && fighter.flowMeter >= power.cost;
+    return this.enabled && power !== null && fighter.combat.powerCooldown === 0 && fighter.flowMeter >= this.getCost(fighter, power);
   }
 
   tryCast(fighter) {
@@ -96,7 +105,7 @@ export class PowerSystem {
     if (!this.canCast(fighter, power)) {
       return false;
     }
-    fighter.flowMeter -= power.cost;
+    fighter.flowMeter -= this.getCost(fighter, power);
     fighter.clearAttack();
     fighter.combat.power = power;
     fighter.restartState(power.channel ? FighterState.CHANNELING : FighterState.CASTING);
@@ -136,7 +145,12 @@ export class PowerSystem {
     const { power } = combat;
     if (!combat.powerTargeted && caster.stateTime >= power.startup) {
       combat.powerTargeted = true;
-      this.affect(caster, target, power, 'active');
+      if (power.projectile) {
+        this.aim(caster, null, power);
+        this.combat.projectiles.spawnThrow(caster, power);
+      } else {
+        this.affect(caster, target, power, 'active');
+      }
       this.combat.emitAction(CombatEvent.POWER_ACTIVE, caster, power.id);
     }
     if (caster.stateTime >= power.startup + power.active + power.recovery) {
@@ -181,7 +195,13 @@ export class PowerSystem {
   affect(caster, target, power, phase) {
     const inRange = target !== null && isInPowerRange(caster, target, power, this.config.airReach);
     this.aim(caster, inRange ? target : null, power);
-    if (!inRange || isInvulnerable(target)) {
+    if (inRange) {
+      this.strike(caster, target, power, phase, null);
+    }
+  }
+
+  strike(caster, target, power, phase, projectile) {
+    if (isInvulnerable(target)) {
       return;
     }
     if (isBarrierUp(target)) {
@@ -202,6 +222,7 @@ export class PowerSystem {
     context.air = target.grounded ? GROUNDED : table.air;
     context.scale = interaction.scale * caster.stats.power.potency * context.air.scale;
     context.guarded = interaction.blockable && isGuardingAgainst(target, caster);
+    context.projectile = projectile;
     powerEffects[power.effect][phase](context);
   }
 
@@ -224,8 +245,9 @@ export class PowerSystem {
   }
 
   finish(caster) {
+    const variant = this.getVariant(caster, caster.combat.power);
     caster.clearPower();
-    caster.combat.powerCooldown = this.config.cooldown;
+    caster.combat.powerCooldown = variant?.cooldown ?? this.config.cooldown;
     caster.setState(FighterState.IDLE);
   }
 }

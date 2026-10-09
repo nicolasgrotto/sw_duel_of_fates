@@ -105,7 +105,7 @@ export const texts = {
     recorderModes: { idle: 'Gravação parada', recording: 'Gravando', playing: 'Reproduzindo' },
     inputNames: { idle: '—', left: '←', right: '→', jump: 'pulo', lightAttack: 'rápido', heavyAttack: 'forte', block: 'guarda', dodge: 'esquiva', evade: 'precis\u00e3o', special: 'habilidade', power: 'poder' },
     frameData: '{attack} · {result} · {advantage} s',
-    attacks: { air: 'Aéreo', forwardHeavy: 'Forte de avanço', light: 'Rápido', light2: 'Rápido 2', light3: 'Rápido 3', light4: 'Rápido 4', light5: 'Rápido 5', heavy: 'Forte', riposte: 'Riposta', shove: 'Empurrão', special: 'Habilidade', counterStrike: 'Contra-golpe', airHeavy: 'Mergulho' },
+    attacks: { air: 'Aéreo', forwardHeavy: 'Forte de avanço', light: 'Rápido', light2: 'Rápido 2', light3: 'Rápido 3', light4: 'Rápido 4', light5: 'Rápido 5', heavy: 'Forte', riposte: 'Riposta', shove: 'Empurrão', special: 'Habilidade', counterStrike: 'Contra-golpe', airHeavy: 'Mergulho', spin: 'Giro', dashSlash: 'Avanço com corte', saberThrow: 'Arremesso da lâmina' },
     results: {
       hit: 'acertou',
       block: 'bloqueado',
@@ -254,6 +254,8 @@ export const texts = {
     barrier: 'Barreira',
     spin: 'Giro',
     dashSlash: 'Avanço com corte',
+    throw: 'Arremesso',
+    saberThrow: 'Arremesso da lâmina',
     alignments: { light: 'Aurora', dark: 'Eclipse' },
   },
   pause: {

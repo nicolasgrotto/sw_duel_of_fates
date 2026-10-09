@@ -11,6 +11,7 @@ import { DuelRenderer } from '../rendering/DuelRenderer.js';
 import { createArenaBounds } from '../simulation/arenaBounds.js';
 import { DuelSimulation } from '../simulation/DuelSimulation.js';
 import { restoreFighter } from '../simulation/ReplayBuffer.js';
+import { restoreProjectiles } from '../combat/ProjectileSystem.js';
 import { EffectsSystem } from '../systems/EffectsSystem.js';
 import { TimeControl } from '../systems/TimeControl.js';
 import { formatText } from '../ui/formatText.js';
@@ -50,6 +51,8 @@ export class ReplayState extends GameState {
       animationConfig: animationStyle,
       rules,
     });
+    this.simulation.projectiles.fighters = this.fighters;
+    restoreProjectiles(this.simulation.projectiles, playback.snapshot.projectiles);
     const random = createRandom(playback.firstStep + 1);
     this.camera = new Camera(effectsConfig, random);
     this.timeControl = new TimeControl();
@@ -99,7 +102,7 @@ export class ReplayState extends GameState {
 
   render(renderer) {
     renderer.clear(colors.background);
-    this.view.render(renderer, this.arena, this.fighters, this.effects, this.camera, []);
+    this.view.render(renderer, this.arena, this.fighters, this.effects, this.camera, [], 1, this.simulation.projectiles.pool);
     this.letterbox.render(renderer);
     renderer.text(texts.replay.label, layout.hud.margin, layout.replay.labelY, textStyles.replayLabel);
     renderer.text(this.skipLine, renderer.width - layout.hud.margin, layout.replay.labelY, textStyles.replaySkip);

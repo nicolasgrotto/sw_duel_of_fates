@@ -599,17 +599,29 @@ Na guarda, o Puxão não causa dano e puxa pela metade; o Raio causa um quarto d
 
 | Categoria | Alinhamento | Habilidades |
 | --- | --- | --- |
-| Fluxo comum | os dois | Repulsão, Puxão (Arremesso e Redirecionamento entram nas próximas etapas) |
+| Fluxo comum | os dois | Repulsão, Puxão, Arremesso (Redirecionamento entra numa próxima etapa) |
 | Aurora | Aurora | Barreira (Cura e Foco nas próximas etapas) |
 | Eclipse | Eclipse | Raio (Estrangular, Tempestade e Congelar nas próximas etapas) |
-| Técnicas de lâmina | os dois | Giro, Avanço com corte (Arremesso da lâmina na próxima etapa); custam stamina e escalam com a Lâmina |
+| Técnicas de lâmina | os dois | Giro, Avanço com corte, Arremesso da lâmina; custam stamina e escalam com a Lâmina |
 
 **Comandos.** Nenhum botão novo. `Poder` + direção (neutro, frente, trás) escolhe entre até três habilidades do Fluxo; `Habilidade` + direção escolhe entre a habilidade própria (neutro) e até duas técnicas de lâmina (frente, trás). Espaço vazio cai no neutro. Técnicas só valem com a opção Poderes (os modos clássicos não mudam). O Eco e o Predestinado não têm técnicas: o avanço deles já segue a direção.
 
 - **Giro** (técnica): a lâmina dá a volta no corpo e acerta dos dois lados; quem estava atrás não consegue bloquear (a guarda só vale de frente).
 - **Avanço com corte** (técnica): avanço longo que termina num corte; recuperação longa se errar.
+- **Arremesso** (Fluxo comum, v1.16): arranca um fragmento da arena e o lança em linha reta. O tamanho vem da faixa de Fluxo de quem lança, e cada faixa tem dano, velocidade, empurrão, desequilíbrio, custo e recarga próprios:
 
-**Loadouts atuais.** Aurora (Guardião, Bastião, Vespa, Espelho, Garça, Ancião, Predestinado): Repulsão (neutro) e Barreira (trás). Eclipse (Sombra, Haste, Brasa, Forja, Eco, chefe do Arcade, Soberano): Raio (neutro) e Puxão (frente). Técnicas: Avanço com corte para Guardião, Vespa e Brasa; Giro para Bastião, Espelho, Haste, Forja, Garça, Ancião e Soberano; os dois para a Sombra e o chefe do Arcade. O protagonista recebe os poderes do caminho (`storyConfig.protagonist.loadouts`) e as técnicas do personagem-base do estilo.
+| Fluxo | Tamanho | Dano | Velocidade | Custo | Recarga |
+| --- | --- | --- | --- | --- | --- |
+| 1–3 | pequeno | 6 | 760 | 30 | 1,0 s |
+| 4–5 | médio | 8 | 700 | 34 | 1,1 s |
+| 6–8 | grande | 11 | 620 | 40 | 1,3 s |
+| 9 | muito grande | 14 | 560 | 44 | 1,4 s |
+| 10 | máximo | 17 | 520 | 48 | 1,5 s |
+
+  No impacto valem a tabela de interação (resistido a −3 ou menos), a guarda de frente (um quarto do dano passa), a Barreira (absorve) e a invulnerabilidade da esquiva (passa através). Some ao bater na parede.
+- **Arremesso da lâmina** (técnica, v1.16): a lâmina sai girando para a frente, vai até cerca de 380 px e volta para a mão. Acerta uma vez (na ida ou, se errou, na volta); a guarda de frente bloqueia e a Barreira absorve, e a lâmina volta mesmo assim. Enquanto ela não volta, o lutador não ataca, não bloqueia e não apara com a lâmina (empurrão, esquiva e poderes continuam valendo).
+
+**Loadouts atuais.** Aurora (Guardião, Bastião, Vespa, Espelho, Garça, Ancião, Predestinado): Repulsão (neutro) e Barreira (trás); Vespa, Espelho, Garça, Ancião e Predestinado também têm o Arremesso (frente). Eclipse (Sombra, Haste, Brasa, Forja, Eco, chefe do Arcade, Soberano): Raio (neutro) e Puxão (frente); Haste, Forja, Eco e Soberano também têm o Arremesso (trás). Técnicas: Guardião, Vespa e Brasa com Avanço com corte (frente) e Arremesso da lâmina (trás); Forja com Arremesso da lâmina (frente) e Giro (trás); Giro para Bastião, Espelho, Haste, Garça, Ancião e Soberano; Avanço e Giro para a Sombra e o chefe do Arcade. O protagonista recebe os poderes do caminho (`storyConfig.protagonist.loadouts`) e as técnicas do personagem-base do estilo.
 
 | Poder | Alinhamento | Comando | Efeito |
 | --- | --- | --- | --- |
@@ -622,7 +634,7 @@ Na guarda, o Puxão não causa dano e puxa pela metade; o Raio causa um quarto d
 - Esquiva e EVADE com invulnerabilidade fazem o poder passar. O dash aéreo não tem invulnerabilidade.
 - **No ar** não há guarda contra poderes, e o alcance vertical cobre o pulo duplo (`powersConfig.airReach`). Quem está no ar sofre o modificador aéreo da habilidade: a Repulsão empurra 30% mais e desequilibra 20% mais, o Puxão desequilibra 20% mais e o Raio prende 60% mais a cada pulso.
 - A Barreira contra a Repulsão segura, mas o dono recua um pouco.
-- Poderes não têm projétil: o efeito é decidido no instante ativo (Repulsão e Puxão) ou em cada pulso (Raio).
+- Repulsão, Puxão e Raio não têm projétil: o efeito é decidido no instante ativo ou em cada pulso. O Arremesso e o Arremesso da lâmina são projéteis (abaixo).
 - Nomes de tela em `uiConfig.texts.powers`; os ids no código são `push`, `pull`, `lightning` e `barrier`.
 
 **Elenco.** Aurora: Guardião, Bastião, Vespa, Espelho, Garça. Eclipse: Sombra, Haste, Brasa, Forja, Eco. Chefe do Arcade: Eclipse, nível 7.

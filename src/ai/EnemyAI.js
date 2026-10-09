@@ -1,6 +1,7 @@
 import { AttackPhase, AttackType, getAttackDuration, getAttackPhase, isHeavyAttack } from '../combat/attackPhases.js';
 import { isInPowerRange, isUsingPower } from '../combat/PowerSystem.js';
-import { getFlowDifference, resolveInteraction } from '../combat/flowInteractions.js';
+import { getFlowDifference, resolveInteraction, resolveLevelBand } from '../combat/flowInteractions.js';
+import { projectilesConfig } from '../config/projectilesConfig.js';
 import { evadeConfig } from '../config/evadeConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { FighterState } from '../entities/fighterStates.js';
@@ -33,7 +34,7 @@ export const AiDecision = Object.freeze({
 
 const STUN_STATES = new Set([FighterState.HIT, FighterState.STAGGERED]);
 
-const POWER_SLOTS = ['forward', 'neutral'];
+const POWER_SLOTS = ['forward', 'neutral', 'back'];
 
 export const SpecialKind = Object.freeze({
   COUNTER: 'counter',
@@ -472,13 +473,21 @@ export class EnemyAI {
     if (this.random() >= this.profile.blockChance * this.difficulty.defenseMultiplier) {
       return null;
     }
-    const remaining = Math.max(0, power.startup - opponent.stateTime) + (power.channel ? power.maxChannel : power.active);
+    const remaining = Math.max(0, power.startup - opponent.stateTime) + (power.channel ? power.maxChannel : power.active) + this.getProjectileTravelTime(power);
     if (this.random() < this.perception.barrierPreference && this.tryBarrier(remaining)) {
       return AiDecision.POWER;
     }
     this.plan.blockTime = remaining + this.perception.blockHoldTime;
     this.plan.punishAfterBlock = false;
     return AiDecision.BLOCK;
+  }
+
+  getProjectileTravelTime(power) {
+    if (!power.sizes) {
+      return 0;
+    }
+    const { speed } = resolveLevelBand(this.opponent.flowLevel, projectilesConfig[power.sizes].sizes);
+    return getGap(this.opponent, this.self) / speed;
   }
 
   tryEvade(roll) {

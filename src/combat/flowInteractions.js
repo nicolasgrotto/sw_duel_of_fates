@@ -12,12 +12,16 @@ export function resolveInteraction(table, flowDifference) {
   return bands[bands.length - 1];
 }
 
-export function getPowerTier(level, tiers) {
-  let tier = tiers[0];
-  for (const candidate of tiers) {
+export function resolveLevelBand(level, bands) {
+  let band = bands[0];
+  for (const candidate of bands) {
     if (level >= candidate.minLevel) {
-      tier = candidate;
+      band = candidate;
     }
   }
-  return tier;
+  return band;
+}
+
+export function getPowerTier(level, tiers) {
+  return resolveLevelBand(level, tiers);
 }

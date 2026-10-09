@@ -19,10 +19,10 @@ export const powersConfig = {
   castHeight: 0.6,
   airReach: 320,
   categories: {
-    flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull'] },
+    flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull', 'throw'] },
     aurora: { alignments: ['light'], abilities: ['barrier'] },
     eclipse: { alignments: ['dark'], abilities: ['lightning'] },
-    blade: { alignments: ['light', 'dark'], abilities: ['spin', 'dashSlash'] },
+    blade: { alignments: ['light', 'dark'], abilities: ['spin', 'dashSlash', 'saberThrow'] },
   },
   powers: {
     push: {
@@ -42,6 +42,11 @@ export const powersConfig = {
       cost: 15, drainPerSecond: 55, startup: 0.3, maxChannel: 1, recovery: 0.35, range: 300,
       tickInterval: 0.15, damage: 3, knockback: 70, stun: 0.12,
       guard: { staminaCost: 5 },
+    },
+    throw: {
+      id: 'throw', effect: 'throw', channel: false, pose: 'cast', interaction: 'throw', projectile: true, sizes: 'throw',
+      cost: 40, startup: 0.26, active: 0.08, recovery: 0.3, range: 700,
+      guard: { staminaCost: 10 },
     },
     barrier: {
       id: 'barrier', effect: 'barrier', channel: true, pose: 'barrier',
@@ -74,6 +79,10 @@ export const powersConfig = {
     pull: {
       air: { scale: 1, duration: 1, stagger: 1.2 },
       bands: [{ ...NORMAL_BAND, ...STRIKE_GUARD }, { ...REDUCED_BAND, ...STRIKE_GUARD }, { ...RESISTED_BAND, ...STRIKE_GUARD }],
+    },
+    throw: {
+      air: { scale: 1.2, duration: 1, stagger: 1.2 },
+      bands: [{ ...NORMAL_BAND, ...STRIKE_GUARD, guardDamage: 0.25 }, { ...REDUCED_BAND, ...STRIKE_GUARD, guardDamage: 0.25 }, { ...RESISTED_BAND, ...STRIKE_GUARD }],
     },
     lightning: {
       air: { scale: 1, duration: 1.6, stagger: 1 },

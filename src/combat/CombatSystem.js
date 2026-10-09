@@ -9,6 +9,8 @@ import { ATTACK_STATES, AttackPhase, AttackType, getAttackDuration, getAttackPha
 import { CombatEvent, createCombatEvent } from './combatEvents.js';
 import { boxesOverlap, comesFromFront, createBox, getAttackHitbox, getHurtbox, hasActiveHitbox, hasHurtbox, isGuardingAgainst, isInvulnerable } from './hitboxes.js';
 import { PowerSystem, isBarrierUp, selectTechnique } from './PowerSystem.js';
+import { ProjectileSystem } from './ProjectileSystem.js';
+import { projectilesConfig } from '../config/projectilesConfig.js';
 
 const PUNISHED_STATES = new Set([FighterState.STAGGERED, FighterState.STUNNED]);
 
@@ -59,10 +61,12 @@ export class CombatSystem {
     this.hurtbox = createBox();
     this.contacts = [];
     this.powers = new PowerSystem(this, powersConfig, rules.powers === true, friction);
+    this.projectiles = new ProjectileSystem(this, projectilesConfig);
   }
 
   update(fighters, dt) {
     this.events.length = 0;
+    this.projectiles.fighters = fighters;
 
     for (const fighter of fighters) {
       this.updateTimers(fighter, dt);
@@ -163,7 +167,7 @@ export class CombatSystem {
     const action = fighter.combat.bufferedAction;
     const started = action !== null && this.tryBufferedAction(fighter, action);
 
-    if (!started && fighter.intent.block) {
+    if (!started && fighter.intent.block && !fighter.combat.saberThrown) {
       fighter.combat.blockstun = 0;
       fighter.setState(FighterState.BLOCKING);
     }
@@ -333,6 +337,9 @@ export class CombatSystem {
   }
 
   startParry(fighter) {
+    if (fighter.combat.saberThrown) {
+      return false;
+    }
     fighter.combat.blockstun = 0;
     fighter.setState(FighterState.BLOCKING);
     this.armParry(fighter);
@@ -350,7 +357,7 @@ export class CombatSystem {
 
   tryAttack(fighter, attackType) {
     const attack = fighter.moves[attackType];
-    if (!canAfford(fighter, attack.staminaCost)) {
+    if (fighter.combat.saberThrown && isSaberAttack(attackType) || !canAfford(fighter, attack.staminaCost)) {
       return false;
     }
 
@@ -407,6 +414,9 @@ export class CombatSystem {
     }
 
     if (combat.attack && !combat.lungeApplied && getAttackPhase(combat.attack, fighter.stateTime) === AttackPhase.ACTIVE) {
+      if (combat.attack.projectile) {
+        this.projectiles.spawnSaber(fighter, combat.attackType);
+      }
       fighter.vx = fighter.facing * combat.attack.lunge;
       if (combat.attack.dive && !fighter.grounded) {
         fighter.vy = combat.attack.dive;

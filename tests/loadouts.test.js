@@ -61,7 +61,10 @@ describe('blade techniques', () => {
     fighter.intent.moveX = 1;
     assert.equal(selectTechnique(fighter), 'dashSlash');
     fighter.intent.moveX = -1;
-    assert.equal(selectTechnique(fighter), null);
+    assert.equal(selectTechnique(fighter), 'saberThrow');
+    const bastion = spawnFighter(400, 1, 'bastion');
+    bastion.intent.moveX = 1;
+    assert.equal(selectTechnique(bastion), null);
   });
 
   it('scale damage with the blade rating', () => {
@@ -123,5 +126,15 @@ describe('blade techniques', () => {
     const classic = make({});
     classic.think();
     assert.notEqual(classic.decision, AiDecision.TECHNIQUE);
+  });
+});
+
+describe('technique names', () => {
+  it('names every blade technique in the training frame data', async () => {
+    const { texts } = await import('../src/config/uiConfig.js');
+    for (const id of Object.keys(bladeTechniques)) {
+      assert.equal(typeof texts.training.attacks[id], 'string', id);
+      assert.equal(typeof texts.powers[id], 'string', id);
+    }
   });
 });

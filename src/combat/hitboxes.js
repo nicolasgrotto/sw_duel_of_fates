@@ -35,11 +35,11 @@ export function isAttackActive(fighter) {
 }
 
 export function isSaberStrikeActive(fighter) {
-  return isAttackActive(fighter) && isSaberAttack(fighter.combat.attackType);
+  return isAttackActive(fighter) && isSaberAttack(fighter.combat.attackType) && !fighter.combat.attack.projectile;
 }
 
 export function hasActiveHitbox(fighter) {
-  return !fighter.combat.hasHit && isAttackActive(fighter);
+  return !fighter.combat.hasHit && isAttackActive(fighter) && !fighter.combat.attack.projectile;
 }
 
 export function comesFromFront(defender, attacker) {

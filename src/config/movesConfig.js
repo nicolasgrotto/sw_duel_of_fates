@@ -237,4 +237,9 @@ export const bladeTechniques = {
     attack: 'heavy', type: 'heavy', pose: 'dashSlash', cancelsInto: [], damage: 13,
     staminaCost: 34, startup: 0.3, active: 0.14, recovery: 0.62, lunge: 900,
   },
+  saberThrow: {
+    attack: 'heavy', type: 'heavy', pose: 'saberThrow', cancelsInto: [], damage: 9, projectile: true,
+    staminaCost: 28, startup: 0.26, active: 0.08, recovery: 0.4, lunge: 0, knockback: 220,
+    hitbox: { reach: 380, top: 0.7, bottom: 0.4 },
+  },
 };

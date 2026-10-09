@@ -22,6 +22,10 @@ export class DuelSimulation {
     return this.combat.events;
   }
 
+  get projectiles() {
+    return this.combat.projectiles;
+  }
+
   step(dt) {
     const { fighters } = this;
 
@@ -35,6 +39,7 @@ export class DuelSimulation {
     this.collision.update(fighters);
     this.movement.updateStates(fighters);
     this.combat.resolveHits(fighters);
+    this.combat.projectiles.update(fighters, dt);
     this.stamina.update(fighters, dt);
     this.combat.powers.update(fighters, dt);
     this.animator.update(fighters, dt);

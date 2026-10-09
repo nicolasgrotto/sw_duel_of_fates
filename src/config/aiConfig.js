@@ -417,6 +417,7 @@ export const aiConfig = {
       push: { minGap: 0, maxGap: 100 },
       pull: { minGap: 250, maxGap: Infinity },
       lightning: { minGap: 110, maxGap: Infinity },
+      throw: { minGap: 140, maxGap: Infinity },
     },
     feintAt: 0.45,
     habits: {

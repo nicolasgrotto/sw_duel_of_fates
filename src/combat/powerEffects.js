@@ -12,10 +12,10 @@ function getGap(caster, target) {
   return Math.abs(target.x - caster.x) - (caster.width + target.width) / 2;
 }
 
-function applyGuarded(context) {
+function applyGuarded(context, damage = context.power.damage) {
   const { combat, caster, target, power, interaction, scale } = context;
   spendStamina(target, power.guard.staminaCost * interaction.guardStamina);
-  return combat.dealPowerDamage(caster, target, power, power.damage * scale * interaction.guardDamage, CombatEvent.POWER_BLOCKED);
+  return combat.dealPowerDamage(caster, target, power, damage * scale * interaction.guardDamage, CombatEvent.POWER_BLOCKED);
 }
 
 function getStagger(context) {
@@ -65,9 +65,24 @@ function lightning(context) {
   }
 }
 
+function throwImpact(context) {
+  const { combat, caster, target, power, interaction, air, scale, guarded, projectile } = context;
+  const knockback = (Math.sign(projectile.vx) || caster.facing) * projectile.knockback * scale * interaction.knockback;
+  if (guarded) {
+    target.vx = knockback * interaction.guardSlide;
+    applyGuarded(context, projectile.damage);
+    return;
+  }
+  target.vx = knockback;
+  if (combat.dealPowerDamage(caster, target, power, projectile.damage * scale, CombatEvent.POWER_HIT)) {
+    interrupt(target, FighterState.STAGGERED, projectile.stagger * Math.min(1, scale) * interaction.stagger * air.stagger);
+  }
+}
+
 export const powerEffects = Object.freeze({
   push: { active: push },
   pull: { active: pull },
   lightning: { tick: lightning },
   barrier: {},
+  throw: { impact: throwImpact },
 });
