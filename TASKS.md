@@ -6,7 +6,8 @@
 | --- | --- | --- |
 | [versions/v1.md](versions/v1.md) | Fases 1–7 e roadmap v0.2 → v1.0 | fechada (tag `v1.0.0`, branch `main`) |
 | [versions/v2.md](versions/v2.md) | Etapas v1.1 → v1.19, testes e critérios de aceitação | **fechada** (tag local `v2.0.0`, integrada à `origin/main`) |
-| [versions/backlog.md](versions/backlog.md) | Ideias adiadas para a v3+ | — |
+| [versions/v3.md](versions/v3.md) | Plano funcional v2.1 → v3.0 e prompt para o arquiteto | planejamento consolidado; arquitetura pendente |
+| [versions/backlog.md](versions/backlog.md) | Sugestões fora do ciclo aprovado | não comprometidas |
 
 ## Como atualizar
 
@@ -16,5 +17,7 @@
 
 ## Ponto de continuidade
 
+- **Próximo ciclo v2.1 → v3.0:** decisões consolidadas em [versions/v3.md](versions/v3.md), na branch local `v3-planning`. Enviar o documento integral ao arquiteto para contratos, tarefas e critérios técnicos; revisar a entrega antes de iniciar gameplay. Numeração intermediária e parâmetros de balanceamento são propostas, não funcionalidades implementadas. O plano substitui o backlog antigo como ponto de partida do próximo ciclo.
+
 - **v1.0** publicada: `main` e tag `v1.0.0` no GitHub. Falta ativar o GitHub Pages (passos no README) e, se o autor quiser, gravar GIFs para o README.
-- **v2.0** concluída com aprovação do autor: etapas **v1.1–v1.19**, tag local `v2.0.0` e integração por fast-forward publicada na `origin/main`. Versão do pacote: `2.0.0`. Fechamento: 580 testes, clássico idêntico em 364 cenários, médias com poderes 47,9–53,3%, secretos e chefes validados, Chrome CPU 6× dentro do orçamento. Matrizes na ARCHITECTURE e checklist em `versions/v2.md`. Hardware conferido pelo autor nas etapas anteriores. Tags permanecem locais. Próximas funcionalidades: `versions/backlog.md`, mediante escolha do autor.
+- **v2.0** concluída com aprovação do autor: etapas **v1.1–v1.19**, tag local `v2.0.0` e integração por fast-forward publicada na `origin/main`. Versão do pacote: `2.0.0`. Fechamento: 580 testes, clássico idêntico em 364 cenários, médias com poderes 47,9–53,3%, secretos e chefes validados, Chrome CPU 6× dentro do orçamento. Matrizes na ARCHITECTURE e checklist em `versions/v2.md`. Hardware conferido pelo autor nas etapas anteriores. Tags permanecem locais. Próximo ciclo: `versions/v3.md`; ideias adicionais em `versions/backlog.md`.
