@@ -1066,7 +1066,7 @@ Roteiro, tarefas e validações em [versions/v2.md](versions/v2.md). O detalhe d
 | 6× | completos | 0,68 / 0,80 ms | 7,56 / 9,10 ms | 60,5 |
 | 6× | reduzidos | 0,62 / 0,79 ms | 7,32 / 8,90 ms | 60,7 |
 
-Update e render dentro do alvo em todas as janelas. Sem mudanças de visual ou otimizações adicionais. A medição usa aceleração padrão: a tentativa com GPU desabilitada não representa o alvo mobile. Validação em hardware Android/iOS continua com o autor.
+Update e render dentro do alvo em todas as janelas. Sem mudanças de visual ou otimizações adicionais. A medição usa aceleração padrão: a tentativa com GPU desabilitada não representa o alvo mobile. Validação em hardware Android/iOS feita pelo autor.
 
 ---
 

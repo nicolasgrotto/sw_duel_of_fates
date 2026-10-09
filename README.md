@@ -119,7 +119,7 @@ Os controles ficam em [src/config/controlsConfig.js](src/config/controlsConfig.j
 
 ## Mobile
 
-Use o aparelho em paisagem. Joystick na esquerda; rápido, forte, guarda, esquiva, habilidade e pulo na direita. Arraste para baixo para a esquiva de precisão. Toque uma opção para selecionar e novamente para confirmar. A pausa fica no topo. O manifest permite adicionar à tela inicial; não há suporte offline. QA em Chrome Android e Safari iOS reais ainda depende do autor (versions/v2.md).
+Use o aparelho em paisagem. Joystick na esquerda; rápido, forte, guarda, esquiva, habilidade e pulo na direita. Arraste para baixo para a esquiva de precisão. Toque uma opção para selecionar e novamente para confirmar. A pausa fica no topo. O manifest permite adicionar à tela inicial; não há suporte offline. Conferido pelo autor em Chrome Android e Safari iOS reais (versions/v2.md).
 
 ## Documentação
 
