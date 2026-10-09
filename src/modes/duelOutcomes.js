@@ -2,7 +2,8 @@ import { isLastStage, nextArcadeRun } from './arcade.js';
 import { nextSurvivalRun } from './survival.js';
 import { resolveDialogue } from './story/dialogue.js';
 import { resolveStoryResult } from './story/storyRun.js';
-import { ARCADE_UNLOCK, addUnlocks, findChallengeUnlocks } from './unlocks.js';
+import { characters } from '../characters/characterData.js';
+import { unlockProgressSkins, ARCADE_UNLOCK, addUnlocks, findChallengeUnlocks } from './unlocks.js';
 import { DuelMode } from '../states/duelModes.js';
 import { StateId } from '../states/stateIds.js';
 import { texts } from '../config/uiConfig.js';
@@ -31,6 +32,10 @@ function resolveStoryOutcome(result, { params, settings, story }) {
         menuState: StateId.STORY,
       },
     };
+  }
+  if (outcome.ending) {
+    progress.unlocks = unlockProgressSkins(settings.unlocks, Object.values(characters), 'story');
+    if (outcome.ending === 'secret') progress.unlocks = unlockProgressSkins(progress.unlocks, Object.values(characters), 'secret');
   }
   const { protagonist } = params.story;
   const lines = resolveDialogue(story.texts.encounters[outcome.encounter.id].after, protagonist, story.names);
@@ -91,8 +96,11 @@ export function resolveDuelOutcome(result, { params, settings, character, surviv
       }
     }
     if (result.mode === DuelMode.ARCADE && playerWon && isLastStage(params.arcade)) {
+      progress.unlocks = unlockProgressSkins(progress.unlocks ?? settings.unlocks, [character], ARCADE_UNLOCK);
       const cleared = settings.arcadeCleared ?? [];
       let arcadeLine = '';
+      const newSkin = character.skins?.find((skin) => skin.unlock === ARCADE_UNLOCK && !(settings.unlocks?.[character.id] ?? []).includes(skin.id));
+      const skinLine = newSkin ? formatText(texts.characterSelect.skinUnlocked, { name: newSkin.name }) : '';
       if (!cleared.includes(character.id)) {
         progress.arcadeCleared = [...cleared, character.id];
         const color = character.altSaberColors.find((alt) => alt.id === ARCADE_UNLOCK);
@@ -101,7 +109,7 @@ export function resolveDuelOutcome(result, { params, settings, character, surviv
       Object.assign(screen, {
         title: texts.arcade.completeTitle,
         subtitle: formatText(texts.arcade.completeSubtitle, { name: player.name }),
-        summary: '', unlockLine: [arcadeLine, challengeLine].filter(Boolean).join('   \u00b7   '),
+        summary: '', unlockLine: [arcadeLine, challengeLine, skinLine].filter(Boolean).join('   \u00b7   '),
         rematchLabel: texts.arcade.playAgain,
         rematchParams: { mode: DuelMode.ARCADE, arcade: { ...params.arcade, stage: 0 } },
       });

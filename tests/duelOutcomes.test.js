@@ -1,3 +1,7 @@
+import { storyConfig } from '../src/config/storyConfig.js';
+import { storyTexts } from '../src/config/storyTexts.js';
+import { createStoryRun } from '../src/modes/story/storyRun.js';
+import { powersConfig } from '../src/config/powersConfig.js';
 import { it } from 'node:test';
 import assert from 'node:assert/strict';
 import { createDuelResult } from '../src/modes/DuelResult.js';
@@ -36,4 +40,37 @@ it('returns survival navigation and progress without changing inputs', () => {
   assert.equal(win.params.rematchParams.survival.health, 100);
   assert.equal(win.params.rematchParams.survival.wins, 7);
   assert.deepEqual(win.progress, {});
+});
+
+it('unlocks Arcade skins with challenge rewards and preserves ladder customization', () => {
+  const params = { mode: 'arcade', arcade: { playerCharacter: 'guardian', ladder: ['shadow'], stage: 0, playerSkin: 'skin-story', playerSaberColor: 'blade' } };
+  const settings = { unlocks: { guardian: ['legacy'] } };
+  const result = { mode: 'arcade', winnerSide: 0, fighters: [{ name: 'Guardian' }, {}], stats: [{ perfectParries: 3 }, {}] };
+  const outcome = resolveDuelOutcome(result, { params, settings, character: characters.guardian });
+  assert.deepEqual(outcome.progress.unlocks.guardian, ['legacy', 'challenge', 'skin-arcade']);
+  assert.deepEqual(settings.unlocks.guardian, ['legacy']);
+  assert.equal(outcome.params.rematchParams.arcade.playerSkin, 'skin-story');
+  assert.equal(outcome.params.rematchParams.arcade.playerSaberColor, 'blade');
+  const repeat = resolveDuelOutcome(result, { params, settings: { ...settings, ...outcome.progress }, character: characters.guardian });
+  assert.deepEqual(repeat.progress.unlocks.guardian, ['legacy', 'challenge', 'skin-arcade']);
+});
+
+it('unlocks roster skins at either story ending and secret skins only at the secret ending', () => {
+  const profile = { name: 'Kael', alignment: 'light', style: 'technique', saberColor: storyConfig.protagonist.saberColors[0] };
+  const story = { config: storyConfig, texts: storyTexts, loadouts: powersConfig.loadouts, names: Object.fromEntries(Object.values(characters).map((character) => [character.id, character.name])) };
+  for (const encounter of ['trial', 'sovereign', 'foretold']) {
+    const run = { ...createStoryRun(profile, 'normal', storyConfig), encounter };
+    const result = { mode: 'story', winnerSide: 0, fighters: [{ healthRatio: 0.5 }, {}], stats: [{}, {}] };
+    const outcome = resolveDuelOutcome(result, { params: { mode: 'story', story: run }, settings: { unlocks: { guardian: ['challenge'] } }, story });
+    if (encounter === 'trial') {
+      assert.equal(outcome.progress.unlocks, undefined);
+      continue;
+    }
+    for (const character of Object.values(characters).filter((character) => character.selectable)) {
+      assert.ok(outcome.progress.unlocks[character.id].includes('skin-story'));
+    }
+    assert.ok(outcome.progress.unlocks.guardian.includes('challenge'));
+    assert.equal(outcome.progress.unlocks.sovereign?.includes('skin-secret') ?? false, encounter === 'foretold');
+    assert.equal(outcome.progress.unlocks.foretold?.includes('skin-secret') ?? false, encounter === 'foretold');
+  }
 });
