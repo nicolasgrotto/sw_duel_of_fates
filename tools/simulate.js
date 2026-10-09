@@ -7,6 +7,7 @@ import { storyConfig } from '../src/config/storyConfig.js';
 import { CombatEvent } from '../src/combat/combatEvents.js';
 import { evadeConfig } from '../src/config/evadeConfig.js';
 import { aiConfig } from '../src/config/aiConfig.js';
+import { powersConfig } from '../src/config/powersConfig.js';
 import { fighterArchetypes } from '../src/config/fightersConfig.js';
 import { animation as animationStyle } from '../src/config/fighterVisualConfig.js';
 import { gameConfig } from '../src/config/gameConfig.js';
@@ -46,6 +47,8 @@ const CONFIG_ROOTS = {
   ai: aiConfig,
   game: gameConfig,
   evade: evadeConfig,
+  powers: powersConfig,
+  story: storyConfig,
 };
 
 function applyOverride(assignment) {
