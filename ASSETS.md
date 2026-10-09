@@ -45,3 +45,5 @@ assets/
 | media/v1.10-skins-desktop.png, media/v1.10-skins-mobile.png | capturas de QA | próprio jogo, Chrome headless | MIT | Skins na seleção em desktop e toque emulado |
 
 | media/v1.10-name-desktop.png, media/v1.10-name-mobile.png, media/v1.10-protagonist-desktop.png | capturas de QA | próprio jogo, Chrome headless | MIT | Campo temporário de nome e visual do protagonista, sem assets externos |
+
+| media/v2-qa-story-duel.png, media/v2-qa-replay.png, media/v2-qa-final-replay.png, media/v2-qa-training.png, media/v2-qa-touch-pause.png | capturas de QA | próprio jogo, Chrome headless | MIT | Regressão de História, replay, Treino e pausa por toque |
