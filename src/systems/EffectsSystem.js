@@ -1,6 +1,6 @@
 import { isStrongAttack } from '../combat/attackPhases.js';
 import { CombatEvent } from '../combat/combatEvents.js';
-import { getPowerTier } from '../combat/powerResistance.js';
+import { getPowerTier } from '../combat/flowInteractions.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { degreesToRadians } from '../utils/math.js';
 import { pick, randomInt, randomRange } from '../utils/random.js';

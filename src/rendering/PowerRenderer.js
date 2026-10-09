@@ -1,4 +1,4 @@
-import { getPowerTier } from '../combat/powerResistance.js';
+import { getPowerTier } from '../combat/flowInteractions.js';
 import { isBarrierUp, isChannelOpen, isUsingPower } from '../combat/PowerSystem.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { colors } from '../config/themeConfig.js';

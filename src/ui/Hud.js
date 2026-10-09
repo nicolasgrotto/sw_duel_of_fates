@@ -1,5 +1,5 @@
 import { CombatEvent } from '../combat/combatEvents.js';
-import { getPowerTier } from '../combat/powerResistance.js';
+import { getPowerTier } from '../combat/flowInteractions.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
 import { layout } from '../config/uiConfig.js';

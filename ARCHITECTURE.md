@@ -106,7 +106,7 @@ src/
     combatEvents.js         ✅ tipos e criação de eventos de combate
     PowerSystem.js          ✅ medidor, recarga, escolha e fases dos poderes, alvo, resistência e Barreira; desligado sem `rules.powers`
     powerEffects.js         ✅ registro de efeitos por poder (`push`, `pull`, `lightning`, `barrier`)
-    powerResistance.js      ✅ diferença de nível, `resolvePowerOutcome` (faixas em dados) e tier visual (puros)
+    flowInteractions.js     ✅ diferença de Fluxo, `resolveInteraction` (faixas por habilidade em dados) e tier visual (puros)
   simulation/               ✅
     DuelSimulation.js       ✅ ordem dos sistemas em um passo do duelo
     ReplayBuffer.js         ✅ grava intents, dt e fotos do estado; alimenta o replay determinístico
@@ -153,7 +153,7 @@ src/
     touchLayoutConfig.js    ✅ geometria e limiares do toque
     evadeConfig.js          ✅ flag e perfil global de esquiva de precisão
     attributesConfig.js     ✅ tabela 1–9, bases na nota 5 e calibração por arquétipo
-    powersConfig.js         ✅ modos com poderes, medidor, regras de resistência e tiers visuais do Fluxo
+    powersConfig.js         ✅ modos com poderes, medidor, tabelas de interação por habilidade e tiers visuais do Fluxo
     storyConfig.js          ✅ regras da História, opções do protagonista, encontros (rotas, recompensas, liberações) e finais
     storyTexts.js           ✅ títulos e falas dos encontros e finais
     introConfig.js          ✅ linha do tempo e desenho da intro
@@ -558,16 +558,16 @@ Arquivos: [src/core/AudioManager.js](src/core/AudioManager.js), [src/audio/](src
 
 ## Fluxo e poderes
 
-Arquivos: [src/combat/PowerSystem.js](src/combat/PowerSystem.js), [src/combat/powerEffects.js](src/combat/powerEffects.js), [src/combat/powerResistance.js](src/combat/powerResistance.js), [src/config/powersConfig.js](src/config/powersConfig.js), [src/rendering/PowerRenderer.js](src/rendering/PowerRenderer.js).
+Arquivos: [src/combat/PowerSystem.js](src/combat/PowerSystem.js), [src/combat/powerEffects.js](src/combat/powerEffects.js), [src/combat/flowInteractions.js](src/combat/flowInteractions.js), [src/config/powersConfig.js](src/config/powersConfig.js), [src/rendering/PowerRenderer.js](src/rendering/PowerRenderer.js).
 
-### Medidor, regra por modo e resistência
+### Medidor, regra por modo e interações
 
 Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 22).
 
 - **Regra por modo.** `createDuelRules(mode, settings, powersConfig.modes)` devolve `{ powers }`: ligado só em Duelar, 2 Jogadores e Treino, e só se `settings.powers` não for `false`. O `DuelState` guarda `this.rules` (ou usa `params.rules`, para o Story) e passa para a `DuelSimulation`, para a HUD e para o `ReplayState` (o replay re-simula com as mesmas regras). O simulador aceita `--rules powers` e a matriz repassa a opção.
 - **Medidor.** A `DuelSimulation` repassa `rules` ao `CombatSystem`, que cria o `PowerSystem` (desligado quando `rules.powers` não é `true`). O `PowerSystem` regenera `fighter.flowMeter` depois da stamina e soma ganhos nos ganchos do `CombatSystem` (`onHit` no `applyHit`, `onBlock` no `resolveBlock`, `onParry` no `resolveParry`). `flowMeter` fica no `Fighter` (como `stamina`), começa em `stats.power.start` e volta a esse valor no `resetForRound`; o snapshot do replay o inclui.
 - **Nível.** `stats.flowLevel` vem do atributo Fluxo. A factory soma `stats.alignment` (do `characterData`) e `stats.power` (`resolvePowerStats`): o nível muda o ganho do medidor e a potência dos poderes, não o máximo.
-- **Resistência.** `getLevelDifference(caster, target)` = nível do alvo − nível de quem lança. `resolvePowerOutcome(rule, diff)` percorre as faixas da regra (`powersConfig.resistance`) e devolve `{ scale, outcome }`. Cada poder aponta para uma regra pelo nome; nenhum `if` por poder.
+- **Interações.** `getFlowDifference(caster, target)` = `caster.flowLevel − target.flowLevel` (positivo: quem lança é mais forte). Cada poder aponta para sua tabela em `powersConfig.interactions[power.interaction]`. `resolveInteraction(table, diff)` devolve a primeira faixa com `diff ≥ atLeast` (a última tem `atLeast: -Infinity`). A faixa é o conjunto de modificadores que os handlers leem: `outcome` (`normal`, `reduced`, `resisted`), `scale` (escala do efeito, multiplicada pela potência), `blockable` (a guarda de frente vale), `guardDamage` (fração do dano escalado que passa pela guarda), `guardSlide` (fator do recuo na guarda), `guardStamina` (fator sobre `power.guard.staminaCost`), `duration` (stun e efeitos com duração) e `stagger` (desequilíbrio). Falhar é sempre por limiar (`outcome: resisted`), nunca por sorteio, para o replay continuar determinístico. Nenhum `if` por poder: um poder novo ganha uma tabela, e um modificador novo entra em todas as faixas e no handler que o usa. As faixas atuais (v1.11) reproduzem a regra da v1.6 com o sinal novo: −1 ou mais normal, −2 metade, −3 ou menos resistido; guarda da Repulsão e do Puxão sem dano e com metade do recuo, guarda do Raio com um quarto do dano.
 - **Tier visual.** `getPowerTier(level, powersConfig.tiers)` escolhe cor (`themeConfig`) e intensidade. A HUD desenha o medidor na cor do tier, abaixo da stamina, só com `rules.powers`.
 
 ### Poderes
@@ -575,7 +575,7 @@ Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 22).
 - **Estados e ação.** `CASTING` (poderes instantâneos) e `CHANNELING` (raio e barreira). A ação `power` (`intent.power`, segurar = `intent.powerHeld`) entra no buffer depois do empurrão e antes da habilidade, e também sai de dentro do `BLOCKING` fora do blockstun. Com os poderes desligados, a ação é descartada sem evento. Sem medidor ou em recarga, `actionRejected` sai com `attackType: 'power'`.
 - **Escolha.** `selectPower` lê `stats.power.loadout` (de `powersConfig.loadouts[alinhamento]`): direção relativa ao `facing` escolhe `forward`, `back` ou `neutral`, e um espaço vazio cai no `neutral`.
 - **Fases.** `PowerSystem.resolve` roda no fim de `CombatSystem.update`, antes do movimento. Instantâneo: no fim do startup aplica o efeito uma vez (`affect(..., 'active')`), emite `powerActive` e termina depois de active + recovery. Canal: depois do startup, enquanto `powerHeld`, há medidor e o tempo não passou de `maxChannel`, drena o medidor e chama `tick`; sempre há pelo menos um passo de canal (um toque dá um pulso). `powerEndTime` marca o fim do canal; a recuperação conta a partir dele. `finish` limpa o poder, volta a `IDLE` e liga `powerCooldown` (`powersConfig.cooldown`).
-- **Efeito.** `affect` confere alcance (`isInPowerRange`: à frente, gap ≤ `range`, mesma altura), invulnerabilidade (esquiva e EVADE passam), Barreira (`isBarrierUp` → `powerAbsorbed`, com recuo pequeno para empurrões), resistência (`powerResisted` quando a escala é 0) e guarda de frente (`isGuardingAgainst`). Depois chama o handler do registro `powerEffects[effect][fase]` com um contexto reaproveitado (sem objeto novo por chamada). O dano passa por `CombatSystem.dealPowerDamage`, que emite `powerHit` ou `powerBlocked`, dá medidor ao atingido e usa o mesmo `knockOut` do golpe de lâmina.
+- **Efeito.** `affect` confere alcance (`isInPowerRange`: à frente, gap ≤ `range`, mesma altura), invulnerabilidade (esquiva e EVADE passam), Barreira (`isBarrierUp` → `powerAbsorbed`, com recuo pequeno para empurrões), interação (`powerResisted` quando a faixa é `resisted`) e guarda de frente (`isGuardingAgainst`, só se a faixa for `blockable`). Depois chama o handler do registro `powerEffects[effect][fase]` com um contexto reaproveitado (sem objeto novo por chamada), que carrega a faixa em `context.interaction`. O dano passa por `CombatSystem.dealPowerDamage`, que emite `powerHit` ou `powerBlocked`, dá medidor ao atingido e usa o mesmo `knockOut` do golpe de lâmina.
 - **Barreira na lâmina.** Em `resolveContact`, depois do empurrão de corpo e antes do counter: com a barreira de pé, `resolveBarrierBlock` segura o golpe sem gastar stamina e emite `powerAbsorbed`. O empurrão de corpo continua vencendo (`applyShove` limpa o poder).
 - **Interrupção.** `Fighter.clearAttack` também limpa o poder (`clearPower`), então qualquer golpe, empurrão ou desequilíbrio interrompe quem está lançando.
 - **Puxão.** A velocidade vem do atrito de ação da física (`friction`, repassado pela `DuelSimulation`): `√(2 × atrito × distância)` faz o alvo parar perto de `endGap`.
@@ -850,7 +850,7 @@ DuelSimulation → CombatSystem executa (igual ao jogador)
 
 ---
 
-IA de poderes (v1.6): a `EnemyAI` recebe `rules` e só pensa em poderes com `rules.powers`; sem a regra, nenhum passo novo consome o RNG, então o duelo clássico fica idêntico. O passo `power` (depois de `special` nas `priorities` de todos os perfis) testa os espaços `forward` e `neutral` do loadout (a Barreira é só defensiva): precisa de recarga zerada, medidor para o custo (mais uma reserva de canal, `perception.powerChannelReserve`), alcance, o oponente fora da guarda, distância dentro de `perception.powerUse[efeito]` (Repulsão de perto, Raio a meia distância, Puxão de longe) e, com `difficulty.powerAware`, uma escala de resistência maior que zero (o Fácil não sabe disso e gasta medidor à toa). A chance é `profile.powerChance` (ou `perception.powerChance`) × `difficulty.powerMultiplier`. `startPower` aponta o `moveX` para o espaço escolhido e segura `powerHeld` por `plan.powerHoldTime` (Raio: sorteio em `perception.lightningHold`). Na defesa, `tryDefendPower` roda antes da ameaça de lâmina: contra um poder do oponente que alcança, com a chance de bloqueio do perfil, levanta a Barreira (se tiver, com `perception.barrierPreference`) ou segura a guarda até o fim do poder. Contra golpes de lâmina, a Barreira também entra com `perception.barrierVsSaberChance`.
+IA de poderes (v1.6): a `EnemyAI` recebe `rules` e só pensa em poderes com `rules.powers`; sem a regra, nenhum passo novo consome o RNG, então o duelo clássico fica idêntico. O passo `power` (depois de `special` nas `priorities` de todos os perfis) testa os espaços `forward` e `neutral` do loadout (a Barreira é só defensiva): precisa de recarga zerada, medidor para o custo (mais uma reserva de canal, `perception.powerChannelReserve`), alcance, o oponente fora da guarda, distância dentro de `perception.powerUse[efeito]` (Repulsão de perto, Raio a meia distância, Puxão de longe) e, com `difficulty.powerAware`, uma faixa de interação com escala maior que zero (o Fácil não sabe disso e gasta medidor à toa). A chance é `profile.powerChance` (ou `perception.powerChance`) × `difficulty.powerMultiplier`. `startPower` aponta o `moveX` para o espaço escolhido e segura `powerHeld` por `plan.powerHoldTime` (Raio: sorteio em `perception.lightningHold`). Na defesa, `tryDefendPower` roda antes da ameaça de lâmina: contra um poder do oponente que alcança, com a chance de bloqueio do perfil, levanta a Barreira (se tiver, com `perception.barrierPreference`) ou segura a guarda até o fim do poder. Contra golpes de lâmina, a Barreira também entra com `perception.barrierVsSaberChance`.
 
 IA EVADE: getTimeUntilAttackActive expõe startup restante, zero no active ainda não conectado e Infinity fora da ameaça. No pensamento de defesa, a rolagem já existente escolhe EVADE por evadeChance e evadeWeight do perfil, somente contra active. evadeTimingJitter agenda atraso; a cada passo o plano valida se aquele golpe ainda existe e solicita intent.evade uma vez. Nenhuma mutação no lutador. Fora de blockstun, EVADE também pode sair de BLOCKING. Chances iniciais pequenas preservam o combate clássico; calibração final pela matriz.
 
@@ -884,7 +884,7 @@ Testes rodam em Node (`npm test`), sem navegador. Por isso:
 - Quando um módulo do core precisa do navegador (`Input`, `TouchInput`, `GameLoop`, `textPrompt`), a dependência é injetada.
 - `computePose` é uma função pura e também é testada.
 
-Testes atuais: 456 testes em `tests/`, um arquivo por área (loop, input e toque, estados e modos, combate, especiais, EVADE, atributos, Fluxo e poderes, IA, simulação, replay, áudio, efeitos, UI, desbloqueios e skins, Arcade, Sobrevivência, História, segredos, remapeamento, save). `tests/states.test.js` cobre o fluxo de telas; `goToMenuItem(game, id)` navega no menu pelo id, sem depender da posição dos itens. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
+Testes atuais: 461 testes em `tests/`, um arquivo por área (loop, input e toque, estados e modos, combate, especiais, EVADE, atributos, Fluxo e poderes, IA, simulação, replay, áudio, efeitos, UI, desbloqueios e skins, Arcade, Sobrevivência, História, segredos, remapeamento, save). `tests/states.test.js` cobre o fluxo de telas; `goToMenuItem(game, id)` navega no menu pelo id, sem depender da posição dos itens. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
 
 ---
 
@@ -903,8 +903,8 @@ simulation    → systems, combat, controllers/IntentRecorder (codificação dos
 systems/EffectsSystem → combat (tipos de evento), core/Camera (via construtor), config, utils
 characters    → entities, config
 controllers   → config
-systems / combat / ai → entities, config, utils (combat também usa StaminaSystem; a IA lê PowerSystem e powerResistance só para decidir)
-rendering     → config, utils, entities, combat/attackPhases, PowerSystem e powerResistance (só leitura)
+systems / combat / ai → entities, config, utils (combat também usa StaminaSystem; a IA lê PowerSystem e flowInteractions só para decidir)
+rendering     → config, utils, entities, combat/attackPhases, PowerSystem e flowInteractions (só leitura)
 entities      → config, utils
 core (resto)  → config
 ```
@@ -925,7 +925,7 @@ Roteiro, tarefas e validações em [versions/v2.md](versions/v2.md). O detalhe d
 
 - **Atributos** (1–9; Fluxo 10 só com `apex: true`) são a única fonte dos stats escalares; o arquétipo continua dono de tempos, golpes e traços.
 - **Fluxo**: `flowLevel` (permanente) define potência, ganho do medidor, resistência e tier visual; `flowMeter` é o recurso da luta; `stamina` continua o recurso físico.
-- **Resistência**: `levelDiff = alvo − conjurador`; regras em dados, um resolvedor puro, sem `if` por poder.
+- **Interações**: `flowDifference = quem lança − alvo`; uma tabela de faixas por habilidade, cada faixa com modificadores (escala, guarda, dano e deslize na guarda, duração, stagger); um resolvedor puro, sem `if` por poder; falha só por limiar.
 - **Poderes** têm fases como os golpes, são pagos com `flowMeter` e não têm projétil. Estados `CASTING` e `CHANNELING`.
 - **EVADE** fica no "baixo" (S/↓, direcional, joystick); o Shift continua o dash. **Pulo duplo** por `movement.maxJumps`.
 - **Rotas e finais** são dados avaliados por um registro de condições contra o `DuelResult`.

@@ -17,4 +17,4 @@
 ## Ponto de continuidade
 
 - **v1.0** publicada: `main` e tag `v1.0.0` no GitHub. Falta ativar o GitHub Pages (passos no README) e, se o autor quiser, gravar GIFs para o README.
-- **v2.0** em andamento na `v2-development`: todas as etapas v1.1–v1.10 concluídas (tags locais), regressão e desempenho no Chrome feitos, docs revisados. Falta: teste em aparelho real (autor), tag `v2.0.0` e merge na `main`.
+- **v2.0** em andamento na `v2-development`: etapas v1.1–v1.10 concluídas (tags locais), regressão e desempenho no Chrome feitos. Em curso a etapa "Fluxo profundo, habilidades e movimento aéreo" (v1.11 → v1.19, em `versions/v2.md`): **v1.11 concluída** (tag local `v1.11`); próxima: **v1.12** (escala 7/8/9/10). Depois dela: teste em aparelho real (autor), tag `v2.0.0` e merge na `main`.

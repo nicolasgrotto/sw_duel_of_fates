@@ -571,13 +571,15 @@ O Fluxo é a energia dos poderes. Nomes de tela em `uiConfig`; no código, `powe
 - **Medidor** (0–100): começa cada round com 20, enche devagar com o tempo e mais rápido ao acertar, ao ser atingido, ao bloquear e ao aparar. É separado da stamina.
 - Depois de qualquer poder há uma recarga curta, igual para todos os poderes do lutador.
 
-**Resistência.** Diferença = nível do alvo − nível de quem lança. Cada poder aponta para uma regra em dados:
+**Interações pelo Fluxo.** Diferença de Fluxo = nível de quem lança − nível do alvo (positiva quando quem lança é mais forte). Cada habilidade tem a própria tabela de faixas em dados; cada faixa diz a escala do efeito, se a guarda vale, quanto dano e quanto recuo passam pela guarda, o gasto de stamina na guarda e a escala de duração e de desequilíbrio. Falhar é sempre por limiar, nunca por sorte. Resultado atual, igual para Repulsão, Puxão e Raio:
 
-| Diferença | Resultado padrão |
+| Diferença | Resultado |
 | --- | --- |
-| até 1 | efeito normal |
-| 2 | efeito reduzido (metade) |
-| 3 ou mais | resistido: o poder bate numa barreira e não tem efeito |
+| −1 ou mais | efeito normal |
+| −2 | efeito reduzido (metade) |
+| −3 ou menos | resistido: o poder bate numa barreira e não tem efeito |
+
+Na guarda, Repulsão e Puxão não causam dano e empurram pela metade; o Raio causa um quarto do dano. As próximas etapas (`versions/v2.md`) dão a cada habilidade faixas próprias, inclusive para quem lança muito acima do alvo.
 
 **Alinhamentos e poderes.** Cada personagem tem um alinhamento e dois poderes. Comando: `Poder` parado (ou com o direcional que não pede outro poder) usa o principal; com direção usa o secundário.
 
@@ -610,7 +612,7 @@ Campanha linear com um protagonista criado pelo jogador. Textos em `src/config/s
 | Normal | 7 | 37 |
 | Difícil | 6 | 34 |
 
-O total máximo impede um protagonista com tudo no teto: ele termina forte, mas especializado (o elenco tem totais entre 29 e 39). O teto do Fluxo também decide a resistência contra os chefes: no Difícil, o Fluxo 6 contra um chefe de Fluxo 9 dá diferença 3, e os poderes do jogador são resistidos; a luta vira de lâmina.
+O total máximo impede um protagonista com tudo no teto: ele termina forte, mas especializado (o elenco tem totais entre 29 e 39). O teto do Fluxo também decide a resistência contra os chefes: no Difícil, o Fluxo 6 contra um chefe de Fluxo 9 dá diferença −3, e os poderes do jogador são resistidos; a luta vira de lâmina.
 
 **Poderes.** O protagonista começa só com o poder principal do caminho; o segundo vem como recompensa de um capítulo. Na História os poderes estão sempre ligados.
 

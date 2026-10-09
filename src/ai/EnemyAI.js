@@ -1,6 +1,6 @@
 import { AttackPhase, AttackType, getAttackDuration, getAttackPhase, isHeavyAttack } from '../combat/attackPhases.js';
 import { isInPowerRange, isUsingPower } from '../combat/PowerSystem.js';
-import { getLevelDifference, resolvePowerOutcome } from '../combat/powerResistance.js';
+import { getFlowDifference, resolveInteraction } from '../combat/flowInteractions.js';
 import { evadeConfig } from '../config/evadeConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { FighterState } from '../entities/fighterStates.js';
@@ -362,7 +362,7 @@ export class EnemyAI {
     if (!this.difficulty.powerAware) {
       return 1;
     }
-    return resolvePowerOutcome(powersConfig.resistance[power.resistance], getLevelDifference(this.self, this.opponent)).scale;
+    return resolveInteraction(powersConfig.interactions[power.interaction], getFlowDifference(this.self, this.opponent)).scale;
   }
 
   canUsePower(power) {

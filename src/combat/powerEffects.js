@@ -12,51 +12,56 @@ function getGap(caster, target) {
   return Math.abs(target.x - caster.x) - (caster.width + target.width) / 2;
 }
 
-function applyGuarded(context, damage) {
-  const { combat, caster, target, power } = context;
-  spendStamina(target, power.guard.staminaCost);
-  return combat.dealPowerDamage(caster, target, power, damage, CombatEvent.POWER_BLOCKED);
+function applyGuarded(context) {
+  const { combat, caster, target, power, interaction, scale } = context;
+  spendStamina(target, power.guard.staminaCost * interaction.guardStamina);
+  return combat.dealPowerDamage(caster, target, power, power.damage * scale * interaction.guardDamage, CombatEvent.POWER_BLOCKED);
+}
+
+function getStagger(context) {
+  const { power, scale, interaction } = context;
+  return power.stagger * Math.min(1, scale) * interaction.stagger;
 }
 
 function push(context) {
-  const { combat, caster, target, power, scale, guarded } = context;
+  const { combat, caster, target, power, interaction, scale, guarded } = context;
   const knockback = caster.facing * power.knockback * scale;
   if (guarded) {
-    target.vx = knockback * power.guard.knockbackScale;
-    applyGuarded(context, 0);
+    target.vx = knockback * interaction.guardSlide;
+    applyGuarded(context);
     return;
   }
   target.vx = knockback;
   if (combat.dealPowerDamage(caster, target, power, power.damage * scale, CombatEvent.POWER_HIT)) {
-    interrupt(target, FighterState.STAGGERED, power.stagger * Math.min(1, scale));
+    interrupt(target, FighterState.STAGGERED, getStagger(context));
   }
 }
 
 function pull(context) {
-  const { system, combat, caster, target, power, scale, guarded } = context;
+  const { system, combat, caster, target, power, interaction, scale, guarded } = context;
   const travel = Math.max(0, getGap(caster, target) - power.endGap);
   const speed = Math.min(power.maxSpeed, Math.sqrt(2 * system.friction * travel)) * Math.min(1, scale);
   if (guarded) {
-    target.vx = -caster.facing * speed * power.guard.knockbackScale;
-    applyGuarded(context, 0);
+    target.vx = -caster.facing * speed * interaction.guardSlide;
+    applyGuarded(context);
     return;
   }
   target.vx = -caster.facing * speed;
   if (combat.dealPowerDamage(caster, target, power, power.damage * scale, CombatEvent.POWER_HIT)) {
-    interrupt(target, FighterState.STAGGERED, power.stagger * Math.min(1, scale));
+    interrupt(target, FighterState.STAGGERED, getStagger(context));
   }
 }
 
 function lightning(context) {
-  const { combat, caster, target, power, scale, guarded } = context;
+  const { combat, caster, target, power, interaction, scale, guarded } = context;
   if (guarded) {
-    target.vx = caster.facing * power.knockback * power.guard.knockbackScale;
-    applyGuarded(context, power.damage * scale * power.guard.damageScale);
+    target.vx = caster.facing * power.knockback * interaction.guardSlide;
+    applyGuarded(context);
     return;
   }
   target.vx = caster.facing * power.knockback * scale;
   if (combat.dealPowerDamage(caster, target, power, power.damage * scale, CombatEvent.POWER_HIT)) {
-    interrupt(target, FighterState.HIT, power.stun);
+    interrupt(target, FighterState.HIT, power.stun * interaction.duration);
   }
 }
 

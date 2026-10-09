@@ -6,6 +6,12 @@ export const PowerOutcome = Object.freeze({
   RESISTED: 'resisted',
 });
 
+const NORMAL_BAND = { atLeast: -1, outcome: PowerOutcome.NORMAL, scale: 1, blockable: true, guardStamina: 1, duration: 1, stagger: 1 };
+const REDUCED_BAND = { atLeast: -2, outcome: PowerOutcome.REDUCED, scale: 0.5, blockable: true, guardStamina: 1, duration: 1, stagger: 1 };
+const RESISTED_BAND = { atLeast: -Infinity, outcome: PowerOutcome.RESISTED, scale: 0, blockable: true, guardStamina: 1, duration: 1, stagger: 1 };
+const STRIKE_GUARD = { guardDamage: 0, guardSlide: 0.5 };
+const CHANNEL_GUARD = { guardDamage: 0.25, guardSlide: 0.5 };
+
 export const powersConfig = {
   modes: ['versus', 'local', 'training'],
   maxLevel: 12,
@@ -18,22 +24,22 @@ export const powersConfig = {
   },
   powers: {
     push: {
-      id: 'push', effect: 'push', channel: false, pose: 'cast', resistance: 'standard',
+      id: 'push', effect: 'push', channel: false, pose: 'cast', interaction: 'push',
       cost: 40, startup: 0.22, active: 0.08, recovery: 0.34, range: 320,
       damage: 5, knockback: 950, stagger: 0.45,
-      guard: { knockbackScale: 0.5, staminaCost: 12 },
+      guard: { staminaCost: 12 },
     },
     pull: {
-      id: 'pull', effect: 'pull', channel: false, pose: 'cast', resistance: 'standard',
+      id: 'pull', effect: 'pull', channel: false, pose: 'cast', interaction: 'pull',
       cost: 40, startup: 0.24, active: 0.08, recovery: 0.3, range: 380,
       damage: 3, endGap: 30, maxSpeed: 1100, stagger: 0.42,
-      guard: { knockbackScale: 0.5, staminaCost: 12 },
+      guard: { staminaCost: 12 },
     },
     lightning: {
-      id: 'lightning', effect: 'lightning', channel: true, pose: 'channel', resistance: 'standard',
+      id: 'lightning', effect: 'lightning', channel: true, pose: 'channel', interaction: 'lightning',
       cost: 15, drainPerSecond: 55, startup: 0.3, maxChannel: 1, recovery: 0.35, range: 300,
       tickInterval: 0.15, damage: 3, knockback: 70, stun: 0.12,
-      guard: { damageScale: 0.25, staminaCost: 5, knockbackScale: 0.5 },
+      guard: { staminaCost: 5 },
     },
     barrier: {
       id: 'barrier', effect: 'barrier', channel: true, pose: 'barrier',
@@ -50,12 +56,10 @@ export const powersConfig = {
     gainPerLevel: 0.05,
     potencyPerLevel: 0.03,
   },
-  resistance: {
-    standard: [
-      { upTo: 1, scale: 1, outcome: PowerOutcome.NORMAL },
-      { upTo: 2, scale: 0.5, outcome: PowerOutcome.REDUCED },
-      { upTo: Infinity, scale: 0, outcome: PowerOutcome.RESISTED },
-    ],
+  interactions: {
+    push: [{ ...NORMAL_BAND, ...STRIKE_GUARD }, { ...REDUCED_BAND, ...STRIKE_GUARD }, { ...RESISTED_BAND, ...STRIKE_GUARD }],
+    pull: [{ ...NORMAL_BAND, ...STRIKE_GUARD }, { ...REDUCED_BAND, ...STRIKE_GUARD }, { ...RESISTED_BAND, ...STRIKE_GUARD }],
+    lightning: [{ ...NORMAL_BAND, ...CHANNEL_GUARD }, { ...REDUCED_BAND, ...CHANNEL_GUARD }, { ...RESISTED_BAND, ...CHANNEL_GUARD }],
   },
   render: {
     seed: 7,

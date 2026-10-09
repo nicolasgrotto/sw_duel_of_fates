@@ -120,6 +120,39 @@ describe('instant powers', () => {
     assert.ok(Math.abs(reducedDamage - fullDamage / 2) < 0.01);
   });
 
+  it('applies the modifiers of the interaction band', () => {
+    const band = powersConfig.interactions.push[0];
+    const withBand = (setup, override) => {
+      setup.simulation.combat.powers.config = { ...powersConfig, interactions: { ...powersConfig.interactions, push: [{ ...band, ...override }] } };
+    };
+    const unblockable = duel('guardian', 'shadow');
+    withBand(unblockable, { blockable: false });
+    unblockable.target.intent.block = true;
+    step(unblockable);
+    cast(unblockable, unblockable.caster);
+    step(unblockable, stepsFor(push.startup));
+    assert.ok(unblockable.events.includes(CombatEvent.POWER_HIT));
+    assert.equal(unblockable.target.state, FighterState.STAGGERED);
+
+    const chip = duel('guardian', 'shadow');
+    withBand(chip, { guardDamage: 0.5 });
+    chip.target.intent.block = true;
+    step(chip);
+    cast(chip, chip.caster);
+    step(chip, stepsFor(push.startup));
+    assert.ok(chip.events.includes(CombatEvent.POWER_BLOCKED));
+    assert.equal(chip.target.state, FighterState.BLOCKING);
+    const expected = push.damage * chip.caster.stats.power.potency * 0.5;
+    assert.ok(Math.abs(chip.target.stats.maxHealth - chip.target.health - expected) < 1e-9);
+
+    const longer = duel('guardian', 'shadow');
+    withBand(longer, { stagger: 2 });
+    cast(longer, longer.caster);
+    step(longer, stepsFor(push.startup));
+    const potency = longer.caster.stats.power.potency;
+    assert.ok(Math.abs(longer.target.combat.stunDuration - push.stagger * Math.min(1, potency) * 2) < 1e-9);
+  });
+
   it('misses targets out of range or invulnerable', () => {
     const far = duel('guardian', 'shadow', push.range + 40);
     cast(far, far.caster);

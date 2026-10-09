@@ -1,8 +1,9 @@
+import { PowerOutcome } from '../config/powersConfig.js';
 import { FighterState } from '../entities/fighterStates.js';
 import { CombatEvent } from './combatEvents.js';
 import { isGuardingAgainst, isInvulnerable } from './hitboxes.js';
 import { powerEffects } from './powerEffects.js';
-import { getLevelDifference, resolvePowerOutcome } from './powerResistance.js';
+import { getFlowDifference, resolveInteraction } from './flowInteractions.js';
 
 const POWER_STATES = new Set([FighterState.CASTING, FighterState.CHANNELING]);
 
@@ -41,7 +42,7 @@ export class PowerSystem {
     this.config = config;
     this.enabled = enabled;
     this.friction = friction;
-    this.context = { system: this, combat, caster: null, target: null, power: null, scale: 1, guarded: false };
+    this.context = { system: this, combat, caster: null, target: null, power: null, interaction: null, scale: 1, guarded: false };
   }
 
   update(fighters, dt) {
@@ -178,8 +179,8 @@ export class PowerSystem {
       this.absorb(caster, target, power);
       return;
     }
-    const outcome = resolvePowerOutcome(this.config.resistance[power.resistance], getLevelDifference(caster, target));
-    if (outcome.scale === 0) {
+    const interaction = resolveInteraction(this.config.interactions[power.interaction], getFlowDifference(caster, target));
+    if (interaction.outcome === PowerOutcome.RESISTED) {
       this.combat.emit(CombatEvent.POWER_RESISTED, this.combat.createPowerContact(caster, target, power, 0));
       return;
     }
@@ -187,8 +188,9 @@ export class PowerSystem {
     context.caster = caster;
     context.target = target;
     context.power = power;
-    context.scale = outcome.scale * caster.stats.power.potency;
-    context.guarded = isGuardingAgainst(target, caster);
+    context.interaction = interaction;
+    context.scale = interaction.scale * caster.stats.power.potency;
+    context.guarded = interaction.blockable && isGuardingAgainst(target, caster);
     powerEffects[power.effect][phase](context);
   }
 

@@ -1,27 +1,52 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { resolvePowerStats } from '../src/characters/powers.js';
-import { getLevelDifference, getPowerTier, resolvePowerOutcome } from '../src/combat/powerResistance.js';
+import { getFlowDifference, getPowerTier, resolveInteraction } from '../src/combat/flowInteractions.js';
 import { PowerOutcome, powersConfig } from '../src/config/powersConfig.js';
 import { DuelMode, createDuelRules } from '../src/states/duelModes.js';
 import { STEP, createSimulation, repeat, spawnFighter } from './helpers.js';
 
-describe('power resistance', () => {
-  const rule = powersConfig.resistance.standard;
+describe('flow interactions', () => {
+  const tables = Object.entries(powersConfig.interactions);
 
-  it('keeps the effect up to one level of difference, halves it at two and resists from three', () => {
-    assert.equal(resolvePowerOutcome(rule, -4).outcome, PowerOutcome.NORMAL);
-    assert.equal(resolvePowerOutcome(rule, 0).outcome, PowerOutcome.NORMAL);
-    assert.equal(resolvePowerOutcome(rule, 1).scale, 1);
-    assert.equal(resolvePowerOutcome(rule, 2).outcome, PowerOutcome.REDUCED);
-    assert.equal(resolvePowerOutcome(rule, 2).scale, 0.5);
-    assert.equal(resolvePowerOutcome(rule, 3).outcome, PowerOutcome.RESISTED);
-    assert.equal(resolvePowerOutcome(rule, 9).scale, 0);
+  it('keeps the effect down to one level below the target, halves it at two and resists from three', () => {
+    for (const [, table] of tables) {
+      for (const difference of [4, 1, 0, -1]) {
+        assert.equal(resolveInteraction(table, difference).outcome, PowerOutcome.NORMAL);
+        assert.equal(resolveInteraction(table, difference).scale, 1);
+      }
+      assert.equal(resolveInteraction(table, -2).outcome, PowerOutcome.REDUCED);
+      assert.equal(resolveInteraction(table, -2).scale, 0.5);
+      for (const difference of [-3, -9]) {
+        assert.equal(resolveInteraction(table, difference).outcome, PowerOutcome.RESISTED);
+        assert.equal(resolveInteraction(table, difference).scale, 0);
+      }
+    }
   });
 
-  it('measures the difference as target level minus caster level', () => {
-    assert.equal(getLevelDifference({ flowLevel: 5 }, { flowLevel: 8 }), 3);
-    assert.equal(getLevelDifference({ flowLevel: 8 }, { flowLevel: 5 }), -3);
+  it('measures the difference as caster flow level minus target flow level', () => {
+    assert.equal(getFlowDifference({ flowLevel: 8 }, { flowLevel: 5 }), 3);
+    assert.equal(getFlowDifference({ flowLevel: 5 }, { flowLevel: 8 }), -3);
+    assert.equal(getFlowDifference({ flowLevel: 6 }, { flowLevel: 6 }), 0);
+  });
+
+  it('gives every offensive power its own table with all the modifiers', () => {
+    for (const power of Object.values(powersConfig.powers)) {
+      if (power.effect === 'barrier') {
+        continue;
+      }
+      const table = powersConfig.interactions[power.interaction];
+      assert.ok(table, power.id);
+      for (const band of table) {
+        assert.equal(typeof band.blockable, 'boolean');
+        for (const field of ['atLeast', 'scale', 'guardDamage', 'guardSlide', 'guardStamina', 'duration', 'stagger']) {
+          assert.equal(typeof band[field], 'number', `${power.id}.${field}`);
+        }
+      }
+      assert.equal(table[table.length - 1].atLeast, -Infinity);
+    }
+    assert.equal(resolveInteraction(powersConfig.interactions.lightning, 0).guardDamage, 0.25);
+    assert.equal(resolveInteraction(powersConfig.interactions.push, 0).guardDamage, 0);
   });
 
   it('maps levels to the four visual tiers', () => {
