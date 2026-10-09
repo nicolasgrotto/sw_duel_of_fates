@@ -17,4 +17,4 @@
 ## Ponto de continuidade
 
 - **v1.0** publicada: `main` e tag `v1.0.0` no GitHub. Falta ativar o GitHub Pages (passos no README) e, se o autor quiser, gravar GIFs para o README.
-- **v2.0** em andamento na `v2-development`: etapas v1.1–v1.10 concluídas (tags locais), regressão e desempenho no Chrome feitos. Em curso a etapa "Fluxo profundo, habilidades e movimento aéreo" (v1.11 → v1.19, em `versions/v2.md`): **v1.11 a v1.13 concluídas** (tags locais `v1.11` a `v1.13`); próxima: **v1.14** (Repulsão pela diferença de Fluxo). Depois dela: teste em aparelho real (autor), tag `v2.0.0` e merge na `main`.
+- **v2.0** em andamento na `v2-development`: etapas v1.1–v1.10 concluídas (tags locais), regressão e desempenho no Chrome feitos. Em curso a etapa "Fluxo profundo, habilidades e movimento aéreo" (v1.11 → v1.19, em `versions/v2.md`): **v1.11 a v1.14 concluídas** (tags locais `v1.11` a `v1.14`); próxima: **v1.15** (catálogo por categoria e loadout por personagem). Depois dela: teste em aparelho real (autor), tag `v2.0.0` e merge na `main`.

@@ -42,7 +42,7 @@ describe('flow interactions', () => {
       }
       for (const band of table.bands) {
         assert.equal(typeof band.blockable, 'boolean');
-        for (const field of ['atLeast', 'scale', 'guardDamage', 'guardSlide', 'guardStamina', 'duration', 'stagger']) {
+        for (const field of ['atLeast', 'scale', 'knockback', 'guardDamage', 'guardSlide', 'guardStamina', 'duration', 'stagger']) {
           assert.equal(typeof band[field], 'number', `${power.id}.${field}`);
         }
       }

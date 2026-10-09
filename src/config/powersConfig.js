@@ -6,9 +6,9 @@ export const PowerOutcome = Object.freeze({
   RESISTED: 'resisted',
 });
 
-const NORMAL_BAND = { atLeast: -1, outcome: PowerOutcome.NORMAL, scale: 1, blockable: true, guardStamina: 1, duration: 1, stagger: 1 };
-const REDUCED_BAND = { atLeast: -2, outcome: PowerOutcome.REDUCED, scale: 0.5, blockable: true, guardStamina: 1, duration: 1, stagger: 1 };
-const RESISTED_BAND = { atLeast: -Infinity, outcome: PowerOutcome.RESISTED, scale: 0, blockable: true, guardStamina: 1, duration: 1, stagger: 1 };
+const NORMAL_BAND = { atLeast: -1, outcome: PowerOutcome.NORMAL, scale: 1, knockback: 1, blockable: true, guardStamina: 1, duration: 1, stagger: 1 };
+const REDUCED_BAND = { atLeast: -2, outcome: PowerOutcome.REDUCED, scale: 0.5, knockback: 1, blockable: true, guardStamina: 1, duration: 1, stagger: 1 };
+const RESISTED_BAND = { atLeast: -Infinity, outcome: PowerOutcome.RESISTED, scale: 0, knockback: 1, blockable: true, guardStamina: 1, duration: 1, stagger: 1 };
 const STRIKE_GUARD = { guardDamage: 0, guardSlide: 0.5 };
 const CHANNEL_GUARD = { guardDamage: 0.25, guardSlide: 0.5 };
 
@@ -59,7 +59,15 @@ export const powersConfig = {
   interactions: {
     push: {
       air: { scale: 1.3, duration: 1, stagger: 1.2 },
-      bands: [{ ...NORMAL_BAND, ...STRIKE_GUARD }, { ...REDUCED_BAND, ...STRIKE_GUARD }, { ...RESISTED_BAND, ...STRIKE_GUARD }],
+      bands: [
+        { ...NORMAL_BAND, atLeast: 3, blockable: false, guardDamage: 0, guardSlide: 1 },
+        { ...NORMAL_BAND, atLeast: 2, guardDamage: 0.5, guardSlide: 1, guardStamina: 1.5 },
+        { ...NORMAL_BAND, atLeast: 1, guardDamage: 0.25, guardSlide: 0.75 },
+        { ...NORMAL_BAND, atLeast: 0, ...STRIKE_GUARD },
+        { ...NORMAL_BAND, atLeast: -1, guardDamage: 0, guardSlide: 0.35, guardStamina: 0.75 },
+        { ...REDUCED_BAND, knockback: 0, stagger: 0.5, guardDamage: 0, guardSlide: 0, guardStamina: 0.5 },
+        { ...RESISTED_BAND, ...STRIKE_GUARD },
+      ],
     },
     pull: {
       air: { scale: 1, duration: 1, stagger: 1.2 },

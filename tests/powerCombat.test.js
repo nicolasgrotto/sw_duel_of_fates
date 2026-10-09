@@ -2,6 +2,7 @@ import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { CombatEvent } from '../src/combat/combatEvents.js';
 import { isBarrierUp, selectPower } from '../src/combat/PowerSystem.js';
+import { resolveInteraction } from '../src/combat/flowInteractions.js';
 import { powersConfig } from '../src/config/powersConfig.js';
 import { Fighter } from '../src/entities/Fighter.js';
 import { FighterState } from '../src/entities/fighterStates.js';
@@ -123,7 +124,7 @@ describe('instant powers', () => {
   it('applies the modifiers of the interaction band', () => {
     const table = powersConfig.interactions.push;
     const withBand = (setup, override) => {
-      setup.simulation.combat.powers.config = { ...powersConfig, interactions: { ...powersConfig.interactions, push: { ...table, bands: [{ ...table.bands[0], ...override }] } } };
+      setup.simulation.combat.powers.config = { ...powersConfig, interactions: { ...powersConfig.interactions, push: { ...table, bands: [{ ...resolveInteraction(table, 0), ...override, atLeast: -Infinity }] } } };
     };
     const unblockable = duel('guardian', 'shadow');
     withBand(unblockable, { blockable: false });

@@ -56,6 +56,16 @@ describe('AI powers', () => {
     assert.equal(think(naive.ai), AiDecision.POWER);
   });
 
+  it('repels a guarding opponent only when the push cannot be blocked', () => {
+    const even = setup('guardian', 'shadow', 60);
+    even.opponent.setState(FighterState.BLOCKING);
+    assert.equal(think(even.ai), AiDecision.WAIT);
+    const stronger = setup('guardian', 'shadow', 60);
+    stronger.opponent.setState(FighterState.BLOCKING);
+    stronger.self.stats = { ...stronger.self.stats, flowLevel: stronger.opponent.flowLevel + 3 };
+    assert.equal(think(stronger.ai), AiDecision.POWER);
+  });
+
   it('waits for meter and cooldown and never casts in the classic rules', () => {
     const empty = setup('shadow', 'guardian', 200);
     empty.self.flowMeter = 10;

@@ -581,7 +581,19 @@ O Fluxo é a energia dos poderes. Nomes de tela em `uiConfig`; no código, `powe
 | −2 | efeito reduzido (metade) |
 | −3 ou menos | resistido: o poder bate numa barreira e não tem efeito |
 
-Na guarda, Repulsão e Puxão não causam dano e empurram pela metade; o Raio causa um quarto do dano. As próximas etapas (`versions/v2.md`) dão a cada habilidade faixas próprias, inclusive para quem lança muito acima do alvo.
+Na guarda, o Puxão não causa dano e puxa pela metade; o Raio causa um quarto do dano.
+
+**Repulsão pela diferença (v1.14).** A Repulsão tem faixas próprias, simétricas: quem lança acima fura a guarda; quem lança abaixo empurra menos.
+
+| Diferença | Sem guarda | Com guarda |
+| --- | --- | --- |
+| +3 ou mais | normal | não pode ser bloqueada: empurra, causa dano e desequilibra |
+| +2 | normal | a guarda segura, mas metade do dano passa, o defensor desliza o dobro e gasta 1,5× a stamina |
+| +1 | normal | a guarda segura com um quarto do dano e 75% do deslize |
+| 0 | normal | a guarda segura sem dano, com metade do deslize |
+| −1 | normal | a guarda segura sem dano, com 35% do deslize e 0,75× a stamina |
+| −2 | metade do dano e do desequilíbrio, **não empurra** o mais forte | não desliza e gasta metade da stamina |
+| −3 ou menos | resistida | resistida |
 
 **Alinhamentos e poderes.** Cada personagem tem um alinhamento e dois poderes. Comando: `Poder` parado (ou com o direcional que não pede outro poder) usa o principal; com direção usa o secundário.
 

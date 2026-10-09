@@ -361,11 +361,19 @@ export class EnemyAI {
     return null;
   }
 
+  getPowerInteraction(power) {
+    return resolveInteraction(powersConfig.interactions[power.interaction], getFlowDifference(this.self, this.opponent));
+  }
+
   getPowerScale(power) {
-    if (!this.difficulty.powerAware) {
-      return 1;
+    return this.difficulty.powerAware ? this.getPowerInteraction(power).scale : 1;
+  }
+
+  isPowerBlocked(power) {
+    if (this.opponent.state !== FighterState.BLOCKING) {
+      return false;
     }
-    return resolveInteraction(powersConfig.interactions[power.interaction], getFlowDifference(this.self, this.opponent)).scale;
+    return !this.difficulty.powerAware || this.getPowerInteraction(power).blockable;
   }
 
   canUsePower(power) {
@@ -377,7 +385,7 @@ export class EnemyAI {
   wantsPower(power) {
     const use = this.perception.powerUse[power.effect];
     const gap = getGap(this.self, this.opponent);
-    return Boolean(use) && gap >= use.minGap && gap <= use.maxGap && this.opponent.state !== FighterState.BLOCKING
+    return Boolean(use) && gap >= use.minGap && gap <= use.maxGap && !this.isPowerBlocked(power)
       && isInPowerRange(this.self, this.opponent, power) && this.getPowerScale(power) > 0;
   }
 
