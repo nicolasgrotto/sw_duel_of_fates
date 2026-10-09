@@ -51,6 +51,7 @@ export const gameConfig = {
     snapshotInterval: 30,
     speed: 0.45,
     minDuration: 1,
+    interpolation: { maxDistance: 60 },
   },
   survival: {
     healRatio: 0.3,

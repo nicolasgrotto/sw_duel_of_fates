@@ -493,6 +493,10 @@ describe('duel rounds', () => {
       game.step();
     }
     assert.ok(replay.step > replay.playback.firstStep);
+    const before = JSON.stringify(replay.fighters.map((fighter) => [fighter.x, fighter.y, fighter.stateTime, fighter.animation]));
+    const renderer = new Proxy({}, { get: (target, name) => (name === 'width' || name === 'height' || name === 'viewWidth' ? 1280 : () => {}) });
+    replay.render(renderer);
+    assert.equal(JSON.stringify(replay.fighters.map((fighter) => [fighter.x, fighter.y, fighter.stateTime, fighter.animation])), before);
 
     game.step(Action.CONFIRM);
     game.step();

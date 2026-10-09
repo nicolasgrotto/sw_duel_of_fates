@@ -8,12 +8,14 @@ import { layout, texts } from '../config/uiConfig.js';
 import { Camera } from '../core/Camera.js';
 import { Fighter } from '../entities/Fighter.js';
 import { DuelRenderer } from '../rendering/DuelRenderer.js';
+import { RenderInterpolation } from '../rendering/RenderInterpolation.js';
 import { createArenaBounds } from '../simulation/arenaBounds.js';
 import { DuelSimulation } from '../simulation/DuelSimulation.js';
 import { restoreFighter } from '../simulation/ReplayBuffer.js';
 import { restoreProjectiles } from '../combat/ProjectileSystem.js';
 import { EffectsSystem } from '../systems/EffectsSystem.js';
 import { TimeControl } from '../systems/TimeControl.js';
+import { clamp } from '../utils/math.js';
 import { formatText } from '../ui/formatText.js';
 import { formatActionKeys } from '../ui/keyLabels.js';
 import { Letterbox } from '../ui/Letterbox.js';
@@ -61,6 +63,10 @@ export class ReplayState extends GameState {
     this.view = new DuelRenderer(arenas[arenaId]);
     this.letterbox = new Letterbox(layout.letterbox);
     this.letterbox.setTarget(1);
+    this.interpolation = new RenderInterpolation(gameConfig.replay.interpolation);
+    this.interpolation.capture(this.fighters);
+    this.nextStepDt = 0;
+    this.stepsThisFrame = 0;
     this.time = 0;
     this.skipLine = formatText(texts.replay.skip, { confirm: formatActionKeys(this.game.input.bindings ?? keyBindings, Action.CONFIRM) });
   }
@@ -77,15 +83,19 @@ export class ReplayState extends GameState {
     }
     this.time += dt;
     this.pending += this.timeControl.scale(dt * gameConfig.replay.speed);
+    this.stepsThisFrame = 0;
     while (!this.isFinished && this.pending > 0) {
       const stepDt = this.playback.buffer.readStep(this.step, this.fighters);
+      this.nextStepDt = stepDt;
       if (this.pending < stepDt) {
         break;
       }
       this.pending -= stepDt;
       this.simulation.step(stepDt);
+      this.interpolation.capture(this.fighters);
       this.effects.handleEvents(this.simulation.events);
       this.step += 1;
+      this.stepsThisFrame += 1;
     }
     this.effects.update(dt);
     this.camera.frame(
@@ -100,9 +110,19 @@ export class ReplayState extends GameState {
     }
   }
 
+  get interpolationAmount() {
+    return this.isFinished || this.nextStepDt <= 0 ? 1 : clamp(this.pending / this.nextStepDt, 0, 1);
+  }
+
+  getDebugInfo() {
+    return [`replay step ${this.step}/${this.playback.lastStep}  steps ${this.stepsThisFrame}  blend ${this.interpolationAmount.toFixed(2)}`];
+  }
+
   render(renderer) {
     renderer.clear(colors.background);
+    this.interpolation.apply(this.fighters, this.interpolationAmount);
     this.view.render(renderer, this.arena, this.fighters, this.effects, this.camera, [], 1, this.simulation.projectiles.pool);
+    this.interpolation.restore(this.fighters);
     this.letterbox.render(renderer);
     renderer.text(texts.replay.label, layout.hud.margin, layout.replay.labelY, textStyles.replayLabel);
     renderer.text(this.skipLine, renderer.width - layout.hud.margin, layout.replay.labelY, textStyles.replaySkip);
