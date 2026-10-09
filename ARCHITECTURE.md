@@ -1186,6 +1186,41 @@ Update e render dentro do alvo em todas as janelas. Sem mudanças de visual ou o
 
 ---
 
+## v3: princípios e decisões
+
+Roteiro, etapas e especificação aprovada em [versions/v3.md](versions/v3.md). Esta seção registra os contratos que valem para todo o ciclo; o detalhe de cada sistema entra nas seções acima quando a etapa for implementada.
+
+**Princípios.** Os da v2 continuam. Toda mecânica nova roda na `DuelSimulation`, guarda estado em `fighter.combat` ou em campo coberto pelo teste de snapshot, e passa no replay a partir de snapshots intermediários. Render, áudio e VFX só leem eventos e estado.
+
+**Regras como capacidades.** `rules` deixa de ser só `{ powers }`. Cada mecânica nova ganha uma capacidade booleana própria, criada na etapa que a implementa, sem campo antecipado: `exhaustion`, `wounds` e `wrath` (2.4), `bladeLock` (2.5), `finishers` (2.9). Foco automático, Ira e quarto poder continuam exigindo `rules.powers`. `createDuelRules` monta o objeto a partir de uma lista de modos por capacidade em config, no mesmo padrão de `powersConfig.modes`; a História usa as regras do `storyConfig`. O simulador aceita `--rules` com nomes de capacidades; sem nenhuma capacidade nova ligada, o resultado é o preset `reference`, que precisa passar em `npm run reference -- --check tools/reference-v2.json`.
+
+| Modo | Capacidades novas |
+| --- | --- |
+| Duelar, 2 Jogadores, Treino | ligadas quando a etapa fecha |
+| Tutorial | ligadas, com passos novos |
+| História | ligadas a partir da 2.8 |
+| Arcade, Sobrevivência, Desafio | desligadas; tabela final revista antes da 3.0 |
+| Simulador | escolhidas por execução |
+
+**Ordem do passo.** A ordem atual de `DuelSimulation.step` é a referência; mecânicas novas se encaixam nela sem reordenar o que existe:
+
+1. `advanceStateTime`;
+2. `combat.update` (ações, custos, poderes iniciados);
+3. movimento, física, colisão e estados de movimento;
+4. `combat.resolveHits` (contatos de lâmina: esquiva, disputa, defesa, dano, ferimento, K.O.);
+5. projéteis;
+6. regeneração de Vigor (saída da exaustão);
+7. `statuses.update` (Cura, Foco, Ira, Estrangular: ticks e términos);
+8. `powers.update` e animação.
+
+Consequências: dano do passo 4 ou 5 interrompe a Cura antes do passo 7, então dano no passo de conclusão impede a limpeza do ferimento sem regra extra. A disputa de lâminas é detectada no passo 4 e, enquanto ativa, os passos 2, 3, 6 e 7 a ignoram para os dois participantes.
+
+**Pontos únicos.** Custos de Vigor passam por `getStaminaCost` (multiplicadores de Foco e ferimento sobre o custo derivado, com o tipo do custo) e gastos por `spendStamina` (entrada na exaustão quando o Vigor chega a zero). Todo dano efetivo passa por um único caminho que chama a interrupção de efeitos, inclusive o dano periódico de `applyStatusDamage`. Nenhuma regra nova fica espalhada em estados, renderers ou IA.
+
+**Término de efeitos.** Efeitos de duração registram o motivo de término: `completed`, `interrupted`, `death`, `reset` ou `replaced`. Só `completed` dispara consequências de conclusão (a Cura limpar o ferimento). O motivo fica em `fighter.combat` até o próximo início do efeito, para o F3 e os testes.
+
+**Render.** Interpolação visual (2.1) usa o `alpha` do `GameLoop` e dados pré-alocados do passo anterior, fora do snapshot. Desligar ou ligar a interpolação não muda nenhum resultado.
+
 ---
 
 ## Convenções de código
