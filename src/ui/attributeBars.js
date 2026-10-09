@@ -12,7 +12,8 @@ export function drawAttributeBars(renderer, attributes, frame = layout.attribute
     for (let index = 0; index < Math.max(attributesConfig.maxRating, value); index++) {
       renderer.fillRect(barX + index * (segmentWidth + segmentGap), y - segmentHeight / 2, segmentWidth, segmentHeight, index < value ? colors.accent : colors.hudTrack);
     }
-    renderer.text(String(value), valueX, y, textStyles.attributeValue);
+    const overflow = Math.max(0, value - attributesConfig.maxRating) * (segmentWidth + segmentGap);
+    renderer.text(String(value), valueX + overflow, y, textStyles.attributeValue);
     row++;
   }
 }

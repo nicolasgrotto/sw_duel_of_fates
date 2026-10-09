@@ -12,4 +12,5 @@ export const StateId = Object.freeze({
   STORY: 'story',
   PROTAGONIST: 'protagonist',
   DIALOGUE: 'dialogue',
+  INTRO: 'intro',
 });

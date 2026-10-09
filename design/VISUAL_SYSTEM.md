@@ -40,6 +40,8 @@ Cores de sabre (ficam em `characterData`, por personagem; uma cor por personagem
 | vermelho-forja | `#ff4038` | Forja |
 | verde-menta | `#5fffc0` | Garça |
 | rosa-pálido | `#ffa6e0` | Eco |
+| ouro-velho | `#e0b84a` | Soberano (secreto) |
+| azul-aurora | `#6fb2ff` | Predestinado (secreto) |
 | núcleo | `#ffffff` | todos |
 
 Não crie cores novas direto no código. Adicione um token aqui e no `themeConfig`.
@@ -280,3 +282,9 @@ O estilo trainingStatus usa system-ui 18 px, textMuted, alinhado à esquerda; st
 - **Barreira**: elipse em volta de quem lança, com glow fraco que pulsa; clareia ao absorver.
 - **Resistido**: anel curto na cor do tier do **alvo**, como se o poder batesse numa parede.
 - Pose: ao lançar, a lâmina vai para trás e o corpo inclina para a frente; ao canalizar, o corpo treme de leve; na barreira, a lâmina sobe e o corpo abaixa.
+
+## Intro
+
+- Fundo preto; uma lâmina horizontal acende do centro para as pontas (token `introBlade`, ciano-gelo), com o mesmo desenho das lâminas do duelo: glow largo e translúcido, núcleo branco e um brilho no centro.
+- O título e a frase de apoio entram em fade depois da lâmina; então aparece `Pressione Enter` (ou `Toque para começar`) piscando devagar.
+- Segredo revelado: um brilho grande em `powerTierApex` atrás da lâmina e a frase em `introSecret` (vermelho do nível 10), por cerca de 3 s. Nada indica na tela que existe um segredo.

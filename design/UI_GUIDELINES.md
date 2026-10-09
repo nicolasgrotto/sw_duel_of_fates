@@ -106,6 +106,12 @@ NOME ESQUERDA                                         NOME DIREITA
 - Tela cheia, sem HUD: a cena re-simulada com letterbox fechado.
 - "REPLAY" (`replayLabel`, `accent`, letras espaçadas) à esquerda na barra de baixo e a dica de pular (`replaySkip`) à direita.
 
+### Intro e título
+
+- Primeira tela do jogo, antes do menu. Lâmina acendendo, título e frase, depois a dica para começar.
+- `Enter`, `Start` ou um toque fora do título pula a animação; com a animação pronta, abrem o menu. Letras e direcionais não pulam nada: ali é que se digita o segredo.
+- Personagens secretos liberados entram no fim da lista da seleção (com espaçamento menor, para caber). Ficam fora dos adversários do Arcade e da Sobrevivência.
+
 ### Pausa
 
 - Overlay escuro sobre o duelo congelado.

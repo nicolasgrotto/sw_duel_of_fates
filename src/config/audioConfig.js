@@ -138,6 +138,12 @@ export const audioConfig = {
       { type: 'tone', wave: 'triangle', from: 700, to: 640, duration: 0.2, attack: 0.002, gain: 0.12, filter: null },
       { type: 'noise', duration: 0.05, attack: 0.002, gain: 0.18, filter: { type: 'bandpass', from: 2000, to: 2000, q: 1.5 } },
     ],
+    secret: [
+      { type: 'tone', wave: 'sine', from: 440, to: 440, duration: 0.5, attack: 0.01, gain: 0.08, filter: null },
+      { type: 'tone', wave: 'sine', from: 660, to: 660, duration: 0.7, attack: 0.12, gain: 0.07, filter: null },
+      { type: 'tone', wave: 'sine', from: 880, to: 990, duration: 1, attack: 0.25, gain: 0.06, filter: null },
+      { type: 'tone', wave: 'triangle', from: 55, to: 55, duration: 1.2, attack: 0.05, gain: 0.12, filter: null },
+    ],
     feint: [
       { type: 'noise', duration: 0.12, attack: 0.01, gain: 0.22, filter: { type: 'bandpass', from: 1800, to: 3200, q: 2 } },
     ],

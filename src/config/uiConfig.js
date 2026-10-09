@@ -226,6 +226,12 @@ export const texts = {
     backToStory: 'Voltar à história',
     unlocked: 'Desbloqueado: {names}',
   },
+  intro: {
+    prompt: 'Pressione Enter',
+    touchPrompt: 'Toque para começar',
+    secretUnlocked: 'O EQUILÍBRIO DESPERTA',
+    secretKnown: 'O EQUILÍBRIO JÁ DESPERTOU',
+  },
   dialogue: {
     hint: '{confirm}  continuar  ·  {back}  pular',
     touchHint: 'Toque para continuar',
@@ -318,6 +324,7 @@ export const layout = {
     touchWidth: 320,
     firstItemY: 196,
     itemSpacing: 44,
+    compactItemSpacing: 36,
     previewX: 880,
     previewY: 590,
     previewScale: 1.3,
@@ -379,6 +386,13 @@ export const layout = {
     previewScale: 1,
     list: { firstItemY: 230, itemSpacing: 44, listX: 340, touchWidth: 520 },
     attributes: { firstRowY: 320, rowSpacing: 30, labelX: 660, barX: 785, valueX: 965, segmentWidth: 14, segmentHeight: 5, segmentGap: 4 },
+  },
+  intro: {
+    titleY: 300,
+    taglineY: 370,
+    bladeY: 420,
+    promptY: 560,
+    messageY: 560,
   },
   dialogue: {
     titleY: 140,

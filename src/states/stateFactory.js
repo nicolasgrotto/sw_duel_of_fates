@@ -3,6 +3,7 @@ import { ControlsState } from './ControlsState.js';
 import { DialogueState } from './DialogueState.js';
 import { DuelState } from './DuelState.js';
 import { GameOverState } from './GameOverState.js';
+import { IntroState } from './IntroState.js';
 import { KeyRemapState } from './KeyRemapState.js';
 import { MenuState } from './MenuState.js';
 import { MoveListState } from './MoveListState.js';
@@ -27,6 +28,7 @@ const stateClasses = {
   [StateId.STORY]: StoryState,
   [StateId.PROTAGONIST]: ProtagonistState,
   [StateId.DIALOGUE]: DialogueState,
+  [StateId.INTRO]: IntroState,
 };
 
 export function createState(id, game, params) {

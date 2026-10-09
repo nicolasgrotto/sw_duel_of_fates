@@ -28,6 +28,7 @@ export const colors = {
   powerTierSteady: '#5d8dff',
   powerTierDeep: '#b26bff',
   powerTierApex: '#ff2b45',
+  introBlade: '#7fe4ff',
   desaturateGray: '#808080',
   desaturateDim: '#000000',
   hitFlash: '#ffffff',
@@ -179,6 +180,13 @@ export const textStyles = {
     color: colors.text,
     align: 'left',
     baseline: 'middle',
+  },
+  introSecret: {
+    font: `bold 30px ${FONT_FAMILY}`,
+    color: colors.powerTierApex,
+    align: 'center',
+    baseline: 'middle',
+    letterSpacing: '4px',
   },
   dialogueSpeaker: {
     font: `bold 24px ${FONT_FAMILY}`,

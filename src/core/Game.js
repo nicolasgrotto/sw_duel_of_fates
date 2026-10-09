@@ -33,7 +33,7 @@ export class Game {
     this.touchControls = new TouchControls(this.touch);
     this.states = new StateMachine();
     this.settings = loadSettings(
-      { keyboardPreset: 'classic', difficulty: aiConfig.defaultDifficulty, reducedEffects: coarsePointer, sound: true, music: true, parryChallengeBest: 0, arcadeCleared: [], finalReplay: true, customBindings: {}, unlocks: {}, survivalBest: 0, powers: true },
+      { keyboardPreset: 'classic', difficulty: aiConfig.defaultDifficulty, reducedEffects: coarsePointer, sound: true, music: true, parryChallengeBest: 0, arcadeCleared: [], finalReplay: true, customBindings: {}, unlocks: {}, survivalBest: 0, powers: true, unlockedCharacters: [] },
       globalThis.localStorage,
       gameConfig.settingsStorageKey,
       { difficulty: aiConfig.difficultyOrder, keyboardPreset: keyboardPresetOrder },
@@ -58,7 +58,7 @@ export class Game {
     this.resizeObserver.observe(this.renderer.canvas);
     this.handleResize();
     this.renderer.canvas.focus();
-    this.changeState(StateId.MENU);
+    this.changeState(StateId.INTRO);
     this.loop.start();
   }
 
@@ -83,21 +83,21 @@ export class Game {
   changeState(id, params) {
     const state = createState(id, this, params);
     state.id = id;
-    this.touch.setContext(id === StateId.DUEL ? 'duel' : 'menu', id !== StateId.MENU);
+    this.touch.setContext(id === StateId.DUEL ? 'duel' : 'menu', id !== StateId.MENU && id !== StateId.INTRO);
     this.states.change(state);
   }
 
   pushState(id, params) {
     const state = createState(id, this, params);
     state.id = id;
-    this.touch.setContext(id === StateId.DUEL ? 'duel' : 'menu', id !== StateId.MENU);
+    this.touch.setContext(id === StateId.DUEL ? 'duel' : 'menu', id !== StateId.MENU && id !== StateId.INTRO);
     this.states.push(state);
   }
 
   popState() {
     this.states.pop();
     const id = this.states.current?.id;
-    this.touch.setContext(id === StateId.DUEL ? 'duel' : 'menu', id !== StateId.MENU);
+    this.touch.setContext(id === StateId.DUEL ? 'duel' : 'menu', id !== StateId.MENU && id !== StateId.INTRO);
   }
 
   handleResize() {

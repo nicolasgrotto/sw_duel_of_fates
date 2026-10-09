@@ -32,11 +32,14 @@ export const SelectStep = Object.freeze({
 
 export class CharacterSelectState extends GameState {
   enter() {
-    this.characterIds = Object.keys(characters).filter((id) => characters[id].selectable);
+    this.rosterIds = Object.keys(characters).filter((id) => characters[id].selectable);
+    const unlocked = this.game.settings.unlockedCharacters ?? [];
+    this.characterIds = [...this.rosterIds, ...Object.keys(characters).filter((id) => characters[id].secret && unlocked.includes(id))];
+    const listLayout = this.characterIds.length > this.rosterIds.length ? { ...layout.characterSelect, itemSpacing: layout.characterSelect.compactItemSpacing } : layout.characterSelect;
     this.step = SelectStep.PLAYER;
     this.playerChoice = null;
     this.opponentChoice = null;
-    this.characterMenu = new MenuList(this.characterIds.map((id) => ({ id, label: characters[id].name })), layout.characterSelect, this.game.audio);
+    this.characterMenu = new MenuList(this.characterIds.map((id) => ({ id, label: characters[id].name })), listLayout, this.game.audio);
     this.arenaMenu = new MenuList(gameConfig.duel.arenaOrder.map((id) => ({ id, label: texts.arenas[id] })), layout.characterSelect, this.game.audio);
     this.menu = this.characterMenu;
     this.arenaBounds = createArenaBounds(gameConfig);
@@ -130,7 +133,7 @@ export class CharacterSelectState extends GameState {
 
   choose(choice) {
     if (this.step === SelectStep.PLAYER && this.params.mode === DuelMode.ARCADE) {
-      const run = createArcadeRun(choice, this.characterIds, gameConfig.arcade);
+      const run = createArcadeRun(choice, this.rosterIds, gameConfig.arcade);
       this.game.changeState(StateId.DUEL, { mode: DuelMode.ARCADE, arcade: { ...run, playerSaberColor: this.getChosenColorParam(choice) } });
       return;
     }
