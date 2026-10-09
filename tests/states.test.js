@@ -891,3 +891,60 @@ it('keeps color arrow taps separate from the character list, including a selecte
   assert.equal(game.states.current.menu.selected.id, 'wasp');
   assert.equal(game.states.current.getChosenColor('wasp'), '#7cff6b');
 });
+
+describe('skin selection and duel persistence', () => {
+  it('skips locked skins and supports touch while preserving blade selection', () => {
+    const game = createFakeGame();
+    game.changeState(StateId.CHARACTER_SELECT, { mode: DuelMode.VERSUS });
+    const state = game.states.current;
+    game.step(Action.SPECIAL);
+    assert.equal(state.getChosenSkin('guardian'), 'base');
+    game.settings.unlocks = { guardian: ['skin-story'] };
+    game.input.touchTaps = [{ x: 1170, y: 366 }];
+    game.step();
+    game.input.touchTaps = [];
+    assert.equal(state.getChosenSkin('guardian'), 'skin-story');
+    assert.equal(state.previews.get('guardian').appearance.pauldrons, true);
+    const color = state.getChosenColor('guardian');
+    game.step(Action.BLOCK);
+    assert.equal(state.getChosenSkin('guardian'), 'base');
+    assert.equal(state.getChosenColor('guardian'), color);
+  });
+
+  it('keeps independent local player skins through pause restart and rematch', () => {
+    const game = createFakeGame();
+    game.settings.unlocks = { guardian: ['skin-arcade', 'skin-story'] };
+    game.changeState(StateId.CHARACTER_SELECT, { mode: DuelMode.LOCAL });
+    game.step(Action.SPECIAL);
+    game.step(Action.CONFIRM);
+    game.states.current.menu.selectedIndex = 0;
+    game.stepSecond(Action.SPECIAL);
+    game.stepSecond(Action.CONFIRM);
+    game.step(Action.CONFIRM);
+    const duel = game.states.current;
+    assert.equal(duel.params.playerSkin, 'skin-arcade');
+    assert.equal(duel.params.opponentSkin, 'skin-story');
+    assert.equal(duel.player.appearance.scarf, true);
+    assert.equal(duel.fighters[1].appearance.pauldrons, true);
+    game.step(Action.PAUSE);
+    goToMenuItem(game, 'restart');
+    game.step(Action.CONFIRM);
+    assert.deepEqual(game.states.current.params, duel.params);
+    game.changeState(StateId.GAME_OVER, { duelParams: duel.params, title: 'Result', subtitle: '', summary: '' });
+    game.step(Action.CONFIRM);
+    assert.deepEqual(game.states.current.params, duel.params);
+    assert.equal(game.states.current.fighters[1].appearance.pauldrons, true);
+  });
+
+  it('passes the selected skin into Arcade and Survival runs', () => {
+    for (const mode of [DuelMode.ARCADE, DuelMode.SURVIVAL]) {
+      const game = createFakeGame();
+      game.settings.arcadeCleared = ['guardian'];
+      game.changeState(StateId.CHARACTER_SELECT, { mode });
+      game.step(Action.SPECIAL);
+      game.step(Action.CONFIRM);
+      assert.equal(game.states.current.ladderRun.playerSkin, 'skin-arcade');
+      assert.equal(game.states.current.player.appearance.scarf, true);
+    }
+  });
+});

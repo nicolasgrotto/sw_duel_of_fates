@@ -319,11 +319,12 @@ export class DuelState extends GameState {
     const { floorY } = this.arena;
 
     const playerSaberColor = this.ladderRun ? this.ladderRun.playerSaberColor : this.params.playerSaberColor;
+    const playerSkin = this.ladderRun ? this.ladderRun.playerSkin : this.params.playerSkin;
     const playerSpawn = { x: centerX - spawnDistance / 2, y: floorY, facing: 1 };
     const player = this.playerCharacterData
       ? createFighterFromCharacter(this.playerCharacterData, playerSpawn)
-      : createFighter(playerCharacter, playerSpawn, { saberColor: playerSaberColor });
-    const opponent = createFighter(opponentCharacter, { x: centerX + spawnDistance / 2, y: floorY, facing: -1 }, { saberColor: this.params.opponentSaberColor });
+      : createFighter(playerCharacter, playerSpawn, { saberColor: playerSaberColor, skin: playerSkin });
+    const opponent = createFighter(opponentCharacter, { x: centerX + spawnDistance / 2, y: floorY, facing: -1 }, { saberColor: this.params.opponentSaberColor, skin: this.params.opponentSkin });
 
     return [
       { fighter: player, controller: new PlayerController(this.game.input) },

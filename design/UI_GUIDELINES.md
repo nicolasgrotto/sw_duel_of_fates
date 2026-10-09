@@ -181,3 +181,9 @@ Em retrato, o canvas mostra GIRE O APARELHO e pede paisagem; simulação suspens
 ## Atributos na seleção v1.4
 
 Na coluna direita, abaixo de estilo/traço/habilidade e cores, seis linhas com Vida, Stamina, Lâmina, Defesa, Agilidade e Fluxo. Primeiro centro y=410, espaçamento 30; rótulo em x=620, barra em x=745 e valor em x=925. Nove segmentos de 14×5, separados por 4 px; cheios em accent, vazios em hudTrack. Rótulos attributeLabel (Oxanium 18, textMuted, esquerda), valores attributeValue (Oxanium 18, text, centro). Nenhuma cor indica alinhamento ou poder. Preview desloca para x=1080 e escala 1, sem cobrir as barras. Arena mantém o preview original. Layout fica em uiConfig, sem contagem de orçamento ou teto nesta etapa.
+
+## Personalização (v1.10)
+
+Na seleção, a linha Visual fica em y=366 e o requisito em y=390, entre a cor da lâmina e os atributos. Guarda/habilidade anterior/próximo (LB/RB no gamepad); a dica usa os bindings atuais. No toque, setas em (590,366) e (1170,366), raio 24. Cores conservam esquerda/direita. A navegação pula skins bloqueadas; o texto informa o primeiro requisito pendente. J1 e J2 confirmam escolhas independentes, incluindo quando usam o mesmo personagem. A prévia mostra a combinação de visual e lâmina imediatamente.
+
+A criação da História ganha um passo Visual entre Estilo e Cor. Os três visuais do protagonista estão disponíveis desde o início. Nome mantém a lista pronta e inclui Usar nome digitado. Um input temporário aparece acima da lista em (65,170), tamanho 470×38 em coordenadas lógicas; fonte Oxanium, cores de texto, fundo e borda pelos tokens existentes. Tocar o campo abre o teclado nativo. Enter confirma o texto; nomes vazios mantêm o nome atual, espaços externos são removidos e o limite é 16 caracteres. O campo sai ao mudar de passo ou sair da tela. Digitar não aciona menus ou combate; o input escala junto ao canvas.

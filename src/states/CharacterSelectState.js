@@ -17,7 +17,7 @@ import { formatText } from '../ui/formatText.js';
 import { formatActionKeys } from '../ui/keyLabels.js';
 import { createArcadeRun } from '../modes/arcade.js';
 import { createSurvivalRun } from '../modes/survival.js';
-import { getSaberOptions } from '../modes/unlocks.js';
+import { getSkinOptions, getSaberOptions } from '../modes/unlocks.js';
 import { createRandomSeed } from '../utils/random.js';
 import { MenuList } from '../ui/MenuList.js';
 import { DuelMode } from './duelModes.js';
@@ -46,6 +46,7 @@ export class CharacterSelectState extends GameState {
     this.arenaViews = new Map(gameConfig.duel.arenaOrder.map((id) => [id, new ArenaRenderer(arenas[id])]));
     this.previews = new Map(this.characterIds.map((id) => [id, createFighter(id, { x: 0, y: 0, facing: -1 })]));
     this.colorChoices = new Map();
+    this.skinChoices = new Map();
     this.playerSaberColor = null;
     this.pose = createPose();
     const bindings = this.game.input.bindings ?? keyBindings;
@@ -85,6 +86,7 @@ export class CharacterSelectState extends GameState {
     }
     if (this.step !== SelectStep.ARENA) {
       this.updateColorChoice(input);
+      this.updateSkinChoice(input);
     }
     if (this.step !== SelectStep.ARENA) {
       this.previews.get(this.menu.selected.id).animation.time += dt;
@@ -102,9 +104,30 @@ export class CharacterSelectState extends GameState {
     const current = unlocked.findIndex((option) => option.color === this.getChosenColor(id));
     const next = unlocked[(Math.max(0, current) + step + unlocked.length) % unlocked.length];
     this.colorChoices.set(id, next.color);
-    const preview = createFighter(id, { x: 0, y: 0, facing: -1 }, { saberColor: next.color });
+    this.refreshPreview(id);
+  }
+
+  refreshPreview(id) {
+    const preview = createFighter(id, { x: 0, y: 0, facing: -1 }, { saberColor: this.getChosenColor(id), skin: this.getChosenSkin(id) });
     preview.animation.time = this.previews.get(id).animation.time;
     this.previews.set(id, preview);
+  }
+
+  getChosenSkin(id) {
+    return this.skinChoices.get(id) ?? 'base';
+  }
+
+  updateSkinChoice(input) {
+    const taps = input.touchTaps ?? [];
+    const step = (input.wasPressed(Action.SPECIAL) || taps.some((tap) => containsTouch(tap, touchLayoutConfig.skinRight)) ? 1 : 0)
+      - (input.wasPressed(Action.BLOCK) || taps.some((tap) => containsTouch(tap, touchLayoutConfig.skinLeft)) ? 1 : 0);
+    if (!step) return;
+    const id = this.menu.selected.id;
+    const options = getSkinOptions(characters[id], this.game.settings).filter((skin) => skin.unlocked);
+    const current = options.findIndex((skin) => skin.id === this.getChosenSkin(id));
+    if (!options.length) return;
+    this.skinChoices.set(id, options[(Math.max(0, current) + step + options.length) % options.length].id);
+    this.refreshPreview(id);
   }
 
   getChosenColor(id) {
@@ -121,28 +144,37 @@ export class CharacterSelectState extends GameState {
       this.step = SelectStep.OPPONENT;
       this.menu = this.characterMenu;
       this.menu.selectedIndex = this.characterIds.indexOf(this.opponentChoice);
+      this.restoreChoice(this.opponentChoice, this.opponentSkin, this.opponentSaberColor);
       return;
     }
     if (this.step === SelectStep.OPPONENT) {
       this.step = SelectStep.PLAYER;
       this.menu.selectedIndex = this.characterIds.indexOf(this.playerChoice);
+      this.restoreChoice(this.playerChoice, this.playerSkin, this.playerSaberColor);
       return;
     }
     this.game.changeState(StateId.MENU);
   }
 
+  restoreChoice(id, skin, saberColor) {
+    this.skinChoices.set(id, skin ?? 'base');
+    this.colorChoices.set(id, saberColor ?? characters[id].appearance.saberColor);
+    this.refreshPreview(id);
+  }
+
   choose(choice) {
     if (this.step === SelectStep.PLAYER && this.params.mode === DuelMode.ARCADE) {
       const run = createArcadeRun(choice, this.rosterIds, gameConfig.arcade);
-      this.game.changeState(StateId.DUEL, { mode: DuelMode.ARCADE, arcade: { ...run, playerSaberColor: this.getChosenColorParam(choice) } });
+      this.game.changeState(StateId.DUEL, { mode: DuelMode.ARCADE, arcade: { ...run, playerSaberColor: this.getChosenColorParam(choice), playerSkin: this.getChosenSkin(choice) } });
       return;
     }
     if (this.step === SelectStep.PLAYER && this.params.mode === DuelMode.SURVIVAL) {
       const run = createSurvivalRun(choice, this.getChosenColorParam(choice), createRandomSeed());
-      this.game.changeState(StateId.DUEL, { mode: DuelMode.SURVIVAL, survival: run });
+      this.game.changeState(StateId.DUEL, { mode: DuelMode.SURVIVAL, survival: { ...run, playerSkin: this.getChosenSkin(choice) } });
       return;
     }
     if (this.step === SelectStep.PLAYER) {
+      this.playerSkin = this.getChosenSkin(choice);
       this.playerChoice = choice;
       this.playerSaberColor = this.getChosenColorParam(choice);
       this.step = SelectStep.OPPONENT;
@@ -150,6 +182,7 @@ export class CharacterSelectState extends GameState {
       return;
     }
     if (this.step === SelectStep.OPPONENT) {
+      this.opponentSkin = this.getChosenSkin(choice);
       this.opponentChoice = choice;
       this.opponentSaberColor = this.getChosenColorParam(choice);
       this.step = SelectStep.ARENA;
@@ -160,6 +193,8 @@ export class CharacterSelectState extends GameState {
       ...this.params,
       playerCharacter: this.playerChoice,
       opponentCharacter: this.opponentChoice,
+      playerSkin: this.playerSkin,
+      opponentSkin: this.opponentSkin,
       playerSaberColor: this.playerSaberColor,
       opponentSaberColor: this.opponentSaberColor,
       arena: choice,
@@ -217,6 +252,23 @@ export class CharacterSelectState extends GameState {
     renderer.text(requirement, x, y + layout.characterSelect.infoLineSpacing * 0.8, textStyles.hint);
   }
 
+  renderSkinInfo(renderer, character) {
+    const options = getSkinOptions(character, this.game.settings);
+    const index = options.findIndex((skin) => skin.id === this.getChosenSkin(character.id));
+    if (index < 0) return;
+    const { previewX, skinY, skinRequirementY, skinControlsY } = layout.characterSelect;
+    renderer.text(formatText(texts.characterSelect.skin, { name: options[index].name, index: index + 1, total: options.length }), previewX, skinY, textStyles.accentHint);
+    const locked = options.find((skin) => !skin.unlocked);
+    renderer.text(locked ? formatText(texts.characterSelect.skinNext, { text: texts.characterSelect.skinRequirements[locked.unlock] }) : texts.characterSelect.skinsUnlocked, previewX, skinRequirementY, textStyles.hint);
+    if (this.activeInput.lastInputKind === 'touch') {
+      this.renderColorArrow(renderer, touchLayoutConfig.skinLeft, texts.touch.colorLeft);
+      this.renderColorArrow(renderer, touchLayoutConfig.skinRight, texts.touch.colorRight);
+    } else {
+      const bindings = this.activeInput.bindings ?? keyBindings;
+      renderer.text(formatText(texts.characterSelect.skinControls, { previous: formatActionKeys(bindings, Action.BLOCK), next: formatActionKeys(bindings, Action.SPECIAL) }), previewX, skinControlsY, textStyles.hint);
+    }
+  }
+
   renderCharacterPreview(renderer) {
     const { previewX, previewY, infoY, infoLineSpacing } = layout.characterSelect;
     const character = characters[this.menu.selected.id];
@@ -226,6 +278,7 @@ export class CharacterSelectState extends GameState {
     renderer.text(character.info.ability, previewX, infoY + infoLineSpacing * 2, textStyles.hint);
     this.renderColorInfo(renderer, character, previewX, infoY + infoLineSpacing * 3);
 
+    this.renderSkinInfo(renderer, character);
     const fighter = this.previews.get(character.id);
     computePose(fighter, this.pose);
     renderer.save();

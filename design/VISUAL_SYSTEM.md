@@ -288,3 +288,18 @@ O estilo trainingStatus usa system-ui 18 px, textMuted, alinhado à esquerda; st
 - Fundo preto; uma lâmina horizontal acende do centro para as pontas (token `introBlade`, ciano-gelo), com o mesmo desenho das lâminas do duelo: glow largo e translúcido, núcleo branco e um brilho no centro.
 - O título e a frase de apoio entram em fade depois da lâmina; então aparece `Pressione Enter` (ou `Toque para começar`) piscando devagar.
 - Segredo revelado: um brilho grande em `powerTierApex` atrás da lâmina e a frase em `introSecret` (vermelho do nível 10), por cerca de 3 s. Nada indica na tela que existe um segredo.
+
+## Skins (v1.10)
+
+Skins alteram somente paleta e peças existentes. A base preserva a aparência atual; nunca alteram lâmina, proporções de arma, poses ou atributos. As cores ficam em `characterData.skins` e `storyConfig.protagonist.skins`.
+
+| Visual | Capa | Corpo | Acabamento | Peças |
+| --- | --- | --- | --- | --- |
+| Viajante (Arcade, elenco) | `#454d58` | `#222730` | `#83909e` | capuz abaixado, lenço; demais peças da base |
+| Sentinela (História, elenco) | `#51483c` | `#28231e` | `#a0957e` | ombreiras, sem lenço; demais peças da base |
+| Legado (final secreto, secretos) | `#34394a` | `#191e29` | `#8795b1` | capa longa e máscara; demais peças da base |
+| Protagonista: Errante | `#3e4a5e` | `#1d222b` | `#7f90aa` | visual atual: capa longa, lenço, sem capuz nem máscara |
+| Protagonista: Vigia | `#454d58` | `#222730` | `#83909e` | capa curta, capuz e máscara, sem lenço |
+| Protagonista: Peregrino | `#51483c` | `#28231e` | `#a0957e` | capa longa, ombreiras, sem capuz, máscara ou lenço |
+
+A paleta baixa a saturação para conservar o contraste da lâmina. O desenho continua procedural e não exige assets novos.

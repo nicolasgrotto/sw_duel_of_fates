@@ -629,3 +629,9 @@ O total máximo impede um protagonista com tudo no teto: ele termina forte, mas 
 - **Pelo segredo da intro**: uma sequência digitada no teclado, feita no direcional/stick ou tocando o título várias vezes libera os dois de uma vez, com som e frase próprios. As sequências ficam em `src/config/secretsConfig.js`; a tela não dá pista.
 - **Final secreto**: na História, vencer o Soberano com mais de 75% de vida leva ao duelo contra o Predestinado em vez do final normal.
 - Equilíbrio medido com poderes ligados: cada um vence cerca de 60% contra o elenco no Normal e no Difícil (fortes, mas vencíveis). Ver a ARCHITECTURE → Balanceamento.
+
+## 25. Skins e personalização
+
+O elenco tem Original, Viajante (vencer Arcade com o lutador) e Sentinela (concluir qualquer final da História). Secretos têm Original e Legado (final secreto). São cosméticas: paleta e peças existentes, sem alterar atributos, golpes ou lâmina. A cor da lâmina continua independente. Skins bloqueadas são puladas na seleção, que mostra o requisito pendente. As escolhas de ambos os lados permanecem ao reiniciar ou jogar revanche e nas escadas.
+
+O protagonista escolhe Errante, Vigia ou Peregrino desde o início, em um passo Visual. O nome pode vir da lista ou ser digitado com teclado nativo, até 16 caracteres. O visual e o nome acompanham o save da campanha.

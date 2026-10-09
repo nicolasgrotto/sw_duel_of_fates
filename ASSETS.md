@@ -41,3 +41,5 @@ assets/
 | assets/ui/icon-192.png, assets/ui/icon-512.png | ícone PNG | geometria original do projeto, Canvas 2D com tokens de themeConfig; duas lâminas cruzadas | MIT | Sem logo de franquia, tamanhos 192 e 512 |
 | media/v1.2-desktop-touch.png, media/v1.2-mobile-landscape.png, media/v1.2-mobile-pause.png, media/v1.2-mobile-portrait.png | capturas de QA | próprio jogo, Chrome headless com toque emulado | MIT | Desktop 1280×720, mobile 844×390 e retrato 390×844 |
 | media/v1.4-attributes-desktop.png, media/v1.4-attributes-mobile.png | capturas de QA | próprio jogo, Chrome headless | MIT | Barras na seleção em 1280×720 e 844×390 |
+
+| media/v1.10-skins-desktop.png, media/v1.10-skins-mobile.png | capturas de QA | próprio jogo, Chrome headless | MIT | Skins na seleção em desktop e toque emulado |

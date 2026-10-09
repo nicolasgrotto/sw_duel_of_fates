@@ -5,6 +5,7 @@ import { applyAttributes } from './attributes.js';
 import { resolvePowerStats } from './powers.js';
 import { fighterArchetypes } from '../config/fightersConfig.js';
 import { Fighter } from '../entities/Fighter.js';
+import { resolveAppearance } from './skins.js';
 import { characters } from './characterData.js';
 
 export function createFighter(characterId, spawn, options) {
@@ -15,7 +16,7 @@ export function createFighter(characterId, spawn, options) {
   return createFighterFromCharacter(character, spawn, options);
 }
 
-export function createFighterFromCharacter(character, { x, y, facing }, { saberColor = null } = {}) {
+export function createFighterFromCharacter(character, { x, y, facing }, { saberColor = null, skin = null } = {}) {
   const stats = fighterArchetypes[character.archetype];
   if (!stats) {
     throw new Error(`Unknown archetype: ${character.archetype}`);
@@ -38,11 +39,14 @@ export function createFighterFromCharacter(character, { x, y, facing }, { saberC
     attacks: moves,
   }, character.attributes, attributesConfig, { apex: character.apex === true });
 
+  const appearance = resolveAppearance(character, skin);
+  if (saberColor) appearance.saberColor = saberColor;
+
   return new Fighter({
     id: character.id,
     name: character.name,
     stats: { ...derived, alignment: character.alignment, power: resolvePowerStats(derived.powerLevel, powersConfig, character.alignment, character.powerSlots ?? null) },
-    appearance: saberColor ? { ...character.appearance, saberColor } : character.appearance,
+    appearance,
     sound: character.sound,
     x,
     y,

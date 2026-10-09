@@ -28,5 +28,22 @@ export function findChallengeUnlocks(character, stats, settings) {
 
 export function addUnlocks(unlocks, characterId, alts) {
   const current = unlocks?.[characterId] ?? [];
-  return { ...unlocks, [characterId]: [...current, ...alts.map((alt) => alt.id)] };
+  return { ...unlocks, [characterId]: [...new Set([...current, ...alts.map((alt) => alt.id)])] };
+}
+
+export function getSkinOptions(character, settings) {
+  return (character.skins ?? []).map((skin) => ({
+    ...skin,
+    unlocked: !skin.unlock || (settings.unlocks?.[character.id] ?? []).includes(skin.id)
+      || (skin.unlock === ARCADE_UNLOCK && (settings.arcadeCleared ?? []).includes(character.id)),
+  }));
+}
+
+export function unlockProgressSkins(unlocks, characters, milestone) {
+  let next = unlocks ?? {};
+  for (const character of characters) {
+    const skins = (character.skins ?? []).filter((skin) => skin.unlock === milestone);
+    if (skins.length) next = addUnlocks(next, character.id, skins);
+  }
+  return next;
 }

@@ -16,7 +16,7 @@ Legenda: ✅ existe · ⏳ planejado (criar só quando a tarefa pedir)
 index.html                  ✅ página com o canvas (caminhos relativos: funciona em qualquer servidor estático e no GitHub Pages)
 manifest.webmanifest        ✅ manifest para tela inicial em paisagem, fullscreen e start_url relativo; sem service worker
 .nojekyll                   ✅ desliga o Jekyll do GitHub Pages; os arquivos são servidos como estão
-média/                      ✅ capturas de tela usadas no README (não são carregadas pelo jogo)
+media/                      ✅ capturas de tela usadas no README (não são carregadas pelo jogo)
 styles/
   main.css                  ✅ layout da página e do canvas, @font-face da fonte do jogo
 design/                     ✅ direção de arte, sistema visual, UI, VFX, referências
@@ -27,6 +27,7 @@ src/
   core/                     ✅ infraestrutura do jogo
     Game.js                 ✅ monta e conecta os módulos
     GameLoop.js             ✅ loop com timestep fixo
+    textPrompt.js           ✅ input temporário com alvo DOM injetado; Enter, composição e limpeza
     Input.js                ✅ teclado e gamepad → ações; uma instância por jogador (gamepadSlot)
     KeyboardSource.js       ✅ eventos de teclado e bindings
     TouchInput.js           ✅ alvo injetado, pointerId e joystick; libera listeners no destroy
@@ -35,7 +36,7 @@ src/
     StateMachine.js         ✅ pilha de estados
     Camera.js               ✅ screen shake (com limites)
     AudioManager.js         ✅ AudioContext, buses de sfx e música, liberação no primeiro input
-    saveStorage.js          ✅ save versionado com lista ordenada de migrações (v3: `{ version, settings, story }`)
+    saveStorage.js          ✅ save versionado com lista ordenada de migrações (v4: `{ version, settings, story }`)
     settingsStorage.js      ✅ carrega e salva as opções (localStorage, tolerante a erro)
     keyBindings.js          ✅ preset personalizado: junta, troca teclas entre ações e valida o que vem do armazenamento
     AssetManager.js         ⏳ só quando houver assets externos
@@ -46,7 +47,7 @@ src/
     stateFactory.js         ✅ cria estados a partir do id
     IntroState.js           ✅ intro (lâmina, título), tela de título e segredo; primeira tela do jogo
     MenuState.js            ✅ título + opções (MenuList)
-    CharacterSelectState.js ✅ escolhe jogador, adversário (ou J2), cor da lâmina e arena; Arcade e Sobrevivência só pedem o jogador
+    CharacterSelectState.js ✅ escolhe jogador, adversário (ou J2), cor da lâmina, skin e arena; Arcade e Sobrevivência só pedem o jogador
     ControlsState.js        ✅ tabela de controles gerada do controlsConfig
     DuelState.js            ✅ duelo: intro, simulação, efeitos, HUD, fim do duelo
     PauseState.js           ✅ continuar, reiniciar, sair
@@ -56,7 +57,7 @@ src/
     OptionsState.js         ✅ dificuldade, efeitos, som, música, teclado, replay
     KeyRemapState.js        ✅ remapeamento das ações de luta (preset Personalizado)
     StoryState.js           ✅ hub da História: continuar, evoluir, nova campanha
-    ProtagonistState.js     ✅ criação do protagonista em cinco passos e distribuição de pontos
+    ProtagonistState.js     ✅ criação do protagonista em seis passos e distribuição de pontos
     DialogueState.js        ✅ falas em sequência sobre a arena ou sobre o duelo; ao fim troca para `params.next`
   arenas/                   ✅ dados visuais de arenas, sem regras de gameplay
     arenaData.js            ✅ camadas estáticas e partículas ambientes por arena
@@ -64,6 +65,8 @@ src/
     characterData.js        ✅ personagens: nome, arquétipo, perfil de IA, aparência
     attributes.js           ✅ deriva stats sem mutar base ou notas
     powers.js               ✅ `resolvePowerStats`: medidor, ganho, potência e poderes do alinhamento (loadout)
+    skins.js                ✅ resolve overrides cosméticos parciais sem mudar lâmina ou stats
+    protagonist.js          ✅ perfil e skin da História sobre o arquétipo do estilo
     characterFactory.js     ✅ cria um Fighter a partir dos dados
   modes/                    ✅ regras de modos de jogo, puras e testáveis (sem render)
     DuelResult.js           ✅ resultado independente dos Fighters
@@ -71,7 +74,7 @@ src/
     TutorialDirector.js     ✅ passos do tutorial: objetivo, progresso e comportamento do boneco
     ParryChallenge.js       ✅ desafio de parry: tempo, pontos e resumo
     arcade.js               ✅ escada do Arcade: adversários, dificuldade e arena por luta, chefe no fim
-    unlocks.js              ✅ cores de lâmina liberadas por Arcade e por desafio do personagem
+    unlocks.js              ✅ cores de lâmina e skins liberadas por Arcade, desafios e finais
     survival.js             ✅ Sobrevivência: adversário sorteado por seed, dificuldade por vitórias, chefe periódico, vida carregada
     story/storyRun.js       ✅ campanha pura: criar, avançar, rotas por condição, pontos, recompensas, validação do save
     story/conditions.js     ✅ registro de condições de rota (`always`, `healthRatioAbove`, `alignmentIs`)
@@ -559,7 +562,14 @@ Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 23).
 - **Campanha pura.** `storyRun.js` trabalha sobre um objeto simples salvo no save (`run`): protagonista (nome, alinhamento, estilo, cor, notas), dificuldade, encontro atual, pontos, espaços de poder liberados, encontros vencidos e final. `resolveStoryResult(run, duelResult, config, loadouts)` devolve o novo `run`, o final e os personagens liberados; a rota usa `evaluateCondition` sobre `{ result, run }`. Nada lê o `Fighter`: a condição de vida vem do `DuelResult`.
 - **Protagonista.** `createProtagonistCharacter(perfil, storyConfig, espaços)` monta um objeto de personagem com o arquétipo, golpes, som e aparência base do estilo escolhido, sobrepondo `storyConfig.protagonist.appearance` e a cor da lâmina. `createFighterFromCharacter` (a factory agora aceita um objeto, não só um id) cria o lutador; `powerSlots` filtra o loadout do alinhamento. A nota 10 só vale para o Fluxo de personagens com `apex: true` (`attributesConfig.apexRating`).
 - **Fluxo de telas.** Menu → `StoryState` → (`ProtagonistState` criar → atributos) → `DialogueState` (antes, com a arena) → `DuelState` (`DuelMode.STORY`, `params.story`, `params.rules = storyConfig.rules`). O `DuelState` usa `storyStage` como mais um degrau da "escada" (adversário, arena, dificuldade) e cria o jogador a partir do protagonista. No resultado, `resolveDuelOutcome` desvia para `resolveStoryOutcome`: na vitória, empilha `DialogueState` (falas de depois, final e desbloqueios) que leva de volta ao `StoryState`, e devolve `story` (novo `run`) e `progress.unlockedCharacters`; na derrota, `GameOverState` com "Tentar de novo" e "Voltar à história" (`menuState`). A pausa sai para a História (`quitState`) e a lista de golpes recebe o personagem gerado.
-- **Save.** `Game.story` vem de `loadStory` + `sanitizeStoryRun` e é salvo junto com as opções (`saveSettings` grava `{ version: 3, settings, story }`). A migração 2 → 3 acrescenta `story: null`.
+- **Save.** `Game.story` vem de `loadStory` + `sanitizeStoryRun` e é salvo junto com as opções (`saveSettings` grava `{ version: 4, settings, story }`). A migração 2 → 3 acrescenta `story: null`; 3 → 4 acrescenta `protagonist.skin` (base) sem perder progresso.
+
+### Personalização (v1.10)
+
+- `characterData.skins` e `storyConfig.protagonist.skins` descrevem paleta e peças existentes. `resolveAppearance` copia a base e aplica somente campos cosméticos permitidos. A factory aceita `{ skin, saberColor }`, nessa ordem; stats e replay continuam independentes do visual.
+- `getSkinOptions` reutiliza `settings.unlocks[character.id]` com ids `skin-arcade`, `skin-story` e `skin-secret`, separados das cores. Saves antigos com `arcadeCleared` também liberam Viajante. `unlockProgressSkins` e `addUnlocks` acumulam recompensas sem duplicatas; `duelOutcomes` aplica Arcade ao vencedor e finais ao elenco, mais secretos no final secreto.
+- A seleção filtra bloqueadas, mostra requisitos e guarda escolhas confirmadas por lado, mesmo com personagens iguais. `playerSkin`/`opponentSkin` seguem params e escadas; pausa, revanche e próxima luta reutilizam esses dados. A prévia conserva cor e skin ao mudar uma delas e ao voltar.
+- A criação tem Nome, Caminho, Estilo, Visual, Cor e Dificuldade. `Game.createTextPrompt` injeta documento, host e limites do canvas no helper de core; o estado apenas consome valor e envio. O input intercepta teclas, respeita composição e sai ao mudar de passo ou estado. O resize reposiciona o campo. Nenhum estado acessa DOM. `sanitizeStoryRun` valida a skin e retorna base para ids desconhecidos.
 
 ### Segredos e personagens secretos (v1.8–v1.9)
 
@@ -917,12 +927,12 @@ A regra `rules` nos parâmetros do duelo (`powers`) foi implementada na v1.5, ju
 
 ```
 core/TouchInput.js            IMPLEMENTADO v1.2: pointer events no canvas → ações (multitoque por pointerId, joystick com zona morta)
-core/textPrompt.js            input DOM temporário só na tela de nome (injetado)
+core/textPrompt.js            IMPLEMENTADO v1.10: input DOM temporário só na tela de nome (injetado)
 config/touchLayoutConfig.js, attributesConfig.js, powersConfig.js (com os tiers visuais),
        storyConfig.js, secretsConfig.js, introConfig.js
 characters/attributes.js      IMPLEMENTADO v1.4: applyAttributes(base, attributes, config) → stats derivados (puro)
 characters/protagonist.js     IMPLEMENTADO v1.7: createProtagonistCharacter(perfil, config, espaços) → dados para createFighterFromCharacter
-characters/skins.js           resolveAppearance(character, skinId)
+characters/skins.js           IMPLEMENTADO v1.10: resolveAppearance(character, skinId)
 combat/powerResistance.js     IMPLEMENTADO v1.5: resolvePowerOutcome(rule, levelDiff) → { scale, outcome } e getPowerTier (puros)
 combat/powerEffects.js        registro { push, pull, lightning, barrier } → handler
 combat/PowerSystem.js         IMPLEMENTADO v1.5 (medidor); recargas, fases do poder e eventos na v1.6

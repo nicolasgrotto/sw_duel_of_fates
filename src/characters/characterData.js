@@ -16,6 +16,11 @@ export const characters = {
       trait: 'Bloqueio custa menos stamina',
       ability: 'Contraguarda: postura curta que responde com a riposta',
     },
+    skins: [
+      { id: 'base', name: 'Original', appearance: {}, unlock: null },
+      { id: 'skin-arcade', name: 'Viajante', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
+      { id: 'skin-story', name: 'Sentinela', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
+    ],
     altSaberColors: [
       { id: 'arcade', name: 'Azul-profundo', color: '#5f8bff', challenge: null },
       { id: 'challenge', name: 'Verde-água', color: '#3fffc8', challenge: { stat: 'perfectParries', target: 3, text: 'vença com 3 parries perfeitos' } },
@@ -57,6 +62,11 @@ export const characters = {
       trait: 'Golpe que acerta devolve stamina',
       ability: 'Ímpeto: avanço com armadura contra um golpe',
     },
+    skins: [
+      { id: 'base', name: 'Original', appearance: {}, unlock: null },
+      { id: 'skin-arcade', name: 'Viajante', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
+      { id: 'skin-story', name: 'Sentinela', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
+    ],
     altSaberColors: [
       { id: 'arcade', name: 'Violeta-escuro', color: '#c23cff', challenge: null },
       { id: 'challenge', name: 'Rubi', color: '#ff2a3a', challenge: { stat: 'damage', target: 200, text: 'vença causando 200 de dano' } },
@@ -98,6 +108,11 @@ export const characters = {
       trait: 'Anda bloqueando e não é empurrado',
       ability: 'Marreta: golpe lento com armadura contra dois golpes',
     },
+    skins: [
+      { id: 'base', name: 'Original', appearance: {}, unlock: null },
+      { id: 'skin-arcade', name: 'Viajante', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
+      { id: 'skin-story', name: 'Sentinela', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
+    ],
     altSaberColors: [
       { id: 'arcade', name: 'Ouro-pálido', color: '#ffe08a', challenge: null },
       { id: 'challenge', name: 'Azul-céu', color: '#3fd0ff', challenge: { stat: 'blocks', target: 12, text: 'vença com 12 defesas' } },
@@ -139,6 +154,11 @@ export const characters = {
       trait: 'Sequência de cinco golpes rápidos',
       ability: 'Zumbido: avanço que atravessa o oponente',
     },
+    skins: [
+      { id: 'base', name: 'Original', appearance: {}, unlock: null },
+      { id: 'skin-arcade', name: 'Viajante', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
+      { id: 'skin-story', name: 'Sentinela', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
+    ],
     altSaberColors: [
       { id: 'arcade', name: 'Lima', color: '#7cff6b', challenge: null },
       { id: 'challenge', name: 'Rosa', color: '#ff6bd5', challenge: { stat: 'longestChain', target: 5, text: 'vença acertando a sequência completa de 5' } },
@@ -180,6 +200,11 @@ export const characters = {
       trait: 'Janelas de parry maiores',
       ability: 'Postura de Espera: apara e responde com a riposta',
     },
+    skins: [
+      { id: 'base', name: 'Original', appearance: {}, unlock: null },
+      { id: 'skin-arcade', name: 'Viajante', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
+      { id: 'skin-story', name: 'Sentinela', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
+    ],
     altSaberColors: [
       { id: 'arcade', name: 'Prata-azulada', color: '#9fd8ff', challenge: null },
       { id: 'challenge', name: 'Marfim', color: '#ffe2b0', challenge: { stat: 'perfectParries', target: 4, text: 'vença com 4 parries perfeitos' } },
@@ -221,6 +246,11 @@ export const characters = {
       trait: 'A ponta da lâmina dá mais dano; de perto, menos',
       ability: 'Varredura: golpe de alcance enorme e lento',
     },
+    skins: [
+      { id: 'base', name: 'Original', appearance: {}, unlock: null },
+      { id: 'skin-arcade', name: 'Viajante', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
+      { id: 'skin-story', name: 'Sentinela', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
+    ],
     altSaberColors: [
       { id: 'arcade', name: 'Anil', color: '#6b7cff', challenge: null },
       { id: 'challenge', name: 'Fúcsia', color: '#ff6bff', challenge: { stat: 'hits', target: 15, text: 'vença com 15 golpes acertados' } },
@@ -262,6 +292,11 @@ export const characters = {
       trait: 'Mais dano em quem está aberto',
       ability: 'Brasa Viva: postura que responde com um corte forte',
     },
+    skins: [
+      { id: 'base', name: 'Original', appearance: {}, unlock: null },
+      { id: 'skin-arcade', name: 'Viajante', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
+      { id: 'skin-story', name: 'Sentinela', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
+    ],
     altSaberColors: [
       { id: 'arcade', name: 'Ouro', color: '#ffcf3f', challenge: null },
       { id: 'challenge', name: 'Carmim', color: '#ff3f5a', challenge: { stat: 'counters', target: 3, text: 'vença com 3 contra-golpes da postura' } },
@@ -303,6 +338,11 @@ export const characters = {
       trait: 'Empurra mais longe a cada golpe',
       ability: 'Forja: segure para carregar; o nível 3 quebra a guarda',
     },
+    skins: [
+      { id: 'base', name: 'Original', appearance: {}, unlock: null },
+      { id: 'skin-arcade', name: 'Viajante', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
+      { id: 'skin-story', name: 'Sentinela', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
+    ],
     altSaberColors: [
       { id: 'arcade', name: 'Laranja-forno', color: '#ff9a3f', challenge: null },
       { id: 'challenge', name: 'Verde-escória', color: '#b0ff3f', challenge: { stat: 'guardBreaks', target: 2, text: 'vença quebrando a guarda 2 vezes' } },
@@ -344,6 +384,11 @@ export const characters = {
       trait: 'Pula na parede, esquiva atravessando e tem dois aéreos',
       ability: 'Voo da Garça: salto que passa por cima do oponente',
     },
+    skins: [
+      { id: 'base', name: 'Original', appearance: {}, unlock: null },
+      { id: 'skin-arcade', name: 'Viajante', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
+      { id: 'skin-story', name: 'Sentinela', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
+    ],
     altSaberColors: [
       { id: 'arcade', name: 'Azul-gelo', color: '#a6e8ff', challenge: null },
       { id: 'challenge', name: 'Coral', color: '#ff8a6b', challenge: { stat: 'airHits', target: 4, text: 'vença acertando 4 ataques aéreos' } },
@@ -385,6 +430,11 @@ export const characters = {
       trait: 'Finta: tocar a guarda cancela o forte',
       ability: 'Passo-reflexo: passo curto e invulnerável',
     },
+    skins: [
+      { id: 'base', name: 'Original', appearance: {}, unlock: null },
+      { id: 'skin-arcade', name: 'Viajante', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
+      { id: 'skin-story', name: 'Sentinela', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
+    ],
     altSaberColors: [
       { id: 'arcade', name: 'Lilás', color: '#c9a6ff', challenge: null },
       { id: 'challenge', name: 'Prata', color: '#d6dbe6', challenge: { stat: 'feints', target: 5, text: 'vença fintando 5 vezes' } },
@@ -465,6 +515,10 @@ export const characters = {
       trait: 'A ponta da lâmina dá mais dano; de perto, menos',
       ability: 'Varredura: golpe de alcance enorme e lento',
     },
+    skins: [
+      { id: 'base', name: 'Original', appearance: {}, unlock: null },
+      { id: 'skin-secret', name: 'Legado', appearance: { cloakColor: '#34394a', bodyColor: '#191e29', trimColor: '#8795b1', longCape: true, masked: true }, unlock: 'secret' },
+    ],
     altSaberColors: [],
     sound: {
       humFrequency: 58,
@@ -505,6 +559,10 @@ export const characters = {
       trait: 'Finta: tocar a guarda cancela o forte',
       ability: 'Passo-reflexo: passo curto e invulnerável',
     },
+    skins: [
+      { id: 'base', name: 'Original', appearance: {}, unlock: null },
+      { id: 'skin-secret', name: 'Legado', appearance: { cloakColor: '#34394a', bodyColor: '#191e29', trimColor: '#8795b1', longCape: true, masked: true }, unlock: 'secret' },
+    ],
     altSaberColors: [],
     sound: {
       humFrequency: 80,
