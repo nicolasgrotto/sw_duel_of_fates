@@ -4,11 +4,6 @@
 
 - **Nicolas Grotto**: game design, direção, desenvolvimento
 
-## Ferramentas
-
-- Agentes de IA usados no desenvolvimento e na documentação: Claude Code (Anthropic), Codex (OpenAI) e modelos GPT (OpenAI). Todo código gerado é revisado e integrado pelo autor.
-- Editor: Visual Studio Code
-
 ## Inspiração
 
 Este é um projeto acadêmico, sem fins comerciais, inspirado nos duelos de sabre de luz de **Star Wars**.
