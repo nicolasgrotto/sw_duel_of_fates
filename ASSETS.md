@@ -47,3 +47,6 @@ assets/
 | media/v1.10-name-desktop.png, media/v1.10-name-mobile.png, media/v1.10-protagonist-desktop.png | capturas de QA | próprio jogo, Chrome headless | MIT | Campo temporário de nome e visual do protagonista, sem assets externos |
 
 | media/v2-qa-story-duel.png, media/v2-qa-replay.png, media/v2-qa-final-replay.png, media/v2-qa-training.png, media/v2-qa-touch-pause.png | capturas de QA | próprio jogo, Chrome headless | MIT | Regressão de História, replay, Treino e pausa por toque |
+
+| media/v2-performance-4x-full.png, media/v2-performance-4x-reduced.png, media/v2-performance-6x-full.png, media/v2-performance-6x-reduced.png | capturas de desempenho | próprio jogo, Chrome headless | MIT | F3 com Raio e Barreira simultâneos, CPU 4×/6×, efeitos completos/reduzidos |
+| media/v2-performance.json | dados de QA | medição original do projeto | MIT | Janelas de timing e FPS do teste de desempenho |

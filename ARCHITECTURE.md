@@ -958,6 +958,20 @@ ui/TouchControls.js           IMPLEMENTADO v1.2: controles de toque desenhados n
 
 **Orçamento de desempenho (alvo mobile).** Update ≤ 2 ms e render ≤ 10 ms por frame em celular intermediário. Partículas dos poderes usam o pool atual (`maxParticles` 300; metade com efeitos reduzidos); luzes 8 (4 com efeitos reduzidos); raio com no máximo 2 polilinhas de cerca de 10 segmentos, regeradas a cada poucos frames; aura em sprites pré-renderizados por tier; nada de `shadowBlur`, `filter` ou gradiente criado por frame; DPR limitado por config; áudio continua sintetizado.
 
+
+**Medição da v1.10 e QA final.** Chrome 154.0.8037.98 headless no Windows, aceleração padrão, CPU via `Emulation.setCPUThrottlingRate` (4×/6×). Viewport 844×390, DPR emulado 3 limitado a 2 (canvas 1386×780). Sombra lançando Raio contra a Barreira do Guardião no Santuário, incluindo reflexos, partículas e F3 ligado. Canais mantidos ativos e medidor reposto somente pelo cenário de teste, sem alteração das regras do jogo.
+
+11 s por cenário, cerca de 650 frames; aquecimento de 120 frames. Médias do `GameLoop.timings`, com a janela normal de 60 frames do F3: 9 janelas por caso (10 em 4× reduzido). Máximo na tabela é a maior média de janela, não o pior frame isolado; FPS é a leitura final do overlay. Dados brutos em `media/v2-performance.json` e quatro capturas `media/v2-performance-*.png`.
+
+| CPU | Efeitos | Update médio / máximo | Render médio / máximo | FPS observado |
+| --- | --- | --- | --- | --- |
+| 4× | completos | 0,51 / 0,58 ms | 5,09 / 5,69 ms | 60,3 |
+| 4× | reduzidos | 0,51 / 0,64 ms | 4,90 / 5,91 ms | 59,7 |
+| 6× | completos | 0,68 / 0,80 ms | 7,56 / 9,10 ms | 60,5 |
+| 6× | reduzidos | 0,62 / 0,79 ms | 7,32 / 8,90 ms | 60,7 |
+
+Update e render dentro do alvo em todas as janelas. Sem mudanças de visual ou otimizações adicionais. A medição usa aceleração padrão: a tentativa com GPU desabilitada não representa o alvo mobile. Validação em hardware Android/iOS continua com o autor.
+
 ---
 
 ## Convenções de código

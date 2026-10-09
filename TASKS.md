@@ -17,4 +17,4 @@
 ## Ponto de continuidade
 
 - **v1.0** publicada: `main` e tag `v1.0.0` no GitHub. Falta ativar o GitHub Pages (passos no README) e, se o autor quiser, gravar GIFs para o README.
-- **v2.0** em andamento na `v2-development`. Concluídas com tags locais: v1.1 a v1.10 (fundação, mobile, movimento, atributos, Fluxo, poderes, História completa com final secreto, personagens secretos, intro, segredo, skins e personalização). Próximo: **regressão e desempenho com throttling (Codex)**, o teste em aparelho real (autor) e a etapa final (regressão, revisão de docs, tag `v2.0.0` e merge na `main`).
+- **v2.0** em andamento na `v2-development`. Concluídas com tags locais: v1.1 a v1.10 (fundação, mobile, movimento, atributos, Fluxo, poderes, História completa com final secreto, personagens secretos, intro, segredo, skins e personalização). **Regressão e desempenho no Chrome com CPU 4×/6× concluídos por Codex** (456 testes; evidências em versions/v2.md e media/). Próximo: **teste em aparelho real (autor)**, revisão final de docs, tag `v2.0.0` e merge na `main` (autor com Claude).

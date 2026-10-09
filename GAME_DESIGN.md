@@ -599,7 +599,7 @@ O Fluxo é a energia dos poderes. Nomes de tela em `uiConfig`; no código, `powe
 
 Campanha linear com um protagonista criado pelo jogador. Textos em `src/config/storyTexts.js`; regras e encontros em `src/config/storyConfig.js`.
 
-**Criação.** Cinco passos: nome (lista pronta; digitar o nome chega com a personalização), Caminho do Fluxo (Aurora ou Eclipse, que definem os poderes), estilo de luta (Técnica, Fúria ou Voo: usam golpes e habilidade do Guardião, da Sombra ou da Garça), cor da lâmina e dificuldade. Logo depois, o jogador distribui os pontos iniciais.
+**Criação.** Seis passos: nome (lista pronta ou digitado, até 16 caracteres), Caminho do Fluxo (Aurora ou Eclipse, que definem os poderes), estilo de luta (Técnica, Fúria ou Voo: usam golpes e habilidade do Guardião, da Sombra ou da Garça), visual (Errante, Vigia ou Peregrino), cor da lâmina e dificuldade. Logo depois, o jogador distribui os pontos iniciais.
 
 **Atributos e progressão.** Todos começam em 4 (total 24) com 4 pontos livres. Cada vitória dá 2 pontos. Um ponto sobe uma nota em 1, respeitando:
 
