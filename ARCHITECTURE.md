@@ -44,6 +44,7 @@ src/
     stateIds.js             ✅ ids dos estados
     duelModes.js            ✅ modos do duelo (versus, local, arcade, sobrevivência, tutorial, desafio, treino) e `createDuelRules`
     stateFactory.js         ✅ cria estados a partir do id
+    IntroState.js           ✅ intro (lâmina, título), tela de título e segredo; primeira tela do jogo
     MenuState.js            ✅ título + opções (MenuList)
     CharacterSelectState.js ✅ escolhe jogador, adversário (ou J2), cor da lâmina e arena; Arcade e Sobrevivência só pedem o jogador
     ControlsState.js        ✅ tabela de controles gerada do controlsConfig
@@ -75,6 +76,7 @@ src/
     story/storyRun.js       ✅ campanha pura: criar, avançar, rotas por condição, pontos, recompensas, validação do save
     story/conditions.js     ✅ registro de condições de rota (`always`, `healthRatioAbove`, `alignmentIs`)
     story/dialogue.js       ✅ resolve falante, variante de alinhamento e `{name}`
+    SecretUnlockSystem.js   ✅ casa sequências de tokens por tipo (`key:`, `action:`, `tap:`), com tempo limite entre tokens
   controllers/              ✅ quem controla um lutador
     PlayerController.js     ✅ Input → intent
     IntentRecorder.js       ✅ buffer Uint16 fixo: grava intents e reproduz movimento relativo
@@ -149,6 +151,10 @@ src/
     evadeConfig.js          ✅ flag e perfil global de esquiva de precisão
     attributesConfig.js     ✅ tabela 1–9, bases na nota 5 e calibração por arquétipo
     powersConfig.js         ✅ modos com poderes, medidor, regras de resistência e tiers visuais do Fluxo
+    storyConfig.js          ✅ regras da História, opções do protagonista, encontros (rotas, recompensas, liberações) e finais
+    storyTexts.js           ✅ títulos e falas dos encontros e finais
+    introConfig.js          ✅ linha do tempo e desenho da intro
+    secretsConfig.js        ✅ sequências secretas (teclas, ações, toques) e recompensas
     fightersConfig.js       ✅ estrutura por arquétipo (corpo, tempos, golpes, custos, traços e regras de mobilidade)
     fighterVisualConfig.js  ✅ proporções, animação, poses de combate, sombra e estilo do sabre
     effectsConfig.js        ✅ limites e receitas de VFX
@@ -387,7 +393,9 @@ Estados podem receber parâmetros: `game.pushState(StateId.GAME_OVER, { playerWo
 Fluxo de telas:
 
 ```
-MenuState ─┬─ Duelar / Arcade / Sobrevivência / 2 Jogadores ──▶ CharacterSelectState ──▶ DuelState({ mode, ... })
+IntroState ──Confirmar──▶ MenuState
+MenuState ─┬─ História ──▶ StoryState ──▶ ProtagonistState / DialogueState ──▶ DuelState({ mode: story })
+           ├─ Duelar / Arcade / Sobrevivência / 2 Jogadores ──▶ CharacterSelectState ──▶ DuelState({ mode, ... })
            ├─ Tutorial / Desafio de parry / Treino ─────────────────────────────────────▶ DuelState({ mode })
            ├─ Opções ──▶ OptionsState (push) ──Configurar teclas──▶ KeyRemapState (push)
            └─ Controles ──▶ ControlsState (push)
@@ -552,6 +560,12 @@ Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 23).
 - **Protagonista.** `createProtagonistCharacter(perfil, storyConfig, espaços)` monta um objeto de personagem com o arquétipo, golpes, som e aparência base do estilo escolhido, sobrepondo `storyConfig.protagonist.appearance` e a cor da lâmina. `createFighterFromCharacter` (a factory agora aceita um objeto, não só um id) cria o lutador; `powerSlots` filtra o loadout do alinhamento. A nota 10 só vale para o Fluxo de personagens com `apex: true` (`attributesConfig.apexRating`).
 - **Fluxo de telas.** Menu → `StoryState` → (`ProtagonistState` criar → atributos) → `DialogueState` (antes, com a arena) → `DuelState` (`DuelMode.STORY`, `params.story`, `params.rules = storyConfig.rules`). O `DuelState` usa `storyStage` como mais um degrau da "escada" (adversário, arena, dificuldade) e cria o jogador a partir do protagonista. No resultado, `resolveDuelOutcome` desvia para `resolveStoryOutcome`: na vitória, empilha `DialogueState` (falas de depois, final e desbloqueios) que leva de volta ao `StoryState`, e devolve `story` (novo `run`) e `progress.unlockedCharacters`; na derrota, `GameOverState` com "Tentar de novo" e "Voltar à história" (`menuState`). A pausa sai para a História (`quitState`) e a lista de golpes recebe o personagem gerado.
 - **Save.** `Game.story` vem de `loadStory` + `sanitizeStoryRun` e é salvo junto com as opções (`saveSettings` grava `{ version: 3, settings, story }`). A migração 2 → 3 acrescenta `story: null`.
+
+### Segredos e personagens secretos (v1.8–v1.9)
+
+- **Campanha completa.** Oito encontros lineares e um secreto em `storyConfig.encounters`. A Vespa (capítulo 3) dá `reward.powers` (libera o segundo poder do alinhamento). O Soberano tem `unlocks: ['sovereign']` e `outcomes`: `healthRatioAbove 0.75` leva ao encontro `foretold`; senão, final `normal`. O Predestinado termina no final `secret` e libera `foretold`.
+- **Personagens.** `sovereign` e `foretold` são dados comuns em `characterData` com `selectable: false` e `secret: true`, reaproveitando arquétipo e golpes da Haste e do Eco (sem tuning novo de golpes), com notas, alinhamento, aparência e perfis de IA próprios (`aiConfig.profiles.sovereign/foretold`). `foretold` tem `apex: true` (Fluxo 10). A `CharacterSelectState` monta `rosterIds` (só `selectable`, usado pelo Arcade) e `characterIds` (roster + secretos em `settings.unlockedCharacters`).
+- **Intro e segredo.** `Game.start` abre o `IntroState`. A cada passo ele transforma o input em tokens (`key:<code>` pelo `input.lastPressedCode`, `action:<ação>` para as ações vigiadas, `tap:title` para toques no título) e alimenta o `SecretUnlockSystem`. Cada sequência só considera tokens do próprio tipo, então as setas (que geram tecla e ação) não atrapalham uma à outra. Ao casar, a recompensa de `secretsConfig.rewards` entra em `settings.unlockedCharacters`, é salva, toca `SoundName.SECRET` e mostra a frase. O som funciona porque o próprio toque de tecla é o gesto que libera o `AudioContext`. O `TouchInput` não mostra o botão de voltar na intro.
 
 ### Fluxo e poderes (v1.5)
 
@@ -755,6 +769,19 @@ Sequências: o combate marca `attackConnected` apenas em hit ou bloqueio (inclui
 
 Na média das duas dificuldades todos ficam entre 46% e 54% (no clássico, 45–57%). A diferença por dificuldade continua: no Normal os fortes de lâmina (Bastião, Haste) seguem na frente; no Difícil a IA apara e usa Barreira/guarda melhor, e Brasa e Vespa sobem. A Vespa (Fluxo 4) cai no Normal porque os poderes alheios a alcançam de longe. Nenhum atributo foi mexido para isso; ajustes futuros devem começar por `aiConfig.perception.powerUse`, `powerChance` e os custos em `powersConfig`.
 
+### Secretos contra o elenco (v1.9)
+
+`simulate --rules powers`, 40 duelos por par, % de vitória do secreto contra cada personagem.
+
+| Secreto | Dificuldade | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco | média |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Soberano | Normal | 65 | 35 | 75 | 42 | 82 | 67 | 67 | 62 | 65 | 62 | 62,5 |
+| Soberano | Difícil | 72 | 77 | 90 | 25 | 45 | 82 | 62 | 60 | 42 | 47 | 60,5 |
+| Predestinado | Normal | 52 | 42 | 52 | 50 | 82 | 65 | 67 | 62 | 67 | 55 | 59,8 |
+| Predestinado | Difícil | 47 | 60 | 62 | 50 | 52 | 75 | 42 | 77 | 62 | 62 | 59,2 |
+
+Alvo: fortes, mas vencíveis (cerca de 60%). Com base no Espelho, o Soberano dependia demais de parry (53% no Normal, 84% no Difícil); a base da Haste deixou as duas dificuldades parecidas.
+
 ## AI
 
 Arquivos: [src/ai/](src/ai/), [src/config/aiConfig.js](src/config/aiConfig.js). Regras em [GAME_DESIGN.md](GAME_DESIGN.md#7-ia).
@@ -884,14 +911,14 @@ core/textPrompt.js            input DOM temporário só na tela de nome (injetad
 config/touchLayoutConfig.js, attributesConfig.js, powersConfig.js (com os tiers visuais),
        storyConfig.js, secretsConfig.js, introConfig.js
 characters/attributes.js      IMPLEMENTADO v1.4: applyAttributes(base, attributes, config) → stats derivados (puro)
-characters/protagonist.js     createProtagonistCharacter(save) → dados para a createFighter atual
+characters/protagonist.js     IMPLEMENTADO v1.7: createProtagonistCharacter(perfil, config, espaços) → dados para createFighterFromCharacter
 characters/skins.js           resolveAppearance(character, skinId)
 combat/powerResistance.js     IMPLEMENTADO v1.5: resolvePowerOutcome(rule, levelDiff) → { scale, outcome } e getPowerTier (puros)
 combat/powerEffects.js        registro { push, pull, lightning, barrier } → handler
 combat/PowerSystem.js         IMPLEMENTADO v1.5 (medidor); recargas, fases do poder e eventos na v1.6
-modes/story/StoryDirector.js, modes/story/conditions.js
-modes/SecretUnlockSystem.js   casa sequências de teclas (lastPressedCode) e de ações; persiste o desbloqueio
-states/IntroState.js, StoryState.js, DialogueState.js, ProtagonistState.js
+modes/story/storyRun.js (no lugar do StoryDirector), modes/story/conditions.js   IMPLEMENTADOS v1.7
+modes/SecretUnlockSystem.js   IMPLEMENTADO v1.9: casa sequências; a persistência fica no IntroState
+states/IntroState.js, StoryState.js, DialogueState.js, ProtagonistState.js   IMPLEMENTADOS v1.7–v1.9
 rendering/powerRenderer.js    aura em cache por tier, raio em polilinha, ondas
 ui/TouchControls.js           IMPLEMENTADO v1.2: controles de toque desenhados no canvas
 ```

@@ -616,3 +616,16 @@ O total máximo impede um protagonista com tudo no teto: ele termina forte, mas 
 **Encontros.** Cada encontro tem adversário, arena, ajuste de dificuldade da IA (`aiOffset`) e diálogo antes e depois. Um round decide o duelo. Derrota: tentar de novo ou voltar à História, sem perder progresso. Vitória: diálogo, pontos e o próximo encontro.
 
 **Rotas e finais como dados.** Um encontro pode ter `outcomes`: a primeira condição verdadeira (`always`, `healthRatioAbove`, `alignmentIs`) escolhe o próximo encontro ou um final. Finais liberam personagens. O alinhamento muda falas (texto com variantes `light`/`dark`), poderes e recompensas, não a sequência de missões.
+
+## 24. Personagens secretos e segredo da intro (v2)
+
+| Personagem | Base | Notas | Alinhamento | Ideia |
+| --- | --- | --- | --- | --- |
+| Soberano | Haste (alcance) | Vida 6, Stamina 6, Lâmina 5, Defesa 5, Agilidade 3, Fluxo 9 | Eclipse | Vence de longe com Raio e Puxão; colado, é lento |
+| Predestinado | Eco (fintas) | Vida 7, Stamina 6, Lâmina 8, Defesa 6, Agilidade 7, Fluxo 10 | Aurora | Único com Fluxo 10: resiste a quase tudo e quase nada o resiste |
+
+- Não aparecem na seleção até serem liberados. Liberação salva no navegador (`settings.unlockedCharacters`).
+- **Pela História**: vencer o Soberano libera o Soberano; vencer o Predestinado (final secreto) libera o Predestinado.
+- **Pelo segredo da intro**: uma sequência digitada no teclado, feita no direcional/stick ou tocando o título várias vezes libera os dois de uma vez, com som e frase próprios. As sequências ficam em `src/config/secretsConfig.js`; a tela não dá pista.
+- **Final secreto**: na História, vencer o Soberano com mais de 75% de vida leva ao duelo contra o Predestinado em vez do final normal.
+- Equilíbrio medido com poderes ligados: cada um vence cerca de 60% contra o elenco no Normal e no Difícil (fortes, mas vencíveis). Ver a ARCHITECTURE → Balanceamento.

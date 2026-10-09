@@ -30,7 +30,23 @@ export const storyConfig = {
   },
   encounters: [
     { id: 'trial', opponent: 'guardian', arena: 'refinery', aiOffset: -1, next: 'forest' },
-    { id: 'forest', opponent: 'echo', arena: 'forest', aiOffset: 0, next: null },
+    { id: 'forest', opponent: 'echo', arena: 'forest', aiOffset: -1, next: 'rooftop' },
+    { id: 'rooftop', opponent: 'wasp', arena: 'rooftop', aiOffset: 0, reward: { powers: true }, next: 'mine' },
+    { id: 'mine', opponent: 'ember', arena: 'crystalMine', aiOffset: 0, next: 'sanctuary' },
+    { id: 'sanctuary', opponent: 'bastion', arena: 'sanctuary', aiOffset: 0, next: 'shadowDuel' },
+    { id: 'shadowDuel', opponent: 'shadow', arena: 'refinery', aiOffset: 0, next: 'awakened' },
+    { id: 'awakened', opponent: 'shadowAwakened', arena: 'crystalMine', aiOffset: 0, next: 'sovereign' },
+    {
+      id: 'sovereign', opponent: 'sovereign', arena: 'orbital', aiOffset: 0, unlocks: ['sovereign'],
+      outcomes: [
+        { condition: { type: 'healthRatioAbove', threshold: 0.75 }, next: 'foretold' },
+        { condition: { type: 'always' }, ending: 'normal' },
+      ],
+    },
+    { id: 'foretold', opponent: 'foretold', arena: 'sanctuary', aiOffset: 0, secret: true, unlocks: ['foretold'], ending: 'secret' },
   ],
-  endings: {},
+  endings: {
+    normal: { unlocks: [] },
+    secret: { unlocks: [] },
+  },
 };
