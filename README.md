@@ -98,9 +98,11 @@ Roda duelos IA × IA sem navegador e mostra vitórias e estatísticas. `npm run 
 
 O preset alternativo, selecionável em Opções, usa setas para mover/pular e Z/X/C/V para rápido/forte/guarda/esquiva. A escolha é salva no navegador e a tela de Controles acompanha o preset. Gamepad padrão: stick/direcional para mover, A pular/confirmar, X rápido, Y forte, LB/LT guarda, B esquiva/voltar e Start pausa.
 
-Habilidade do personagem: `I`. Gamepad: ataques nos botões frontais (X rápido, Y forte), guarda em LB/LT, habilidade em RB/RT, esquiva em B, pulo em A.
+Habilidade do personagem: `I`. Gamepad: ataques nos botões frontais (X rápido, Y forte), guarda em LB/LT, habilidade em RB, poder em RT, esquiva em B, pulo em A.
 
-**Dois jogadores no mesmo teclado:** J1 usa `W A S D`, `F G H` (rápido, forte, guarda), `T` (habilidade) e `Shift` esquerdo; J2 usa as setas, `J K L`, `I` e `Shift` direito (ou o teclado numérico). Cada jogador também pode usar um controle.
+**Poderes do Fluxo** (opção **Poderes**, ligada por padrão em Duelar, 2 Jogadores e Treino): `U` usa o poder principal do alinhamento (Aurora: Repulsão; Eclipse: Raio, segurando); com direção usa o segundo (trás + `U`: Barreira, segurando; frente + `U`: Puxão). O medidor fica abaixo da stamina. No celular há um botão **Poder**.
+
+**Dois jogadores no mesmo teclado:** J1 usa `W A S D`, `F G H` (rápido, forte, guarda), `T` (habilidade), `R` (poder) e `Shift` esquerdo; J2 usa as setas, `J K L`, `I`, `O` (poder) e `Shift` direito (ou o teclado numérico). Cada jogador também pode usar um controle.
 
 As teclas de luta podem ser trocadas em **Opções → Configurar teclas** (fica salvo no navegador).
 
