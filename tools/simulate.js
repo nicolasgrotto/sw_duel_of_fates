@@ -1,7 +1,9 @@
 import { attributesConfig } from '../src/config/attributesConfig.js';
 import { EnemyAI } from '../src/ai/EnemyAI.js';
 import { characters } from '../src/characters/characterData.js';
-import { createFighter } from '../src/characters/characterFactory.js';
+import { createFighterFromCharacter } from '../src/characters/characterFactory.js';
+import { createProtagonistCharacter } from '../src/characters/protagonist.js';
+import { storyConfig } from '../src/config/storyConfig.js';
 import { CombatEvent } from '../src/combat/combatEvents.js';
 import { evadeConfig } from '../src/config/evadeConfig.js';
 import { aiConfig } from '../src/config/aiConfig.js';
@@ -13,6 +15,29 @@ import { DuelSimulation } from '../src/simulation/DuelSimulation.js';
 import { createRandom } from '../src/utils/random.js';
 
 const STEP = gameConfig.loop.fixedStep;
+const PROTAGONIST_PREFIX = 'protagonist:';
+const PROTAGONIST_ORDER = ['flow', 'blade', 'health', 'agility', 'defense', 'stamina'];
+
+function buildProtagonist(spec) {
+  const [difficulty = 'normal', alignment = 'light', style = 'technique'] = spec.slice(PROTAGONIST_PREFIX.length).split(':');
+  const attributes = { ...storyConfig.startAttributes };
+  const cap = storyConfig.ratingCaps[difficulty];
+  let total = Object.values(attributes).reduce((sum, value) => sum + value, 0);
+  while (total < storyConfig.budgets[difficulty] && PROTAGONIST_ORDER.some((name) => attributes[name] < cap)) {
+    for (const name of PROTAGONIST_ORDER) {
+      if (attributes[name] < cap && total < storyConfig.budgets[difficulty]) {
+        attributes[name] += 1;
+        total += 1;
+      }
+    }
+  }
+  const profile = { name: 'Protagonista', alignment, style, saberColor: storyConfig.protagonist.saberColors[0], attributes };
+  return createProtagonistCharacter(profile, storyConfig);
+}
+
+function resolveCharacter(id) {
+  return id.startsWith(PROTAGONIST_PREFIX) ? buildProtagonist(id) : characters[id];
+}
 const CONFIG_ROOTS = {
   fighters: fighterArchetypes,
   attributes: Object.fromEntries(Object.entries(characters).map(([id, character]) => [id, character.attributes])),
@@ -70,7 +95,7 @@ function createController(self, opponent, { characterId, difficulty, profile }, 
   return new EnemyAI({
     self,
     opponent,
-    profile: aiConfig.profiles[profile || characters[characterId].aiProfile],
+    profile: aiConfig.profiles[profile || resolveCharacter(characterId).aiProfile],
     difficulty: aiConfig.difficulties[difficulty],
     perception: aiConfig.perception,
     random,
@@ -89,8 +114,8 @@ function runDuel(leftSetup, rightSetup, random, rules) {
   const arena = createArenaBounds(gameConfig);
   const centerX = (arena.left + arena.right) / 2;
   const half = gameConfig.duel.spawnDistance / 2;
-  const left = createFighter(leftId, { x: centerX - half, y: arena.floorY, facing: 1 });
-  const right = createFighter(rightId, { x: centerX + half, y: arena.floorY, facing: -1 });
+  const left = createFighterFromCharacter(resolveCharacter(leftId), { x: centerX - half, y: arena.floorY, facing: 1 });
+  const right = createFighterFromCharacter(resolveCharacter(rightId), { x: centerX + half, y: arena.floorY, facing: -1 });
   const fighters = [left, right];
   const controllers = [
     createController(left, right, leftSetup, random, rules),
@@ -176,7 +201,7 @@ function main() {
   const timeouts = results.filter((result) => !result.winnerSide).length;
   const percent = (value) => `${((value / results.length) * 100).toFixed(1)}%`;
   const describe = ({ characterId, difficulty, profile }) =>
-    `${characterId} (${difficulty}, ${profile || characters[characterId].aiProfile})`.padEnd(36);
+    `${characterId} (${difficulty}, ${profile || resolveCharacter(characterId).aiProfile})`.padEnd(36);
 
   console.log(`Duels: ${results.length}  seed: ${options.seed}${options.rules ? `  rules: ${options.rules}` : ''}${options.overrides.length ? `  set: ${options.overrides.join(', ')}` : ''}`);
   console.log(`A ${describe(sides[0])} wins: ${String(wins.A).padStart(4)}  (${percent(wins.A)})`);

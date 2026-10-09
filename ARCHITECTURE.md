@@ -780,6 +780,16 @@ Na média das duas dificuldades todos ficam entre 46% e 54% (no clássico, 45–
 | Predestinado | Normal | 52 | 42 | 52 | 50 | 82 | 65 | 67 | 62 | 67 | 55 | 59,8 |
 | Predestinado | Difícil | 47 | 60 | 62 | 50 | 52 | 75 | 42 | 77 | 62 | 62 | 59,2 |
 
+Protagonista no teto de cada dificuldade contra o Soberano (`simulate --left protagonist:<dificuldade>:<alinhamento>:<estilo> --right sovereign --rules powers`, 60 duelos; o simulador distribui os pontos até o total da dificuldade, priorizando Fluxo, Lâmina e Vida). A IA do Soberano usa a mesma dificuldade, como na História:
+
+| Dificuldade | Aurora | Eclipse |
+| --- | --- | --- |
+| Fácil | 35% | 28% |
+| Normal | 25% | 38% |
+| Difícil | 33% | 37% |
+
+O chefe final vence a IA pilotando o protagonista em cerca de dois terços dos duelos em todas as dificuldades: difícil, mas vencível. No Difícil os poderes do protagonista são resistidos (Fluxo 6 contra 9) e a luta é de lâmina, como planejado.
+
 Alvo: fortes, mas vencíveis (cerca de 60%). Com base no Espelho, o Soberano dependia demais de parry (53% no Normal, 84% no Difícil); a base da Haste deixou as duas dificuldades parecidas.
 
 ## AI

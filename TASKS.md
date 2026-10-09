@@ -17,4 +17,4 @@
 ## Ponto de continuidade
 
 - **v1.0** publicada: `main` e tag `v1.0.0` no GitHub. Falta ativar o GitHub Pages (passos no README) e, se o autor quiser, gravar GIFs para o README.
-- **v2.0** em andamento na `v2-development`. **v1.1 Fundação** e **v1.3 Movimento** concluídas, com tags locais `v1.1` e `v1.3`. **v1.2 Mobile (Codex)** implementada com tag local `v1.2`; teste em aparelho real pendente do autor (checklist em versions/v2.md). **v1.4 Atributos (Codex)** concluída, tag local `v1.4`; matriz idêntica à v1.3. **v1.5 Fluxo** e **v1.6 Poderes (Claude)** concluídas, tags locais `v1.5` e `v1.6`: medidor, regra por modo, resistência por nível, quatro poderes, IA e matriz com poderes. Próximo: **v1.7 Base do Story (Claude)**; **v1.10 Skins** pode ir para o Codex em paralelo.
+- **v2.0** em andamento na `v2-development`. Concluídas com tags locais: v1.1 a v1.9 (fundação, mobile, movimento, atributos, Fluxo, poderes, História completa com final secreto, personagens secretos, intro e segredo). Falta: **v1.10 Skins e personalização (Codex)**, o teste em aparelho real (autor) e a etapa final (regressão, revisão de docs, tag `v2.0.0` e merge na `main`).
