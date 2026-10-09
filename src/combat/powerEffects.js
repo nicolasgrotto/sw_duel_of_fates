@@ -79,10 +79,70 @@ function throwImpact(context) {
   }
 }
 
+function holdTarget(target, duration) {
+  target.vx = 0;
+  interrupt(target, FighterState.STUNNED, duration);
+}
+
+function getStatusDuration(context) {
+  const { power, interaction, air } = context;
+  return power.duration * interaction.duration * air.duration;
+}
+
+function choke(context) {
+  const { combat, caster, target, power, scale, guarded } = context;
+  if (guarded) {
+    applyGuarded(context);
+    return;
+  }
+  const duration = getStatusDuration(context);
+  if (combat.dealPowerDamage(caster, target, power, power.damage * scale, CombatEvent.POWER_HIT)) {
+    holdTarget(target, duration);
+    target.combat.chokeTime = duration;
+    target.combat.chokeDamageRate = power.damagePerSecond * scale;
+    target.combat.statusLevel = caster.flowLevel;
+  }
+}
+
+function freeze(context) {
+  const { combat, caster, target, power, guarded } = context;
+  if (guarded) {
+    applyGuarded(context);
+    return;
+  }
+  const duration = getStatusDuration(context);
+  if (combat.dealPowerDamage(caster, target, power, 0, CombatEvent.POWER_HIT)) {
+    holdTarget(target, duration);
+    target.combat.freezeTime = duration;
+    target.combat.statusLevel = caster.flowLevel;
+  }
+}
+
+function heal(context) {
+  const { caster, power, scale } = context;
+  const missing = caster.stats.maxHealth - caster.health;
+  const amount = Math.min(power.amount * scale, missing * power.maxMissingFraction);
+  caster.combat.healTime = power.duration;
+  caster.combat.healRate = amount / power.duration;
+  caster.combat.healCap = caster.health + amount;
+  caster.combat.statusLevel = caster.flowLevel;
+}
+
+function focus(context) {
+  const { caster, power, scale } = context;
+  caster.combat.focusTime = power.duration * scale;
+  caster.combat.focusScale = power.staminaScale;
+  caster.combat.statusLevel = caster.flowLevel;
+}
+
 export const powerEffects = Object.freeze({
   push: { active: push },
   pull: { active: pull },
   lightning: { tick: lightning },
   barrier: {},
   throw: { impact: throwImpact },
+  choke: { active: choke },
+  freeze: { active: freeze },
+  heal: { self: heal },
+  focus: { self: focus },
 });

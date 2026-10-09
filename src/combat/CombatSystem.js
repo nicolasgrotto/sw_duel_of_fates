@@ -2,7 +2,7 @@ import { airDashConfig } from '../config/airDashConfig.js';
 import { evadeConfig } from '../config/evadeConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { FighterState } from '../entities/fighterStates.js';
-import { canAfford, spendStamina } from '../systems/StaminaSystem.js';
+import { canAfford, getStaminaCost, spendStamina } from '../systems/StaminaSystem.js';
 import { CombatAction, clearActionBuffer, updateActionBuffer } from './actionBuffer.js';
 import { clamp } from '../utils/math.js';
 import { ATTACK_STATES, AttackPhase, AttackType, getAttackDuration, getAttackPhase, getChargeLevel, isSaberAttack } from './attackPhases.js';
@@ -10,6 +10,7 @@ import { CombatEvent, createCombatEvent } from './combatEvents.js';
 import { boxesOverlap, comesFromFront, createBox, getAttackHitbox, getHurtbox, hasActiveHitbox, hasHurtbox, isGuardingAgainst, isInvulnerable } from './hitboxes.js';
 import { PowerSystem, isBarrierUp, selectTechnique } from './PowerSystem.js';
 import { ProjectileSystem } from './ProjectileSystem.js';
+import { StatusSystem } from './StatusSystem.js';
 import { projectilesConfig } from '../config/projectilesConfig.js';
 
 const PUNISHED_STATES = new Set([FighterState.STAGGERED, FighterState.STUNNED]);
@@ -62,6 +63,7 @@ export class CombatSystem {
     this.contacts = [];
     this.powers = new PowerSystem(this, powersConfig, rules.powers === true, friction);
     this.projectiles = new ProjectileSystem(this, projectilesConfig);
+    this.statuses = new StatusSystem(this);
   }
 
   update(fighters, dt) {
@@ -178,11 +180,11 @@ export class CombatSystem {
     if (!stats.feint || combat.bufferedAction !== CombatAction.PARRY || combat.attack?.type !== AttackType.HEAVY) {
       return false;
     }
-    if (getAttackPhase(combat.attack, fighter.stateTime) !== AttackPhase.STARTUP || !canAfford(fighter, stats.feint.staminaCost)) {
+    if (getAttackPhase(combat.attack, fighter.stateTime) !== AttackPhase.STARTUP || !canAfford(fighter, getStaminaCost(fighter, stats.feint.staminaCost))) {
       return false;
     }
     clearActionBuffer(fighter);
-    spendStamina(fighter, stats.feint.staminaCost);
+    spendStamina(fighter, getStaminaCost(fighter, stats.feint.staminaCost));
     const { attackType } = combat;
     fighter.clearAttack();
     fighter.setState(FighterState.IDLE);
@@ -197,11 +199,11 @@ export class CombatSystem {
     }
     clearActionBuffer(fighter);
     const profile = stats.airDash;
-    if (!airDashConfig.enabled || combat.airDashUsed || !canAfford(fighter, profile.staminaCost)) {
+    if (!airDashConfig.enabled || combat.airDashUsed || !canAfford(fighter, getStaminaCost(fighter, profile.staminaCost))) {
       this.emitAction(CombatEvent.ACTION_REJECTED, fighter, null);
       return true;
     }
-    spendStamina(fighter, profile.staminaCost);
+    spendStamina(fighter, getStaminaCost(fighter, profile.staminaCost));
     combat.airDashUsed = true;
     const { moveX } = fighter.intent;
     this.startDodge(fighter, profile, moveX !== 0 ? Math.sign(moveX) : fighter.facing, profile.passThrough);
@@ -310,10 +312,10 @@ export class CombatSystem {
   }
 
   tryLeap(fighter, move) {
-    if (!canAfford(fighter, move.staminaCost)) {
+    if (!canAfford(fighter, getStaminaCost(fighter, move.staminaCost))) {
       return false;
     }
-    spendStamina(fighter, move.staminaCost);
+    spendStamina(fighter, getStaminaCost(fighter, move.staminaCost));
     fighter.vx = fighter.facing * move.leap.speedX;
     fighter.vy = -move.leap.speedY;
     fighter.grounded = false;
@@ -325,10 +327,10 @@ export class CombatSystem {
   }
 
   tryDash(fighter, move) {
-    if (!canAfford(fighter, move.staminaCost)) {
+    if (!canAfford(fighter, getStaminaCost(fighter, move.staminaCost))) {
       return false;
     }
-    spendStamina(fighter, move.staminaCost);
+    spendStamina(fighter, getStaminaCost(fighter, move.staminaCost));
     const { moveX } = fighter.intent;
     const direction = move.dash.followInput ? (moveX !== 0 ? Math.sign(moveX) : -fighter.facing) : fighter.facing;
     this.startDodge(fighter, move.dash, direction, move.dash.passThrough);
@@ -357,11 +359,11 @@ export class CombatSystem {
 
   tryAttack(fighter, attackType) {
     const attack = fighter.moves[attackType];
-    if (fighter.combat.saberThrown && isSaberAttack(attackType) || !canAfford(fighter, attack.staminaCost)) {
+    if (fighter.combat.saberThrown && isSaberAttack(attackType) || !canAfford(fighter, getStaminaCost(fighter, attack.staminaCost))) {
       return false;
     }
 
-    spendStamina(fighter, attack.staminaCost);
+    spendStamina(fighter, getStaminaCost(fighter, attack.staminaCost));
     fighter.combat.riposteTime = 0;
     fighter.clearAttack();
     fighter.combat.attack = attack;
@@ -384,11 +386,11 @@ export class CombatSystem {
 
   tryDodge(fighter) {
     const { dodge } = fighter.stats;
-    if (!canAfford(fighter, dodge.staminaCost)) {
+    if (!canAfford(fighter, getStaminaCost(fighter, dodge.staminaCost))) {
       return false;
     }
 
-    spendStamina(fighter, dodge.staminaCost);
+    spendStamina(fighter, getStaminaCost(fighter, dodge.staminaCost));
     const { moveX } = fighter.intent;
     this.startDodge(fighter, dodge, moveX !== 0 ? Math.sign(moveX) : -fighter.facing, dodge.passThrough === true);
     return true;
@@ -603,7 +605,7 @@ export class CombatSystem {
 
   resolveBlock(contact) {
     const { attacker, defender, attack } = contact;
-    const staminaCost = attack.blockStaminaCost * defender.stats.blockStaminaScale;
+    const staminaCost = getStaminaCost(defender, attack.blockStaminaCost * defender.stats.blockStaminaScale);
     attacker.combat.attackConnected = true;
     defender.vx = attacker.facing * attack.blockPushback * defender.stats.blockPushbackScale;
 
@@ -644,6 +646,9 @@ export class CombatSystem {
     attacker.stamina = Math.min(attacker.stats.maxStamina, attacker.stamina + attacker.stats.staminaOnHit);
     contact.damage = Math.min(defender.health, damage);
     defender.health = Math.max(0, defender.health - damage);
+    if (damage > 0) {
+      this.statuses.onDamaged(defender);
+    }
     contact.armored = armored;
     this.powers.onHit(attacker, defender);
     if (!armored) {
@@ -676,6 +681,7 @@ export class CombatSystem {
     const dealt = Math.min(target.health, damage);
     target.health = Math.max(0, target.health - damage);
     if (dealt > 0) {
+      this.statuses.onDamaged(target);
       this.powers.gain(target, this.powers.config.meter.gain.hitTaken);
     }
     const contact = this.createPowerContact(caster, target, power, dealt);
@@ -685,6 +691,13 @@ export class CombatSystem {
       return false;
     }
     return true;
+  }
+
+  applyStatusDamage(fighter, source, amount) {
+    fighter.health = Math.max(0, fighter.health - amount);
+    if (fighter.health === 0) {
+      this.knockOut(fighter, { attacker: source, defender: fighter, attackType: 'choke', x: fighter.x, y: fighter.y - fighter.height * this.powers.config.impactHeight, damage: amount });
+    }
   }
 
   createPowerContact(caster, target, power, damage) {

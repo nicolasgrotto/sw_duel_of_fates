@@ -406,10 +406,21 @@ export class EnemyAI {
     return !this.difficulty.powerAware || this.getPowerInteraction(power).blockable;
   }
 
+  getPowerCost(power) {
+    return power.sizes ? resolveLevelBand(this.self.flowLevel, projectilesConfig[power.sizes].sizes).cost : power.cost;
+  }
+
   canUsePower(power) {
     const { self } = this;
     const reserve = power.channel ? power.drainPerSecond * this.perception.powerChannelReserve : 0;
-    return self.combat.powerCooldown === 0 && self.flowMeter >= power.cost + reserve;
+    return self.combat.powerCooldown === 0 && self.flowMeter >= this.getPowerCost(power) + reserve;
+  }
+
+  wantsSelfPower(power) {
+    const use = this.perception.selfPowerUse[power.effect];
+    const { self } = this;
+    return Boolean(use) && self.combat[use.active] === 0 && getGap(self, this.opponent) >= use.minGap
+      && self[use.stat] / self.stats[use.max] < use.below;
   }
 
   wantsPower(power) {
@@ -431,7 +442,7 @@ export class EnemyAI {
     }
     for (const slot of POWER_SLOTS) {
       const power = loadout[slot];
-      if (power && power.effect !== 'barrier' && this.canUsePower(power) && this.wantsPower(power)) {
+      if (power && power.effect !== 'barrier' && this.canUsePower(power) && (power.self ? this.wantsSelfPower(power) : this.wantsPower(power))) {
         const [minHold, maxHold] = this.perception.lightningHold;
         return this.startPower(slot, power.channel ? minHold + (maxHold - minHold) * this.random() : 0);
       }

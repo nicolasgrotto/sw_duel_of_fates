@@ -143,7 +143,7 @@ describe('move list powers', () => {
   it('lists the loadout powers and blade techniques only when powers are on', () => {
     const rows = buildMoveList(characters.guardian, keyBindings);
     const withPowers = buildMoveList(characters.guardian, keyBindings, true);
-    assert.equal(withPowers.length, rows.length + 4);
+    assert.equal(withPowers.length, rows.length + 5);
     assert.ok(withPowers.some((row) => row.label.includes(texts.powers.push)));
     assert.ok(withPowers.some((row) => row.label.includes(texts.powers.barrier) && row.keys.includes('U')));
     assert.ok(withPowers.some((row) => row.label.includes(texts.powers.dashSlash) && row.keys.includes('I') && row.keys.includes('D')));

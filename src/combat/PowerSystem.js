@@ -145,7 +145,9 @@ export class PowerSystem {
     const { power } = combat;
     if (!combat.powerTargeted && caster.stateTime >= power.startup) {
       combat.powerTargeted = true;
-      if (power.projectile) {
+      if (power.self) {
+        this.applySelf(caster, power);
+      } else if (power.projectile) {
         this.aim(caster, null, power);
         this.combat.projectiles.spawnThrow(caster, power);
       } else {
@@ -224,6 +226,20 @@ export class PowerSystem {
     context.guarded = interaction.blockable && isGuardingAgainst(target, caster);
     context.projectile = projectile;
     powerEffects[power.effect][phase](context);
+  }
+
+  applySelf(caster, power) {
+    const { context } = this;
+    this.aim(caster, caster, power);
+    context.caster = caster;
+    context.target = caster;
+    context.power = power;
+    context.interaction = null;
+    context.air = GROUNDED;
+    context.scale = caster.stats.power.potency;
+    context.guarded = false;
+    context.projectile = null;
+    powerEffects[power.effect].self(context);
   }
 
   absorb(caster, target, power) {

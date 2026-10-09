@@ -53,6 +53,15 @@ function createCombat() {
     powerCooldown: 0,
     powerTargetX: 0,
     powerTargetY: 0,
+    statusLevel: 0,
+    chokeTime: 0,
+    chokeDamageRate: 0,
+    freezeTime: 0,
+    focusTime: 0,
+    focusScale: 1,
+    healTime: 0,
+    healRate: 0,
+    healCap: 0,
   };
 }
 

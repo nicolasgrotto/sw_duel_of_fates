@@ -4,6 +4,10 @@ export function canAfford(fighter, cost) {
   return fighter.stamina >= cost;
 }
 
+export function getStaminaCost(fighter, cost) {
+  return fighter.combat.focusTime > 0 ? cost * fighter.combat.focusScale : cost;
+}
+
 export function spendStamina(fighter, amount) {
   fighter.stamina = Math.max(0, fighter.stamina - amount);
   fighter.combat.staminaRegenDelay = fighter.stats.stamina.regenDelay;

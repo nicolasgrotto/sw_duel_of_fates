@@ -56,7 +56,10 @@ describe('power selection', () => {
     light.intent.moveX = -1;
     assert.equal(selectPower(light).id, 'barrier');
     light.intent.moveX = 1;
-    assert.equal(selectPower(light).id, 'push');
+    assert.equal(selectPower(light).id, 'heal');
+    const bastion = spawnFighter(400, 1, 'bastion');
+    bastion.intent.moveX = -1;
+    assert.equal(selectPower(bastion).id, 'barrier');
     assert.equal(selectPower(dark).id, 'lightning');
     dark.intent.moveX = -1;
     assert.equal(selectPower(dark).id, 'pull');

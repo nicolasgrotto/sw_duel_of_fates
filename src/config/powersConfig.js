@@ -20,8 +20,8 @@ export const powersConfig = {
   airReach: 320,
   categories: {
     flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull', 'throw'] },
-    aurora: { alignments: ['light'], abilities: ['barrier'] },
-    eclipse: { alignments: ['dark'], abilities: ['lightning'] },
+    aurora: { alignments: ['light'], abilities: ['barrier', 'heal', 'focus'] },
+    eclipse: { alignments: ['dark'], abilities: ['lightning', 'choke', 'freeze'] },
     blade: { alignments: ['light', 'dark'], abilities: ['spin', 'dashSlash', 'saberThrow'] },
   },
   powers: {
@@ -47,6 +47,28 @@ export const powersConfig = {
       id: 'throw', effect: 'throw', channel: false, pose: 'cast', interaction: 'throw', projectile: true, sizes: 'throw',
       cost: 40, startup: 0.26, active: 0.08, recovery: 0.3, range: 700,
       guard: { staminaCost: 10 },
+    },
+    choke: {
+      id: 'choke', effect: 'choke', channel: false, pose: 'cast', interaction: 'choke',
+      cost: 45, startup: 0.3, active: 0.08, recovery: 0.4, range: 240,
+      damage: 2, damagePerSecond: 4, duration: 0.7,
+      guard: { staminaCost: 14 },
+    },
+    freeze: {
+      id: 'freeze', effect: 'freeze', channel: false, pose: 'cast', interaction: 'freeze',
+      cost: 40, startup: 0.28, active: 0.08, recovery: 0.36, range: 340,
+      damage: 0, duration: 1.1,
+      guard: { staminaCost: 12 },
+    },
+    heal: {
+      id: 'heal', effect: 'heal', channel: false, pose: 'barrier', self: true,
+      cost: 50, startup: 0.35, active: 0.08, recovery: 0.4,
+      amount: 14, duration: 2, maxMissingFraction: 0.35,
+    },
+    focus: {
+      id: 'focus', effect: 'focus', channel: false, pose: 'barrier', self: true,
+      cost: 35, startup: 0.25, active: 0.08, recovery: 0.3,
+      duration: 4, staminaScale: 0.5,
     },
     barrier: {
       id: 'barrier', effect: 'barrier', channel: true, pose: 'barrier',
@@ -84,6 +106,25 @@ export const powersConfig = {
       air: { scale: 1.2, duration: 1, stagger: 1.2 },
       bands: [{ ...NORMAL_BAND, ...STRIKE_GUARD, guardDamage: 0.25 }, { ...REDUCED_BAND, ...STRIKE_GUARD, guardDamage: 0.25 }, { ...RESISTED_BAND, ...STRIKE_GUARD }],
     },
+    choke: {
+      air: { scale: 1, duration: 1.2, stagger: 1 },
+      bands: [
+        { ...NORMAL_BAND, atLeast: 3, blockable: false, scale: 1.2, duration: 1.3, ...STRIKE_GUARD },
+        { ...NORMAL_BAND, atLeast: -1, ...STRIKE_GUARD },
+        { ...REDUCED_BAND, duration: 0.5, ...STRIKE_GUARD },
+        { ...RESISTED_BAND, ...STRIKE_GUARD },
+      ],
+    },
+    freeze: {
+      air: { scale: 1, duration: 1.2, stagger: 1 },
+      bands: [
+        { ...NORMAL_BAND, atLeast: 3, blockable: false, ...STRIKE_GUARD },
+        { ...NORMAL_BAND, atLeast: 0, ...STRIKE_GUARD },
+        { ...NORMAL_BAND, atLeast: -1, duration: 0.75, ...STRIKE_GUARD },
+        { ...REDUCED_BAND, scale: 1, duration: 0.4, ...STRIKE_GUARD },
+        { ...RESISTED_BAND, ...STRIKE_GUARD },
+      ],
+    },
     lightning: {
       air: { scale: 1, duration: 1.6, stagger: 1 },
       bands: [{ ...NORMAL_BAND, ...CHANNEL_GUARD }, { ...REDUCED_BAND, ...CHANNEL_GUARD }, { ...RESISTED_BAND, ...CHANNEL_GUARD }],
@@ -112,6 +153,26 @@ export const powersConfig = {
     barrierPulseSpeed: 3,
     barrierLineWidth: 2,
     waveOffset: 40,
+    status: {
+      chokeHeight: 0.82,
+      chokeRadius: 0.45,
+      chokeAlpha: [0.35, 0.7],
+      chokePulseSpeed: 9,
+      freezeRadiusX: 0.4,
+      freezeRadiusY: 0.58,
+      freezeAlpha: 0.22,
+      freezeLineAlpha: 0.7,
+      freezeLineWidth: 2,
+      focusHeight: 0.6,
+      focusRadius: 0.55,
+      focusAlpha: [0.12, 0.25],
+      focusPulseSpeed: 2.5,
+      healFrom: 0.25,
+      healTo: 0.75,
+      healRadius: 0.6,
+      healAlpha: 0.3,
+      healRiseSpeed: 1.5,
+    },
   },
   tiers: [
     { id: 'faint', color: colors.powerTierFaint, minLevel: 1, glowRadius: 34, glowAlpha: 0.45, boltWidth: 2, particles: [4, 6] },

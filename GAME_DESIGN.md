@@ -600,8 +600,8 @@ Na guarda, o Puxão não causa dano e puxa pela metade; o Raio causa um quarto d
 | Categoria | Alinhamento | Habilidades |
 | --- | --- | --- |
 | Fluxo comum | os dois | Repulsão, Puxão, Arremesso (Redirecionamento entra numa próxima etapa) |
-| Aurora | Aurora | Barreira (Cura e Foco nas próximas etapas) |
-| Eclipse | Eclipse | Raio (Estrangular, Tempestade e Congelar nas próximas etapas) |
+| Aurora | Aurora | Barreira, Cura, Foco |
+| Eclipse | Eclipse | Raio, Estrangular, Congelar (Tempestade numa próxima etapa) |
 | Técnicas de lâmina | os dois | Giro, Avanço com corte, Arremesso da lâmina; custam stamina e escalam com a Lâmina |
 
 **Comandos.** Nenhum botão novo. `Poder` + direção (neutro, frente, trás) escolhe entre até três habilidades do Fluxo; `Habilidade` + direção escolhe entre a habilidade própria (neutro) e até duas técnicas de lâmina (frente, trás). Espaço vazio cai no neutro. Técnicas só valem com a opção Poderes (os modos clássicos não mudam). O Eco e o Predestinado não têm técnicas: o avanço deles já segue a direção.
@@ -621,7 +621,13 @@ Na guarda, o Puxão não causa dano e puxa pela metade; o Raio causa um quarto d
   No impacto valem a tabela de interação (resistido a −3 ou menos), a guarda de frente (um quarto do dano passa), a Barreira (absorve) e a invulnerabilidade da esquiva (passa através). Some ao bater na parede.
 - **Arremesso da lâmina** (técnica, v1.16): a lâmina sai girando para a frente, vai até cerca de 380 px e volta para a mão. Acerta uma vez (na ida ou, se errou, na volta); a guarda de frente bloqueia e a Barreira absorve, e a lâmina volta mesmo assim. Enquanto ela não volta, o lutador não ataca, não bloqueia e não apara com a lâmina (empurrão, esquiva e poderes continuam valendo).
 
-**Loadouts atuais.** Aurora (Guardião, Bastião, Vespa, Espelho, Garça, Ancião, Predestinado): Repulsão (neutro) e Barreira (trás); Vespa, Espelho, Garça, Ancião e Predestinado também têm o Arremesso (frente). Eclipse (Sombra, Haste, Brasa, Forja, Eco, chefe do Arcade, Soberano): Raio (neutro) e Puxão (frente); Haste, Forja, Eco e Soberano também têm o Arremesso (trás). Técnicas: Guardião, Vespa e Brasa com Avanço com corte (frente) e Arremesso da lâmina (trás); Forja com Arremesso da lâmina (frente) e Giro (trás); Giro para Bastião, Espelho, Haste, Garça, Ancião e Soberano; Avanço e Giro para a Sombra e o chefe do Arcade. O protagonista recebe os poderes do caminho (`storyConfig.protagonist.loadouts`) e as técnicas do personagem-base do estilo.
+**Efeitos de estado (v1.17).** Duram um tempo e ficam no lutador.
+- **Estrangular** (Eclipse, 240 px): prende o alvo (não age) e drena vida enquanto dura (0,7 s, 4 de dano por segundo). +3 ou mais fura a guarda; −2 dura metade e drena metade; −3 ou menos falha.
+- **Congelar** (Eclipse, 340 px): prende o alvo por 1,1 s sem dano; o primeiro dano quebra o gelo (janela de punição). −1 dura 75%, −2 dura 40%, −3 ou menos não tem efeito; +3 fura a guarda.
+- **Foco** (Aurora, em si): por 4 s × potência, atacar, bloquear e esquivar custam metade da stamina (drenos como empurrão e quebra de guarda não mudam).
+- **Cura** (Aurora, em si): devolve vida ao longo de 2 s, até 14 × potência e nunca mais que 35% da vida perdida; ser atingido interrompe.
+
+**Loadouts atuais.** Aurora (Guardião, Bastião, Vespa, Espelho, Garça, Ancião, Predestinado): Repulsão (neutro) e Barreira (trás); Vespa, Espelho, Garça, Ancião e Predestinado também têm o Arremesso (frente). Eclipse (Sombra, Haste, Brasa, Forja, Eco, chefe do Arcade, Soberano): Raio (neutro) e Puxão (frente); Haste, Forja, Eco e Soberano também têm o Arremesso (trás). Trocas da v1.17: Guardião e Ancião com Cura (frente), Bastião com Foco (frente), Sombra, chefe do Arcade e Soberano com Estrangular (trás), Brasa com Congelar (trás). Técnicas: Guardião, Vespa e Brasa com Avanço com corte (frente) e Arremesso da lâmina (trás); Forja com Arremesso da lâmina (frente) e Giro (trás); Giro para Bastião, Espelho, Haste, Garça, Ancião e Soberano; Avanço e Giro para a Sombra e o chefe do Arcade. O protagonista recebe os poderes do caminho (`storyConfig.protagonist.loadouts`) e as técnicas do personagem-base do estilo.
 
 | Poder | Alinhamento | Comando | Efeito |
 | --- | --- | --- | --- |

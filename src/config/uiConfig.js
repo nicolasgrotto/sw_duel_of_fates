@@ -256,6 +256,10 @@ export const texts = {
     dashSlash: 'Avanço com corte',
     throw: 'Arremesso',
     saberThrow: 'Arremesso da lâmina',
+    choke: 'Estrangular',
+    freeze: 'Congelar',
+    heal: 'Cura',
+    focus: 'Foco',
     alignments: { light: 'Aurora', dark: 'Eclipse' },
   },
   pause: {

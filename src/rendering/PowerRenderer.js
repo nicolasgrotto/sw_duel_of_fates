@@ -1,5 +1,6 @@
 import { getPowerTier } from '../combat/flowInteractions.js';
 import { isBarrierUp, isChannelOpen, isUsingPower } from '../combat/PowerSystem.js';
+import { hasStatus } from '../combat/StatusSystem.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { colors } from '../config/themeConfig.js';
 import { TAU, clamp, lerp } from '../utils/math.js';
@@ -40,8 +41,37 @@ export class PowerRenderer {
       if (isUsingPower(fighter)) {
         this.drawFighter(renderer, fighter);
       }
+      if (hasStatus(fighter)) {
+        this.drawStatus(renderer, fighter);
+      }
     }
     renderer.restore();
+  }
+
+  drawStatus(renderer, fighter) {
+    const status = style.status;
+    const { combat, x, y, height } = fighter;
+    const tier = getPowerTier(combat.statusLevel, powersConfig.tiers);
+    const time = fighter.animation.time;
+    if (combat.chokeTime > 0) {
+      const pulse = (Math.sin(time * status.chokePulseSpeed) + 1) / 2;
+      renderer.drawGlow(x, y - height * status.chokeHeight, tier.glowRadius * status.chokeRadius, tier.color, lerp(status.chokeAlpha[0], status.chokeAlpha[1], pulse));
+    }
+    if (combat.freezeTime > 0) {
+      const centerY = y - height / 2;
+      renderer.drawGlow(x, centerY, height * status.freezeRadiusY, tier.color, status.freezeAlpha);
+      renderer.setAlpha(status.freezeLineAlpha);
+      renderer.strokeEllipse(x, centerY, height * status.freezeRadiusX, height * status.freezeRadiusY, tier.color, status.freezeLineWidth);
+      renderer.setAlpha(1);
+    }
+    if (combat.focusTime > 0) {
+      const pulse = (Math.sin(time * status.focusPulseSpeed) + 1) / 2;
+      renderer.drawGlow(x, y - height * status.focusHeight, tier.glowRadius * status.focusRadius, tier.color, lerp(status.focusAlpha[0], status.focusAlpha[1], pulse));
+    }
+    if (combat.healTime > 0) {
+      const rise = (time * status.healRiseSpeed) % 1;
+      renderer.drawGlow(x, y - height * lerp(status.healFrom, status.healTo, rise), tier.glowRadius * status.healRadius, tier.color, status.healAlpha * (1 - rise));
+    }
   }
 
   drawFighter(renderer, fighter) {

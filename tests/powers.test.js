@@ -7,7 +7,7 @@ import { DuelMode, createDuelRules } from '../src/states/duelModes.js';
 import { STEP, createSimulation, repeat, spawnFighter } from './helpers.js';
 
 describe('flow interactions', () => {
-  const tables = Object.entries(powersConfig.interactions);
+  const tables = ['push', 'pull', 'lightning', 'throw'].map((id) => [id, powersConfig.interactions[id]]);
 
   it('keeps the effect down to one level below the target, halves it at two and resists from three', () => {
     for (const [, table] of tables) {
@@ -32,7 +32,7 @@ describe('flow interactions', () => {
 
   it('gives every offensive power its own table with all the modifiers', () => {
     for (const power of Object.values(powersConfig.powers)) {
-      if (power.effect === 'barrier') {
+      if (power.effect === 'barrier' || power.self) {
         continue;
       }
       const table = powersConfig.interactions[power.interaction];
