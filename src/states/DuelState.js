@@ -726,6 +726,7 @@ export class DuelState extends GameState {
       lines.push(
         `${fighter.id}: ${fighter.state}  hp ${fighter.health.toFixed(0)}  st ${fighter.stamina.toFixed(0)}  flow ${this.rules.powers ? fighter.flowMeter.toFixed(0) : 'off'}`,
         `  ratings ${Object.values(fighter.stats.attributes).join("/")}  flow ${fighter.flowLevel}`,
+        `  power ${fighter.combat.power?.id ?? '-'}  redirect ${fighter.combat.redirectTime.toFixed(2)}`,
         `  jumps ${fighter.combat.jumpsUsed}/${fighter.stats.movement.maxJumps}  air dash ${fighter.combat.airDashUsed ? 'used' : 'ready'}  evade ${fighter.combat.evading ? fighter.stateTime.toFixed(2) : '-'}`,
         `  pos ${fighter.x.toFixed(0)}, ${fighter.y.toFixed(0)}  vel ${fighter.vx.toFixed(0)}, ${fighter.vy.toFixed(0)}`,
         `  parry ${fighter.combat.parryArmed ? fighter.combat.parryTime.toFixed(2) : '-'}  lockout ${fighter.combat.parryLockout.toFixed(2)}  buffer ${fighter.combat.bufferedAction ?? '-'}`,

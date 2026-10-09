@@ -599,9 +599,9 @@ Na guarda, o Puxão não causa dano e puxa pela metade; o Raio causa um quarto d
 
 | Categoria | Alinhamento | Habilidades |
 | --- | --- | --- |
-| Fluxo comum | os dois | Repulsão, Puxão, Arremesso (Redirecionamento entra numa próxima etapa) |
+| Fluxo comum | os dois | Repulsão, Puxão, Arremesso, Redirecionamento |
 | Aurora | Aurora | Barreira, Cura, Foco |
-| Eclipse | Eclipse | Raio, Estrangular, Congelar (Tempestade numa próxima etapa) |
+| Eclipse | Eclipse | Raio, Estrangular, Congelar, Tempestade |
 | Técnicas de lâmina | os dois | Giro, Avanço com corte, Arremesso da lâmina; custam stamina e escalam com a Lâmina |
 
 **Comandos.** Nenhum botão novo. `Poder` + direção (neutro, frente, trás) escolhe entre até três habilidades do Fluxo; `Habilidade` + direção escolhe entre a habilidade própria (neutro) e até duas técnicas de lâmina (frente, trás). Espaço vazio cai no neutro. Técnicas só valem com a opção Poderes (os modos clássicos não mudam). O Eco e o Predestinado não têm técnicas: o avanço deles já segue a direção.
@@ -626,6 +626,24 @@ Na guarda, o Puxão não causa dano e puxa pela metade; o Raio causa um quarto d
 - **Congelar** (Eclipse, 340 px): prende o alvo por 1,1 s sem dano; o primeiro dano quebra o gelo (janela de punição). −1 dura 75%, −2 dura 40%, −3 ou menos não tem efeito; +3 fura a guarda.
 - **Foco** (Aurora, em si): por 4 s × potência, atacar, bloquear e esquivar custam metade da stamina (drenos como empurrão e quebra de guarda não mudam).
 - **Cura** (Aurora, em si): devolve vida ao longo de 2 s, até 14 × potência e nunca mais que 35% da vida perdida; ser atingido interrompe.
+
+**Redirecionamento e Tempestade (v1.18).**
+
+- **Redirecionamento** (Fluxo comum): custa 18, prepara por 0,05 s e abre uma janela de 0,3 s para um pulso de Raio em alcance, com o canal do oponente aberto. Consome a janela uma vez; se não houver Raio, expira. Interrupção ou fim do poder remove a janela. Recuperação de 0,2 s, recarga comum. A diferença abaixo é de quem redireciona menos quem canaliza; não há sorteio.
+
+| Diferença | Absorção do pulso | Retorno ao canalizador | Ganho de medidor |
+| --- | --- | --- | --- |
+| +1 ou mais | 100% | 6 × potência e 0,25 s de desequilíbrio | 12 × ganho |
+| 0 | 100% | 4,5 × potência e 0,25 s de desequilíbrio | 8 × ganho |
+| −1 | 50% | 1,5 × potência e 0,25 s de desequilíbrio | nenhum |
+| −2 | falha, sofre o pulso | nenhum | nenhum |
+| −3 ou menos | falha, sofre o pulso + 5 de dano e 0,25 s de desequilíbrio | nenhum | nenhum |
+
+O retorno interrompe o canal. A parcela não absorvida causa hit; a falha extrema causa stagger em quem tentou. Ganhos normais por sofrer dano continuam valendo. A reação abre antes da resolução dos canais no mesmo passo, independentemente do lado do jogador.
+
+- **Tempestade** (Eclipse): exige Fluxo 6, custa 30 e drena 35/s; preparação de 0,35 s, canal segurado até 1,2 s e recuperação de 0,4 s. A área circular tem raio 180 px entre os centros dos corpos, inclui atrás e acima e não usa a extensão vertical dos poderes direcionais. Cada pulso de 0,2 s causa 4 × intensidade × potência, sem travar movimento. Diferença −2 reduz à metade; −3 ou menos é resistida; +3 aumenta a escala para 1,2 e ignora guarda. Nas outras faixas, guarda frontal deixa passar um quarto do dano e custa 6 de stamina; Barreira e invulnerabilidade continuam funcionando. Soltar, ficar sem medidor ou sofrer interrupção encerra o canal pelas regras existentes.
+
+Loadouts da v1.18: Garça troca Barreira por Redirecionamento (trás + Poder); Soberano troca Puxão por Tempestade (frente + Poder). Demais espaços e atributos permanecem iguais. IA reage ao Raio com Redirecionamento a partir de diferença −1 e usa Tempestade de perto, respeitando o requisito de Fluxo.
 
 **Loadouts atuais.** Aurora (Guardião, Bastião, Vespa, Espelho, Garça, Ancião, Predestinado): Repulsão (neutro) e Barreira (trás); Vespa, Espelho, Garça, Ancião e Predestinado também têm o Arremesso (frente). Eclipse (Sombra, Haste, Brasa, Forja, Eco, chefe do Arcade, Soberano): Raio (neutro) e Puxão (frente); Haste, Forja, Eco e Soberano também têm o Arremesso (trás). Trocas da v1.17: Guardião e Ancião com Cura (frente), Bastião com Foco (frente), Sombra, chefe do Arcade e Soberano com Estrangular (trás), Brasa com Congelar (trás). Técnicas: Guardião, Vespa e Brasa com Avanço com corte (frente) e Arremesso da lâmina (trás); Forja com Arremesso da lâmina (frente) e Giro (trás); Giro para Bastião, Espelho, Haste, Garça, Ancião e Soberano; Avanço e Giro para a Sombra e o chefe do Arcade. O protagonista recebe os poderes do caminho (`storyConfig.protagonist.loadouts`) e as técnicas do personagem-base do estilo.
 

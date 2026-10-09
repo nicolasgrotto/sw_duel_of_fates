@@ -40,6 +40,9 @@ export function selectTechnique(fighter) {
 }
 
 export function isInPowerRange(caster, target, power, airReach = powersConfig.airReach) {
+  if (power.around) {
+    return Math.hypot(target.x - caster.x, (target.y - target.height / 2) - (caster.y - caster.height / 2)) <= power.range;
+  }
   const side = Math.sign(target.x - caster.x) || caster.facing;
   const gap = Math.abs(target.x - caster.x) - (caster.width + target.width) / 2;
   const verticalReach = caster.grounded && target.grounded ? caster.height : Math.max(caster.height, airReach);
@@ -61,6 +64,7 @@ export class PowerSystem {
     }
     for (const fighter of fighters) {
       fighter.combat.powerCooldown = Math.max(0, fighter.combat.powerCooldown - dt);
+      fighter.combat.redirectTime = Math.max(0, fighter.combat.redirectTime - dt);
       if (fighter.isAlive) {
         this.gain(fighter, this.config.meter.regenPerSecond * dt);
       }
@@ -97,7 +101,7 @@ export class PowerSystem {
   }
 
   canCast(fighter, power) {
-    return this.enabled && power !== null && fighter.combat.powerCooldown === 0 && fighter.flowMeter >= this.getCost(fighter, power);
+    return this.enabled && power !== null && fighter.flowLevel >= (power.minFlowLevel ?? 0) && fighter.combat.powerCooldown === 0 && fighter.flowMeter >= this.getCost(fighter, power);
   }
 
   tryCast(fighter) {
@@ -119,7 +123,12 @@ export class PowerSystem {
       return;
     }
     for (const caster of fighters) {
-      if (!isUsingPower(caster)) {
+      if (isUsingPower(caster) && caster.combat.power.reaction) {
+        this.updateInstant(caster, null);
+      }
+    }
+    for (const caster of fighters) {
+      if (!isUsingPower(caster) || caster.combat.power.reaction) {
         continue;
       }
       const target = this.findOpponent(caster, fighters);
@@ -190,6 +199,9 @@ export class PowerSystem {
     combat.powerTick -= dt;
     if (combat.powerTick <= 0) {
       combat.powerTick += power.tickInterval;
+      if (power.around) {
+        this.combat.emitAction(CombatEvent.POWER_PULSE, caster, power.id);
+      }
       this.affect(caster, target, power, 'tick');
     }
   }
@@ -204,6 +216,10 @@ export class PowerSystem {
 
   strike(caster, target, power, phase, projectile) {
     if (isInvulnerable(target)) {
+      return;
+    }
+    if (power.effect === 'lightning' && isChannelOpen(caster) && target.combat.redirectTime > 0) {
+      this.redirect(caster, target, power);
       return;
     }
     if (isBarrierUp(target)) {
@@ -240,6 +256,29 @@ export class PowerSystem {
     context.guarded = false;
     context.projectile = null;
     powerEffects[power.effect].self(context);
+  }
+
+  redirect(caster, target, incoming) {
+    const power = this.config.powers.redirect;
+    const band = resolveInteraction(this.config.interactions.redirect, getFlowDifference(target, caster));
+    target.combat.redirectTime = 0;
+    if (band.absorb > 0) {
+      this.combat.emit(CombatEvent.POWER_ABSORBED, this.combat.createPowerContact(caster, target, power, 0));
+      this.gain(target, power.meterGain * band.gain);
+      if (this.combat.dealPowerDamage(target, caster, power, power.returnDamage * band.reflect * target.stats.power.potency, CombatEvent.POWER_HIT)) {
+        caster.clearAttack();
+        caster.combat.stunDuration = power.stagger;
+        caster.restartState(FighterState.STAGGERED);
+      }
+    } else {
+      this.combat.emit(CombatEvent.POWER_RESISTED, this.combat.createPowerContact(target, caster, power, 0));
+    }
+    const damage = incoming.damage * caster.stats.power.potency * (1 - band.absorb) + power.backlashDamage * band.backlash;
+    if (damage > 0 && this.combat.dealPowerDamage(caster, target, incoming, damage, CombatEvent.POWER_HIT)) {
+      target.clearAttack();
+      target.combat.stunDuration = band.backlash ? power.stagger : incoming.stun;
+      target.restartState(band.backlash ? FighterState.STAGGERED : FighterState.HIT);
+    }
   }
 
   absorb(caster, target, power) {

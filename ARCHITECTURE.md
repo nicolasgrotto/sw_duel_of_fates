@@ -583,6 +583,9 @@ Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 22).
 
 ### Poderes
 
+- **Reação e área (v1.18).** Redirecionamento usa `self`, `reaction` e `combat.redirectTime`, incluído automaticamente no snapshot e zerado em `clearPower` e no round. `PowerSystem.resolve` resolve reações antes dos outros poderes para não favorecer a ordem de `fighters`. `strike` só encaminha Raio com canal aberto e janela positiva para `redirect`: consome a janela e lê `interactions.redirect` com diferença defensor − canalizador (`absorb`, `reflect`, `gain`, `backlash`). Retorno e dano residual passam por `dealPowerDamage`; retorno interrompe o canal, falha extrema desequilibra quem reagiu. Não há RNG de gameplay novo.
+- **Tempestade (v1.18).** Poder de canal com `minFlowLevel` validado em `canCast` e na IA; `around` faz `isInPowerRange` medir a distância circular entre centros, sem depender de facing ou airReach. Handler `powerEffects.storm.tick` usa intensidade, escala e guarda sem stun contínuo. `powerPulse` é emitido nos pulsos mesmo sem alvo, e só o EffectsSystem cria partículas no pool existente, descartando excedentes; usa parâmetros de evento reutilizados. PowerRenderer desenha o limite circular e o brilho da janela sem alterar gameplay. IA consulta `perception.powerUse.redirect/storm`; F3 mostra poder e tempo da reação. Garça e Soberano recebem os poderes por loadout, sem condições por personagem nem alterações de input, save ou atributos.
+
 - **Estados e ação.** `CASTING` (poderes instantâneos) e `CHANNELING` (raio e barreira). A ação `power` (`intent.power`, segurar = `intent.powerHeld`) entra no buffer depois do empurrão e antes da habilidade, e também sai de dentro do `BLOCKING` fora do blockstun. Com os poderes desligados, a ação é descartada sem evento. Sem medidor ou em recarga, `actionRejected` sai com `attackType: 'power'`.
 - **Escolha.** `getIntentSlot` converte a direção relativa ao `facing` em `forward`, `back` ou `neutral`. `selectPower` lê `stats.power.loadout` e cai no `neutral` com espaço vazio; `selectTechnique` lê `stats.techniques` e devolve `null` com espaço vazio (a habilidade própria continua no neutro).
 - **Catálogo e loadout (v1.15).** `powersConfig.categories` lista as habilidades de cada categoria e os alinhamentos que a abrem. Cada personagem tem `characterData.loadout = { powers: { slot: id }, techniques: { slot: id } }`; `findLoadoutProblems` (em `characters/powers.js`, puro) aponta id desconhecido ou categoria fora do alinhamento, e um teste roda isso no elenco inteiro. A factory monta `stats.power.loadout` (`resolvePowerStats` com os espaços do personagem, filtrados por `powerSlots` no protagonista), `stats.techniques` (ids por espaço) e acrescenta os golpes das técnicas em `fighter.moves` a partir de `movesConfig.bladeTechniques`. O dano de técnica vem de `damage` da própria definição (base na nota 4), multiplicado pela Lâmina em `applyAttributes`. O protagonista recebe `loadout` em `createProtagonistCharacter`: poderes de `storyConfig.protagonist.loadouts[caminho]` (que também alimenta a liberação do segundo espaço na campanha) e técnicas do personagem-base do estilo.
@@ -932,6 +935,25 @@ Clássico idêntico à v1.15. Com poderes (60 por par), média das duas dificuld
 
 Clássico idêntico à v1.16. Com poderes (60 por par, antes do último ajuste do Estrangular), média das duas dificuldades: Guardião 47,8 · Sombra 63,4 · Bastião 48,6 · Vespa 49,7 · Espelho 50,5 · Haste 51,0 · Brasa 49,2 · Forja 51,2 · Garça 45,5 · Eco 48,5. O Estrangular passou de 6 dano/s e 0,9 s para 4 dano/s e 0,7 s; a linha da Sombra caiu para 57,3 (62,8 Normal, 51,7 Difícil). A matriz completa com poderes fica para a v1.19.
 
+### Redirecionamento e Tempestade (v1.18)
+
+Clássico: saída completa do `simulate` idêntica byte a byte à base v1.17 em **364 cenários** (14 personagens, todos os pares ordenados distintos, Normal e Difícil, 20 duelos por par, seed 1). Assim permanece a referência clássica v1.13, dentro de ±5 pontos da v1.0. Nenhum atributo foi alterado.
+
+Matriz com poderes: `npm run matrix -- --rules powers`, 60 duelos por par ordenado, seed 1, perfis próprios. Médias por linha abaixo; a última coluna é a média aproximada das duas dificuldades. Sombra ainda excede o alvo 46–54%; ajuste final pertence à v1.19. A matriz usa os dez selecionáveis comuns; a nova Tempestade do Soberano será incluída na bateria dos secretos e chefes da v1.19.
+
+| Personagem | Normal | Difícil | Média |
+| --- | --- | --- | --- |
+| Guardião | 50,2 | 45,6 | 47,9 |
+| Sombra | 61,1 | 52,2 | 56,7 |
+| Bastião | 62,0 | 36,7 | 49,4 |
+| Vespa | 38,3 | 64,1 | 51,2 |
+| Espelho | 46,3 | 60,0 | 53,2 |
+| Haste | 63,5 | 37,4 | 50,5 |
+| Brasa | 42,2 | 57,4 | 49,8 |
+| Forja | 54,1 | 48,5 | 51,3 |
+| Garça | 40,0 | 58,7 | 49,4 |
+| Eco | 47,2 | 51,9 | 49,6 |
+
 ## AI
 
 Arquivos: [src/ai/](src/ai/), [src/config/aiConfig.js](src/config/aiConfig.js). Regras em [GAME_DESIGN.md](GAME_DESIGN.md#7-ia).
@@ -1080,4 +1102,3 @@ Update e render dentro do alvo em todas as janelas. Sem mudanças de visual ou o
 - **Sem comentários no código.** Nomes claros substituem comentários. Contexto e decisões ficam neste documento.
 - Evitar criar objetos dentro do loop sem necessidade.
 - Listeners adicionados devem ter forma de remoção (`destroy()`).
-

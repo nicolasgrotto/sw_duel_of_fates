@@ -89,6 +89,12 @@ export class PowerRenderer {
       this.drawBarrier(renderer, fighter, tier);
     } else if (isChannelOpen(fighter) && power.effect === 'lightning') {
       this.drawLightning(renderer, fighter, tier, originX, originY);
+    } else if (isChannelOpen(fighter) && power.effect === 'storm') {
+      renderer.setAlpha(style.storm.alpha);
+      renderer.strokeEllipse(fighter.x, fighter.y - fighter.height / 2, power.range, power.range, tier.color, style.storm.lineWidth);
+      renderer.setAlpha(1);
+    } else if (fighter.combat.redirectTime > 0) {
+      renderer.drawGlow(originX, originY, tier.glowRadius * style.redirectGlowScale, tier.color, tier.glowAlpha);
     }
   }
 

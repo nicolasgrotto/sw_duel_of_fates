@@ -15,6 +15,7 @@ export const CombatEvent = Object.freeze({
   FEINT: 'feint',
   POWER_START: 'powerStart',
   POWER_ACTIVE: 'powerActive',
+  POWER_PULSE: 'powerPulse',
   POWER_HIT: 'powerHit',
   POWER_BLOCKED: 'powerBlocked',
   POWER_RESISTED: 'powerResisted',

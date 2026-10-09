@@ -19,12 +19,22 @@ export const powersConfig = {
   castHeight: 0.6,
   airReach: 320,
   categories: {
-    flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull', 'throw'] },
+    flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull', 'throw', 'redirect'] },
     aurora: { alignments: ['light'], abilities: ['barrier', 'heal', 'focus'] },
-    eclipse: { alignments: ['dark'], abilities: ['lightning', 'choke', 'freeze'] },
+    eclipse: { alignments: ['dark'], abilities: ['lightning', 'choke', 'freeze', 'storm'] },
     blade: { alignments: ['light', 'dark'], abilities: ['spin', 'dashSlash', 'saberThrow'] },
   },
   powers: {
+    redirect: {
+      id: 'redirect', effect: 'redirect', channel: false, pose: 'barrier', self: true, reaction: true, interaction: 'redirect',
+      cost: 18, startup: 0.05, active: 0.3, recovery: 0.2, window: 0.3,
+      returnDamage: 6, backlashDamage: 5, stagger: 0.25, meterGain: 8,
+    },
+    storm: {
+      id: 'storm', effect: 'storm', channel: true, pose: 'channel', interaction: 'storm', around: true,
+      minFlowLevel: 6, cost: 30, drainPerSecond: 35, startup: 0.35, maxChannel: 1.2, recovery: 0.4,
+      range: 180, tickInterval: 0.2, damage: 4, intensity: 1, guard: { staminaCost: 6 },
+    },
     push: {
       id: 'push', effect: 'push', channel: false, pose: 'cast', interaction: 'push',
       cost: 40, startup: 0.22, active: 0.08, recovery: 0.34, range: 320,
@@ -86,6 +96,25 @@ export const powersConfig = {
     potencyPerLevel: 0.03,
   },
   interactions: {
+    redirect: {
+      air: { scale: 1, duration: 1, stagger: 1 },
+      bands: [
+        { ...NORMAL_BAND, ...STRIKE_GUARD, atLeast: 1, absorb: 1, reflect: 1, gain: 1.5, backlash: 0 },
+        { ...NORMAL_BAND, ...STRIKE_GUARD, atLeast: 0, absorb: 1, reflect: 0.75, gain: 1, backlash: 0 },
+        { ...REDUCED_BAND, ...STRIKE_GUARD, atLeast: -1, absorb: 0.5, reflect: 0.25, gain: 0, backlash: 0 },
+        { ...RESISTED_BAND, ...STRIKE_GUARD, atLeast: -2, absorb: 0, reflect: 0, gain: 0, backlash: 0 },
+        { ...RESISTED_BAND, ...STRIKE_GUARD, absorb: 0, reflect: 0, gain: 0, backlash: 1 },
+      ],
+    },
+    storm: {
+      air: { scale: 1, duration: 1, stagger: 1 },
+      bands: [
+        { ...NORMAL_BAND, ...CHANNEL_GUARD, atLeast: 3, scale: 1.2, blockable: false },
+        { ...NORMAL_BAND, ...CHANNEL_GUARD },
+        { ...REDUCED_BAND, ...CHANNEL_GUARD },
+        { ...RESISTED_BAND, ...CHANNEL_GUARD },
+      ],
+    },
     push: {
       air: { scale: 1.3, duration: 1, stagger: 1.2 },
       bands: [
@@ -131,6 +160,8 @@ export const powersConfig = {
     },
   },
   render: {
+    redirectGlowScale: 0.65,
+    storm: { alpha: 0.25, lineWidth: 1.5, particles: 12, reducedParticles: 5, life: 0.3, speed: 65, size: 2 },
     seed: 7,
     handOffset: 8,
     chargeMinScale: 0.4,

@@ -136,6 +136,16 @@ function focus(context) {
 }
 
 export const powerEffects = Object.freeze({
+  redirect: { self: ({ caster, power }) => { caster.combat.redirectTime = power.window; } },
+  storm: { tick: (context) => {
+    const { combat, caster, target, power, scale, guarded } = context;
+    const damage = power.damage * power.intensity;
+    if (guarded) {
+      applyGuarded(context, damage);
+    } else {
+      combat.dealPowerDamage(caster, target, power, damage * scale, CombatEvent.POWER_HIT);
+    }
+  } },
   push: { active: push },
   pull: { active: pull },
   lightning: { tick: lightning },

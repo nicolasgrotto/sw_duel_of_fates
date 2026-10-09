@@ -9,6 +9,12 @@ Segue [ART_DIRECTION.md](ART_DIRECTION.md) e [VISUAL_SYSTEM.md](VISUAL_SYSTEM.md
 - O efeito nunca esconde o que o oponente está fazendo.
 - A cor do efeito vem do sabre envolvido. Faíscas de impacto são brancas ou amareladas. Efeitos de poder usam a cor do tier do Fluxo (ver VISUAL_SYSTEM).
 
+### Redirecionamento e Tempestade (v1.18)
+
+Redirecionamento reutiliza a pose de Barreira, o anel de lançamento e um brilho pequeno na mão durante a janela de reação. Absorção usa o anel existente na cor do tier do defensor; retorno usa o impacto de poder no canalizador. O brilho da janela some ao consumir a reação ou sofrer interrupção.
+
+Tempestade usa a pose de canal, preparação luminosa e um círculo fino de baixa opacidade centrado no corpo, delimitando o alcance real. Durante o canal (até 1,2 s), pulsos de partículas curtas na cor do tier ocupam a área sem esconder as silhuetas. As partículas vêm exclusivamente do ParticlePool existente (300 no total), com parâmetros reutilizados e descarte quando cheio. Sem flash ou shake contínuos, cor ou asset novos. Intensidade, emissão e duração ficam em config; efeitos reduzidos diminuem a emissão.
+
 ## Fluxo
 
 ```

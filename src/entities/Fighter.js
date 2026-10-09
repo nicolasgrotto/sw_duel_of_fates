@@ -51,6 +51,7 @@ function createCombat() {
     powerTick: 0,
     powerTargeted: false,
     powerCooldown: 0,
+    redirectTime: 0,
     powerTargetX: 0,
     powerTargetY: 0,
     statusLevel: 0,
@@ -181,6 +182,7 @@ export class Fighter {
   }
 
   clearPower() {
+    this.combat.redirectTime = 0;
     this.combat.power = null;
     this.combat.powerEndTime = 0;
     this.combat.powerTick = 0;

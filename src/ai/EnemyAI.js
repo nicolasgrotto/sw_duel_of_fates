@@ -1,5 +1,5 @@
 import { AttackPhase, AttackType, getAttackDuration, getAttackPhase, isHeavyAttack } from '../combat/attackPhases.js';
-import { isInPowerRange, isUsingPower } from '../combat/PowerSystem.js';
+import { isChannelOpen, isInPowerRange, isUsingPower } from '../combat/PowerSystem.js';
 import { getFlowDifference, resolveInteraction, resolveLevelBand } from '../combat/flowInteractions.js';
 import { projectilesConfig } from '../config/projectilesConfig.js';
 import { evadeConfig } from '../config/evadeConfig.js';
@@ -413,10 +413,16 @@ export class EnemyAI {
   canUsePower(power) {
     const { self } = this;
     const reserve = power.channel ? power.drainPerSecond * this.perception.powerChannelReserve : 0;
-    return self.combat.powerCooldown === 0 && self.flowMeter >= this.getPowerCost(power) + reserve;
+    return self.flowLevel >= (power.minFlowLevel ?? 0) && self.combat.powerCooldown === 0 && self.flowMeter >= this.getPowerCost(power) + reserve;
   }
 
   wantsSelfPower(power) {
+    if (power.effect === 'redirect') {
+      const use = this.perception.powerUse.redirect;
+      return isChannelOpen(this.opponent) && this.opponent.combat.power.effect === use.against
+        && isInPowerRange(this.opponent, this.self, this.opponent.combat.power)
+        && getFlowDifference(this.self, this.opponent) >= use.minDifference;
+    }
     const use = this.perception.selfPowerUse[power.effect];
     const { self } = this;
     return Boolean(use) && self.combat[use.active] === 0 && getGap(self, this.opponent) >= use.minGap
@@ -476,6 +482,13 @@ export class EnemyAI {
     const { self, opponent } = this;
     if (!this.powersEnabled || !isUsingPower(opponent)) {
       return null;
+    }
+    for (const slot of POWER_SLOTS) {
+      const reaction = self.stats.power.loadout?.[slot];
+      if (reaction?.effect === 'redirect' && this.canUsePower(reaction) && this.wantsSelfPower(reaction)
+        && (self.canAct || (self.state === FighterState.BLOCKING && self.combat.blockstun === 0))) {
+        return this.startPower(slot, 0);
+      }
     }
     const { power } = opponent.combat;
     if (power.effect === 'barrier' || !isInPowerRange(opponent, self, power) || this.plan.blockTime > 0 || this.plan.powerHoldTime > 0) {

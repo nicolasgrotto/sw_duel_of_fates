@@ -248,6 +248,8 @@ export const texts = {
     touchHint: 'Toque para continuar',
   },
   powers: {
+    redirect: 'Redirecionamento',
+    storm: 'Tempestade',
     push: 'Repulsão',
     pull: 'Puxão',
     lightning: 'Raio',

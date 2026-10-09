@@ -68,6 +68,8 @@ export class EffectsSystem {
     this.shakeScale = 1;
     this.flashScale = 1;
     this.punchScale = 1;
+    this.reduced = false;
+    this.eventParams = { x: 0, y: 0, direction: 1, color: '', secondaryColor: null };
     this.evadeAfterimages = new Map();
     this.hitFlashes = new Map();
     this.tremors = new Map();
@@ -86,6 +88,7 @@ export class EffectsSystem {
   }
 
   setReduced(reduced) {
+    this.reduced = reduced;
     this.punchScale = reduced ? this.config.reduced.punchScale : 1;
     if (reduced) {
       this.hitFlashes.clear();
@@ -102,13 +105,16 @@ export class EffectsSystem {
 
   handleEvent(event) {
     const { attacker, defender, x, y } = event;
-    const params = {
-      x,
-      y,
-      direction: attacker.facing,
-      color: attacker.appearance.saberColor,
-      secondaryColor: null,
-    };
+    if (event.type === CombatEvent.POWER_PULSE) {
+      this.spawnStorm(attacker);
+      return;
+    }
+    const params = this.eventParams;
+    params.x = x;
+    params.y = y;
+    params.direction = attacker.facing;
+    params.color = attacker.appearance.saberColor;
+    params.secondaryColor = null;
 
     switch (event.type) {
       case CombatEvent.EVADE_SUCCESS:
@@ -153,10 +159,10 @@ export class EffectsSystem {
         break;
       case CombatEvent.POWER_HIT:
         params.color = getTierColor(attacker);
-        if (this.flashScale > 0) {
+        if (this.flashScale > 0 && event.attackType !== 'storm') {
           this.hitFlashes.set(defender, this.config.hitFlashDuration);
         }
-        this.spawn(event.attackType === 'lightning' ? EffectType.LIGHTNING_TICK : EffectType.POWER_IMPACT, params);
+        this.spawn(event.attackType === 'lightning' || event.attackType === 'storm' ? EffectType.LIGHTNING_TICK : EffectType.POWER_IMPACT, params);
         break;
       case CombatEvent.POWER_BLOCKED:
         params.color = getTierColor(attacker);
@@ -184,6 +190,27 @@ export class EffectsSystem {
     }
     if (recipe.desaturate) {
       this.startDesaturation(recipe.desaturate);
+    }
+  }
+
+  spawnStorm(caster) {
+    const style = powersConfig.render.storm;
+    const power = powersConfig.powers.storm;
+    const tier = getPowerTier(caster.flowLevel, powersConfig.tiers);
+    const count = this.reduced ? style.reducedParticles : style.particles;
+    for (let i = 0; i < count; i += 1) {
+      const particle = this.particles.acquire();
+      if (!particle) return;
+      const angle = this.random() * Math.PI * 2;
+      const radius = Math.sqrt(this.random()) * power.range;
+      particle.x = caster.x + Math.cos(angle) * radius;
+      particle.y = caster.y - caster.height / 2 + Math.sin(angle) * radius;
+      particle.vx = -Math.sin(angle) * style.speed;
+      particle.vy = Math.cos(angle) * style.speed;
+      particle.life = style.life;
+      particle.maxLife = style.life;
+      particle.size = style.size;
+      particle.color = tier.color;
     }
   }
 
