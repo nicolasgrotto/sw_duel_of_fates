@@ -544,9 +544,10 @@ Os dois podem pausar (J1: Esc ou P; J2: P ou Start). A HUD mostra "J1" e "J2" an
 | Arcade (até 6 lutas + chefe) | existe |
 | 2P local | existe |
 | Sobrevivência | existe |
-| Torneio, campanha, online | fora do escopo |
+| História (campanha) | existe desde a v2 (seção 23) |
+| Torneio, online | fora do escopo |
 
-Progressão sem grind: no build de portfólio tudo fica liberado. Desafios por personagem liberam só cores de sabre e paletas alternativas. Títulos por marcos de habilidade. Nada afeta atributos.
+Progressão sem grind nos modos de duelo: desafios, Arcade e finais da História liberam só cores de lâmina, trajes e os personagens secretos; nada muda os atributos do elenco. A única progressão de atributos é a do protagonista da História, limitada por teto e total por dificuldade.
 
 ## 21.1. Movimento v1.3: esquiva de precisão
 
@@ -556,7 +557,7 @@ Pulo duplo: todos os arquétipos usam movement.maxJumps = 1, exceto Vespa = 2. N
 
 ## 21.2. Atributos v1.4
 
-Vida, Stamina, Lâmina, Defesa, Agilidade e Fluxo usam notas 1–9. Nota 5 tem multiplicador 1; cada nota muda 6%. Dez é reservado ao secreto futuro. As bases por arquétipo preservam os stats atuais do elenco, inclusive o chefe. Vida muda vida máxima; Stamina muda máximo e regeneração; Lâmina muda todos os danos e dá pequeno bônus de parry perfeito. Defesa muda custo da guarda, recuo e reserva de stamina para evitar quebra, sem reduzir dano recebido. Agilidade muda caminhada, pulo, avanços e janela do EVADE, sem devolver ataques aéreos. Fluxo guarda o nível para a v1.5 e ainda não afeta combate. Não há distribuição de pontos nesta etapa.
+Vida, Stamina, Lâmina, Defesa, Agilidade e Fluxo usam notas 1–9. Nota 5 tem multiplicador 1; cada nota muda 6%. Dez é reservado ao Predestinado (Fluxo 10, ver seção 24). As bases por arquétipo preservam os stats atuais do elenco, inclusive o chefe. Vida muda vida máxima; Stamina muda máximo e regeneração; Lâmina muda todos os danos e dá pequeno bônus de parry perfeito. Defesa muda custo da guarda, recuo e reserva de stamina para evitar quebra, sem reduzir dano recebido. Agilidade muda caminhada, pulo, avanços e janela do EVADE, sem devolver ataques aéreos. Fluxo define o nível dos poderes (seção 22). Só o protagonista da História distribui pontos (seção 23).
 
 ## 22. Fluxo e poderes (v2)
 

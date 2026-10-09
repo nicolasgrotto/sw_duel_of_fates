@@ -1,5 +1,10 @@
 # Duel of Fates — duelo 2D de lâminas de energia
 
+## ⚠️ Aviso Legal / Disclaimer
+Este é um projeto estritamente acadêmico e sem fins lucrativos, desenvolvido exclusivamente para fins de portfólio e aprendizado. 
+Os conceitos de "A Força" e mecânicas de duelo contidos aqui são inspirados na franquia Star Wars, de propriedade da Lucasfilm Ltd. e Walt Disney Company. 
+Não há intenção de violação de direitos autorais. Todo o código e implementação lógica são de autoria própria.
+
 **Academic Project / Prototype**
 
 Jogo 2D de duelo de lâminas de energia para navegador, feito com HTML5, CSS3, JavaScript puro (ES Modules) e Canvas 2D. Sem frameworks, sem engine e sem bundler.
@@ -15,11 +20,13 @@ Jogo 2D de duelo de lâminas de energia para navegador, feito com HTML5, CSS3, J
 
 ## O que tem no jogo
 
-- **10 personagens** com atributos, golpes, habilidade e IA próprios: Guardião, Sombra, Bastião, Vespa, Espelho, Haste, Brasa, Forja, Garça e Eco. Mais um chefe no Arcade e na Sobrevivência.
+- **10 personagens** com atributos (seis notas de 1 a 9), golpes, habilidade, alinhamento e IA próprios: Guardião, Sombra, Bastião, Vespa, Espelho, Haste, Brasa, Forja, Garça e Eco. Mais um chefe no Arcade e na Sobrevivência e **dois personagens secretos**, liberados pela História ou por um segredo na tela de abertura.
 - **6 arenas** desenhadas por código: Plataforma de Refino, Santuário Alagado, Mina de Cristal, Telhado Neon, Anel Orbital e Floresta Lumínica.
-- **Combate por timing**: rápido, forte, bloqueio, parry e parry perfeito com riposta, empurrão, esquiva, sequências, golpe aéreo e habilidade de cada personagem.
-- **Modos**: Duelar (contra a IA, em Fácil, Normal ou Difícil), Arcade, Sobrevivência, 2 Jogadores no mesmo teclado ou com dois controles, Tutorial, Desafio de parry e Treino (boneco configurável, gravação e reprodução de inputs, hitboxes).
-- **Apresentação**: replay em câmera lenta do golpe final, música e som sintetizados que reagem à luta, cores de lâmina desbloqueáveis, teclas configuráveis e suporte a gamepad.
+- **Combate por timing**: rápido, forte, bloqueio, parry e parry perfeito com riposta, empurrão, esquiva (dash) e esquiva de precisão, sequências, golpe aéreo, pulo duplo (Vespa) e habilidade de cada personagem.
+- **Poderes do Fluxo** (opcionais): medidor próprio, quatro poderes em dois caminhos (Aurora: Repulsão e Barreira; Eclipse: Raio e Puxão) e resistência pela diferença de nível entre os lutadores.
+- **Modos**: **História** (campanha com protagonista criado e evoluído pelo jogador, diálogos, dois finais e um duelo secreto), Duelar (contra a IA, em Fácil, Normal ou Difícil), Arcade, Sobrevivência, 2 Jogadores no mesmo teclado ou com dois controles, Tutorial, Desafio de parry e Treino (boneco configurável, gravação e reprodução de inputs, hitboxes).
+- **Apresentação**: abertura com a lâmina acendendo, replay em câmera lenta do golpe final, música e som sintetizados que reagem à luta, cores de lâmina e trajes desbloqueáveis, teclas configuráveis e suporte a gamepad.
+- **Celular**: controles de toque (joystick e botões desenhados no jogo), menus por toque, paisagem com safe areas e efeitos reduzidos automáticos.
 
 ## Requisitos
 

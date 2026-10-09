@@ -220,7 +220,7 @@ Trocar todos os personagens (ex.: versão com identidade própria) deve exigir a
 
 Personagens atuais: Guardião, Sombra, Bastião, Vespa, Espelho, Haste, Brasa, Forja, Garça e Eco, mais o chefe Sombra Desperta (`selectable: false`, só no Arcade). A seleção mostra só os personagens com `selectable: true`.
 
-### Atributos implementados na v1.4
+### Atributos
 
 `applyAttributes(base, attributes, config)` é pura. Notas inteiras 1–9, padrão 5; 10 rejeitado nesta etapa e reservado ao secreto futuro. Multiplicadores 0,76 / 0,82 / 0,88 / 0,94 / 1 / 1,06 / 1,12 / 1,18 / 1,24. Bases na nota 5 ficam em attributesConfig.bases por arquétipo, calibradas dividindo os stats v1.3 pelo multiplicador da nota do elenco. Essa calibração preserva os valores escalares da v1.0 e a mobilidade adicionada na v1.3. Arredondamento em 9 casas evita alterações por ponto flutuante. Fixture stats-v1.3 foi capturada antes da migração e verifica todos os stats afetados, os 11 arquétipos e danos de cada golpe.
 
@@ -271,9 +271,10 @@ Todos os números de balanceamento, cores, textos e ajustes.
 main.js
   └─ new Game(canvas)
        ├─ Renderer
-       ├─ Input e secondInput (2 Jogadores)
+       ├─ Input e secondInput (2 Jogadores), com TouchInput como fonte do Input
        ├─ AudioManager
-       ├─ StateMachine ── createState(StateId) → MenuState / DuelState / PauseState
+       ├─ StateMachine ── createState(StateId) → IntroState (primeira tela) / MenuState / DuelState / ...
+       ├─ settings + story (save v4)
        ├─ DebugOverlay
        └─ GameLoop
             ├─ update(step)  → debug toggle → states.update(step) → input.endFrame()
@@ -505,7 +506,7 @@ Arquivos: [src/combat/](src/combat/). Regras em [GAME_DESIGN.md](GAME_DESIGN.md#
 
 ---
 
-### Movimento v1.3
+### Esquiva de precisão e pulo duplo
 
 `evadeConfig.js` define enabled e perfil global; stats.evade opcional substitui o perfil completo. CombatSystem.tryEvade reaproveita startDodge e DODGING, com combat.evading/evadeSucceeded no snapshot. Deslocamento para trás só durante movementTime. findContacts detecta hitbox contra hurtbox invulnerável do EVADE e captura evaded antes de resolver; marca hasHit do atacante e emite EVADE_SUCCESS, libera IDLE e zera velocidade. Dash comum continua ignorando contatos invulneráveis. EffectsSystem guarda timer visual por defensor; DuelRenderer e DodgeAfterimage usam esse sinal para uma silhueta inclinada curta, inclusive depois da liberação imediata. Audio reutiliza DODGE. Sem novas cores/assets ou estado de combate.
 
@@ -554,30 +555,11 @@ Arquivos: [src/core/AudioManager.js](src/core/AudioManager.js), [src/audio/](src
 - Música dinâmica: `DuelAudio.updateMusic(fighters, heartbeatFighter, dt)` calcula a tensão (`1 − menor fração de vida`) e só chama `AudioManager.setMusicTension` quando ela muda mais que `music.tension.step`. O `createMusic` do synth tem uma camada extra (`music.tension`) cujo volume e o corte do filtro seguem a tensão com `setTargetAtTime` (sem cliques). A batida (`heartbeat`) é tocada pelo `DuelAudio` com dois toques por intervalo enquanto o lutador observado está abaixo de `heartbeat.healthRatio`. `DuelAudio.stop()` zera a tensão.
 - Interface: `MenuList` toca `uiMove` e `uiConfirm` quando recebe o `AudioManager`.
 
-### História (v1.7)
+## Fluxo e poderes
 
-Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 23).
+Arquivos: [src/combat/PowerSystem.js](src/combat/PowerSystem.js), [src/combat/powerEffects.js](src/combat/powerEffects.js), [src/combat/powerResistance.js](src/combat/powerResistance.js), [src/config/powersConfig.js](src/config/powersConfig.js), [src/rendering/PowerRenderer.js](src/rendering/PowerRenderer.js).
 
-- **Dados.** `storyConfig` guarda regras (pontos, tetos, totais, regras do duelo, `roundsToWin`), opções do protagonista e a lista de encontros (`id`, `opponent`, `arena`, `aiOffset`, `next` ou `outcomes`, `reward`, `unlocks`, `ending`). `storyTexts` guarda títulos e falas por encontro e final. Fala: `{ speaker: 'protagonist' | 'narrator' | idDoPersonagem, text: string | { light, dark } }`.
-- **Campanha pura.** `storyRun.js` trabalha sobre um objeto simples salvo no save (`run`): protagonista (nome, alinhamento, estilo, cor, notas), dificuldade, encontro atual, pontos, espaços de poder liberados, encontros vencidos e final. `resolveStoryResult(run, duelResult, config, loadouts)` devolve o novo `run`, o final e os personagens liberados; a rota usa `evaluateCondition` sobre `{ result, run }`. Nada lê o `Fighter`: a condição de vida vem do `DuelResult`.
-- **Protagonista.** `createProtagonistCharacter(perfil, storyConfig, espaços)` monta um objeto de personagem com o arquétipo, golpes, som e aparência base do estilo escolhido, sobrepondo `storyConfig.protagonist.appearance` e a cor da lâmina. `createFighterFromCharacter` (a factory agora aceita um objeto, não só um id) cria o lutador; `powerSlots` filtra o loadout do alinhamento. A nota 10 só vale para o Fluxo de personagens com `apex: true` (`attributesConfig.apexRating`).
-- **Fluxo de telas.** Menu → `StoryState` → (`ProtagonistState` criar → atributos) → `DialogueState` (antes, com a arena) → `DuelState` (`DuelMode.STORY`, `params.story`, `params.rules = storyConfig.rules`). O `DuelState` usa `storyStage` como mais um degrau da "escada" (adversário, arena, dificuldade) e cria o jogador a partir do protagonista. No resultado, `resolveDuelOutcome` desvia para `resolveStoryOutcome`: na vitória, empilha `DialogueState` (falas de depois, final e desbloqueios) que leva de volta ao `StoryState`, e devolve `story` (novo `run`) e `progress.unlockedCharacters`; na derrota, `GameOverState` com "Tentar de novo" e "Voltar à história" (`menuState`). A pausa sai para a História (`quitState`) e a lista de golpes recebe o personagem gerado.
-- **Save.** `Game.story` vem de `loadStory` + `sanitizeStoryRun` e é salvo junto com as opções (`saveSettings` grava `{ version: 4, settings, story }`). A migração 2 → 3 acrescenta `story: null`; 3 → 4 acrescenta `protagonist.skin` (base) sem perder progresso.
-
-### Personalização (v1.10)
-
-- `characterData.skins` e `storyConfig.protagonist.skins` descrevem paleta e peças existentes. `resolveAppearance` copia a base e aplica somente campos cosméticos permitidos. A factory aceita `{ skin, saberColor }`, nessa ordem; stats e replay continuam independentes do visual.
-- `getSkinOptions` reutiliza `settings.unlocks[character.id]` com ids `skin-arcade`, `skin-story` e `skin-secret`, separados das cores. Saves antigos com `arcadeCleared` também liberam Viajante. `unlockProgressSkins` e `addUnlocks` acumulam recompensas sem duplicatas; `duelOutcomes` aplica Arcade ao vencedor e finais ao elenco, mais secretos no final secreto.
-- A seleção filtra bloqueadas, mostra requisitos e guarda escolhas confirmadas por lado, mesmo com personagens iguais. `playerSkin`/`opponentSkin` seguem params e escadas; pausa, revanche e próxima luta reutilizam esses dados. A prévia conserva cor e skin ao mudar uma delas e ao voltar.
-- A criação tem Nome, Caminho, Estilo, Visual, Cor e Dificuldade. `Game.createTextPrompt` injeta documento, host e limites do canvas no helper de core; o estado apenas consome valor e envio. O input intercepta teclas, respeita composição e sai ao mudar de passo ou estado. O resize reposiciona o campo. Nenhum estado acessa DOM. `sanitizeStoryRun` valida a skin e retorna base para ids desconhecidos.
-
-### Segredos e personagens secretos (v1.8–v1.9)
-
-- **Campanha completa.** Oito encontros lineares e um secreto em `storyConfig.encounters`. A Vespa (capítulo 3) dá `reward.powers` (libera o segundo poder do alinhamento). O Soberano tem `unlocks: ['sovereign']` e `outcomes`: `healthRatioAbove 0.75` leva ao encontro `foretold`; senão, final `normal`. O Predestinado termina no final `secret` e libera `foretold`.
-- **Personagens.** `sovereign` e `foretold` são dados comuns em `characterData` com `selectable: false` e `secret: true`, reaproveitando arquétipo e golpes da Haste e do Eco (sem tuning novo de golpes), com notas, alinhamento, aparência e perfis de IA próprios (`aiConfig.profiles.sovereign/foretold`). `foretold` tem `apex: true` (Fluxo 10). A `CharacterSelectState` monta `rosterIds` (só `selectable`, usado pelo Arcade) e `characterIds` (roster + secretos em `settings.unlockedCharacters`).
-- **Intro e segredo.** `Game.start` abre o `IntroState`. A cada passo ele transforma o input em tokens (`key:<code>` pelo `input.lastPressedCode`, `action:<ação>` para as ações vigiadas, `tap:title` para toques no título) e alimenta o `SecretUnlockSystem`. Cada sequência só considera tokens do próprio tipo, então as setas (que geram tecla e ação) não atrapalham uma à outra. Ao casar, a recompensa de `secretsConfig.rewards` entra em `settings.unlockedCharacters`, é salva, toca `SoundName.SECRET` e mostra a frase. O som funciona porque o próprio toque de tecla é o gesto que libera o `AudioContext`. O `TouchInput` não mostra o botão de voltar na intro.
-
-### Fluxo e poderes (v1.5)
+### Medidor, regra por modo e resistência
 
 Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 22).
 
@@ -587,7 +569,7 @@ Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 22).
 - **Resistência.** `getLevelDifference(caster, target)` = nível do alvo − nível de quem lança. `resolvePowerOutcome(rule, diff)` percorre as faixas da regra (`powersConfig.resistance`) e devolve `{ scale, outcome }`. Cada poder aponta para uma regra pelo nome; nenhum `if` por poder.
 - **Tier visual.** `getPowerTier(level, powersConfig.tiers)` escolhe cor (`themeConfig`) e intensidade. A HUD desenha o medidor na cor do tier, abaixo da stamina, só com `rules.powers`.
 
-### Poderes (v1.6)
+### Poderes
 
 - **Estados e ação.** `CASTING` (poderes instantâneos) e `CHANNELING` (raio e barreira). A ação `power` (`intent.power`, segurar = `intent.powerHeld`) entra no buffer depois do empurrão e antes da habilidade, e também sai de dentro do `BLOCKING` fora do blockstun. Com os poderes desligados, a ação é descartada sem evento. Sem medidor ou em recarga, `actionRejected` sai com `attackType: 'power'`.
 - **Escolha.** `selectPower` lê `stats.power.loadout` (de `powersConfig.loadouts[alinhamento]`): direção relativa ao `facing` escolhe `forward`, `back` ou `neutral`, e um espaço vazio cai no `neutral`.
@@ -599,6 +581,33 @@ Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 22).
 - **Estado.** Tudo que muda fica em `fighter.combat` (`power`, `powerEndTime`, `powerTick`, `powerTargeted`, `powerCooldown`, `powerTargetX/Y`) e em `fighter.powerMeter`; o replay re-simula igual (teste dedicado). `powerTargetX/Y` guarda o ponto mirado para o render, sem lógica no renderer.
 - **Apresentação.** O `PowerRenderer` (chamado pelo `DuelRenderer` depois das lâminas) só lê o estado: brilho de carga na mão durante o startup, domo da Barreira enquanto `isBarrierUp`, raio enquanto o canal está aberto, da mão até `powerTargetX/Y`. O raio guarda, por lutador, deslocamentos perpendiculares em `Float32Array` (RNG próprio com seed, renovados a cada `render.boltRefresh` do tempo de animação) e recalcula os pontos a cada frame sem alocar. Cores e intensidade vêm do tier (`getPowerTier`); toda luz usa `drawGlow` (sprite em cache por cor). O `EffectsSystem` trata `powerActive` (anel que abre ou, no Puxão, fecha: `ring.contract`), `powerHit`, `powerBlocked`, `powerResisted` (anel na cor do tier do alvo) e `powerAbsorbed`; receitas com `tinted` pintam metade das faíscas na cor do tier. Poses em `fighterVisualConfig.combatPoses.powers` (`cast`, `channel`, `barrier`), com entrada no startup e volta na recuperação. Sons sintetizados em `audioConfig.sounds` (carga, onda, puxão, impacto, raio, barreira, resistido, absorvido). A HUD pisca o medidor quando a rejeição vem com `attackType: 'power'`. A lista de golpes (aberta pela pausa, que recebe `rules`) mostra os poderes do alinhamento quando eles estão ligados.
 - **Entrada.** Teclado `U` (preset de setas: `N`; 2 Jogadores: J1 `R`, J2 `O`/Numpad6), gamepad RT, botão de toque `Poder` (só aparece quando o `DuelState` chama `touch.setFeatures(['powers'])`). `POWER` está em `remappableActions`; o `IntentRecorder` grava `power` e `powerHeld` no fim da lista de flags.
+
+## História, secretos e personalização
+
+Arquivos: [src/modes/story/](src/modes/story/), [src/config/storyConfig.js](src/config/storyConfig.js), [src/config/storyTexts.js](src/config/storyTexts.js), [src/states/StoryState.js](src/states/StoryState.js), [src/states/IntroState.js](src/states/IntroState.js), [src/characters/skins.js](src/characters/skins.js).
+
+### Campanha
+
+Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 23).
+
+- **Dados.** `storyConfig` guarda regras (pontos, tetos, totais, regras do duelo, `roundsToWin`), opções do protagonista e a lista de encontros (`id`, `opponent`, `arena`, `aiOffset`, `next` ou `outcomes`, `reward`, `unlocks`, `ending`). `storyTexts` guarda títulos e falas por encontro e final. Fala: `{ speaker: 'protagonist' | 'narrator' | idDoPersonagem, text: string | { light, dark } }`.
+- **Campanha pura.** `storyRun.js` trabalha sobre um objeto simples salvo no save (`run`): protagonista (nome, alinhamento, estilo, cor, notas), dificuldade, encontro atual, pontos, espaços de poder liberados, encontros vencidos e final. `resolveStoryResult(run, duelResult, config, loadouts)` devolve o novo `run`, o final e os personagens liberados; a rota usa `evaluateCondition` sobre `{ result, run }`. Nada lê o `Fighter`: a condição de vida vem do `DuelResult`.
+- **Protagonista.** `createProtagonistCharacter(perfil, storyConfig, espaços)` monta um objeto de personagem com o arquétipo, golpes, som e aparência base do estilo escolhido, sobrepondo `storyConfig.protagonist.appearance` e a cor da lâmina. `createFighterFromCharacter` (a factory agora aceita um objeto, não só um id) cria o lutador; `powerSlots` filtra o loadout do alinhamento. A nota 10 só vale para o Fluxo de personagens com `apex: true` (`attributesConfig.apexRating`).
+- **Fluxo de telas.** Menu → `StoryState` → (`ProtagonistState` criar → atributos) → `DialogueState` (antes, com a arena) → `DuelState` (`DuelMode.STORY`, `params.story`, `params.rules = storyConfig.rules`). O `DuelState` usa `storyStage` como mais um degrau da "escada" (adversário, arena, dificuldade) e cria o jogador a partir do protagonista. No resultado, `resolveDuelOutcome` desvia para `resolveStoryOutcome`: na vitória, empilha `DialogueState` (falas de depois, final e desbloqueios) que leva de volta ao `StoryState`, e devolve `story` (novo `run`) e `progress.unlockedCharacters`; na derrota, `GameOverState` com "Tentar de novo" e "Voltar à história" (`menuState`). A pausa sai para a História (`quitState`) e a lista de golpes recebe o personagem gerado.
+- **Save.** `Game.story` vem de `loadStory` + `sanitizeStoryRun` e é salvo junto com as opções (`saveSettings` grava `{ version: 4, settings, story }`). A migração 2 → 3 acrescenta `story: null`; 3 → 4 acrescenta `protagonist.skin` (base) sem perder progresso.
+
+### Conteúdo, personagens secretos e intro
+
+- **Campanha completa.** Oito encontros lineares e um secreto em `storyConfig.encounters`. A Vespa (capítulo 3) dá `reward.powers` (libera o segundo poder do alinhamento). O Soberano tem `unlocks: ['sovereign']` e `outcomes`: `healthRatioAbove 0.75` leva ao encontro `foretold`; senão, final `normal`. O Predestinado termina no final `secret` e libera `foretold`.
+- **Personagens.** `sovereign` e `foretold` são dados comuns em `characterData` com `selectable: false` e `secret: true`, reaproveitando arquétipo e golpes da Haste e do Eco (sem tuning novo de golpes), com notas, alinhamento, aparência e perfis de IA próprios (`aiConfig.profiles.sovereign/foretold`). `foretold` tem `apex: true` (Fluxo 10). A `CharacterSelectState` monta `rosterIds` (só `selectable`, usado pelo Arcade) e `characterIds` (roster + secretos em `settings.unlockedCharacters`).
+- **Intro e segredo.** `Game.start` abre o `IntroState`. A cada passo ele transforma o input em tokens (`key:<code>` pelo `input.lastPressedCode`, `action:<ação>` para as ações vigiadas, `tap:title` para toques no título) e alimenta o `SecretUnlockSystem`. Cada sequência só considera tokens do próprio tipo, então as setas (que geram tecla e ação) não atrapalham uma à outra. Ao casar, a recompensa de `secretsConfig.rewards` entra em `settings.unlockedCharacters`, é salva, toca `SoundName.SECRET` e mostra a frase. O som funciona porque o próprio toque de tecla é o gesto que libera o `AudioContext`. O `TouchInput` não mostra o botão de voltar na intro.
+
+### Skins e personalização
+
+- `characterData.skins` e `storyConfig.protagonist.skins` descrevem paleta e peças existentes. `resolveAppearance` copia a base e aplica somente campos cosméticos permitidos. A factory aceita `{ skin, saberColor }`, nessa ordem; stats e replay continuam independentes do visual.
+- `getSkinOptions` reutiliza `settings.unlocks[character.id]` com ids `skin-arcade`, `skin-story` e `skin-secret`, separados das cores. Saves antigos com `arcadeCleared` também liberam Viajante. `unlockProgressSkins` e `addUnlocks` acumulam recompensas sem duplicatas; `duelOutcomes` aplica Arcade ao vencedor e finais ao elenco, mais secretos no final secreto.
+- A seleção filtra bloqueadas, mostra requisitos e guarda escolhas confirmadas por lado, mesmo com personagens iguais. `playerSkin`/`opponentSkin` seguem params e escadas; pausa, revanche e próxima luta reutilizam esses dados. A prévia conserva cor e skin ao mudar uma delas e ao voltar.
+- A criação tem Nome, Caminho, Estilo, Visual, Cor e Dificuldade. `Game.createTextPrompt` injeta documento, host e limites do canvas no helper de core; o estado apenas consome valor e envio. O input intercepta teclas, respeita composição e sai ao mudar de passo ou estado. O resize reposiciona o campo. Nenhum estado acessa DOM. `sanitizeStoryRun` valida a skin e retorna base para ids desconhecidos.
 
 ## Balanceamento
 
@@ -866,20 +875,15 @@ Arquivo: [src/utils/debug.js](src/utils/debug.js)
 
 ---
 
-Verificação visual da v0.2: Chrome headless local, Canvas real, eventos de parry/perfeito/empurrão gerados pela simulação e tela de Controles inspecionada. Dessaturação cobre o mundo com shake de ±12 px; lâminas, anéis e flare mantêm a cor.
-
-Validação final: fixture `tests/fixtures/save-v1.json` foi produzida pelo saveSettings original do commit 305b59f, com progresso e remapeamento reais do esquema v1. Fontes de input não repetem a borda quando teclado assume uma ação já segurada por outra fonte; testes cobrem as duas ordens. Chrome headless local: DPR 3 limitado a 2, Canvas real, F3 com médias e pose inclinada do EVADE; nenhum erro de JavaScript. Servidor de teste encerrado ao finalizar.
-
-
 ## Testabilidade
 
 Testes rodam em Node (`npm test`), sem navegador. Por isso:
 
-- Módulos de lógica (`states/`, `characters/`, `controllers/`, `entities/`, `combat/`, `simulation/`, `systems/`, `ai/`, `config/`, `utils/`) **não** acessam `window`, `document` ou canvas. Estados e `rendering/` desenham só pela API do `Renderer` recebido.
-- Quando um módulo do core precisa do navegador (`Input`, `GameLoop`), a dependência é injetada.
+- Módulos de lógica (`states/`, `modes/`, `characters/`, `controllers/`, `entities/`, `combat/`, `simulation/`, `systems/`, `ai/`, `config/`, `utils/`) **não** acessam `window`, `document` ou canvas. Estados e `rendering/` desenham só pela API do `Renderer` recebido.
+- Quando um módulo do core precisa do navegador (`Input`, `TouchInput`, `GameLoop`, `textPrompt`), a dependência é injetada.
 - `computePose` é uma função pura e também é testada.
 
-Testes atuais: 384 testes em `tests/`, um arquivo por área (loop, input, estados e modos, combate, especiais, IA, simulação, replay, áudio, efeitos, UI, desbloqueios, Arcade, Sobrevivência, remapeamento). `tests/states.test.js` cobre o fluxo de telas; `goToMenuItem(game, id)` navega no menu pelo id, sem depender da posição dos itens. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
+Testes atuais: 456 testes em `tests/`, um arquivo por área (loop, input e toque, estados e modos, combate, especiais, EVADE, atributos, Fluxo e poderes, IA, simulação, replay, áudio, efeitos, UI, desbloqueios e skins, Arcade, Sobrevivência, História, segredos, remapeamento, save). `tests/states.test.js` cobre o fluxo de telas; `goToMenuItem(game, id)` navega no menu pelo id, sem depender da posição dos itens. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
 
 ---
 
@@ -887,18 +891,19 @@ Testes atuais: 384 testes em `tests/`, um arquivo por área (loop, input, estado
 
 ```
 core/Game     → core, states/stateFactory, config, utils
-modes         → combat (fases e eventos), utils (RNG com seed)
+modes         → combat (fases e eventos), states/stateIds e duelModes (rotas de resultado), ui/formatText, utils (RNG com seed)
+modes/story   → nenhuma dependência de Fighter: lê DuelResult, config e loadouts
 states        → states/stateIds, modes, simulation, combat, ai, audio, controllers, characters, entities, rendering, ui, config
 ui            → config, utils
 ai            → combat (fases), entities (estados), systems/StaminaSystem (canAfford), config
 audio         → combat (eventos, fases), config, utils
-tools/simulate → characters, simulation, ai, config (sem navegador)
+tools/simulate → characters (inclui protagonista), simulation, ai, config (sem navegador)
 simulation    → systems, combat, controllers/IntentRecorder (codificação dos intents do replay)
 systems/EffectsSystem → combat (tipos de evento), core/Camera (via construtor), config, utils
 characters    → entities, config
 controllers   → config
-systems / combat / ai → entities, config, utils (combat também usa StaminaSystem)
-rendering     → config, utils, entities, combat/attackPhases (só leitura)
+systems / combat / ai → entities, config, utils (combat também usa StaminaSystem; a IA lê PowerSystem e powerResistance só para decidir)
+rendering     → config, utils, entities, combat/attackPhases, PowerSystem e powerResistance (só leitura)
 entities      → config, utils
 core (resto)  → config
 ```
@@ -907,61 +912,31 @@ Evitar dependências circulares.
 
 ---
 
-## v2 planejada
+## v2: princípios e decisões
 
-Roteiro e tarefas em [versions/v2.md](versions/v2.md). Esta seção registra as decisões de arquitetura aprovadas. Cada módulo só é criado na task que precisar dele e então entra na estrutura de pastas.
+Roteiro, tarefas e validações em [versions/v2.md](versions/v2.md). O detalhe de cada sistema está nas seções acima (Input, Combat, Fluxo e poderes, História, Balanceamento, AI).
 
-**Princípios.** Tudo novo que muda o resultado de uma luta roda dentro da `DuelSimulation` com o dt fixo, guarda estado em `fighter.combat` (copiado inteiro pelo snapshot do replay) e é configurado em `src/config/`. Game, Renderer, Audio, Effects e Input não contêm regra de gameplay. Os modos clássicos (Arcade, Sobrevivência, Tutorial, Treino) recebem `rules` padrão e ficam idênticos à v1.0.
+**Princípios.** Tudo que muda o resultado de uma luta roda dentro da `DuelSimulation` com o dt fixo, guarda estado em `fighter.combat` (copiado inteiro pelo snapshot do replay) ou em campos do `Fighter` cobertos pelo teste de snapshot, e é configurado em `src/config/`. Game, Renderer, Audio, Effects e Input não contêm regra de gameplay. Os modos clássicos (Arcade, Sobrevivência, Tutorial, Desafio) recebem `rules` padrão e ficam idênticos à v1.0; a matriz sem poderes continua igual à v1.3.
 
-**Refactors da v1.1 (concluídos).**
-
-1. `Input` com fontes genéricas: teclado, gamepad e, depois, toque alimentam o mesmo conjunto de ações (teclado e gamepad já são fontes independentes).
-2. Save versionado (`saveStorage.js`): `{ version: 2, settings }` com lista de migrações; a v1 (objeto plano de settings) migra sem perda. Seções novas (story, protagonista) entram na task que precisar delas, com uma migração.
-3. `DuelResult` (objeto simples: vencedor, `healthRatio`, estatísticas, tempo) e `duelOutcomes` (roteamento por modo), tirando Arcade e Sobrevivência do `DuelState`. Story e finais leem o `DuelResult`, nunca o `Fighter`.
-4. Teste que falha se um campo mutável do `Fighter` ficar fora do `captureFighter`.
-5. `gameConfig.canvas.maxPixelRatio` (2) limita o DPR em Game.handleResize; GameLoop mede update e render com now injetado e publica médias por frame (janela de timingSampleFrames, 60). F3 mostra ms, sem mudar dt da simulação.
-
-A regra `rules` nos parâmetros do duelo (`powers`) foi implementada na v1.5, junto com o medidor (ver Combat → Fluxo e poderes).
-
-**Módulos previstos.**
-
-```
-core/TouchInput.js            IMPLEMENTADO v1.2: pointer events no canvas → ações (multitoque por pointerId, joystick com zona morta)
-core/textPrompt.js            IMPLEMENTADO v1.10: input DOM temporário só na tela de nome (injetado)
-config/touchLayoutConfig.js, attributesConfig.js, powersConfig.js (com os tiers visuais),
-       storyConfig.js, secretsConfig.js, introConfig.js
-characters/attributes.js      IMPLEMENTADO v1.4: applyAttributes(base, attributes, config) → stats derivados (puro)
-characters/protagonist.js     IMPLEMENTADO v1.7: createProtagonistCharacter(perfil, config, espaços) → dados para createFighterFromCharacter
-characters/skins.js           IMPLEMENTADO v1.10: resolveAppearance(character, skinId)
-combat/powerResistance.js     IMPLEMENTADO v1.5: resolvePowerOutcome(rule, levelDiff) → { scale, outcome } e getPowerTier (puros)
-combat/powerEffects.js        registro { push, pull, lightning, barrier } → handler
-combat/PowerSystem.js         IMPLEMENTADO v1.5 (medidor); recargas, fases do poder e eventos na v1.6
-modes/story/storyRun.js (no lugar do StoryDirector), modes/story/conditions.js   IMPLEMENTADOS v1.7
-modes/SecretUnlockSystem.js   IMPLEMENTADO v1.9: casa sequências; a persistência fica no IntroState
-states/IntroState.js, StoryState.js, DialogueState.js, ProtagonistState.js   IMPLEMENTADOS v1.7–v1.9
-rendering/powerRenderer.js    aura em cache por tier, raio em polilinha, ondas
-ui/TouchControls.js           IMPLEMENTADO v1.2: controles de toque desenhados no canvas
-```
+**Refactors da v1.1.** `Input` com fontes (teclado, gamepad, toque); save versionado com migrações (hoje v4: `{ version, settings, story }`); `DuelResult` e `duelOutcomes` fora do `DuelState`; teste que falha se um campo mutável do `Fighter` ficar fora do `captureFighter`; DPR limitado e tempos de update/render no F3.
 
 **Decisões.**
 
-- **Atributos implementados na v1.4** (1–9; só o `foretold` tem Fluxo 10) são a única fonte dos stats escalares: Vida → vida; Stamina → máximo e regeneração; Lâmina → escala de dano e bônus pequeno no parry perfeito; Defesa → guarda (custo do bloqueio, recuo, limite de quebra), não redução de dano; Agilidade → velocidade, pulo, dash e janela do EVADE; Fluxo → `powerLevel`. O arquétipo continua dono de tempos, golpes e traços.
-- **Fluxo implementado na v1.5**: `powerLevel` (permanente) define potência, ganho do medidor, resistência e tier visual (o máximo do medidor é igual para todos); `powerMeter` é o recurso da luta; `stamina` continua o recurso físico.
-- **Resistência**: `levelDiff = alvo.powerLevel − conjurador.powerLevel`; cada poder aponta para uma regra em dados (faixas → escala e resultado `normal`, `reduced`, `resisted`). Um único resolvedor puro, sem `if` por poder.
-- **Poderes** são definições com fases (startup, active, recovery), como os golpes, pagas com `powerMeter`. Estados novos: `CASTING` e `CHANNELING`. Sem projéteis na v2. Efeitos no alvo reaproveitam `HIT` e `STAGGERED`.
-- **EVADE implementado na v1.3** (esquiva de precisão) é uma ação nova no "baixo" (S/↓, direcional baixo, joystick baixo); o Shift continua o dash. Flag `evade` no intent (o `IntentRecorder` passa de 10 para 12 bits com `power`, cabe no `Uint16`).
-- **Pulo duplo implementado na v1.3**: `movement.maxJumps` com contador em `fighter.combat`; zera no chão; o pulo na parede não devolve o pulo aéreo.
-- **Finais e condições** são dados (`{ condition: { type, threshold }, next }`) avaliados por um registro de condições contra o `DuelResult`.
-- **Protagonista** é dados gerados do save e entra na `createFighter`; não há sistema de animação novo.
-- **Skins** são overrides parciais de `appearance` (paleta e peças de silhueta existentes), sem efeito em stats; a escolha fica no save.
-- **Segredo**: sequência de letras (teclado) e de ações (gamepad e toque) em `secretsConfig`; o input do jogador é o gesto que libera o áudio; a intro termina numa tela de título que só avança com Confirmar.
+- **Atributos** (1–9; Fluxo 10 só com `apex: true`) são a única fonte dos stats escalares; o arquétipo continua dono de tempos, golpes e traços.
+- **Fluxo**: `powerLevel` (permanente) define potência, ganho do medidor, resistência e tier visual; `powerMeter` é o recurso da luta; `stamina` continua o recurso físico.
+- **Resistência**: `levelDiff = alvo − conjurador`; regras em dados, um resolvedor puro, sem `if` por poder.
+- **Poderes** têm fases como os golpes, são pagos com `powerMeter` e não têm projétil. Estados `CASTING` e `CHANNELING`.
+- **EVADE** fica no "baixo" (S/↓, direcional, joystick); o Shift continua o dash. **Pulo duplo** por `movement.maxJumps`.
+- **Rotas e finais** são dados avaliados por um registro de condições contra o `DuelResult`.
+- **Protagonista** é dado gerado do save e entra em `createFighterFromCharacter`; sem sistema de animação novo.
+- **Skins** são overrides parciais de `appearance`, sem efeito em stats; a escolha fica nos params e no save.
+- **Segredo**: sequências de tokens (`key:`, `action:`, `tap:`) em `secretsConfig`; o próprio input libera o áudio.
 
-**Orçamento de desempenho (alvo mobile).** Update ≤ 2 ms e render ≤ 10 ms por frame em celular intermediário. Partículas dos poderes usam o pool atual (`maxParticles` 300; metade com efeitos reduzidos); luzes 8 (4 com efeitos reduzidos); raio com no máximo 2 polilinhas de cerca de 10 segmentos, regeradas a cada poucos frames; aura em sprites pré-renderizados por tier; nada de `shadowBlur`, `filter` ou gradiente criado por frame; DPR limitado por config; áudio continua sintetizado.
+**Orçamento de desempenho (alvo mobile).** Update ≤ 2 ms e render ≤ 10 ms por frame em celular intermediário. Partículas dos poderes usam o pool atual; raio com no máximo 2 polilinhas de cerca de 10 segmentos; luzes em sprites de glow em cache por cor; nada de `shadowBlur`, `filter` ou gradiente criado por frame; DPR limitado por config; áudio sintetizado.
 
+**Medição (v1.x final).** Chrome 154.0.8037.98 headless no Windows, aceleração padrão, CPU via `Emulation.setCPUThrottlingRate` (4×/6×). Viewport 844×390, DPR emulado 3 limitado a 2 (canvas 1386×780). Sombra lançando Raio contra a Barreira do Guardião no Santuário, incluindo reflexos, partículas e F3 ligado. Canais mantidos ativos e medidor reposto somente pelo cenário de teste, sem alteração das regras do jogo.
 
-**Medição da v1.10 e QA final.** Chrome 154.0.8037.98 headless no Windows, aceleração padrão, CPU via `Emulation.setCPUThrottlingRate` (4×/6×). Viewport 844×390, DPR emulado 3 limitado a 2 (canvas 1386×780). Sombra lançando Raio contra a Barreira do Guardião no Santuário, incluindo reflexos, partículas e F3 ligado. Canais mantidos ativos e medidor reposto somente pelo cenário de teste, sem alteração das regras do jogo.
-
-11 s por cenário, cerca de 650 frames; aquecimento de 120 frames. Médias do `GameLoop.timings`, com a janela normal de 60 frames do F3: 9 janelas por caso (10 em 4× reduzido). Máximo na tabela é a maior média de janela, não o pior frame isolado; FPS é a leitura final do overlay. Dados brutos em `media/v2-performance.json` e quatro capturas `media/v2-performance-*.png`.
+11 s por cenário, cerca de 650 frames; aquecimento de 120 frames. Médias do `GameLoop.timings`, com a janela normal de 60 frames do F3: 9 janelas por caso (10 em 4× reduzido). Máximo na tabela é a maior média de janela, não o pior frame isolado; FPS é a leitura final do overlay. Detalhes em [versions/v2.md](versions/v2.md).
 
 | CPU | Efeitos | Update médio / máximo | Render médio / máximo | FPS observado |
 | --- | --- | --- | --- | --- |
@@ -971,6 +946,8 @@ ui/TouchControls.js           IMPLEMENTADO v1.2: controles de toque desenhados n
 | 6× | reduzidos | 0,62 / 0,79 ms | 7,32 / 8,90 ms | 60,7 |
 
 Update e render dentro do alvo em todas as janelas. Sem mudanças de visual ou otimizações adicionais. A medição usa aceleração padrão: a tentativa com GPU desabilitada não representa o alvo mobile. Validação em hardware Android/iOS continua com o autor.
+
+---
 
 ---
 
