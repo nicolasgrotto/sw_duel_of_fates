@@ -13,7 +13,7 @@ O ciclo aprovado v2.1 → v3.0 está em [v3.md](v3.md). As sugestões abaixo fic
 
 | Ideia | Valor possível | Custo e condição |
 | --- | --- | --- |
-| Acessibilidade adicional na disputa | Reduzir esforço de apertos repetidos | Médio: alternativa confortável e competitivamente equivalente |
+| Acessibilidade competitiva na disputa | Alternativa aos apertos que empate com quem aperta | Médio: a opção "segurar" da v3 (2.5) fica abaixo do teto de apertos de propósito; equivalência exige outro desenho |
 | Treinos guiados das novas mecânicas | Ensinar timing e respostas | Baixo–médio após estabilizar regras; não substitui a atualização do tutorial já exigida |
 | Desafios locais com regras e seed fixas | Reutilizar arenas e elenco | Médio: ampliar o modo existente, sem backend ou farm na História |
 | Galeria de finais e diálogos | Valorizar conteúdo narrativo | Baixo–médio: tradução, persistência e proteção contra spoilers |

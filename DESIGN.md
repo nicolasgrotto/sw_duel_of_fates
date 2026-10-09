@@ -185,6 +185,17 @@ A v2 traz poderes, alinhamentos e personagens secretos. Para manter a identidade
 - As cores dos tiers do Fluxo (azul → roxo → vermelho no nível 10) são da energia, nunca da lâmina. A regra "sabres sem moral" continua valendo.
 - Voz gravada não entra na v2: segredo e finais usam texto na tela e som sintetizado.
 
+## Direção da v3 (aprovada)
+
+O ciclo v2.1 → v3.0 dá consequência ao duelo sem trocar o ritmo de leitura. Plano e etapas em [versions/v3.md](versions/v3.md). As regras entram nos documentos de gameplay e de design ao abrir cada etapa.
+
+- **Consequência, não punição permanente.** Exaustão e ferimento abrem uma janela de risco dentro do round e sempre têm recuperação (fim do round, Cura concluída). Corpo e lâminas continuam completos durante a luta.
+- **Disputa de lâminas é exceção deliberada ao "não arcade frenético".** Os apertos repetidos são curtos, raros (só fortes elegíveis que colidem) e representam esforço físico. A tensão vem do tremor, do som e da aproximação, não de câmera lenta. Uma opção de acessibilidade permite segurar a ação: conta entradas num ritmo fixo de config, abaixo do teto de apertos, para incluir quem não pode apertar repetidamente sem empatar com quem aperta.
+- **Câmera lenta continua com dois momentos** (K.O. e parry perfeito). Finalização usa a câmera lenta do K.O.; esquiva e disputa não ganham câmera lenta nem dessaturação.
+- **Finalização estilizada.** Separação de braço ou perna só no K.O. por lâmina, sem sangue, órgãos ou decapitação, com o corte visível na animação. Opção visual para desligar.
+- **Toque.** O limite de seis botões de combate ganha uma exceção: um botão contextual aparece só para lutadores com quarto poder. Registrado em UI_GUIDELINES na etapa 2.7.
+- **Termos de tela.** Vigor (no lugar de Stamina) e Contra-ataque (no lugar de Riposta) em português; glossário PT-BR/EN em versions/v3.md.
+
 ## Decisões em aberto
 
 - Estilo dos sprites: desenho por código (formas e silhuetas) ou sprites desenhados/gerados.
