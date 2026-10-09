@@ -66,6 +66,7 @@ export class EffectsSystem {
     this.random = random;
     this.timeControl = timeControl;
     this.shakeScale = 1;
+    this.evadeGlowScale = 1;
     this.flashScale = 1;
     this.punchScale = 1;
     this.reduced = false;
@@ -94,6 +95,7 @@ export class EffectsSystem {
       this.hitFlashes.clear();
     }
     this.shakeScale = reduced ? this.config.reduced.shakeScale : 1;
+    this.evadeGlowScale = reduced ? this.config.evadeGlow.reducedScale : 1;
     this.flashScale = reduced ? this.config.reduced.flashScale : 1;
   }
 
@@ -120,6 +122,7 @@ export class EffectsSystem {
     switch (event.type) {
       case CombatEvent.EVADE_SUCCESS:
         this.evadeAfterimages.set(defender, this.config.evadeAfterimageDuration);
+        this.spawnEvadeGlow(defender);
         break;
       case CombatEvent.HIT:
         if (this.flashScale > 0) {
@@ -321,6 +324,13 @@ export class EffectsSystem {
     }
   }
 
+  spawnEvadeGlow(fighter) {
+    const glow = this.config.evadeGlow;
+    const light = this.spawnLight(glow, fighter.x, fighter.y - fighter.height * glow.height, fighter.appearance.saberColor);
+    light.peakAlpha = glow.alpha * this.evadeGlowScale;
+    light.alpha = light.peakAlpha;
+  }
+
   spawnLight({ radius, alpha, duration }, x, y, color) {
     const light = this.findFreeLight();
     light.active = true;
@@ -332,6 +342,7 @@ export class EffectsSystem {
     light.alpha = alpha;
     light.time = 0;
     light.duration = duration;
+    return light;
   }
 
   spawnRing({ radius, lineWidth, alpha, duration }, x, y, color, contract = false) {

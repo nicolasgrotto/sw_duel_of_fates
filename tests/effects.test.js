@@ -336,3 +336,21 @@ it('maps evade success to a short afterimage signal without camera or particles'
   effects.update(effectsConfig.evadeAfterimageDuration);
   assert.equal(effects.hasEvadeAfterimage(event.defender), false);
 });
+
+it('lights the evading fighter in its own blade color, dimmer with reduced effects', () => {
+  const { effects, camera } = createEffects();
+  const event = createEvent(CombatEvent.EVADE_SUCCESS);
+  effects.handleEvents([event]);
+  const light = effects.lights.find((candidate) => candidate.active);
+  assert.equal(light.color, event.defender.appearance.saberColor);
+  assert.equal(light.peakAlpha, effectsConfig.evadeGlow.alpha);
+  assert.equal(light.x, event.defender.x);
+  assert.equal(effects.rings.some((ring) => ring.active), false);
+  assert.equal(camera.shakeTime ?? 0, 0);
+
+  const reduced = createEffects();
+  reduced.effects.setReduced(true);
+  reduced.effects.handleEvents([createEvent(CombatEvent.EVADE_SUCCESS)]);
+  const dim = reduced.effects.lights.find((candidate) => candidate.active);
+  assert.equal(dim.peakAlpha, effectsConfig.evadeGlow.alpha * effectsConfig.evadeGlow.reducedScale);
+});

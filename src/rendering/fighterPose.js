@@ -1,5 +1,5 @@
 import { AttackPhase, getAttackPhase, getPhaseProgress } from '../combat/attackPhases.js';
-import { animation as animationStyle, combatPoses, proportions } from '../config/fighterVisualConfig.js';
+import { animation as animationStyle, combatPoses, motionStyles, proportions } from '../config/fighterVisualConfig.js';
 import { FighterState } from '../entities/fighterStates.js';
 import { easeInOutSine, easeInQuad, easeOutCubic, easeOutQuad } from '../utils/easing.js';
 import { TAU, clamp, degreesToRadians, lerp } from '../utils/math.js';
@@ -120,15 +120,27 @@ function applyStunnedPose(fighter) {
   combatPose.bladeDegrees = style.bladeDegrees + sway;
 }
 
+export function getMotionStyle(fighter) {
+  return motionStyles[fighter.appearance.motion] ?? motionStyles.standard;
+}
+
+export function getEvadeVariant(fighter, justSucceeded = false) {
+  const variants = getMotionStyle(fighter).evade;
+  const index = Math.max(0, fighter.combat.evadeStreak - (justSucceeded ? 1 : 0));
+  return variants[index % variants.length];
+}
+
 function resolveCombatPose(fighter, guardDegrees, forceEvade = false) {
   resetCombatPose(guardDegrees);
 
   if (forceEvade || (fighter.state === FighterState.DODGING && fighter.combat.evading)) {
-    const style = combatPoses.evade;
+    const { releaseTime } = combatPoses.evade;
     const profile = fighter.combat.dodgeProfile;
-    const amount = forceEvade ? 1 : 1 - easeInOutSine(clamp((fighter.stateTime - style.releaseTime) / (profile.duration - style.releaseTime), 0, 1));
-    combatPose.leanDegrees = style.lean * amount;
-    combatPose.crouch = style.crouch * amount;
+    const amount = forceEvade ? 1 : 1 - easeInOutSine(clamp((fighter.stateTime - releaseTime) / (profile.duration - releaseTime), 0, 1));
+    const variant = getEvadeVariant(fighter, forceEvade);
+    combatPose.leanDegrees = variant.lean * amount;
+    combatPose.crouch = variant.crouch * amount;
+    combatPose.bladeDegrees = guardDegrees + variant.bladeOffset * amount;
     return;
   }
   switch (fighter.state) {

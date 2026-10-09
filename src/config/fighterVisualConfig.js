@@ -154,7 +154,7 @@ export const combatPoses = {
     lift: 0.06,
     crouch: 6,
   },
-  evade: { lean: -22, crouch: 8, releaseTime: 0.1 },
+  evade: { releaseTime: 0.1 },
   powers: {
     cast: { bladeDegrees: 115, lean: 12, crouch: 4, reach: 0.06, lift: 0, tremble: 0, trembleSpeed: 0 },
     channel: { bladeDegrees: 125, lean: 8, crouch: 8, reach: 0.04, lift: 0, tremble: 2.5, trembleSpeed: 9 },
@@ -184,6 +184,16 @@ export const combatPoses = {
     fallDuration: 0.45,
     fallDegrees: 88,
     lift: 0.2,
+  },
+};
+
+export const motionStyles = {
+  standard: {
+    evade: [
+      { lean: -22, crouch: 8, bladeOffset: 0 },
+      { lean: -12, crouch: 16, bladeOffset: 18 },
+      { lean: -30, crouch: 4, bladeOffset: -12 },
+    ],
   },
 };
 

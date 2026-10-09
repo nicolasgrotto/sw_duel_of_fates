@@ -12,6 +12,7 @@ export const effectsConfig = {
   maxPunchZoom: 0.06,
   maxPunchDuration: 0.25,
   evadeAfterimageDuration: 0.1,
+  evadeGlow: { radius: 90, alpha: 0.5, duration: 0.2, height: 0.55, reducedScale: 0.6 },
   hitFlashDuration: 0.06,
   hitStopTremor: { amplitude: 2.5, interval: 1 / 60 },
   maxShakeAmplitude: 12,

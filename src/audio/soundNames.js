@@ -8,6 +8,7 @@ export const SoundName = Object.freeze({
   CLASH: 'clash',
   DEATH: 'death',
   DODGE: 'dodge',
+  EVADE_SUCCESS: 'evadeSuccess',
   DENIED: 'denied',
   PARRY: 'parry',
   PERFECT_PARRY: 'perfectParry',
