@@ -75,9 +75,9 @@ async function runAll(scenarios, outDir) {
   return Object.fromEntries(scenarios.map(({ key }) => [key, digests[key]]));
 }
 
-function compare(expected, actual) {
+function compare(expected, actual, only) {
   const changed = Object.keys(actual).filter((key) => expected.scenarios[key] !== actual[key]);
-  const missing = Object.keys(expected.scenarios).filter((key) => !(key in actual));
+  const missing = Object.keys(expected.scenarios).filter((key) => key.startsWith(only) && !(key in actual));
   for (const key of changed) console.log(`changed: ${key}`);
   for (const key of missing) console.log(`missing: ${key}`);
   console.log(`${Object.keys(actual).length} scenarios, ${changed.length} changed, ${missing.length} missing`);
@@ -97,7 +97,7 @@ async function main() {
   }
   if (options.check) {
     const expected = JSON.parse(readFileSync(options.check, 'utf8'));
-    if (!compare(expected, digests)) {
+    if (!compare(expected, digests, options.only)) {
       process.exitCode = 1;
     }
   }
