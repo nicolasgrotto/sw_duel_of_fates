@@ -934,7 +934,7 @@ controllers   → config
 systems / combat / ai → entities, config, utils (combat também usa StaminaSystem; a IA lê PowerSystem e flowInteractions só para decidir)
 rendering     → config, utils, entities, combat/attackPhases, PowerSystem e flowInteractions (só leitura)
 entities      → config, utils
-core (resto)  → config
+core (resto)  → config, utils (saveStorage usa legacyRatings na migração v4 → v5)
 ```
 
 Evitar dependências circulares.
