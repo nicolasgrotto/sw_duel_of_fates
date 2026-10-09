@@ -548,13 +548,13 @@ Os dois podem pausar (J1: Esc ou P; J2: P ou Start). A HUD mostra "J1" e "J2" an
 
 Progressão sem grind: no build de portfólio tudo fica liberado. Desafios por personagem liberam só cores de sabre e paletas alternativas. Títulos por marcos de habilidade. Nada afeta atributos.
 
-## Movimento v1.3: esquiva de precisao
+## 21.1. Movimento v1.3: esquiva de precisão
 
-EVADE (S/baixo) e separado do dash (Shift). No chao, consome zero stamina, recua poucos pixels, fica invulneravel por 0,066 s e recupera ate 0,4 s. Sem contato, a recuperacao e vulneravel. Quando uma hitbox cruza a hurtbox na janela, EVADE_SUCCESS consome esse contato e libera o defensor imediatamente para punir, sem dano nem ganho de stamina. Repetir a acao exige novo toque; nenhuma defesa passiva ao segurar baixo. Config global pode desligar a mecanica; arquetipos podem fornecer perfil completo em stats.evade.
+EVADE (S/baixo) é separado do dash (Shift). No chão, consome zero stamina, recua poucos pixels, fica invulnerável por 0,066 s e recupera até 0,4 s. Sem contato, a recuperação é vulnerável. Quando uma hitbox cruza a hurtbox na janela, EVADE_SUCCESS consome esse contato e libera o defensor imediatamente para punir, sem dano nem ganho de stamina. Repetir a ação exige novo toque; nenhuma defesa passiva ao segurar baixo. Config global pode desligar a mecânica; arquétipos podem fornecer perfil completo em stats.evade.
 
-Pulo duplo: todos os arquetipos usam movement.maxJumps = 1, exceto Vespa = 2. Novo toque no ar aplica 80% da velocidade vertical do primeiro pulo. jumpsUsed zera ao tocar o chao ou reiniciar round. Pulo na parede tem prioridade e preserva quantos pulos ja foram gastos; nao devolve o aereo. Pulo duplo nao rearma ataque aereo (um por voo), evitando sequencias no ar.
+Pulo duplo: todos os arquétipos usam movement.maxJumps = 1, exceto Vespa = 2. Novo toque no ar aplica 80% da velocidade vertical do primeiro pulo. jumpsUsed zera ao tocar o chão ou reiniciar round. Pulo na parede tem prioridade e preserva quantos pulos já foram gastos; não devolve o aéreo. Pulo duplo não rearma ataque aéreo (um por voo), evitando sequências no ar.
 
-## Atributos v1.4
+## 21.2. Atributos v1.4
 
 Vida, Stamina, Lâmina, Defesa, Agilidade e Fluxo usam notas 1–9. Nota 5 tem multiplicador 1; cada nota muda 6%. Dez é reservado ao secreto futuro. As bases por arquétipo preservam os stats atuais do elenco, inclusive o chefe. Vida muda vida máxima; Stamina muda máximo e regeneração; Lâmina muda todos os danos e dá pequeno bônus de parry perfeito. Defesa muda custo da guarda, recuo e reserva de stamina para evitar quebra, sem reduzir dano recebido. Agilidade muda caminhada, pulo, avanços e janela do EVADE, sem devolver ataques aéreos. Fluxo guarda o nível para a v1.5 e ainda não afeta combate. Não há distribuição de pontos nesta etapa.
 
