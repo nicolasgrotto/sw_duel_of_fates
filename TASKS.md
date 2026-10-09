@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | [versions/v1.md](versions/v1.md) | Fases 1–7 e roadmap v0.2 → v1.0 | fechada (tag `v1.0.0`, branch `main`) |
 | [versions/v2.md](versions/v2.md) | Etapas v1.1 → v1.19, testes e critérios de aceitação | **fechada** (tag local `v2.0.0`, integrada à `origin/main`) |
-| [versions/v3.md](versions/v3.md) | Etapas v2.1 → v2.10 e 3.0, especificação aprovada e critérios | **em andamento** (branch local `v3-development`); próxima: 2.1 |
+| [versions/v3.md](versions/v3.md) | Etapas v2.1 → v2.10 e 3.0, especificação aprovada e critérios | **em andamento** (branch local `v3-development`); próxima: 2.2 |
 | [versions/backlog.md](versions/backlog.md) | Sugestões fora do ciclo aprovado | não comprometidas |
 
 ## Como atualizar
@@ -21,7 +21,7 @@ A branch de desenvolvimento leva o nome da versão de destino, igual ao arquivo 
 
 ## Ponto de continuidade
 
-- **Ciclo v2.1 → v3.0:** plano de versões em [versions/v3.md](versions/v3.md), na branch local `v3-development`. **Preparação concluída**: simulador separa K.O. duplo de limite de tempo, referência v2 em `tools/reference-v2.json` (`npm run reference -- --check tools/reference-v2.json`), contratos na ARCHITECTURE → "v3: princípios e decisões", glossário aprovado e cenários de QA registrados. Divisão entre Codex e Claude por task em versions/v3.md → "Divisão entre agentes" (com regra de substituição). Próxima etapa: **2.1 Replay fluido e esquiva em sequência**, começando pela medição (Codex). Ponto de checagem do autor no fim da 2.5.
+- **Ciclo v2.1 → v3.0:** plano de versões em [versions/v3.md](versions/v3.md), na branch local `v3-development`. **Preparação concluída**: simulador separa K.O. duplo de limite de tempo, referência v2 em `tools/reference-v2.json` (`npm run reference -- --check tools/reference-v2.json`), contratos na ARCHITECTURE → "v3: princípios e decisões", glossário aprovado e cenários de QA registrados. Divisão entre Codex e Claude por task em versions/v3.md → "Divisão entre agentes" (com regra de substituição). **2.1 concluída**: medição de frames no F3, replay interpolado (frames parados 99% → 9%), `evadeStreak`, luz, som e poses do sucesso da esquiva. Próxima etapa: **2.2 PT-BR e inglês**. Ponto de checagem do autor no fim da 2.5.
 
 - **v1.0** publicada: `main` e tag `v1.0.0` no GitHub. Falta ativar o GitHub Pages (passos no README) e, se o autor quiser, gravar GIFs para o README.
 - **v2.0** concluída com aprovação do autor: etapas **v1.1–v1.19**, tag local `v2.0.0` e integração por fast-forward publicada na `origin/main`. Versão do pacote: `2.0.0`. Fechamento: 580 testes, clássico idêntico em 364 cenários, médias com poderes 47,9–53,3%, secretos e chefes validados, Chrome CPU 6× dentro do orçamento. Matrizes na ARCHITECTURE e checklist em `versions/v2.md`. Hardware conferido pelo autor nas etapas anteriores. Tags permanecem locais. Próximo ciclo: `versions/v3.md`; ideias adicionais em `versions/backlog.md`.
