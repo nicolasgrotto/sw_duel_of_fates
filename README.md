@@ -77,7 +77,7 @@ Os testes cobrem apenas módulos de lógica. Por isso, módulos de lógica não 
 npm run simulate -- --duels 300 --difficulty normal
 ```
 
-Roda duelos IA × IA sem navegador e mostra vitórias e estatísticas. `npm run matrix` roda todos contra todos e mostra a média de vitórias de cada personagem. Opções e exemplos em [ARCHITECTURE.md](ARCHITECTURE.md#balanceamento).
+Roda duelos IA × IA sem navegador e mostra vitórias e estatísticas. `npm run matrix` roda todos contra todos e mostra a média de vitórias de cada personagem. `npm run reference -- --check tools/reference-v2.json` confere se as regras v2 continuam idênticas. Opções e exemplos em [ARCHITECTURE.md](ARCHITECTURE.md#balanceamento).
 
 ## Controles
 

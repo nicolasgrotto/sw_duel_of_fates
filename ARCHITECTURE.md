@@ -176,6 +176,8 @@ tools/
   server.js                 ✅ servidor estático para desenvolvimento
   simulate.js               ✅ simulador de duelos IA × IA para balanceamento (npm run simulate)
   matrix.js                 ✅ matriz de vitórias de todos contra todos usando o simulate (npm run matrix)
+  reference.js              ✅ conjunto de referência do simulador com digest por cenário (npm run reference)
+  reference-v2.json         ✅ digests das regras v2, referência de regressão do ciclo v3
 tests/                      ✅ testes com node --test
 ```
 
@@ -1025,6 +1027,22 @@ Dois duelos sem vencedor foram confirmados como K.O. simultâneo: Forja × Vespa
 | contra o Predestinado | Difícil | 23,3 | 15,0 | 13,3 |
 
 O Soberano permanece vencível em todas as dificuldades. O Predestinado fica muito difícil, mas possível: piloto Difícil vence 13,3–23,3%; Normal, 1,4–2,2%. Piloto Fácil zerou as vitórias contra o chefe secreto nesta amostra, como na referência v1.12; isso não representa um limite de possibilidade para o jogador. Resultados de IA são uma referência determinística de calibração, não estimativas de taxa de vitória humana.
+
+### Referência v2 para a v3
+
+Durante o ciclo v3, as regras da v2 precisam continuar reproduzíveis. `npm run reference` roda 734 cenários pelo `simulate.js`, seed 1, perfis próprios, e guarda um digest SHA-256 (16 hex) da saída completa de cada um:
+
+- clássico (sem poderes): todos os pares ordenados distintos dos 14 personagens, Normal e Difícil, 20 duelos por par;
+- com poderes: os mesmos 364 pares, 60 duelos por par;
+- História: protagonista Técnica no teto e total de cada dificuldade, luz e sombra, contra o Soberano com poderes, 60 duelos.
+
+```
+npm run reference -- --check tools/reference-v2.json          # falha se algum cenário mudar
+npm run reference -- --check tools/reference-v2.json --only classic/normal
+npm run reference -- --out <pasta> --only powers              # grava as saídas completas para comparar
+```
+
+Gerada sobre a v2.0.0 com Node v24 (registrado no JSON); duas execuções seguidas sem diferença, em cerca de 3,5 min com 4 processos. Dois cenários terminam com um K.O. duplo cada (os mesmos do fechamento v1.19); nenhum atinge o limite de tempo. Uma mudança só visual, de idioma ou de ferramenta deve passar no `--check`. A partir da 2.4, o preset `reference` das regras precisa passar no mesmo `--check`; mudanças intencionais nas regras v2 exigem regenerar o arquivo no mesmo commit e explicar o motivo aqui.
 
 ## AI
 
