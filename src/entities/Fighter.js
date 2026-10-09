@@ -35,6 +35,7 @@ function createCombat() {
     dodgeProfile: null,
     evading: false,
     evadeSucceeded: false,
+    evadeStreak: 0,
     passThrough: false,
     armorHits: 0,
     chargeTime: 0,

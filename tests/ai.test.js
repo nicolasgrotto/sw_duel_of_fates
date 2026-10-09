@@ -552,3 +552,26 @@ it('uses configured hard evade through the actual simulation against an active s
   assert.equal(self.health, self.stats.maxHealth);
   assert.ok(simulation.events.some(event => event.type === 'evadeSuccess'));
 });
+
+it('chains evades through the same action when two strikes arrive in a row', () => {
+  const self = spawnFighter(600, -1, 'guardian');
+  const opponent = spawnFighter(540, 1, 'shadow');
+  const simulation = createSimulation([opponent, self]);
+  const ai = new EnemyAI({ self, opponent, profile: aiConfig.profiles.guardian, difficulty: { ...PERFECT, evadeChance: 1, evadeTimingJitter: 0 }, perception: aiConfig.perception, random: () => 0.99 });
+  let successes = 0;
+  for (let strike = 0; strike < 2; strike += 1) {
+    opponent.restartState(FighterState.IDLE);
+    opponent.clearAttack();
+    simulation.combat.tryAttack(opponent, 'light');
+    opponent.stateTime = opponent.moves.light.startup;
+    ai.thinkTimer = 0;
+    for (let step = 0; step < 40; step += 1) {
+      ai.updateIntent(self.intent, STEP);
+      simulation.step(STEP);
+      successes += simulation.events.filter((event) => event.type === 'evadeSuccess').length;
+    }
+  }
+  assert.equal(successes, 2);
+  assert.equal(self.health, self.stats.maxHealth);
+  assert.equal(self.combat.evadeStreak, 2);
+});

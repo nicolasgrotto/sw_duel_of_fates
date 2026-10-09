@@ -100,6 +100,9 @@ export class CombatSystem {
         break;
       case FighterState.DODGING:
         if (fighter.stateTime >= combat.dodgeProfile.duration) {
+          if (combat.evading) {
+            combat.evadeStreak = 0;
+          }
           combat.passThrough = false;
           combat.evading = false;
           fighter.setState(FighterState.IDLE);
@@ -365,6 +368,7 @@ export class CombatSystem {
 
     spendStamina(fighter, getStaminaCost(fighter, attack.staminaCost));
     fighter.combat.riposteTime = 0;
+    fighter.combat.evadeStreak = 0;
     fighter.clearAttack();
     fighter.combat.attack = attack;
     fighter.combat.attackType = attackType;
@@ -521,6 +525,7 @@ export class CombatSystem {
     if (contact.evaded) {
       const { defender } = contact;
       defender.combat.evadeSucceeded = true;
+      defender.combat.evadeStreak += 1;
       defender.combat.evading = false;
       defender.combat.passThrough = false;
       defender.vx = 0;
@@ -647,6 +652,7 @@ export class CombatSystem {
     contact.damage = Math.min(defender.health, damage);
     defender.health = Math.max(0, defender.health - damage);
     if (damage > 0) {
+      defender.combat.evadeStreak = 0;
       this.statuses.onDamaged(defender);
     }
     contact.armored = armored;
@@ -681,6 +687,7 @@ export class CombatSystem {
     const dealt = Math.min(target.health, damage);
     target.health = Math.max(0, target.health - damage);
     if (dealt > 0) {
+      target.combat.evadeStreak = 0;
       this.statuses.onDamaged(target);
       this.powers.gain(target, this.powers.config.meter.gain.hitTaken);
     }
@@ -695,6 +702,7 @@ export class CombatSystem {
 
   applyStatusDamage(fighter, source, amount) {
     fighter.health = Math.max(0, fighter.health - amount);
+    fighter.combat.evadeStreak = 0;
     if (fighter.health === 0) {
       this.knockOut(fighter, { attacker: source, defender: fighter, attackType: 'choke', x: fighter.x, y: fighter.y - fighter.height * this.powers.config.impactHeight, damage: amount });
     }
