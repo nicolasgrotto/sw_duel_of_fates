@@ -6,6 +6,7 @@ export const DuelMode = Object.freeze({
   TRAINING: 'training',
   TUTORIAL: 'tutorial',
   CHALLENGE: 'parryChallenge',
+  STORY: 'story',
 });
 
 const DUMMY_MODES = new Set([DuelMode.TRAINING, DuelMode.TUTORIAL, DuelMode.CHALLENGE]);

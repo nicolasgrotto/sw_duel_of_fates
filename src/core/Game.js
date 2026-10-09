@@ -1,6 +1,8 @@
 import { aiConfig } from '../config/aiConfig.js';
 import { audioConfig } from '../config/audioConfig.js';
-import { loadSettings, saveSettings } from './settingsStorage.js';
+import { loadSettings, loadStory, saveSettings } from './settingsStorage.js';
+import { storyConfig } from '../config/storyConfig.js';
+import { sanitizeStoryRun } from '../modes/story/storyRun.js';
 import { Action, keyBindings, keyboardPresets, keyboardPresetOrder, remappableActions, twoPlayerBindings } from '../config/controlsConfig.js';
 import { createCustomBindings, sanitizeCustomBindings } from './keyBindings.js';
 import { gameConfig } from '../config/gameConfig.js';
@@ -37,6 +39,7 @@ export class Game {
       { difficulty: aiConfig.difficultyOrder, keyboardPreset: keyboardPresetOrder },
     );
     this.settings.customBindings = sanitizeCustomBindings(this.settings.customBindings, remappableActions);
+    this.story = sanitizeStoryRun(loadStory(globalThis.localStorage, gameConfig.settingsStorageKey), storyConfig);
     this.audio = new AudioManager(audioConfig);
     this.applySettings();
     this.unlockAudio = () => this.audio.unlock();
@@ -74,7 +77,7 @@ export class Game {
   }
 
   saveSettings() {
-    saveSettings(this.settings, globalThis.localStorage, gameConfig.settingsStorageKey);
+    saveSettings(this.settings, globalThis.localStorage, gameConfig.settingsStorageKey, this.story);
   }
 
   changeState(id, params) {

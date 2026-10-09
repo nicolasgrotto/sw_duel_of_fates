@@ -1,5 +1,6 @@
 import { CharacterSelectState } from './CharacterSelectState.js';
 import { ControlsState } from './ControlsState.js';
+import { DialogueState } from './DialogueState.js';
 import { DuelState } from './DuelState.js';
 import { GameOverState } from './GameOverState.js';
 import { KeyRemapState } from './KeyRemapState.js';
@@ -7,8 +8,10 @@ import { MenuState } from './MenuState.js';
 import { MoveListState } from './MoveListState.js';
 import { OptionsState } from './OptionsState.js';
 import { PauseState } from './PauseState.js';
+import { ProtagonistState } from './ProtagonistState.js';
 import { ReplayState } from './ReplayState.js';
 import { StateId } from './stateIds.js';
+import { StoryState } from './StoryState.js';
 
 const stateClasses = {
   [StateId.MENU]: MenuState,
@@ -21,6 +24,9 @@ const stateClasses = {
   [StateId.MOVE_LIST]: MoveListState,
   [StateId.REPLAY]: ReplayState,
   [StateId.KEY_REMAP]: KeyRemapState,
+  [StateId.STORY]: StoryState,
+  [StateId.PROTAGONIST]: ProtagonistState,
+  [StateId.DIALOGUE]: DialogueState,
 };
 
 export function createState(id, game, params) {

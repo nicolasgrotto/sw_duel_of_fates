@@ -1,7 +1,8 @@
-export const SAVE_VERSION = 2;
+export const SAVE_VERSION = 3;
 
 export const saveMigrations = [
   { from: 1, to: 2, migrate: (settings) => ({ version: 2, settings }) },
+  { from: 2, to: 3, migrate: (save) => ({ ...save, version: 3, story: null }) },
 ];
 
 export function loadSave(storage, key) {
@@ -22,9 +23,9 @@ export function loadSave(storage, key) {
   }
 }
 
-export function saveSave(settings, storage, key) {
+export function saveSave(settings, storage, key, story = null) {
   try {
-    storage?.setItem(key, JSON.stringify({ version: SAVE_VERSION, settings }));
+    storage?.setItem(key, JSON.stringify({ version: SAVE_VERSION, settings, story }));
     return true;
   } catch {
     return false;

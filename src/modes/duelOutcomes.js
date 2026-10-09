@@ -1,12 +1,62 @@
 import { isLastStage, nextArcadeRun } from './arcade.js';
 import { nextSurvivalRun } from './survival.js';
+import { resolveDialogue } from './story/dialogue.js';
+import { resolveStoryResult } from './story/storyRun.js';
 import { ARCADE_UNLOCK, addUnlocks, findChallengeUnlocks } from './unlocks.js';
 import { DuelMode } from '../states/duelModes.js';
 import { StateId } from '../states/stateIds.js';
 import { texts } from '../config/uiConfig.js';
 import { formatText } from '../ui/formatText.js';
 
-export function resolveDuelOutcome(result, { params, settings, character, survivalConfig }) {
+function addUnlockedCharacters(settings, ids) {
+  const current = settings.unlockedCharacters ?? [];
+  return [...current, ...ids.filter((id) => !current.includes(id))];
+}
+
+function resolveStoryOutcome(result, { params, settings, story }) {
+  const outcome = resolveStoryResult(params.story, result, story.config, story.loadouts);
+  const progress = {};
+  if (!outcome.won) {
+    return {
+      state: StateId.GAME_OVER,
+      progress,
+      params: {
+        duelParams: params,
+        title: texts.story.defeatTitle,
+        subtitle: formatText(texts.story.defeatSubtitle, { title: story.texts.encounters[outcome.encounter.id].title }),
+        summary: '',
+        rematchLabel: texts.story.retry,
+        rematchParams: params,
+        menuLabel: texts.story.backToStory,
+        menuState: StateId.STORY,
+      },
+    };
+  }
+  const { protagonist } = params.story;
+  const lines = resolveDialogue(story.texts.encounters[outcome.encounter.id].after, protagonist, story.names);
+  if (outcome.ending) {
+    lines.push(...resolveDialogue(story.texts.endings[outcome.ending].lines, protagonist, story.names));
+  }
+  if (outcome.unlocks.length > 0) {
+    progress.unlockedCharacters = addUnlockedCharacters(settings, outcome.unlocks);
+    lines.push({ speaker: '', text: formatText(texts.story.unlocked, { names: outcome.unlocks.map((id) => story.names[id]).join(', ') }) });
+  }
+  return {
+    state: StateId.DIALOGUE,
+    progress,
+    story: outcome.run,
+    params: {
+      lines,
+      title: outcome.ending ? story.texts.endings[outcome.ending].title : '',
+      next: { state: StateId.STORY, params: {} },
+    },
+  };
+}
+
+export function resolveDuelOutcome(result, { params, settings, character, survivalConfig, story = null }) {
+  if (result.mode === DuelMode.STORY) {
+    return resolveStoryOutcome(result, { params, settings, story });
+  }
   const playerWon = result.winnerSide === 0;
   const player = result.fighters[0];
   const progress = {};

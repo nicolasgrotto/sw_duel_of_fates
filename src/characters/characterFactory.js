@@ -7,12 +7,15 @@ import { fighterArchetypes } from '../config/fightersConfig.js';
 import { Fighter } from '../entities/Fighter.js';
 import { characters } from './characterData.js';
 
-export function createFighter(characterId, { x, y, facing }, { saberColor = null } = {}) {
+export function createFighter(characterId, spawn, options) {
   const character = characters[characterId];
   if (!character) {
     throw new Error(`Unknown character: ${characterId}`);
   }
+  return createFighterFromCharacter(character, spawn, options);
+}
 
+export function createFighterFromCharacter(character, { x, y, facing }, { saberColor = null } = {}) {
   const stats = fighterArchetypes[character.archetype];
   if (!stats) {
     throw new Error(`Unknown archetype: ${character.archetype}`);
@@ -33,12 +36,12 @@ export function createFighter(characterId, { x, y, facing }, { saberColor = null
     parry: { ...stats.parry, ...scalars.parry },
     evade: stats.evade ?? evadeConfig.profile,
     attacks: moves,
-  }, character.attributes, attributesConfig);
+  }, character.attributes, attributesConfig, { apex: character.apex === true });
 
   return new Fighter({
     id: character.id,
     name: character.name,
-    stats: { ...derived, alignment: character.alignment, power: resolvePowerStats(derived.powerLevel, powersConfig, character.alignment) },
+    stats: { ...derived, alignment: character.alignment, power: resolvePowerStats(derived.powerLevel, powersConfig, character.alignment, character.powerSlots ?? null) },
     appearance: saberColor ? { ...character.appearance, saberColor } : character.appearance,
     sound: character.sound,
     x,

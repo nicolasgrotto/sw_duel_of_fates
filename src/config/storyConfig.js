@@ -1,0 +1,36 @@
+export const storyConfig = {
+  start: 'trial',
+  pointsPerVictory: 2,
+  startPoints: 4,
+  startAttributes: { health: 4, stamina: 4, blade: 4, defense: 4, agility: 4, flow: 4 },
+  ratingCaps: { easy: 8, normal: 7, hard: 6 },
+  budgets: { easy: 40, normal: 37, hard: 34 },
+  difficulties: ['easy', 'normal', 'hard'],
+  rules: { powers: true },
+  roundsToWin: 1,
+  protagonist: {
+    names: ['Kael', 'Iria', 'Tarin', 'Vessa', 'Oren', 'Lyse'],
+    maxNameLength: 16,
+    alignments: ['light', 'dark'],
+    styles: {
+      technique: { base: 'guardian' },
+      fury: { base: 'shadow' },
+      flight: { base: 'heron' },
+    },
+    saberColors: ['#7fe4ff', '#9dff3f', '#ffd23f', '#e8eeff', '#a46bff', '#ff7a2a', '#5fffc0', '#ffa6e0', '#ff3f9e', '#ff4038'],
+    appearance: {
+      cloakColor: '#3e4a5e',
+      bodyColor: '#1d222b',
+      trimColor: '#7f90aa',
+      hoodUp: false,
+      longCape: true,
+      masked: false,
+      scarf: true,
+    },
+  },
+  encounters: [
+    { id: 'trial', opponent: 'guardian', arena: 'refinery', aiOffset: -1, next: 'forest' },
+    { id: 'forest', opponent: 'echo', arena: 'forest', aiOffset: 0, next: null },
+  ],
+  endings: {},
+};

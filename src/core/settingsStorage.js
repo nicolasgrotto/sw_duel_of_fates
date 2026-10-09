@@ -26,6 +26,11 @@ export function loadSettings(defaults, storage, key, allowed = {}) {
   return settings;
 }
 
-export function saveSettings(settings, storage, key) {
-  return saveSave(settings, storage, key);
+export function saveSettings(settings, storage, key, story = null) {
+  return saveSave(settings, storage, key, story);
+}
+
+export function loadStory(storage, key) {
+  const story = loadSave(storage, key)?.story;
+  return story && typeof story === 'object' && !Array.isArray(story) ? story : null;
 }

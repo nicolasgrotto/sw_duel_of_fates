@@ -594,3 +594,25 @@ O Fluxo é a energia dos poderes. Nomes de tela em `uiConfig`; no código, `powe
 - Nomes de tela em `uiConfig.texts.powers`; os ids no código são `push`, `pull`, `lightning` e `barrier`.
 
 **Elenco.** Aurora: Guardião, Bastião, Vespa, Espelho, Garça. Eclipse: Sombra, Haste, Brasa, Forja, Eco. Chefe do Arcade: Eclipse, nível 9.
+
+## 23. História (v2)
+
+Campanha linear com um protagonista criado pelo jogador. Textos em `src/config/storyTexts.js`; regras e encontros em `src/config/storyConfig.js`.
+
+**Criação.** Cinco passos: nome (lista pronta; digitar o nome chega com a personalização), Caminho do Fluxo (Aurora ou Eclipse, que definem os poderes), estilo de luta (Técnica, Fúria ou Voo: usam golpes e habilidade do Guardião, da Sombra ou da Garça), cor da lâmina e dificuldade. Logo depois, o jogador distribui os pontos iniciais.
+
+**Atributos e progressão.** Todos começam em 4 (total 24) com 4 pontos livres. Cada vitória dá 2 pontos. Um ponto sobe uma nota em 1, respeitando:
+
+| Dificuldade | Teto por atributo | Total máximo |
+| --- | --- | --- |
+| Fácil | 8 | 40 |
+| Normal | 7 | 37 |
+| Difícil | 6 | 34 |
+
+O total máximo impede um protagonista com tudo no teto: ele termina forte, mas especializado (o elenco tem totais entre 29 e 39). O teto do Fluxo também decide a resistência contra os chefes: no Difícil, o Fluxo 6 contra um chefe de Fluxo 9 dá diferença 3, e os poderes do jogador são resistidos; a luta vira de lâmina.
+
+**Poderes.** O protagonista começa só com o poder principal do caminho; o segundo vem como recompensa de um capítulo. Na História os poderes estão sempre ligados.
+
+**Encontros.** Cada encontro tem adversário, arena, ajuste de dificuldade da IA (`aiOffset`) e diálogo antes e depois. Um round decide o duelo. Derrota: tentar de novo ou voltar à História, sem perder progresso. Vitória: diálogo, pontos e o próximo encontro.
+
+**Rotas e finais como dados.** Um encontro pode ter `outcomes`: a primeira condição verdadeira (`always`, `healthRatioAbove`, `alignmentIs`) escolhe o próximo encontro ou um final. Finais liberam personagens. O alinhamento muda falas (texto com variantes `light`/`dark`), poderes e recompensas, não a sequência de missões.

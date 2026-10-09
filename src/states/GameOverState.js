@@ -25,7 +25,7 @@ export class GameOverState extends GameState {
     this.menu = new MenuList(
       [
         { id: GameOverOption.REMATCH, label: this.params.rematchLabel ?? texts.result.rematch },
-        { id: GameOverOption.MENU, label: texts.result.menu },
+        { id: GameOverOption.MENU, label: this.params.menuLabel ?? texts.result.menu },
       ],
       layout.result,
       this.game.audio,
@@ -56,7 +56,7 @@ export class GameOverState extends GameState {
 
   update() {
     if (this.game.input.wasPressed(Action.BACK)) {
-      this.game.changeState(StateId.MENU);
+      this.game.changeState(this.params.menuState ?? StateId.MENU);
       return;
     }
     const choice = this.menu.update(this.game.input);
@@ -64,7 +64,7 @@ export class GameOverState extends GameState {
     if (choice === GameOverOption.REMATCH) {
       this.game.changeState(StateId.DUEL, this.params.rematchParams ?? this.params.duelParams);
     } else if (choice === GameOverOption.MENU) {
-      this.game.changeState(StateId.MENU);
+      this.game.changeState(this.params.menuState ?? StateId.MENU);
     }
   }
 

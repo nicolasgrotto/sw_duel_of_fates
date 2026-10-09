@@ -543,7 +543,7 @@ describe('duel rounds', () => {
   it('runs the arcade ladder: next fight on a win, retry on a loss', () => {
     const game = createFakeGame();
     game.changeState(StateId.MENU);
-    game.step(Action.MENU_DOWN);
+    goToMenuItem(game, 'arcade');
     game.step(Action.CONFIRM);
     assert.deepEqual(game.stateNames(), ['CharacterSelectState']);
     game.step(Action.CONFIRM);

@@ -9,4 +9,7 @@ export const StateId = Object.freeze({
   MOVE_LIST: 'moveList',
   REPLAY: 'replay',
   KEY_REMAP: 'keyRemap',
+  STORY: 'story',
+  PROTAGONIST: 'protagonist',
+  DIALOGUE: 'dialogue',
 });

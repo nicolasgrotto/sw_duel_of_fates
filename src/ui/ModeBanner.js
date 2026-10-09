@@ -9,6 +9,7 @@ export const BannerKind = Object.freeze({
   CHALLENGE: 'challenge',
   ARCADE: 'arcade',
   SURVIVAL: 'survival',
+  STORY: 'story',
 });
 
 function createKeyNames(bindings) {
@@ -40,6 +41,10 @@ export class ModeBanner {
     }
     if (this.kind === BannerKind.SURVIVAL) {
       this.describeSurvival();
+      return;
+    }
+    if (this.kind === BannerKind.STORY) {
+      this.describeStory();
       return;
     }
     const signature = this.kind === BannerKind.TUTORIAL
@@ -96,6 +101,15 @@ export class ModeBanner {
       wins: stage.wins,
       name: stage.opponentName.toUpperCase(),
     });
+    this.detail = '';
+  }
+
+  describeStory() {
+    if (this.signature) {
+      return;
+    }
+    this.signature = 'story';
+    this.title = formatText(texts.story.banner, { number: this.director.number, title: this.director.title.toUpperCase() });
     this.detail = '';
   }
 

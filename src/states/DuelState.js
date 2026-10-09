@@ -3,7 +3,11 @@ import { AmbientSystem } from '../systems/AmbientSystem.js';
 import { EnemyAI } from '../ai/EnemyAI.js';
 import { DuelAudio } from '../audio/DuelAudio.js';
 import { characters } from '../characters/characterData.js';
-import { createFighter } from '../characters/characterFactory.js';
+import { createFighter, createFighterFromCharacter } from '../characters/characterFactory.js';
+import { createProtagonistCharacter } from '../characters/protagonist.js';
+import { storyConfig } from '../config/storyConfig.js';
+import { storyTexts } from '../config/storyTexts.js';
+import { getStoryStage } from '../modes/story/storyRun.js';
 import { getChainStep, isStrongAttack } from '../combat/attackPhases.js';
 import { getFrameAdvantage } from '../combat/frameData.js';
 import { CombatEvent } from '../combat/combatEvents.js';
@@ -46,6 +50,7 @@ import { createRandom, createRandomSeed } from '../utils/random.js';
 import { GameState } from './GameState.js';
 import { DuelMode, createDuelRules, hasRoundLimit, usesDummy } from './duelModes.js';
 import { StateId } from './stateIds.js';
+import { getCharacterNames } from './StoryState.js';
 
 function createFighterStats() {
   return { hits: 0, damage: 0, blocks: 0, parries: 0, perfectParries: 0, guardBreaks: 0, shoves: 0, counters: 0, feints: 0, airHits: 0, longestChain: 0, powerHits: 0 };
@@ -72,9 +77,11 @@ export class DuelState extends GameState {
     this.mode = this.params.mode ?? DuelMode.VERSUS;
     this.arcadeStage = this.mode === DuelMode.ARCADE ? getArcadeStage(this.params.arcade, gameConfig.arcade, gameConfig.duel.arenaOrder) : null;
     this.survivalStage = this.mode === DuelMode.SURVIVAL ? this.createSurvivalStage() : null;
-    this.ladderStage = this.arcadeStage ?? this.survivalStage;
-    this.ladderRun = this.params.arcade ?? this.params.survival ?? null;
-    this.roundsToWin = this.survivalStage ? 1 : gameConfig.duel.roundsToWin;
+    this.storyStage = this.mode === DuelMode.STORY ? getStoryStage(this.params.story, storyConfig, aiConfig.difficultyOrder) : null;
+    this.ladderStage = this.arcadeStage ?? this.survivalStage ?? this.storyStage;
+    this.ladderRun = this.params.arcade ?? this.params.survival ?? this.params.story ?? null;
+    this.roundsToWin = this.survivalStage ? 1 : this.storyStage ? storyConfig.roundsToWin : gameConfig.duel.roundsToWin;
+    this.playerCharacterData = this.storyStage ? createProtagonistCharacter(this.params.story.protagonist, storyConfig, this.params.story.slots) : null;
     this.playerCharacter = this.ladderStage ? this.ladderRun.playerCharacter : (this.params.playerCharacter ?? gameConfig.duel.playerCharacter);
     this.opponentCharacter = this.ladderStage ? this.ladderStage.opponentCharacter : (this.params.opponentCharacter ?? gameConfig.duel.opponentCharacter);
     this.difficultyId = this.ladderStage ? this.ladderStage.difficulty : this.game.settings.difficulty;
@@ -140,8 +147,9 @@ export class DuelState extends GameState {
       this.director = new ParryChallenge(tutorialConfig.challenge);
       this.banner = new ModeBanner(BannerKind.CHALLENGE, this.director, bindings);
     } else if (this.ladderStage) {
-      const kind = this.survivalStage ? BannerKind.SURVIVAL : BannerKind.ARCADE;
-      this.banner = new ModeBanner(kind, { ...this.ladderStage, opponentName: this.fighters[1].name }, bindings);
+      const kind = this.storyStage ? BannerKind.STORY : this.survivalStage ? BannerKind.SURVIVAL : BannerKind.ARCADE;
+      const title = this.storyStage ? storyTexts.encounters[this.storyStage.encounterId].title : '';
+      this.banner = new ModeBanner(kind, { ...this.ladderStage, title, opponentName: this.fighters[1].name }, bindings);
       this.banner.update();
     }
     this.applyDummyBehavior();
@@ -311,7 +319,10 @@ export class DuelState extends GameState {
     const { floorY } = this.arena;
 
     const playerSaberColor = this.ladderRun ? this.ladderRun.playerSaberColor : this.params.playerSaberColor;
-    const player = createFighter(playerCharacter, { x: centerX - spawnDistance / 2, y: floorY, facing: 1 }, { saberColor: playerSaberColor });
+    const playerSpawn = { x: centerX - spawnDistance / 2, y: floorY, facing: 1 };
+    const player = this.playerCharacterData
+      ? createFighterFromCharacter(this.playerCharacterData, playerSpawn)
+      : createFighter(playerCharacter, playerSpawn, { saberColor: playerSaberColor });
     const opponent = createFighter(opponentCharacter, { x: centerX + spawnDistance / 2, y: floorY, facing: -1 }, { saberColor: this.params.opponentSaberColor });
 
     return [
@@ -347,7 +358,7 @@ export class DuelState extends GameState {
 
   update(dt) {
     if (this.isPausePressed()) {
-      this.game.pushState(StateId.PAUSE, { duelParams: this.params, rules: this.rules });
+      this.game.pushState(StateId.PAUSE, { duelParams: this.params, rules: this.rules, character: this.playerCharacterData, quitState: this.storyStage ? StateId.STORY : StateId.MENU });
       return;
     }
 
@@ -594,9 +605,13 @@ export class DuelState extends GameState {
     });
     const outcome = resolveDuelOutcome(result, {
       params: this.params, settings: this.game.settings,
-      character: characters[this.playerCharacter], survivalConfig: gameConfig.survival,
+      character: this.playerCharacterData ?? characters[this.playerCharacter], survivalConfig: gameConfig.survival,
+      story: this.storyStage ? { config: storyConfig, texts: storyTexts, loadouts: powersConfig.loadouts, names: getCharacterNames() } : null,
     });
-    if (Object.keys(outcome.progress).length) {
+    if (outcome.story) {
+      this.game.story = outcome.story;
+    }
+    if (Object.keys(outcome.progress).length || outcome.story) {
       Object.assign(this.game.settings, outcome.progress);
       this.game.saveSettings();
     }

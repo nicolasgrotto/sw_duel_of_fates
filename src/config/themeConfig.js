@@ -180,6 +180,19 @@ export const textStyles = {
     align: 'left',
     baseline: 'middle',
   },
+  dialogueSpeaker: {
+    font: `bold 24px ${FONT_FAMILY}`,
+    color: colors.accent,
+    align: 'center',
+    baseline: 'middle',
+    letterSpacing: '3px',
+  },
+  dialogueLine: {
+    font: `26px ${FONT_FAMILY}`,
+    color: colors.text,
+    align: 'center',
+    baseline: 'middle',
+  },
   debug: {
     font: `14px ${MONO_FONT_FAMILY}`,
     color: colors.debug,

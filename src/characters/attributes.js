@@ -1,7 +1,11 @@
-export function applyAttributes(base, attributes, config) {
+export function getRatingLimit(name, config, apex = false) {
+  return apex && name === config.apexAttribute ? config.apexRating : config.maxRating;
+}
+
+export function applyAttributes(base, attributes, config, { apex = false } = {}) {
   const ratings = { ...config.defaults, ...attributes };
   for (const name of Object.keys(config.defaults)) {
-    if (!Number.isInteger(ratings[name]) || ratings[name] < config.minRating || ratings[name] > config.maxRating) {
+    if (!Number.isInteger(ratings[name]) || ratings[name] < config.minRating || ratings[name] > getRatingLimit(name, config, apex)) {
       throw new RangeError(`Invalid attribute: ${name}=${ratings[name]}`);
     }
   }

@@ -111,6 +111,14 @@ NOME ESQUERDA                                         NOME DIREITA
 - Overlay escuro sobre o duelo congelado.
 - "PAUSADO" + opções: **Continuar**, **Lista de golpes**, **Reiniciar duelo**, **Sair para o menu**.
 
+### História
+
+- **Hub** (`HISTÓRIA`): menu à esquerda (Continuar · Capítulo N: título, Evoluir atributos, Nova/Recomeçar campanha, Voltar); à direita, nome, caminho e estilo, poderes, barras de atributo e o protagonista parado. Linha de status abaixo do título (dificuldade e duelos vencidos, ou "Campanha concluída").
+- **Novo duelista**: mesma composição; o subtítulo mostra o passo (`2/5 · Caminho do Fluxo`) e a prévia muda junto com a opção destacada.
+- **Atributos**: lista das seis notas; o subtítulo mostra pontos, teto e total (`Pontos: 3 · teto 7 · total 30/37`). Subir além do permitido toca o som de ação recusada.
+- **Diálogo**: a arena do encontro ao fundo, escurecida; título do capítulo no alto; faixa escura embaixo com o nome de quem fala (acento, espaçado) e a fala (texto principal), com fade curto a cada linha. `Enter`/toque avança e `Esc` pula. Narração não mostra nome.
+- **Duelo**: faixa do modo com `CAPÍTULO N · TÍTULO`, como no Arcade.
+
 ### Lista de golpes
 
 - Tela opaca (fundo `background`), título "GOLPES · NOME".

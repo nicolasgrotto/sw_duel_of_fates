@@ -40,13 +40,13 @@ export class PauseState extends GameState {
         this.game.popState();
         break;
       case PauseOption.MOVES:
-        this.game.pushState(StateId.MOVE_LIST, { characterId: this.params.duelParams?.playerCharacter ?? gameConfig.duel.playerCharacter, powers: this.params.rules?.powers === true });
+        this.game.pushState(StateId.MOVE_LIST, { characterId: this.params.duelParams?.playerCharacter ?? gameConfig.duel.playerCharacter, character: this.params.character, powers: this.params.rules?.powers === true });
         break;
       case PauseOption.RESTART:
         this.game.changeState(StateId.DUEL, this.params.duelParams);
         break;
       case PauseOption.QUIT:
-        this.game.changeState(StateId.MENU);
+        this.game.changeState(this.params.quitState ?? StateId.MENU);
         break;
       default:
         break;

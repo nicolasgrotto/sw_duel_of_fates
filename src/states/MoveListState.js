@@ -9,7 +9,7 @@ import { GameState } from './GameState.js';
 
 export class MoveListState extends GameState {
   enter() {
-    const character = characters[this.params.characterId];
+    const character = this.params.character ?? characters[this.params.characterId];
     const bindings = this.game.input.bindings ?? keyBindings;
     this.title = formatText(texts.moveList.title, { name: character.name.toUpperCase() });
     this.rows = buildMoveList(character, bindings, this.params.powers === true);

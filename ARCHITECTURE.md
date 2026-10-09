@@ -35,7 +35,7 @@ src/
     StateMachine.js         ✅ pilha de estados
     Camera.js               ✅ screen shake (com limites)
     AudioManager.js         ✅ AudioContext, buses de sfx e música, liberação no primeiro input
-    saveStorage.js          ✅ save versionado com lista ordenada de migrações
+    saveStorage.js          ✅ save versionado com lista ordenada de migrações (v3: `{ version, settings, story }`)
     settingsStorage.js      ✅ carrega e salva as opções (localStorage, tolerante a erro)
     keyBindings.js          ✅ preset personalizado: junta, troca teclas entre ações e valida o que vem do armazenamento
     AssetManager.js         ⏳ só quando houver assets externos
@@ -54,6 +54,9 @@ src/
     ReplayState.js          ✅ replay do golpe final: re-simula a janela gravada em câmera lenta
     OptionsState.js         ✅ dificuldade, efeitos, som, música, teclado, replay
     KeyRemapState.js        ✅ remapeamento das ações de luta (preset Personalizado)
+    StoryState.js           ✅ hub da História: continuar, evoluir, nova campanha
+    ProtagonistState.js     ✅ criação do protagonista em cinco passos e distribuição de pontos
+    DialogueState.js        ✅ falas em sequência sobre a arena ou sobre o duelo; ao fim troca para `params.next`
   arenas/                   ✅ dados visuais de arenas, sem regras de gameplay
     arenaData.js            ✅ camadas estáticas e partículas ambientes por arena
   characters/               ✅ dados e criação de personagens
@@ -69,6 +72,9 @@ src/
     arcade.js               ✅ escada do Arcade: adversários, dificuldade e arena por luta, chefe no fim
     unlocks.js              ✅ cores de lâmina liberadas por Arcade e por desafio do personagem
     survival.js             ✅ Sobrevivência: adversário sorteado por seed, dificuldade por vitórias, chefe periódico, vida carregada
+    story/storyRun.js       ✅ campanha pura: criar, avançar, rotas por condição, pontos, recompensas, validação do save
+    story/conditions.js     ✅ registro de condições de rota (`always`, `healthRatioAbove`, `alignmentIs`)
+    story/dialogue.js       ✅ resolve falante, variante de alinhamento e `{name}`
   controllers/              ✅ quem controla um lutador
     PlayerController.js     ✅ Input → intent
     IntentRecorder.js       ✅ buffer Uint16 fixo: grava intents e reproduz movimento relativo
@@ -119,7 +125,7 @@ src/
     effectsRenderer.js      ✅ partículas, luzes de impacto e flash
     PowerRenderer.js        ✅ brilho de carga, raio (polilinhas) e domo da Barreira, só lendo o estado
   ui/                       ✅ peças de interface desenhadas no canvas
-    attributeBars.js        ✅ seis linhas de nove segmentos; somente leitura
+    attributeBars.js        ✅ seis linhas de nove segmentos (dez para nota 10); posição por parâmetro; somente leitura
     TouchControls.js        ✅ desenho de joystick e botões sem alterar input
     MenuList.js             ✅ lista de opções navegável
     Hud.js                  ✅ nomes, barras de vida (com fantasma) e stamina
@@ -536,6 +542,16 @@ Arquivos: [src/core/AudioManager.js](src/core/AudioManager.js), [src/audio/](src
 - `DuelAudio` só lê eventos e lutadores: toca o som do evento com pan pela posição, mantém um zumbido por lutador (mais forte e agudo na fase active, desligado na morte) e abaixa a música no golpe final.
 - Música dinâmica: `DuelAudio.updateMusic(fighters, heartbeatFighter, dt)` calcula a tensão (`1 − menor fração de vida`) e só chama `AudioManager.setMusicTension` quando ela muda mais que `music.tension.step`. O `createMusic` do synth tem uma camada extra (`music.tension`) cujo volume e o corte do filtro seguem a tensão com `setTargetAtTime` (sem cliques). A batida (`heartbeat`) é tocada pelo `DuelAudio` com dois toques por intervalo enquanto o lutador observado está abaixo de `heartbeat.healthRatio`. `DuelAudio.stop()` zera a tensão.
 - Interface: `MenuList` toca `uiMove` e `uiConfirm` quando recebe o `AudioManager`.
+
+### História (v1.7)
+
+Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 23).
+
+- **Dados.** `storyConfig` guarda regras (pontos, tetos, totais, regras do duelo, `roundsToWin`), opções do protagonista e a lista de encontros (`id`, `opponent`, `arena`, `aiOffset`, `next` ou `outcomes`, `reward`, `unlocks`, `ending`). `storyTexts` guarda títulos e falas por encontro e final. Fala: `{ speaker: 'protagonist' | 'narrator' | idDoPersonagem, text: string | { light, dark } }`.
+- **Campanha pura.** `storyRun.js` trabalha sobre um objeto simples salvo no save (`run`): protagonista (nome, alinhamento, estilo, cor, notas), dificuldade, encontro atual, pontos, espaços de poder liberados, encontros vencidos e final. `resolveStoryResult(run, duelResult, config, loadouts)` devolve o novo `run`, o final e os personagens liberados; a rota usa `evaluateCondition` sobre `{ result, run }`. Nada lê o `Fighter`: a condição de vida vem do `DuelResult`.
+- **Protagonista.** `createProtagonistCharacter(perfil, storyConfig, espaços)` monta um objeto de personagem com o arquétipo, golpes, som e aparência base do estilo escolhido, sobrepondo `storyConfig.protagonist.appearance` e a cor da lâmina. `createFighterFromCharacter` (a factory agora aceita um objeto, não só um id) cria o lutador; `powerSlots` filtra o loadout do alinhamento. A nota 10 só vale para o Fluxo de personagens com `apex: true` (`attributesConfig.apexRating`).
+- **Fluxo de telas.** Menu → `StoryState` → (`ProtagonistState` criar → atributos) → `DialogueState` (antes, com a arena) → `DuelState` (`DuelMode.STORY`, `params.story`, `params.rules = storyConfig.rules`). O `DuelState` usa `storyStage` como mais um degrau da "escada" (adversário, arena, dificuldade) e cria o jogador a partir do protagonista. No resultado, `resolveDuelOutcome` desvia para `resolveStoryOutcome`: na vitória, empilha `DialogueState` (falas de depois, final e desbloqueios) que leva de volta ao `StoryState`, e devolve `story` (novo `run`) e `progress.unlockedCharacters`; na derrota, `GameOverState` com "Tentar de novo" e "Voltar à história" (`menuState`). A pausa sai para a História (`quitState`) e a lista de golpes recebe o personagem gerado.
+- **Save.** `Game.story` vem de `loadStory` + `sanitizeStoryRun` e é salvo junto com as opções (`saveSettings` grava `{ version: 3, settings, story }`). A migração 2 → 3 acrescenta `story: null`.
 
 ### Fluxo e poderes (v1.5)
 
