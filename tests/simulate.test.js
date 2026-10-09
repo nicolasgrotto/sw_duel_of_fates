@@ -18,3 +18,9 @@ it('applies attribute overrides before creating fighters in the simulator', () =
   assert.match(output, /Duels: 2/);
   assert.throws(() => execFileSync(process.execPath, ['tools/simulate.js', '--duels', '1', '--set', 'attributes.guardian.health=8'], { stdio: 'pipe' }));
 });
+
+it('counts duels that reach the time limit apart from double knockouts', () => {
+  const output = execFileSync(process.execPath, ['tools/simulate.js', '--duels', '4', '--maxSeconds', '0.5'], { encoding: 'utf8' });
+  assert.match(output, /timeouts[ ]*: +4 /);
+  assert.match(output, /double KOs: +0 /);
+});

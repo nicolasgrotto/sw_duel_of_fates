@@ -70,7 +70,6 @@ function applyOverride(assignment) {
   }
   target[lastKey] = rawValue === 'true' ? true : rawValue === 'false' ? false : Number.isNaN(Number(rawValue)) ? rawValue : Number(rawValue);
 }
-const MAX_DUEL_SECONDS = 120;
 
 function readOptions(argv) {
   const options = {
@@ -83,6 +82,7 @@ function readOptions(argv) {
     profile: '',
     rules: '',
     seed: 1,
+    maxSeconds: 120,
     overrides: [],
   };
 
@@ -117,7 +117,12 @@ function readRules(names) {
   return { powers: enabled.has('powers') };
 }
 
-function runDuel(leftSetup, rightSetup, random, rules) {
+function describeEnding(left, right) {
+  if (left.isAlive && right.isAlive) return 'timeout';
+  return left.isAlive || right.isAlive ? 'knockout' : 'doubleKnockout';
+}
+
+function runDuel(leftSetup, rightSetup, random, rules, maxSeconds) {
   const leftId = leftSetup.characterId;
   const rightId = rightSetup.characterId;
   const arena = createArenaBounds(gameConfig);
@@ -143,7 +148,7 @@ function runDuel(leftSetup, rightSetup, random, rules) {
 
   const hitsReceived = new Map([[left, 0], [right, 0]]);
   let time = 0;
-  while (time < MAX_DUEL_SECONDS && left.isAlive && right.isAlive) {
+  while (time < maxSeconds && left.isAlive && right.isAlive) {
     for (let i = 0; i < fighters.length; i += 1) {
       controllers[i].updateIntent(fighters[i].intent, STEP);
       if (fighters[i].intent.evade) counts.evadeAttempts += 1;
@@ -180,7 +185,7 @@ function runDuel(leftSetup, rightSetup, random, rules) {
 
   const winner = left.isAlive && !right.isAlive ? left : right.isAlive && !left.isAlive ? right : null;
   const winnerSetup = winner === left ? leftSetup : winner === right ? rightSetup : null;
-  return { winnerSide: winnerSetup?.side ?? null, time, counts, hitsToKnockout: winner ? hitsReceived.get(winner === left ? right : left) : null };
+  return { winnerSide: winnerSetup?.side ?? null, ending: describeEnding(left, right), time, counts, hitsToKnockout: winner ? hitsReceived.get(winner === left ? right : left) : null };
 }
 
 function average(values) {
@@ -201,7 +206,7 @@ function main() {
 
   for (let i = 0; i < options.duels; i += 1) {
     const [first, second] = i % 2 === 1 ? [sides[1], sides[0]] : sides;
-    results.push(runDuel(first, second, random, rules));
+    results.push(runDuel(first, second, random, rules, options.maxSeconds));
   }
 
   const wins = { A: 0, B: 0 };
@@ -210,7 +215,8 @@ function main() {
       wins[result.winnerSide] += 1;
     }
   }
-  const timeouts = results.filter((result) => !result.winnerSide).length;
+  const timeouts = results.filter((result) => result.ending === 'timeout').length;
+  const doubleKnockouts = results.filter((result) => result.ending === 'doubleKnockout').length;
   const percent = (value) => `${((value / results.length) * 100).toFixed(1)}%`;
   const describe = ({ characterId, difficulty, profile }) =>
     `${characterId} (${difficulty}, ${profile || resolveCharacter(characterId).aiProfile})`.padEnd(36);
@@ -219,6 +225,7 @@ function main() {
   console.log(`A ${describe(sides[0])} wins: ${String(wins.A).padStart(4)}  (${percent(wins.A)})`);
   console.log(`B ${describe(sides[1])} wins: ${String(wins.B).padStart(4)}  (${percent(wins.B)})`);
   console.log(`timeouts  : ${String(timeouts).padStart(4)}  (${percent(timeouts)})`);
+  console.log(`double KOs: ${String(doubleKnockouts).padStart(4)}  (${percent(doubleKnockouts)})`);
   console.log(`avg time  : ${average(results.map((result) => result.time)).toFixed(1)} s`);
   console.log(`avg hits  : ${average(results.map((result) => result.counts.hits)).toFixed(1)}`);
   console.log(`avg hits to KO: ${average(results.filter((result) => result.hitsToKnockout !== null).map((result) => result.hitsToKnockout)).toFixed(1)}`);

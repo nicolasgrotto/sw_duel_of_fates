@@ -638,9 +638,10 @@ npm run simulate -- --duels 300 --difficulty hard
 npm run simulate -- --profile balanced                     # mesmo perfil nos dois: mede só os atributos
 npm run simulate -- --left shadow --right shadow --leftDifficulty hard --rightDifficulty normal
 npm run simulate -- --set attributes.shadow.health=7   # testa um valor sem editar arquivos
+npm run simulate -- --maxSeconds 60                     # limite de tempo por duelo (padrão 120 s)
 ```
 
-Referência v0.2 (300 rounds por cenário, seed 1): o simulador mede um round por execução de duelo, sem as intros do melhor de 3. `avg hits` soma ambos os lados; `avg hits to KO` conta os hits recebidos pelo derrotado (exclui timeouts). O alvo de 6–9 é validado pela segunda métrica, coerente com 100 de vida, rápido 10, forte 24/26 e riposta 16/17. Bloquear forte custa 30/32 de stamina.
+Referência v0.2 (300 rounds por cenário, seed 1): o simulador mede um round por execução de duelo, sem as intros do melhor de 3. `avg hits` soma ambos os lados; `avg hits to KO` conta os hits recebidos pelo derrotado (exclui timeouts). Desde a v3, `timeouts` conta só duelos que atingem o limite de tempo; K.O. simultâneo aparece em `double KOs`. O alvo de 6–9 é validado pela segunda métrica, coerente com 100 de vida, rápido 10, forte 24/26 e riposta 16/17. Bloquear forte custa 30/32 de stamina.
 
 | Dificuldade | Guardião vence (perfis próprios) | Tempo | Hits totais | Hits até K.O. | Guardião vence (ambos balanced) | Hits até K.O. (balanced) |
 | --- | --- | --- | --- | --- | --- | --- |
