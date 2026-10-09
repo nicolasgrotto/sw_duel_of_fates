@@ -45,7 +45,11 @@ export class DebugOverlay {
       `states: ${stateMachine.stack.map((state) => state.name).join(' > ')}`,
     ];
 
-    if (timings) lines.splice(1, 0, `update: ${timings.updateMs.toFixed(2)} ms  render: ${timings.renderMs.toFixed(2)} ms`);
+    if (timings) {
+      lines.splice(1, 0,
+        `update: ${timings.updateMs.toFixed(2)} ms  render: ${timings.renderMs.toFixed(2)} ms`,
+        `frame: ${timings.frameMs.toFixed(1)} ms  p95 ${timings.frameP95Ms.toFixed(1)}  max ${timings.frameMaxMs.toFixed(1)}  steps ${timings.stepsPerFrame.toFixed(2)}/${timings.maxSteps}`);
+    }
 
     for (const state of stateMachine.stack) {
       lines.push(...state.getDebugInfo());

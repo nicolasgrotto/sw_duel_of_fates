@@ -132,5 +132,20 @@ it('measures update and render cost with the injected clock and preserves fixed 
   loop.advance(FIXED_STEP * 2);
   loop.advance(0);
   assert.deepEqual(steps, [FIXED_STEP, FIXED_STEP]);
-  assert.deepEqual(loop.timings, { updateMs: 2, renderMs: 5 });
+  assert.equal(loop.timings.updateMs, 2);
+  assert.equal(loop.timings.renderMs, 5);
+});
+
+it('reports frame interval distribution and simulation steps per frame', () => {
+  const { loop } = createLoop({ now: () => 0, timingSampleFrames: 4, update: () => {}, render: () => {} });
+  loop.advance(FIXED_STEP);
+  loop.advance(FIXED_STEP * 2);
+  loop.advance(0);
+  loop.advance(FIXED_STEP);
+  const { timings } = loop;
+  assert.equal(timings.frameMaxMs, FIXED_STEP * 2000);
+  assert.equal(timings.frameP95Ms, FIXED_STEP * 2000);
+  assert.ok(Math.abs(timings.frameMs - FIXED_STEP * 1000) < 1e-9);
+  assert.equal(timings.stepsPerFrame, 1);
+  assert.equal(timings.maxSteps, 2);
 });

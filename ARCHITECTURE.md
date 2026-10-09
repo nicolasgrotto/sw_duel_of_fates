@@ -340,7 +340,8 @@ Arquivo: [src/core/GameLoop.js](src/core/GameLoop.js)
 
 - **Timestep fixo**: `update` sempre recebe o mesmo `dt` (`gameConfig.loop.fixedStep`, 1/60 s). O tempo real de cada frame entra em um acumulador e o loop executa quantos `update` couberem nele.
 - `maxFrameTime` limita o tempo de um frame (ex.: aba voltando do segundo plano), evitando dezenas de updates seguidos.
-- `render(alpha)` roda uma vez por frame de tela. `alpha` é a fração do próximo step (útil para interpolação, se necessário).
+- `render(alpha)` roda uma vez por frame de tela. `alpha` é a fração do próximo step. O duelo não interpola: com o display a 60 Hz ele avança um passo por frame, e a câmera lenta já roda passos com `dt` escalado; interpolar com o `alpha` do loop atrasaria a imagem em até um passo, o que pesa no timing do parry. Só o replay interpola (ver Renderer).
+- **Medição (v2.1).** A cada janela de `timingSampleFrames` (60) o loop publica em `timings`: médias de update e render, intervalo médio entre frames, p95 e máximo de frame isolado, passos de simulação por frame (média e máximo). Os intervalos ficam em `Float64Array` pré-alocados; a ordenação para o p95 roda uma vez por janela. O F3 mostra tudo em duas linhas.
 - `update` altera o estado. `render` apenas desenha.
 
 Por que timestep fixo: startup, active e recovery dos ataques precisam se comportar igual em 60 Hz e 144 Hz. Também torna o combate testável e reproduzível.

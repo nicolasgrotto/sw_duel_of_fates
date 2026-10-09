@@ -80,6 +80,7 @@ describe('DebugOverlay', () => {
 it('shows average frame costs when loop timings are supplied', () => {
   const overlay = new DebugOverlay({ ...layout, enabled: true }, () => 0);
   const renderer = createFakeRenderer();
-  overlay.render(renderer, createFakeStates(), { updateMs: 1.234, renderMs: 4.567 });
+  overlay.render(renderer, createFakeStates(), { updateMs: 1.234, renderMs: 4.567, frameMs: 16.7, frameP95Ms: 17.2, frameMaxMs: 33.4, stepsPerFrame: 1, maxSteps: 2 });
   assert.ok(renderer.texts.includes('update: 1.23 ms  render: 4.57 ms'));
+  assert.ok(renderer.texts.includes('frame: 16.7 ms  p95 17.2  max 33.4  steps 1.00/2'));
 });
