@@ -3,7 +3,7 @@ import { movesByCharacter } from '../config/movesConfig.js';
 export const characters = {
   guardian: {
     id: 'guardian',
-    attributes: {"health": 6, "stamina": 5, "blade": 5, "defense": 8, "agility": 5, "flow": 6},
+    attributes: {"health": 5, "stamina": 4, "blade": 4, "defense": 6, "agility": 4, "flow": 5},
     name: 'Guardião',
     archetype: 'guardian',
     alignment: 'light',
@@ -49,7 +49,7 @@ export const characters = {
   },
   shadow: {
     id: 'shadow',
-    attributes: {"health": 5, "stamina": 5, "blade": 6, "defense": 4, "agility": 5, "flow": 6},
+    attributes: {"health": 4, "stamina": 4, "blade": 5, "defense": 3, "agility": 4, "flow": 5},
     name: 'Sombra',
     archetype: 'shadow',
     alignment: 'dark',
@@ -95,7 +95,7 @@ export const characters = {
   },
   bastion: {
     id: 'bastion',
-    attributes: {"health": 8, "stamina": 7, "blade": 8, "defense": 9, "agility": 2, "flow": 3},
+    attributes: {"health": 6, "stamina": 6, "blade": 6, "defense": 7, "agility": 2, "flow": 2},
     name: 'Bastião',
     archetype: 'bastion',
     alignment: 'light',
@@ -141,7 +141,7 @@ export const characters = {
   },
   wasp: {
     id: 'wasp',
-    attributes: {"health": 3, "stamina": 8, "blade": 2, "defense": 3, "agility": 9, "flow": 4},
+    attributes: {"health": 3, "stamina": 6, "blade": 2, "defense": 3, "agility": 7, "flow": 3},
     name: 'Vespa',
     archetype: 'wasp',
     alignment: 'light',
@@ -187,7 +187,7 @@ export const characters = {
   },
   mirror: {
     id: 'mirror',
-    attributes: {"health": 3, "stamina": 6, "blade": 5, "defense": 9, "agility": 4, "flow": 7},
+    attributes: {"health": 3, "stamina": 5, "blade": 4, "defense": 7, "agility": 3, "flow": 6},
     name: 'Espelho',
     archetype: 'mirror',
     alignment: 'light',
@@ -233,7 +233,7 @@ export const characters = {
   },
   haste: {
     id: 'haste',
-    attributes: {"health": 9, "stamina": 5, "blade": 5, "defense": 5, "agility": 4, "flow": 5},
+    attributes: {"health": 7, "stamina": 4, "blade": 4, "defense": 4, "agility": 3, "flow": 4},
     name: 'Haste',
     archetype: 'haste',
     alignment: 'dark',
@@ -279,7 +279,7 @@ export const characters = {
   },
   ember: {
     id: 'ember',
-    attributes: {"health": 3, "stamina": 6, "blade": 6, "defense": 5, "agility": 5, "flow": 6},
+    attributes: {"health": 3, "stamina": 5, "blade": 5, "defense": 4, "agility": 4, "flow": 5},
     name: 'Brasa',
     archetype: 'ember',
     alignment: 'dark',
@@ -325,7 +325,7 @@ export const characters = {
   },
   forge: {
     id: 'forge',
-    attributes: {"health": 7, "stamina": 4, "blade": 8, "defense": 6, "agility": 3, "flow": 3},
+    attributes: {"health": 6, "stamina": 3, "blade": 6, "defense": 5, "agility": 3, "flow": 2},
     name: 'Forja',
     archetype: 'forge',
     alignment: 'dark',
@@ -371,7 +371,7 @@ export const characters = {
   },
   heron: {
     id: 'heron',
-    attributes: {"health": 6, "stamina": 7, "blade": 3, "defense": 3, "agility": 8, "flow": 6},
+    attributes: {"health": 5, "stamina": 6, "blade": 3, "defense": 3, "agility": 6, "flow": 5},
     name: 'Garça',
     archetype: 'heron',
     alignment: 'light',
@@ -417,7 +417,7 @@ export const characters = {
   },
   echo: {
     id: 'echo',
-    attributes: {"health": 8, "stamina": 7, "blade": 6, "defense": 4, "agility": 7, "flow": 7},
+    attributes: {"health": 6, "stamina": 6, "blade": 5, "defense": 3, "agility": 6, "flow": 6},
     name: 'Eco',
     archetype: 'echo',
     alignment: 'dark',
@@ -463,7 +463,7 @@ export const characters = {
   },
   shadowAwakened: {
     id: 'shadowAwakened',
-    attributes: {"health": 9, "stamina": 7, "blade": 8, "defense": 6, "agility": 5, "flow": 8},
+    attributes: {"health": 7, "stamina": 6, "blade": 6, "defense": 5, "agility": 4, "flow": 7},
     name: 'Sombra Desperta',
     archetype: 'shadowAwakened',
     alignment: 'dark',
@@ -501,7 +501,7 @@ export const characters = {
   },
   sovereign: {
     id: 'sovereign',
-    attributes: { health: 9, stamina: 8, blade: 8, defense: 8, agility: 5, flow: 11 },
+    attributes: { health: 7, stamina: 6, blade: 6, defense: 6, agility: 4, flow: 9 },
     potential: 2,
     name: 'Soberano',
     archetype: 'haste',
@@ -545,7 +545,7 @@ export const characters = {
   },
   foretold: {
     id: 'foretold',
-    attributes: { health: 10, stamina: 10, blade: 12, defense: 9, agility: 11, flow: 12 },
+    attributes: { health: 8, stamina: 8, blade: 9, defense: 7, agility: 9, flow: 10 },
     potential: 3,
     name: 'Predestinado',
     archetype: 'echo',
@@ -555,7 +555,7 @@ export const characters = {
     moves: movesByCharacter.echo,
     aiProfile: 'foretold',
     info: {
-      style: 'Secreto · Fluxo 12',
+      style: 'Secreto · Fluxo 10',
       saberName: 'Azul-aurora',
       trait: 'Finta: tocar a guarda cancela o forte',
       ability: 'Passo-reflexo: passo curto e invulnerável'
@@ -589,7 +589,7 @@ export const characters = {
   },
   elder: {
     id: 'elder',
-    attributes: { health: 7, stamina: 8, blade: 9, defense: 10, agility: 9, flow: 10 },
+    attributes: { health: 6, stamina: 6, blade: 6, defense: 8, agility: 7, flow: 8 },
     potential: 1,
     name: 'Ancião',
     archetype: 'heron',

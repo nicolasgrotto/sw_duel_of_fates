@@ -1,395 +1,394 @@
 export const attributesConfig = {
   "minRating": 1,
-  "maxRating": 9,
-  "ratingLimits": {
-    "flow": 8
-  },
-  "baseRating": 5,
+  "maxRating": 7,
+  "baseRating": 4,
   "multipliers": {
     "1": 0.76,
-    "2": 0.82,
-    "3": 0.88,
-    "4": 0.94,
-    "5": 1.0,
-    "6": 1.06,
-    "7": 1.12,
-    "8": 1.18,
-    "9": 1.24,
-    "10": 1.3,
-    "11": 1.36,
-    "12": 1.42
+    "2": 0.84,
+    "3": 0.92,
+    "4": 1,
+    "5": 1.08,
+    "6": 1.16,
+    "7": 1.24,
+    "8": 1.32,
+    "9": 1.4,
+    "10": 1.48
   },
-  "perfectParryBonus": 0.002,
+  "perfectParryBonus": 0.0025,
   "guardBreakStep": 1,
-  "precision": 1000000000.0,
+  "precision": 1000000000,
+  "legacyScale": {
+    "ratingStep": 0.75,
+    "flowShift": 1
+  },
   "defaults": {
-    "health": 5,
-    "stamina": 5,
-    "blade": 5,
-    "defense": 5,
-    "agility": 5,
-    "flow": 5
+    "health": 4,
+    "stamina": 4,
+    "blade": 4,
+    "defense": 4,
+    "agility": 4,
+    "flow": 4
   },
   "bases": {
     "guardian": {
-      "maxHealth": 99.0566037735849,
-      "maxStamina": 100.0,
+      "maxHealth": 97.22222222222221,
+      "maxStamina": 100,
       "stamina": {
-        "regenPerSecond": 25.0
+        "regenPerSecond": 25
       },
       "movement": {
-        "walkSpeed": 260.0,
-        "jumpVelocity": 820.0
+        "walkSpeed": 260,
+        "jumpVelocity": 820
       },
       "dodge": {
-        "speed": 560.0
+        "speed": 560
       },
       "parry": {
         "perfectWindow": 0.08
       },
-      "guardCostScale": 1.18,
-      "guardPushbackScale": 1.18,
-      "guardBreakThreshold": 3,
-      "evadeWindowScale": 1.0,
-      "abilityMobilityScale": 1.0,
+      "guardCostScale": 1.16,
+      "guardPushbackScale": 1.16,
+      "guardBreakThreshold": 2,
+      "evadeWindowScale": 1,
+      "abilityMobilityScale": 1,
       "damage": {
-        "light": 10.0,
-        "light2": 10.0,
-        "air": 12.0,
-        "forwardHeavy": 24.0,
-        "heavy": 24.0,
-        "riposte": 16.0,
-        "shove": 0.0,
-        "special": 0.0
+        "light": 10,
+        "light2": 10,
+        "air": 12,
+        "forwardHeavy": 24,
+        "heavy": 24,
+        "riposte": 16,
+        "shove": 0,
+        "special": 0
       }
     },
     "shadow": {
-      "maxHealth": 100.0,
-      "maxStamina": 100.0,
+      "maxHealth": 100,
+      "maxStamina": 100,
       "stamina": {
-        "regenPerSecond": 25.0
+        "regenPerSecond": 25
       },
       "movement": {
-        "walkSpeed": 250.0,
-        "jumpVelocity": 800.0
+        "walkSpeed": 250,
+        "jumpVelocity": 800
       },
       "dodge": {
-        "speed": 520.0
+        "speed": 520
       },
       "parry": {
-        "perfectWindow": 0.078
+        "perfectWindow": 0.0775
       },
-      "guardCostScale": 0.94,
-      "guardPushbackScale": 0.94,
+      "guardCostScale": 0.92,
+      "guardPushbackScale": 0.92,
       "guardBreakThreshold": -1,
-      "evadeWindowScale": 1.0,
-      "abilityMobilityScale": 1.0,
+      "evadeWindowScale": 1,
+      "abilityMobilityScale": 1,
       "damage": {
-        "light": 9.433962264150942,
-        "light2": 9.433962264150942,
-        "light3": 9.433962264150942,
-        "air": 11.320754716981131,
-        "forwardHeavy": 20.754716981132074,
-        "heavy": 20.754716981132074,
-        "riposte": 16.037735849056602,
-        "shove": 0.0,
-        "special": 15.094339622641508
+        "light": 9.259259259259258,
+        "light2": 9.259259259259258,
+        "light3": 9.259259259259258,
+        "air": 11.11111111111111,
+        "forwardHeavy": 20.37037037037037,
+        "heavy": 20.37037037037037,
+        "riposte": 15.74074074074074,
+        "shove": 0,
+        "special": 14.814814814814813
       }
     },
     "bastion": {
-      "maxHealth": 98.30508474576271,
-      "maxStamina": 98.21428571428571,
+      "maxHealth": 100,
+      "maxStamina": 94.82758620689656,
       "stamina": {
-        "regenPerSecond": 21.428571428571427
+        "regenPerSecond": 20.689655172413794
       },
       "movement": {
-        "walkSpeed": 243.90243902439025,
-        "jumpVelocity": 853.6585365853659
+        "walkSpeed": 238.0952380952381,
+        "jumpVelocity": 833.3333333333334
       },
       "dodge": {
-        "speed": 536.5853658536586
+        "speed": 523.8095238095239
       },
       "parry": {
-        "perfectWindow": 0.064
+        "perfectWindow": 0.065
       },
       "guardCostScale": 1.24,
       "guardPushbackScale": 1.24,
-      "guardBreakThreshold": 4,
-      "evadeWindowScale": 1.2195121951219512,
-      "abilityMobilityScale": 1.2195121951219512,
+      "guardBreakThreshold": 3,
+      "evadeWindowScale": 1.1904761904761905,
+      "abilityMobilityScale": 1.1904761904761905,
       "damage": {
-        "light": 8.474576271186441,
-        "light2": 8.474576271186441,
-        "air": 10.16949152542373,
-        "forwardHeavy": 23.728813559322035,
-        "heavy": 23.728813559322035,
-        "riposte": 15.254237288135593,
-        "shove": 0.0,
-        "special": 27.118644067796613
+        "light": 8.620689655172413,
+        "light2": 8.620689655172413,
+        "air": 10.344827586206897,
+        "forwardHeavy": 24.137931034482758,
+        "heavy": 24.137931034482758,
+        "riposte": 15.517241379310343,
+        "shove": 0,
+        "special": 27.586206896551726
       }
     },
     "wasp": {
-      "maxHealth": 106.81818181818181,
-      "maxStamina": 84.74576271186442,
+      "maxHealth": 102.17391304347825,
+      "maxStamina": 86.20689655172414,
       "stamina": {
-        "regenPerSecond": 25.423728813559322
+        "regenPerSecond": 25.86206896551724
       },
       "movement": {
-        "walkSpeed": 250.0,
+        "walkSpeed": 250,
         "jumpVelocity": 709.6774193548387
       },
       "dodge": {
         "speed": 516.1290322580645
       },
       "parry": {
-        "perfectWindow": 0.08600000000000001
+        "perfectWindow": 0.085
       },
-      "guardCostScale": 0.88,
-      "guardPushbackScale": 0.88,
-      "guardBreakThreshold": -2,
+      "guardCostScale": 0.92,
+      "guardPushbackScale": 0.92,
+      "guardBreakThreshold": -1,
       "evadeWindowScale": 0.8064516129032259,
       "abilityMobilityScale": 0.8064516129032259,
       "damage": {
-        "light": 8.536585365853659,
-        "light2": 8.536585365853659,
-        "light3": 8.536585365853659,
-        "light4": 8.536585365853659,
-        "light5": 8.536585365853659,
-        "air": 14.634146341463415,
-        "forwardHeavy": 21.951219512195124,
-        "heavy": 21.951219512195124,
-        "riposte": 17.073170731707318,
-        "shove": 0.0,
-        "special": 8.536585365853659
+        "light": 8.333333333333334,
+        "light2": 8.333333333333334,
+        "light3": 8.333333333333334,
+        "light4": 8.333333333333334,
+        "light5": 8.333333333333334,
+        "air": 14.285714285714286,
+        "forwardHeavy": 21.42857142857143,
+        "heavy": 21.42857142857143,
+        "riposte": 16.666666666666668,
+        "shove": 0,
+        "special": 8.333333333333334
       }
     },
     "mirror": {
-      "maxHealth": 107.95454545454545,
-      "maxStamina": 94.33962264150944,
+      "maxHealth": 103.26086956521738,
+      "maxStamina": 92.5925925925926,
       "stamina": {
-        "regenPerSecond": 24.528301886792452
+        "regenPerSecond": 24.074074074074073
       },
       "movement": {
-        "walkSpeed": 255.31914893617022,
-        "jumpVelocity": 851.0638297872341
+        "walkSpeed": 260.86956521739125,
+        "jumpVelocity": 869.5652173913043
       },
       "dodge": {
-        "speed": 595.7446808510639
+        "speed": 608.695652173913
       },
       "parry": {
         "perfectWindow": 0.1
       },
       "guardCostScale": 1.24,
       "guardPushbackScale": 1.24,
-      "guardBreakThreshold": 4,
-      "evadeWindowScale": 1.0638297872340425,
-      "abilityMobilityScale": 1.0638297872340425,
+      "guardBreakThreshold": 3,
+      "evadeWindowScale": 1.0869565217391304,
+      "abilityMobilityScale": 1.0869565217391304,
       "damage": {
-        "light": 9.0,
-        "light2": 9.0,
-        "air": 12.0,
-        "forwardHeavy": 24.0,
-        "heavy": 24.0,
-        "riposte": 14.0,
-        "shove": 0.0,
-        "special": 0.0
+        "light": 9,
+        "light2": 9,
+        "air": 12,
+        "forwardHeavy": 24,
+        "heavy": 24,
+        "riposte": 14,
+        "shove": 0,
+        "special": 0
       }
     },
     "haste": {
       "maxHealth": 96.7741935483871,
-      "maxStamina": 100.0,
+      "maxStamina": 100,
       "stamina": {
-        "regenPerSecond": 25.0
+        "regenPerSecond": 25
       },
       "movement": {
-        "walkSpeed": 250.0,
-        "jumpVelocity": 840.4255319148937
+        "walkSpeed": 255.43478260869563,
+        "jumpVelocity": 858.695652173913
       },
       "dodge": {
-        "speed": 595.7446808510639
+        "speed": 608.695652173913
       },
       "parry": {
         "perfectWindow": 0.08
       },
-      "guardCostScale": 1.0,
-      "guardPushbackScale": 1.0,
+      "guardCostScale": 1,
+      "guardPushbackScale": 1,
       "guardBreakThreshold": 0,
-      "evadeWindowScale": 1.0638297872340425,
-      "abilityMobilityScale": 1.0638297872340425,
+      "evadeWindowScale": 1.0869565217391304,
+      "abilityMobilityScale": 1.0869565217391304,
       "damage": {
-        "light": 10.0,
-        "light2": 10.0,
-        "air": 12.0,
-        "forwardHeavy": 22.0,
-        "heavy": 22.0,
-        "riposte": 15.0,
-        "shove": 0.0,
-        "special": 24.0
+        "light": 10,
+        "light2": 10,
+        "air": 12,
+        "forwardHeavy": 22,
+        "heavy": 22,
+        "riposte": 15,
+        "shove": 0,
+        "special": 24
       }
     },
     "ember": {
-      "maxHealth": 107.95454545454545,
-      "maxStamina": 94.33962264150944,
+      "maxHealth": 103.26086956521738,
+      "maxStamina": 92.5925925925926,
       "stamina": {
-        "regenPerSecond": 24.528301886792452
+        "regenPerSecond": 24.074074074074073
       },
       "movement": {
-        "walkSpeed": 255.0,
-        "jumpVelocity": 820.0
+        "walkSpeed": 255,
+        "jumpVelocity": 820
       },
       "dodge": {
-        "speed": 560.0
+        "speed": 560
       },
       "parry": {
-        "perfectWindow": 0.078
+        "perfectWindow": 0.0775
       },
-      "guardCostScale": 1.0,
-      "guardPushbackScale": 1.0,
+      "guardCostScale": 1,
+      "guardPushbackScale": 1,
       "guardBreakThreshold": 0,
-      "evadeWindowScale": 1.0,
-      "abilityMobilityScale": 1.0,
+      "evadeWindowScale": 1,
+      "abilityMobilityScale": 1,
       "damage": {
-        "light": 7.547169811320754,
-        "light2": 7.547169811320754,
-        "light3": 7.547169811320754,
-        "air": 11.320754716981131,
-        "forwardHeavy": 21.69811320754717,
-        "heavy": 21.69811320754717,
-        "riposte": 16.9811320754717,
-        "shove": 0.0,
-        "counterStrike": 18.867924528301884,
-        "special": 0.0
+        "light": 7.4074074074074066,
+        "light2": 7.4074074074074066,
+        "light3": 7.4074074074074066,
+        "air": 11.11111111111111,
+        "forwardHeavy": 21.296296296296298,
+        "heavy": 21.296296296296298,
+        "riposte": 16.666666666666668,
+        "shove": 0,
+        "counterStrike": 18.518518518518515,
+        "special": 0
       }
     },
     "forge": {
-      "maxHealth": 98.21428571428571,
-      "maxStamina": 106.38297872340426,
+      "maxHealth": 94.82758620689656,
+      "maxStamina": 108.69565217391303,
       "stamina": {
-        "regenPerSecond": 25.531914893617024
+        "regenPerSecond": 26.08695652173913
       },
       "movement": {
-        "walkSpeed": 255.6818181818182,
-        "jumpVelocity": 863.6363636363636
+        "walkSpeed": 244.56521739130434,
+        "jumpVelocity": 826.086956521739
       },
       "dodge": {
-        "speed": 545.4545454545455
+        "speed": 521.7391304347826
       },
       "parry": {
-        "perfectWindow": 0.064
+        "perfectWindow": 0.065
       },
-      "guardCostScale": 1.06,
-      "guardPushbackScale": 1.06,
+      "guardCostScale": 1.08,
+      "guardPushbackScale": 1.08,
       "guardBreakThreshold": 1,
-      "evadeWindowScale": 1.1363636363636365,
-      "abilityMobilityScale": 1.1363636363636365,
+      "evadeWindowScale": 1.0869565217391304,
+      "abilityMobilityScale": 1.0869565217391304,
       "damage": {
-        "light": 9.322033898305085,
-        "light2": 9.322033898305085,
-        "air": 10.16949152542373,
-        "forwardHeavy": 22.88135593220339,
-        "heavy": 22.88135593220339,
-        "riposte": 14.40677966101695,
-        "shove": 0.0,
-        "special": 18.64406779661017
+        "light": 9.482758620689655,
+        "light2": 9.482758620689655,
+        "air": 10.344827586206897,
+        "forwardHeavy": 23.275862068965516,
+        "heavy": 23.275862068965516,
+        "riposte": 14.655172413793103,
+        "shove": 0,
+        "special": 18.96551724137931
       }
     },
     "heron": {
-      "maxHealth": 99.0566037735849,
-      "maxStamina": 89.28571428571428,
+      "maxHealth": 97.22222222222221,
+      "maxStamina": 86.20689655172414,
       "stamina": {
-        "regenPerSecond": 24.107142857142854
+        "regenPerSecond": 23.27586206896552
       },
       "movement": {
-        "walkSpeed": 245.76271186440678,
-        "jumpVelocity": 762.7118644067797
+        "walkSpeed": 249.99999999999997,
+        "jumpVelocity": 775.8620689655172
       },
       "dodge": {
-        "speed": 508.4745762711865
+        "speed": 517.2413793103449
       },
       "parry": {
-        "perfectWindow": 0.084
+        "perfectWindow": 0.0825
       },
-      "guardCostScale": 0.88,
-      "guardPushbackScale": 0.88,
-      "guardBreakThreshold": -2,
-      "evadeWindowScale": 0.8474576271186441,
-      "abilityMobilityScale": 0.8474576271186441,
+      "guardCostScale": 0.92,
+      "guardPushbackScale": 0.92,
+      "guardBreakThreshold": -1,
+      "evadeWindowScale": 0.8620689655172414,
+      "abilityMobilityScale": 0.8620689655172414,
       "damage": {
-        "light": 10.227272727272727,
-        "light2": 10.227272727272727,
-        "light3": 10.227272727272727,
-        "air": 13.636363636363637,
-        "airHeavy": 18.181818181818183,
-        "forwardHeavy": 22.727272727272727,
-        "heavy": 22.727272727272727,
-        "riposte": 17.045454545454547,
-        "shove": 0.0,
-        "special": 10.227272727272727
+        "light": 9.782608695652172,
+        "light2": 9.782608695652172,
+        "light3": 9.782608695652172,
+        "air": 13.043478260869565,
+        "airHeavy": 17.391304347826086,
+        "forwardHeavy": 21.739130434782606,
+        "heavy": 21.739130434782606,
+        "riposte": 16.304347826086957,
+        "shove": 0,
+        "special": 9.782608695652172
       }
     },
     "echo": {
-      "maxHealth": 98.30508474576271,
-      "maxStamina": 89.28571428571428,
+      "maxHealth": 100,
+      "maxStamina": 86.20689655172414,
       "stamina": {
-        "regenPerSecond": 24.107142857142854
+        "regenPerSecond": 23.27586206896552
       },
       "movement": {
-        "walkSpeed": 241.07142857142856,
-        "jumpVelocity": 741.0714285714286
+        "walkSpeed": 232.7586206896552,
+        "jumpVelocity": 715.5172413793105
       },
       "dodge": {
-        "speed": 499.99999999999994
+        "speed": 482.7586206896552
       },
       "parry": {
-        "perfectWindow": 0.078
+        "perfectWindow": 0.0775
       },
-      "guardCostScale": 0.94,
-      "guardPushbackScale": 0.94,
+      "guardCostScale": 0.92,
+      "guardPushbackScale": 0.92,
       "guardBreakThreshold": -1,
-      "evadeWindowScale": 0.8928571428571428,
-      "abilityMobilityScale": 0.8928571428571428,
+      "evadeWindowScale": 0.8620689655172414,
+      "abilityMobilityScale": 0.8620689655172414,
       "damage": {
-        "light": 9.433962264150942,
-        "light2": 9.433962264150942,
-        "air": 11.320754716981131,
-        "forwardHeavy": 24.528301886792452,
-        "heavy": 24.528301886792452,
-        "riposte": 15.094339622641508,
-        "shove": 0.0,
-        "special": 9.433962264150942
+        "light": 9.259259259259258,
+        "light2": 9.259259259259258,
+        "air": 11.11111111111111,
+        "forwardHeavy": 24.074074074074073,
+        "heavy": 24.074074074074073,
+        "riposte": 14.814814814814813,
+        "shove": 0,
+        "special": 9.259259259259258
       }
     },
     "shadowAwakened": {
       "maxHealth": 120.96774193548387,
-      "maxStamina": 89.28571428571428,
+      "maxStamina": 86.20689655172414,
       "stamina": {
-        "regenPerSecond": 26.785714285714285
+        "regenPerSecond": 25.862068965517246
       },
       "movement": {
-        "walkSpeed": 250.0,
-        "jumpVelocity": 800.0
+        "walkSpeed": 250,
+        "jumpVelocity": 800
       },
       "dodge": {
-        "speed": 520.0
+        "speed": 520
       },
       "parry": {
-        "perfectWindow": 0.074
+        "perfectWindow": 0.075
       },
-      "guardCostScale": 1.06,
-      "guardPushbackScale": 1.06,
+      "guardCostScale": 1.08,
+      "guardPushbackScale": 1.08,
       "guardBreakThreshold": 1,
-      "evadeWindowScale": 1.0,
-      "abilityMobilityScale": 1.0,
+      "evadeWindowScale": 1,
+      "abilityMobilityScale": 1,
       "damage": {
-        "light": 8.474576271186441,
-        "light2": 8.474576271186441,
-        "light3": 8.474576271186441,
-        "air": 10.16949152542373,
-        "forwardHeavy": 23.728813559322035,
-        "heavy": 23.728813559322035,
-        "riposte": 14.40677966101695,
-        "shove": 0.0,
-        "special": 13.559322033898306
+        "light": 8.620689655172413,
+        "light2": 8.620689655172413,
+        "light3": 8.620689655172413,
+        "air": 10.344827586206897,
+        "forwardHeavy": 24.137931034482758,
+        "heavy": 24.137931034482758,
+        "riposte": 14.655172413793103,
+        "shove": 0,
+        "special": 13.793103448275863
       }
     }
   }

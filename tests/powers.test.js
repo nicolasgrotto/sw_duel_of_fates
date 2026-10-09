@@ -51,7 +51,7 @@ describe('flow interactions', () => {
 
   it('maps levels to the four visual tiers', () => {
     const { tiers } = powersConfig;
-    assert.deepEqual([1, 3, 4, 7, 8, 11, 12].map((level) => getPowerTier(level, tiers).id), ['faint', 'faint', 'steady', 'steady', 'deep', 'deep', 'apex']);
+    assert.deepEqual([1, 2, 3, 7, 8, 9, 10].map((level) => getPowerTier(level, tiers).id), ['faint', 'faint', 'steady', 'steady', 'deep', 'deep', 'apex']);
   });
 
   it('scales meter gain and potency around the base level', () => {
@@ -82,7 +82,7 @@ describe('power meter', () => {
   it('starts each fighter with the configured meter and level from the flow rating', () => {
     const fighter = spawnFighter(400, 1, 'mirror');
     assert.equal(fighter.flowMeter, powersConfig.meter.start);
-    assert.equal(fighter.flowLevel, 7);
+    assert.equal(fighter.flowLevel, 6);
     assert.equal(fighter.stats.alignment, 'light');
     assert.equal(spawnFighter(400, 1, 'shadow').stats.alignment, 'dark');
   });

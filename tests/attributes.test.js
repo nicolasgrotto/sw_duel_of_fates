@@ -6,6 +6,7 @@ import { fighterArchetypes } from '../src/config/fightersConfig.js';
 import { characters } from '../src/characters/characterData.js';
 import { createFighter } from '../src/characters/characterFactory.js';
 import { applyAttributes } from '../src/characters/attributes.js';
+import { convertLegacyPoints, convertLegacyRating, convertLegacyRatings } from '../src/utils/legacyRatings.js';
 import { evadeConfig } from '../src/config/evadeConfig.js';
 import { CombatSystem } from '../src/combat/CombatSystem.js';
 import { FighterState } from '../src/entities/fighterStates.js';
@@ -41,9 +42,9 @@ it('applies the rating table at every level and changes only the relevant attrib
   const original = base();
   const defaults = attributesConfig.defaults;
   const normal = applyAttributes(original, defaults, attributesConfig);
-  for (let rating = 1; rating <= 9; rating++) {
+  for (let rating = 1; rating <= 10; rating++) {
     const multiplier = attributesConfig.multipliers[rating];
-    const rated = applyAttributes(original, { ...defaults, health: rating, stamina: rating, blade: rating, defense: rating, agility: rating, flow: rating }, attributesConfig, { potential: rating > attributesConfig.ratingLimits.flow ? 1 : 0 });
+    const rated = applyAttributes(original, { ...defaults, health: rating, stamina: rating, blade: rating, defense: rating, agility: rating, flow: rating }, attributesConfig, { potential: Math.max(0, rating - attributesConfig.maxRating) });
     assert.ok(Math.abs(rated.maxHealth - normal.maxHealth * multiplier) < 1e-8);
     assert.ok(Math.abs(rated.stamina.regenPerSecond - normal.stamina.regenPerSecond * multiplier) < 1e-8);
     assert.ok(Math.abs(rated.attacks.heavy.damage - normal.attacks.heavy.damage * multiplier) < 1e-8);
@@ -56,15 +57,15 @@ it('applies the rating table at every level and changes only the relevant attrib
   }
 });
 
-it('rejects invalid ratings including reserved ten and leaves base and ratings untouched', () => {
+it('rejects invalid ratings including eight without potential and leaves base and ratings untouched', () => {
   const original = base();
   const before = structuredClone(original);
   const ratings = { ...attributesConfig.defaults };
   applyAttributes(original, ratings, attributesConfig);
   assert.deepEqual(original, before);
   assert.deepEqual(ratings, attributesConfig.defaults);
-  for (const rating of [0, 10, 2.5, NaN, '5']) assert.throws(() => applyAttributes(original, { health: rating }, attributesConfig), RangeError);
-  assert.equal(applyAttributes(original, {}, attributesConfig).attributes.health, 5);
+  for (const rating of [0, 8, 2.5, NaN, '5']) assert.throws(() => applyAttributes(original, { health: rating }, attributesConfig), RangeError);
+  assert.equal(applyAttributes(original, {}, attributesConfig).attributes.health, attributesConfig.baseRating);
 });
 
 it('defense affects guard reserve and pushback while damage received remains unchanged', () => {
@@ -81,7 +82,7 @@ it('defense affects guard reserve and pushback while damage received remains unc
   const health = defender.health;
   combat.applyHit(contact);
   assert.equal(defender.health, health - contact.attack.damage);
-  const strong = applyAttributes(base(), { ...characters.guardian.attributes, defense: 9 }, attributesConfig);
+  const strong = applyAttributes(base(), { ...characters.guardian.attributes, defense: 7 }, attributesConfig);
   assert.ok(strong.blockPushbackScale < defender.stats.blockPushbackScale);
 });
 
@@ -96,4 +97,14 @@ it('changing flow alone has no combat effects and agility scales special movemen
   const slow = applyAttributes(original, { ...ratings, agility: 1 }, attributesConfig);
   assert.ok(slow.attacks.special.leap.speedY < normal.attacks.special.leap.speedY);
   assert.ok(slow.wallJump.speed < normal.wallJump.speed);
+});
+
+it('converts legacy 1-9 ratings with one rule that keeps every flow difference of the roster', () => {
+  assert.deepEqual([1, 2, 3, 4, 5, 6, 7, 8, 9].map((rating) => convertLegacyRating('health', rating, attributesConfig)), [1, 2, 3, 3, 4, 5, 6, 6, 7]);
+  assert.deepEqual([1, 3, 4, 5, 6, 7, 8].map((rating) => convertLegacyRating('flow', rating, attributesConfig)), [1, 2, 3, 4, 5, 6, 7]);
+  assert.deepEqual(convertLegacyRatings({ health: 9, flow: 8 }, attributesConfig, 5), { health: 5, flow: 5 });
+  assert.deepEqual([0, 1, 2, 3, 4].map((points) => convertLegacyPoints(points, attributesConfig)), [0, 1, 2, 2, 3]);
+  for (const character of Object.values(characters).filter((entry) => !entry.secret)) {
+    assert.ok(Object.values(character.attributes).every((value) => value >= attributesConfig.minRating && value <= attributesConfig.maxRating), character.id);
+  }
 });

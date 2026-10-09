@@ -557,7 +557,7 @@ Pulo duplo: todos os arquétipos usam movement.maxJumps = 1, exceto Vespa = 2. N
 
 ## 21.2. Atributos v1.4
 
-Vida, Stamina, Lâmina, Defesa, Agilidade e Fluxo usam notas 1–9. Nota 5 tem multiplicador 1; cada nota muda 6%. Dez é reservado ao Predestinado (Fluxo 10, ver seção 24). As bases por arquétipo preservam os stats atuais do elenco, inclusive o chefe. Vida muda vida máxima; Stamina muda máximo e regeneração; Lâmina muda todos os danos e dá pequeno bônus de parry perfeito. Defesa muda custo da guarda, recuo e reserva de stamina para evitar quebra, sem reduzir dano recebido. Agilidade muda caminhada, pulo, avanços e janela do EVADE, sem devolver ataques aéreos. Fluxo define o nível dos poderes (seção 22). Só o protagonista da História distribui pontos (seção 23).
+Vida, Stamina, Lâmina, Defesa, Agilidade e Fluxo usam a **escala 7/8/9/10** (v1.12): o elenco comum vai de 1 a 7; só os secretos passam disso, pelo potencial (Ancião até 8, Soberano até 9, Predestinado até 10). Nota 4 tem multiplicador 1; cada nota muda 8% (1 = 0,76; 7 = 1,24; 10 = 1,48). As bases por arquétipo preservam os stats do elenco, inclusive o chefe: a troca de escala não mudou nenhuma luta entre personagens comuns. A conversão da escala antiga (1–9) é uma regra só, usada no elenco e no save: atributos físicos `arredondar(1 + 0,75 × (nota − 1))`; Fluxo `nota − 1`, que preserva toda diferença de Fluxo entre o elenco. Vida muda vida máxima; Stamina muda máximo e regeneração; Lâmina muda todos os danos e dá pequeno bônus de parry perfeito. Defesa muda custo da guarda, recuo e reserva de stamina para evitar quebra, sem reduzir dano recebido. Agilidade muda caminhada, pulo, avanços e janela do EVADE, sem devolver ataques aéreos. Fluxo define o nível dos poderes (seção 22). Só o protagonista da História distribui pontos (seção 23).
 
 ## 22. Fluxo e poderes (v2)
 
@@ -567,7 +567,7 @@ O Fluxo é a energia dos poderes. Nomes de tela em `uiConfig`; no código, `powe
 
 **Nível e medidor.**
 
-- **Nível do Fluxo** (1–8 no elenco comum; até 12 nos secretos, pelo potencial) vem do atributo Fluxo. Ele define a potência, o ganho do medidor, a resistência e a cor da energia.
+- **Nível do Fluxo** (1–7 no elenco comum; 8, 9 e 10 nos secretos, pelo potencial) vem do atributo Fluxo. Ele define a potência, o ganho do medidor, a resistência e a cor da energia.
 - **Medidor** (0–100): começa cada round com 20, enche devagar com o tempo e mais rápido ao acertar, ao ser atingido, ao bloquear e ao aparar. É separado da stamina.
 - Depois de qualquer poder há uma recarga curta, igual para todos os poderes do lutador.
 
@@ -596,7 +596,7 @@ Na guarda, Repulsão e Puxão não causam dano e empurram pela metade; o Raio ca
 - Poderes não têm projétil: o efeito é decidido no instante ativo (Repulsão e Puxão) ou em cada pulso (Raio).
 - Nomes de tela em `uiConfig.texts.powers`; os ids no código são `push`, `pull`, `lightning` e `barrier`.
 
-**Elenco.** Aurora: Guardião, Bastião, Vespa, Espelho, Garça. Eclipse: Sombra, Haste, Brasa, Forja, Eco. Chefe do Arcade: Eclipse, nível 9.
+**Elenco.** Aurora: Guardião, Bastião, Vespa, Espelho, Garça. Eclipse: Sombra, Haste, Brasa, Forja, Eco. Chefe do Arcade: Eclipse, nível 7.
 
 ## 23. História (v2)
 
@@ -604,15 +604,15 @@ Campanha linear com um protagonista criado pelo jogador. Textos em `src/config/s
 
 **Criação.** Seis passos: nome (lista pronta ou digitado, até 16 caracteres), Caminho do Fluxo (Aurora ou Eclipse, que definem os poderes), estilo de luta (Técnica, Fúria ou Voo: usam golpes e habilidade do Guardião, da Sombra ou da Garça), visual (Errante, Vigia ou Peregrino), cor da lâmina e dificuldade. Logo depois, o jogador distribui os pontos iniciais.
 
-**Atributos e progressão.** Todos começam em 4 (total 24) com 4 pontos livres. Cada vitória dá 2 pontos. Um ponto sobe uma nota em 1, respeitando:
+**Atributos e progressão.** Todos começam em 3 (total 18) com 3 pontos livres. Cada vitória dá 2 pontos. Um ponto sobe uma nota em 1, respeitando:
 
 | Dificuldade | Teto por atributo | Total máximo |
 | --- | --- | --- |
-| Fácil | 8 | 40 |
-| Normal | 7 | 37 |
-| Difícil | 6 | 34 |
+| Fácil | 7 | 33 |
+| Normal | 6 | 30 |
+| Difícil | 5 | 28 |
 
-O total máximo impede um protagonista com tudo no teto: ele termina forte, mas especializado (o elenco tem totais entre 29 e 39). O teto do Fluxo também decide a resistência contra os chefes: no Difícil, o Fluxo 6 contra um chefe de Fluxo 9 dá diferença −3, e os poderes do jogador são resistidos; a luta vira de lâmina.
+O total máximo impede um protagonista com tudo no teto: ele termina forte, mas especializado (o elenco comum tem totais entre 24 e 32; o chefe do Arcade, 35). O teto do Fluxo também decide a interação contra os chefes: contra o Soberano (Fluxo 9), o Fácil chega a −2 (poderes pela metade), o Normal a −3 e o Difícil a −4 (resistidos; a luta vira de lâmina). Os chefes são medidos no simulador (ARCHITECTURE → Balanceamento → escala v1.12): o Soberano é vencível em todas as dificuldades e o Predestinado, sempre com IA de chefe, é muito difícil, mas possível.
 
 **Poderes.** O protagonista começa só com o poder principal do caminho; o segundo vem como recompensa de um capítulo. Na História os poderes estão sempre ligados.
 
@@ -624,18 +624,18 @@ O total máximo impede um protagonista com tudo no teto: ele termina forte, mas 
 
 | Personagem | Base | Notas | Alinhamento | Ideia |
 | --- | --- | --- | --- | --- |
-| Ancião | Garça (acrobacia) | potencial +1 (até 10): Vida 7, Stamina 8, Lâmina 9, Defesa 10, Agilidade 9, Fluxo 10 | Aurora | Mestre da Aurora: defesa e técnica acima de todos |
-| Soberano | Haste (alcance) | potencial +2 (até 11): Vida 9, Stamina 8, Lâmina 8, Defesa 8, Agilidade 5, Fluxo 11 | Eclipse | Vence de longe com Raio e Puxão; colado, é lento |
-| Predestinado | Eco (fintas) | potencial +3 (até 12): Vida 10, Stamina 10, Lâmina 12, Defesa 9, Agilidade 11, Fluxo 12 | Aurora | O ápice: único no tier vermelho do Fluxo |
+| Ancião | Garça (acrobacia) | potencial +1 (até 8): Vida 6, Stamina 6, Lâmina 6, Defesa 8, Agilidade 7, Fluxo 8 | Aurora | Mestre da Aurora: defesa e técnica acima de todos |
+| Soberano | Haste (alcance) | potencial +2 (até 9): Vida 7, Stamina 6, Lâmina 6, Defesa 6, Agilidade 4, Fluxo 9 | Eclipse | Vence de longe com Raio e Puxão; colado, é lento |
+| Predestinado | Eco (fintas) | potencial +3 (até 10): Vida 8, Stamina 8, Lâmina 9, Defesa 7, Agilidade 9, Fluxo 10 | Aurora | O ápice: único no tier vermelho do Fluxo |
 
-**Escala (provisória, ver a próxima etapa em `versions/v2.md`).** O elenco comum vai até 9 nos atributos e até 8 no Fluxo (`attributesConfig.ratingLimits`). Secretos têm `potential` (+1, +2, +3): o teto de todos os atributos sobe nesse valor, e a tela de seleção mostra os segmentos extras em dourado (`attributePotential`).
+**Escala 7/8/9/10.** O elenco comum vai até 7 em todos os atributos (`attributesConfig.maxRating`). Secretos têm `potential` (+1, +2, +3): o teto de todos os atributos sobe nesse valor (8, 9 e 10), e a tela de seleção mostra os segmentos extras em dourado (`attributePotential`). Tiers do Fluxo: azul até 7 (todo o elenco), roxo em 8–9 (Ancião e Soberano), vermelho só no 10 (Predestinado).
 
 - Não aparecem na seleção até serem liberados. Liberação salva no navegador (`settings.unlockedCharacters`).
 - **Pela História**: vencer o Soberano libera o Soberano; vencer o Predestinado (final secreto) libera o Predestinado; terminar a campanha pelo Caminho da Aurora (qualquer final) libera o Ancião.
 - **Pelo segredo da intro**: uma sequência digitada no teclado, feita no direcional/stick ou tocando o título várias vezes libera os três de uma vez, com som e frase próprios. As sequências ficam em `src/config/secretsConfig.js`; a tela não dá pista.
 - **Final secreto**: na História, vencer o Soberano com mais de 75% de vida leva ao duelo contra o Predestinado em vez do final normal. Esse duelo usa sempre a IA de chefe, em qualquer dificuldade.
 - **Trajes**: outra sequência da intro (teclado, direcional ou toques na frase de apoio) libera todas as skins de todos os personagens, sem mexer nas cores de lâmina.
-- Equilíbrio medido com poderes ligados (40 duelos por par): Ancião 74% (Normal) e 84% (Difícil); Soberano 83% e 75%; Predestinado 84% e 83%. São propositalmente superiores ao elenco.
+- Equilíbrio medido com poderes ligados (40 duelos por par, v1.12): Ancião 64% (Normal) e 79% (Difícil), média 72%; Soberano 77% e 75%, média 76%; Predestinado 84% e 83%, média 84%. Ordem Ancião < Soberano < Predestinado, todos propositalmente acima do elenco.
 
 ## 25. Skins e personalização
 

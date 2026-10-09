@@ -1,4 +1,4 @@
-import { loadSave } from '../src/core/saveStorage.js';
+import { SAVE_VERSION, loadSave } from '../src/core/saveStorage.js';
 import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -61,12 +61,12 @@ it('migrates a complete v1 save without losing progress or bindings', () => {
   const storage = createStorage({ [KEY]: legacy });
   assert.deepEqual(loadSettings({ difficulty: 'normal', sound: true, music: false, reducedEffects: false, finalReplay: true, keyboardPreset: 'classic', customBindings: {}, arcadeCleared: [], unlocks: {}, survivalBest: 0, parryChallengeBest: 0 }, storage, KEY), settings);
   saveSettings(settings, storage, KEY);
-  assert.deepEqual(JSON.parse(storage.data[KEY]), { version: 4, settings, story: null });
+  assert.deepEqual(JSON.parse(storage.data[KEY]), { version: SAVE_VERSION, settings, story: null });
   assert.deepEqual(loadSettings({ difficulty: 'normal', sound: true, music: false, reducedEffects: false, finalReplay: true, keyboardPreset: 'classic', customBindings: {}, arcadeCleared: [], unlocks: {}, survivalBest: 0, parryChallengeBest: 0 }, storage, KEY), settings);
 });
 
 it('rejects future versions and invalid envelopes without overwriting storage', () => {
-  for (const saved of [{ version: 5, settings: { sound: false } }, { version: 2, settings: [] }, { version: 0 }, []]) {
+  for (const saved of [{ version: SAVE_VERSION + 1, settings: { sound: false } }, { version: 2, settings: [] }, { version: 0 }, []]) {
     const storage = createStorage({ [KEY]: JSON.stringify(saved) });
     assert.deepEqual(loadSettings(defaults, storage, KEY, allowed), defaults);
     assert.equal(storage.data[KEY], JSON.stringify(saved));
@@ -90,8 +90,25 @@ it('migrates v3 story appearance without losing settings, progress or an existin
     const settings = { unlocks: { guardian: ['challenge'] }, arcadeCleared: ['guardian'] };
     const storage = createStorage({ [KEY]: JSON.stringify({ version: 3, settings, story }) });
     const save = loadSave(storage, KEY);
-    assert.equal(save.version, 4);
+    assert.equal(save.version, SAVE_VERSION);
     assert.deepEqual(save.settings, settings);
     assert.deepEqual(save.story, { ...story, protagonist: { ...story.protagonist, skin: skin ?? 'base' } });
   }
+});
+
+it('migrates v4 protagonist ratings to the 1-7 scale with the shared rule and the difficulty cap', () => {
+  const settings = { unlockedCharacters: ['sovereign'], unlocks: { guardian: ['skin-story'] } };
+  const protagonist = { name: 'Kael', alignment: 'light', style: 'technique', saberColor: '#7fe4ff', skin: 'watcher', attributes: { health: 8, stamina: 4, blade: 7, defense: 3, agility: 5, flow: 8 } };
+  const story = { difficulty: 'easy', encounter: 'sovereign', points: 3, slots: ['neutral', 'back'], completed: ['trial', 'forest'], ending: null, protagonist };
+  const save = loadSave(createStorage({ [KEY]: JSON.stringify({ version: 4, settings, story }) }), KEY);
+  assert.equal(save.version, SAVE_VERSION);
+  assert.deepEqual(save.settings, settings);
+  assert.deepEqual(save.story.protagonist.attributes, { health: 6, stamina: 3, blade: 6, defense: 3, agility: 4, flow: 7 });
+  assert.equal(save.story.points, 2);
+  assert.deepEqual({ ...save.story, protagonist: null, points: null }, { ...story, protagonist: null, points: null });
+  assert.equal(save.story.protagonist.skin, 'watcher');
+
+  const hard = loadSave(createStorage({ [KEY]: JSON.stringify({ version: 4, settings, story: { ...story, difficulty: 'hard' } }) }), KEY);
+  assert.deepEqual(hard.story.protagonist.attributes, { health: 5, stamina: 3, blade: 5, defense: 3, agility: 4, flow: 5 });
+  assert.equal(loadSave(createStorage({ [KEY]: JSON.stringify({ version: 4, settings, story: null }) }), KEY).story, null);
 });

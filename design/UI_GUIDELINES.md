@@ -180,7 +180,7 @@ Em retrato, o canvas mostra GIRE O APARELHO e pede paisagem; simulação suspens
 
 ## Atributos na seleção v1.4
 
-Na coluna direita, abaixo de estilo/traço/habilidade e cores, seis linhas com Vida, Stamina, Lâmina, Defesa, Agilidade e Fluxo. Primeiro centro y=410, espaçamento 30; rótulo em x=620, barra em x=745 e valor em x=925. Nove segmentos de 14×5, separados por 4 px; cheios em accent, vazios em hudTrack. Rótulos attributeLabel (Oxanium 18, textMuted, esquerda), valores attributeValue (Oxanium 18, text, centro). Nenhuma cor indica alinhamento ou poder. Preview desloca para x=1080 e escala 1, sem cobrir as barras. Arena mantém o preview original. Layout fica em uiConfig, sem contagem de orçamento ou teto nesta etapa.
+Na coluna direita, abaixo de estilo/traço/habilidade e cores, seis linhas com Vida, Stamina, Lâmina, Defesa, Agilidade e Fluxo. Primeiro centro y=410, espaçamento 30; rótulo em x=620, barra em x=745 e valor em x=925. Sete segmentos de 19×5, separados por 4 px (157 px, o mesmo comprimento dos antigos nove de 14×5; escala 1–7 desde a v1.12); cheios em accent, vazios em hudTrack. Secretos acrescentam até três segmentos dourados (notas 8–10) e o valor anda junto. Rótulos attributeLabel (Oxanium 18, textMuted, esquerda), valores attributeValue (Oxanium 18, text, centro). Nenhuma cor indica alinhamento ou poder. Preview desloca para x=1080 e escala 1, sem cobrir as barras. Arena mantém o preview original. Layout fica em uiConfig, sem contagem de orçamento ou teto nesta etapa.
 
 ## Personalização (v1.10)
 

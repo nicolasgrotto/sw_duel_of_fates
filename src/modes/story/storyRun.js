@@ -107,7 +107,8 @@ export function resolveStoryResult(run, result, config, loadouts) {
 }
 
 function isRatingMap(attributes, config) {
-  return Boolean(attributes) && Object.keys(config.startAttributes).every((name) => Number.isInteger(attributes[name]) && attributes[name] >= 1);
+  const highestCap = Math.max(...Object.values(config.ratingCaps));
+  return Boolean(attributes) && Object.keys(config.startAttributes).every((name) => Number.isInteger(attributes[name]) && attributes[name] >= 1 && attributes[name] <= highestCap);
 }
 
 export function sanitizeStoryRun(raw, config) {

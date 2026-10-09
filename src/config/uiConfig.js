@@ -312,7 +312,7 @@ export const controlsScreenRows = [
 export const keyComboSeparator = '  +  ';
 
 export const layout = {
-  attributes: { firstRowY: 410, rowSpacing: 30, labelX: 620, barX: 745, valueX: 925, segmentWidth: 14, segmentHeight: 5, segmentGap: 4, previewX: 1080, previewScale: 1 },
+  attributes: { firstRowY: 410, rowSpacing: 30, labelX: 620, barX: 745, valueX: 925, segmentWidth: 19, segmentHeight: 5, segmentGap: 4, previewX: 1080, previewScale: 1 },
   touch: { rotateY: 300, rotateHintY: 380 },
   menu: {
     titleY: 140,
@@ -399,7 +399,7 @@ export const layout = {
     previewScale: 1,
     nameInput: { x: 65, y: 170, width: 470, height: 38 },
     list: { firstItemY: 230, itemSpacing: 44, listX: 340, touchWidth: 520 },
-    attributes: { firstRowY: 320, rowSpacing: 30, labelX: 660, barX: 785, valueX: 965, segmentWidth: 14, segmentHeight: 5, segmentGap: 4 },
+    attributes: { firstRowY: 320, rowSpacing: 30, labelX: 660, barX: 785, valueX: 965, segmentWidth: 19, segmentHeight: 5, segmentGap: 4 },
   },
   intro: {
     titleY: 300,

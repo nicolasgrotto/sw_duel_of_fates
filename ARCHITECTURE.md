@@ -36,7 +36,7 @@ src/
     StateMachine.js         ✅ pilha de estados
     Camera.js               ✅ screen shake (com limites)
     AudioManager.js         ✅ AudioContext, buses de sfx e música, liberação no primeiro input
-    saveStorage.js          ✅ save versionado com lista ordenada de migrações (v4: `{ version, settings, story }`)
+    saveStorage.js          ✅ save versionado com lista ordenada de migrações (v5: `{ version, settings, story }`)
     settingsStorage.js      ✅ carrega e salva as opções (localStorage, tolerante a erro)
     keyBindings.js          ✅ preset personalizado: junta, troca teclas entre ações e valida o que vem do armazenamento
     AssetManager.js         ⏳ só quando houver assets externos
@@ -152,7 +152,7 @@ src/
     movesConfig.js          ✅ golpes por personagem: base de atributos, tipo, pose e cancelsInto
     touchLayoutConfig.js    ✅ geometria e limiares do toque
     evadeConfig.js          ✅ flag e perfil global de esquiva de precisão
-    attributesConfig.js     ✅ tabela 1–9, bases na nota 5 e calibração por arquétipo
+    attributesConfig.js     ✅ tabela 1–10 (escala 7/8/9/10), bases na nota 4, calibração por arquétipo e regra de conversão da escala antiga
     powersConfig.js         ✅ modos com poderes, medidor, tabelas de interação por habilidade e tiers visuais do Fluxo
     storyConfig.js          ✅ regras da História, opções do protagonista, encontros (rotas, recompensas, liberações) e finais
     storyTexts.js           ✅ títulos e falas dos encontros e finais
@@ -166,6 +166,7 @@ src/
     math.js                 ✅ clamp, lerp, approach, smoothTowards
     easing.js               ✅ curvas de easing para poses
     random.js               ✅ RNG com seed (testes determinísticos)
+    legacyRatings.js        ✅ conversão das notas 1–9 para a escala 7/8/9/10 (elenco e migração do save)
 tools/
   server.js                 ✅ servidor estático para desenvolvimento
   simulate.js               ✅ simulador de duelos IA × IA para balanceamento (npm run simulate)
@@ -222,13 +223,15 @@ Personagens atuais: Guardião, Sombra, Bastião, Vespa, Espelho, Haste, Brasa, F
 
 ### Atributos
 
-`applyAttributes(base, attributes, config)` é pura. Notas inteiras 1–9, padrão 5; 10 rejeitado nesta etapa e reservado ao secreto futuro. Multiplicadores 0,76 / 0,82 / 0,88 / 0,94 / 1 / 1,06 / 1,12 / 1,18 / 1,24. Bases na nota 5 ficam em attributesConfig.bases por arquétipo, calibradas dividindo os stats v1.3 pelo multiplicador da nota do elenco. Essa calibração preserva os valores escalares da v1.0 e a mobilidade adicionada na v1.3. Arredondamento em 9 casas evita alterações por ponto flutuante. Fixture stats-v1.3 foi capturada antes da migração e verifica todos os stats afetados, os 11 arquétipos e danos de cada golpe.
+`applyAttributes(base, attributes, config, { potential })` é pura. **Escala 7/8/9/10 (v1.12):** notas inteiras de 1 a `maxRating` (7), padrão 4; `getRatingLimit(config, potential)` = `maxRating + potential`, então só os secretos passam de 7 (8, 9 e 10). Multiplicadores lineares `1 + 0,08 × (nota − 4)`: 0,76 / 0,84 / 0,92 / 1 / 1,08 / 1,16 / 1,24 / 1,32 / 1,40 / 1,48. As bases na nota 4 ficam em attributesConfig.bases por arquétipo e foram recalculadas dividindo os stats de cada personagem comum pelo multiplicador da nota nova; parry perfeito (`perfectParryBonus` 0,0025 por nota acima de 4) e reserva de guarda (`guardBreakThreshold` sem o piso) também foram recalibrados na base. Resultado: os 11 arquétipos têm exatamente os mesmos stats (fixture stats-v1.3, que verifica todos os stats afetados e o dano de cada golpe). Arredondamento em 9 casas evita alterações por ponto flutuante.
+
+**Conversão da escala antiga.** `utils/legacyRatings.js` tem a regra única, com os parâmetros em `attributesConfig.legacyScale`: atributo físico `⌊1 + (nota − 1) × 0,75 + 0,5⌋` (1–9 → 1–7) e Fluxo `nota − 1` (`flowShift`). O Fluxo usa deslocamento porque o elenco ia de 3 a 8: menos 1 cabe em 2–7 e preserva **toda** diferença de Fluxo, logo todas as faixas de interação. `meter.baseLevel` do `powersConfig` passou de 5 para 4 pelo mesmo motivo, então ganho de medidor e potência ficaram iguais. A mesma regra converteu as notas do elenco e converte o protagonista no save v4 → v5.
 
 Vida escala maxHealth; Stamina escala maxStamina e regenPerSecond; Lâmina escala o dano de todos os golpes e soma 0,002 s por nota acima de 5 ao parry perfeito (limitado à janela total). Defesa divide custo e recuo do bloqueio pelo multiplicador e muda guardBreakThreshold em 1 de stamina por nota, com piso zero. Bases de reserva compensam as notas atuais para preservar quebra somente quando faltar stamina. CombatSystem compara custo + reserva; dano recebido permanece igual. blockStaminaScale e blockPushbackScale no arquétipo continuam apenas como traços passivos (Guardião/Bastião), compostos com os fatores de Defesa.
 
 Agilidade escala caminhada, velocidade vertical de pulo, dash e invulnerabilidade do EVADE pelo perfil de evadeConfig. Coeficientes calibrados preservam a janela 0,066 s atual. Também escala avanços/saltos de habilidade e pulo na parede, sem alterar durações, maxJumps ou regras de ataque aéreo. Fluxo vira stats.flowLevel, acessível pelo getter Fighter.flowLevel, imutável na luta e coberto pelo snapshot via stats; sem medidor ou efeito nesta etapa.
 
-Factory junta estrutura, bases e golpes antes de aplicar notas; nenhum snapshot de stats é criado no import. Simulador aceita --set attributes.guardian.health=9, attributeBases.guardian.maxHealth=100 e attributeConfig.perfectParryBonus=0. Overrides ocorrem antes da factory; caminhos fighters continuam para tempos, custos e traços. Orçamento e teto do protagonista permanecem na v1.7.
+Factory junta estrutura, bases e golpes antes de aplicar notas; nenhum snapshot de stats é criado no import. Simulador aceita --set attributes.guardian.health=7, attributeBases.guardian.maxHealth=100, attributeConfig.perfectParryBonus=0, story.budgets.easy=33 e powers.cooldown=1 (raízes `story` e `powers` desde a v1.12). Overrides ocorrem antes da factory; caminhos fighters continuam para tempos, custos e traços.
 
 ### Controllers
 
@@ -274,7 +277,7 @@ main.js
        ├─ Input e secondInput (2 Jogadores), com TouchInput como fonte do Input
        ├─ AudioManager
        ├─ StateMachine ── createState(StateId) → IntroState (primeira tela) / MenuState / DuelState / ...
-       ├─ settings + story (save v4)
+       ├─ settings + story (save v5)
        ├─ DebugOverlay
        └─ GameLoop
             ├─ update(step)  → debug toggle → states.update(step) → input.endFrame()
@@ -593,14 +596,14 @@ Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 23).
 
 - **Dados.** `storyConfig` guarda regras (pontos, tetos, totais, regras do duelo, `roundsToWin`), opções do protagonista e a lista de encontros (`id`, `opponent`, `arena`, `aiOffset`, `next` ou `outcomes`, `reward`, `unlocks`, `ending`). `storyTexts` guarda títulos e falas por encontro e final. Fala: `{ speaker: 'protagonist' | 'narrator' | idDoPersonagem, text: string | { light, dark } }`.
 - **Campanha pura.** `storyRun.js` trabalha sobre um objeto simples salvo no save (`run`): protagonista (nome, alinhamento, estilo, cor, notas), dificuldade, encontro atual, pontos, espaços de poder liberados, encontros vencidos e final. `resolveStoryResult(run, duelResult, config, loadouts)` devolve o novo `run`, o final e os personagens liberados; a rota usa `evaluateCondition` sobre `{ result, run }`. Nada lê o `Fighter`: a condição de vida vem do `DuelResult`.
-- **Protagonista.** `createProtagonistCharacter(perfil, storyConfig, espaços)` monta um objeto de personagem com o arquétipo, golpes, som e aparência base do estilo escolhido, sobrepondo `storyConfig.protagonist.appearance` e a cor da lâmina. `createFighterFromCharacter` (a factory agora aceita um objeto, não só um id) cria o lutador; `powerSlots` filtra o loadout do alinhamento. A nota 10 só vale para o Fluxo de personagens com `apex: true` (`attributesConfig.apexRating`).
+- **Protagonista.** `createProtagonistCharacter(perfil, storyConfig, espaços)` monta um objeto de personagem com o arquétipo, golpes, som e aparência base do estilo escolhido, sobrepondo `storyConfig.protagonist.appearance` e a cor da lâmina. `createFighterFromCharacter` (a factory agora aceita um objeto, não só um id) cria o lutador; `powerSlots` filtra o loadout do alinhamento. O protagonista usa a mesma escala do elenco (até 7); teto e total por dificuldade ficam em `storyConfig.ratingCaps` e `budgets`, e `sanitizeStoryRun` rejeita notas acima do maior teto.
 - **Fluxo de telas.** Menu → `StoryState` → (`ProtagonistState` criar → atributos) → `DialogueState` (antes, com a arena) → `DuelState` (`DuelMode.STORY`, `params.story`, `params.rules = storyConfig.rules`). O `DuelState` usa `storyStage` como mais um degrau da "escada" (adversário, arena, dificuldade) e cria o jogador a partir do protagonista. No resultado, `resolveDuelOutcome` desvia para `resolveStoryOutcome`: na vitória, empilha `DialogueState` (falas de depois, final e desbloqueios) que leva de volta ao `StoryState`, e devolve `story` (novo `run`) e `progress.unlockedCharacters`; na derrota, `GameOverState` com "Tentar de novo" e "Voltar à história" (`menuState`). A pausa sai para a História (`quitState`) e a lista de golpes recebe o personagem gerado.
-- **Save.** `Game.story` vem de `loadStory` + `sanitizeStoryRun` e é salvo junto com as opções (`saveSettings` grava `{ version: 4, settings, story }`). A migração 2 → 3 acrescenta `story: null`; 3 → 4 acrescenta `protagonist.skin` (base) sem perder progresso.
+- **Save.** `Game.story` vem de `loadStory` + `sanitizeStoryRun` e é salvo junto com as opções (`saveSettings` grava `{ version: 5, settings, story }`). A migração 2 → 3 acrescenta `story: null`; 3 → 4 acrescenta `protagonist.skin` (base) sem perder progresso; 4 → 5 converte as notas do protagonista para a escala 7/8/9/10 pela regra de `legacyRatings` (limitadas ao teto novo da dificuldade da campanha) e os pontos livres pelo mesmo fator (`⌊pontos × 0,75 + 0,5⌋`); campanha, final, espaços, skin e opções ficam iguais.
 
 ### Conteúdo, personagens secretos e intro
 
 - **Campanha completa.** Oito encontros lineares e um secreto em `storyConfig.encounters`. A Vespa (capítulo 3) dá `reward.powers` (libera o segundo poder do alinhamento). O Soberano tem `unlocks: ['sovereign']` e `outcomes`: `healthRatioAbove 0.75` leva ao encontro `foretold`; senão, final `normal`. O Predestinado termina no final `secret` e libera `foretold`.
-- **Personagens.** `sovereign` e `foretold` são dados comuns em `characterData` com `selectable: false` e `secret: true`, reaproveitando arquétipo e golpes da Haste e do Eco (sem tuning novo de golpes), com notas, alinhamento, aparência e perfis de IA próprios (`aiConfig.profiles.sovereign/foretold`). Secretos têm `potential` (+1 Ancião, +2 Soberano, +3 Predestinado): `getRatingLimit` usa `maxRating + potential` para todos os atributos; sem potencial, vale `attributesConfig.ratingLimits` (Fluxo até 8) ou `maxRating`. `stats.potential` chega às barras (segmentos extras em dourado). O encontro `foretold` fixa `difficulty: 'boss'`; finais aceitam `conditionalUnlocks` (o Ancião no Caminho da Aurora). A recompensa `wardrobe` dos segredos chama `unlockAllSkins`, e a intro tem áreas de toque por nome (`introConfig.tapAreas`). A `CharacterSelectState` monta `rosterIds` (só `selectable`, usado pelo Arcade) e `characterIds` (roster + secretos em `settings.unlockedCharacters`).
+- **Personagens.** `sovereign` e `foretold` são dados comuns em `characterData` com `selectable: false` e `secret: true`, reaproveitando arquétipo e golpes da Haste e do Eco (sem tuning novo de golpes), com notas, alinhamento, aparência e perfis de IA próprios (`aiConfig.profiles.sovereign/foretold`). Secretos têm `potential` (+1 Ancião, +2 Soberano, +3 Predestinado): `getRatingLimit` usa `maxRating + potential` para todos os atributos (7 sem potencial; 8, 9 e 10 com ele). `stats.potential` chega às barras (segmentos extras em dourado). O encontro `foretold` fixa `difficulty: 'boss'`; finais aceitam `conditionalUnlocks` (o Ancião no Caminho da Aurora). A recompensa `wardrobe` dos segredos chama `unlockAllSkins`, e a intro tem áreas de toque por nome (`introConfig.tapAreas`). A `CharacterSelectState` monta `rosterIds` (só `selectable`, usado pelo Arcade) e `characterIds` (roster + secretos em `settings.unlockedCharacters`).
 - **Intro e segredo.** `Game.start` abre o `IntroState`. A cada passo ele transforma o input em tokens (`key:<code>` pelo `input.lastPressedCode`, `action:<ação>` para as ações vigiadas, `tap:title` para toques no título) e alimenta o `SecretUnlockSystem`. Cada sequência só considera tokens do próprio tipo, então as setas (que geram tecla e ação) não atrapalham uma à outra. Ao casar, a recompensa de `secretsConfig.rewards` entra em `settings.unlockedCharacters`, é salva, toca `SoundName.SECRET` e mostra a frase. O som funciona porque o próprio toque de tecla é o gesto que libera o `AudioContext`. O `TouchInput` não mostra o botão de voltar na intro.
 
 ### Skins e personalização
@@ -812,6 +815,31 @@ O chefe final vence a IA pilotando o protagonista em cerca de dois terços dos d
 
 Alvo: fortes, mas vencíveis (cerca de 60%). Com base no Espelho, o Soberano dependia demais de parry (53% no Normal, 84% no Difícil); a base da Haste deixou as duas dificuldades parecidas.
 
+### Escala 7/8/9/10 (v1.12)
+
+**Elenco comum inalterado.** A saída completa do simulador (todas as estatísticas, 20 duelos, seed 1) ficou idêntica byte a byte em 440 cenários: todos os pares do elenco e do chefe do Arcade, Normal e Difícil, com e sem poderes. `npm run matrix` e `npm run matrix -- --rules powers` reproduzem célula a célula as matrizes v1.4 (clássica) e v1.6 (com poderes).
+
+**Secretos contra o elenco** (`simulate --rules powers`, 40 duelos por par, % de vitória do secreto; o Ancião caiu de Lâmina 7 para 6 para ficar abaixo do Soberano):
+
+| Secreto | Notas | Normal | Difícil | média |
+| --- | --- | --- | --- | --- |
+| Ancião | 6/6/6/8/7/8 | 64,3 | 79,3 | 71,8 |
+| Soberano | 7/6/6/6/4/9 | 77,0 | 75,3 | 76,2 |
+| Predestinado | 8/8/9/7/9/10 | 83,8 | 83,3 | 83,5 |
+
+**Curva dos chefes da História.** A IA que pilota o protagonista pesa mais que os atributos: no Fácil, um piloto Fácil perde 90% para o Soberano Fácil, e um piloto Normal vence 90%. Por isso a curva é medida com três pilotos: do mesmo nível da dificuldade (o método da v1.9), Normal fixo e Difícil fixo (aproximações de um jogador mediano e de um bom jogador). O protagonista sobe até o teto e o total da dificuldade (prioridade Fluxo, Lâmina, Vida); média dos dois alinhamentos × três estilos, 60 duelos cada (360 por célula). O Soberano usa a IA da dificuldade da campanha; o Predestinado, sempre a IA de chefe. Comando: `simulate --rules powers --left protagonist:<dif>:<alinhamento>:<estilo> --right sovereign --leftDifficulty <piloto> --rightDifficulty <dif>`.
+
+| % de vitória do protagonista | Piloto | Fácil | Normal | Difícil |
+| --- | --- | --- | --- | --- |
+| contra o Soberano | mesmo nível | 17,2 | 35,8 | 37,8 |
+| contra o Soberano | Normal | 90,8 | 35,8 | 8,1 |
+| contra o Soberano | Difícil | 97,2 | 72,2 | 37,8 |
+| contra o Predestinado | mesmo nível | 0,0 | 1,4 | 23,9 |
+| contra o Predestinado | Normal | 5,0 | 1,4 | 3,6 |
+| contra o Predestinado | Difícil | 38,1 | 27,0 | 23,9 |
+
+Antes da v1.12 (mesma bateria, 40 duelos): Soberano com piloto do mesmo nível 14,6 / 26,3 / 28,8 e Predestinado com piloto Difícil (só medido no Difícil) 27,5. Os tetos e totais novos (7/33, 6/30, 5/28) deixam o Soberano vencível em todas as dificuldades e o Predestinado muito difícil, mas possível: um bom jogador vence de um quarto a um terço das tentativas; um mediano, raramente. No Fácil, o piloto Fácil (que avisa os golpes e reage devagar) não representa o jogador; a faixa relevante ali é a do piloto Normal.
+
 ## AI
 
 Arquivos: [src/ai/](src/ai/), [src/config/aiConfig.js](src/config/aiConfig.js). Regras em [GAME_DESIGN.md](GAME_DESIGN.md#7-ia).
@@ -884,7 +912,7 @@ Testes rodam em Node (`npm test`), sem navegador. Por isso:
 - Quando um módulo do core precisa do navegador (`Input`, `TouchInput`, `GameLoop`, `textPrompt`), a dependência é injetada.
 - `computePose` é uma função pura e também é testada.
 
-Testes atuais: 461 testes em `tests/`, um arquivo por área (loop, input e toque, estados e modos, combate, especiais, EVADE, atributos, Fluxo e poderes, IA, simulação, replay, áudio, efeitos, UI, desbloqueios e skins, Arcade, Sobrevivência, História, segredos, remapeamento, save). `tests/states.test.js` cobre o fluxo de telas; `goToMenuItem(game, id)` navega no menu pelo id, sem depender da posição dos itens. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
+Testes atuais: 463 testes em `tests/`, um arquivo por área (loop, input e toque, estados e modos, combate, especiais, EVADE, atributos, Fluxo e poderes, IA, simulação, replay, áudio, efeitos, UI, desbloqueios e skins, Arcade, Sobrevivência, História, segredos, remapeamento, save). `tests/states.test.js` cobre o fluxo de telas; `goToMenuItem(game, id)` navega no menu pelo id, sem depender da posição dos itens. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
 
 ---
 
@@ -919,11 +947,11 @@ Roteiro, tarefas e validações em [versions/v2.md](versions/v2.md). O detalhe d
 
 **Princípios.** Tudo que muda o resultado de uma luta roda dentro da `DuelSimulation` com o dt fixo, guarda estado em `fighter.combat` (copiado inteiro pelo snapshot do replay) ou em campos do `Fighter` cobertos pelo teste de snapshot, e é configurado em `src/config/`. Game, Renderer, Audio, Effects e Input não contêm regra de gameplay. Os modos clássicos (Arcade, Sobrevivência, Tutorial, Desafio) recebem `rules` padrão e ficam idênticos à v1.0; a matriz sem poderes continua igual à v1.3.
 
-**Refactors da v1.1.** `Input` com fontes (teclado, gamepad, toque); save versionado com migrações (hoje v4: `{ version, settings, story }`); `DuelResult` e `duelOutcomes` fora do `DuelState`; teste que falha se um campo mutável do `Fighter` ficar fora do `captureFighter`; DPR limitado e tempos de update/render no F3.
+**Refactors da v1.1.** `Input` com fontes (teclado, gamepad, toque); save versionado com migrações (hoje v5: `{ version, settings, story }`); `DuelResult` e `duelOutcomes` fora do `DuelState`; teste que falha se um campo mutável do `Fighter` ficar fora do `captureFighter`; DPR limitado e tempos de update/render no F3.
 
 **Decisões.**
 
-- **Atributos** (1–9; Fluxo 10 só com `apex: true`) são a única fonte dos stats escalares; o arquétipo continua dono de tempos, golpes e traços.
+- **Atributos** (escala 7/8/9/10: elenco até 7, secretos até 7 + `potential`) são a única fonte dos stats escalares; o arquétipo continua dono de tempos, golpes e traços. Tier do Fluxo: azul até 7, roxo 8–9, vermelho só no 10.
 - **Fluxo**: `flowLevel` (permanente) define potência, ganho do medidor, resistência e tier visual; `flowMeter` é o recurso da luta; `stamina` continua o recurso físico.
 - **Interações**: `flowDifference = quem lança − alvo`; uma tabela de faixas por habilidade, cada faixa com modificadores (escala, guarda, dano e deslize na guarda, duração, stagger); um resolvedor puro, sem `if` por poder; falha só por limiar.
 - **Poderes** têm fases como os golpes, são pagos com `flowMeter` e não têm projétil. Estados `CASTING` e `CHANNELING`.

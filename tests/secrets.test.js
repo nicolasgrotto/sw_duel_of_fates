@@ -4,6 +4,7 @@ import { arenas } from '../src/arenas/arenaData.js';
 import { characters } from '../src/characters/characterData.js';
 import { createFighter, createFighterFromCharacter } from '../src/characters/characterFactory.js';
 import { Action } from '../src/config/controlsConfig.js';
+import { attributesConfig } from '../src/config/attributesConfig.js';
 import { audioConfig } from '../src/config/audioConfig.js';
 import { introConfig } from '../src/config/introConfig.js';
 import { secretsConfig, SecretToken } from '../src/config/secretsConfig.js';
@@ -126,18 +127,18 @@ describe('IntroState', () => {
 });
 
 describe('secret fighters', () => {
-  it('have elevated potential (+1, +2, +3) while ordinary fighters keep flow at 8 or less', () => {
+  it('reach 8, 9 and 10 through potential while ordinary fighters stop at 7', () => {
     for (const [id, potential] of [['elder', 1], ['sovereign', 2], ['foretold', 3]]) {
       assert.equal(characters[id].selectable, false);
       const fighter = createFighter(id, { x: 0, y: 0, facing: 1 });
       assert.equal(fighter.stats.potential, potential);
-      assert.ok(Object.values(fighter.stats.attributes).every((value) => value <= 9 + potential));
+      assert.ok(Object.values(fighter.stats.attributes).every((value) => value <= attributesConfig.maxRating + potential));
+      assert.equal(fighter.flowLevel, attributesConfig.maxRating + potential);
     }
-    assert.equal(createFighter('foretold', { x: 0, y: 0, facing: 1 }).flowLevel, 12);
     for (const character of Object.values(characters).filter((entry) => !entry.secret)) {
-      assert.ok(character.attributes.flow <= 8, character.id);
+      assert.ok(Object.values(character.attributes).every((value) => value <= attributesConfig.maxRating), character.id);
     }
-    const ordinary = { ...characters.guardian, attributes: { ...characters.guardian.attributes, flow: 9 } };
+    const ordinary = { ...characters.guardian, attributes: { ...characters.guardian.attributes, flow: 8 } };
     assert.throws(() => createFighterFromCharacter(ordinary, { x: 0, y: 0, facing: 1 }), RangeError);
   });
 

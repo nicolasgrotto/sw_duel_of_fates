@@ -53,15 +53,19 @@ describe('story run', () => {
   });
 
   it('raises attributes within points, the difficulty cap and the total budget', () => {
-    const config = { ...storyConfig, budgets: { ...storyConfig.budgets, hard: 26 } };
+    const cap = storyConfig.ratingCaps.hard;
+    const start = storyConfig.startAttributes.flow;
+    const budget = Object.values(storyConfig.startAttributes).reduce((sum, value) => sum + value, 0) + cap - start;
+    const config = { ...storyConfig, budgets: { ...storyConfig.budgets, hard: budget } };
     let run = { ...createStoryRun(PROFILE, 'hard', config), points: 10 };
-    run = raiseAttribute(run, 'flow', config);
-    run = raiseAttribute(run, 'flow', config);
-    assert.equal(run.protagonist.attributes.flow, 6);
+    for (let rating = start; rating < cap; rating += 1) {
+      run = raiseAttribute(run, 'flow', config);
+    }
+    assert.equal(run.protagonist.attributes.flow, cap);
     assert.equal(canRaiseAttribute(run, 'health', config), false);
-    run = { ...run, protagonist: { ...run.protagonist, attributes: { ...run.protagonist.attributes, flow: 5 } } };
+    run = { ...run, protagonist: { ...run.protagonist, attributes: { ...run.protagonist.attributes, flow: cap - 1 } } };
     assert.equal(canRaiseAttribute(run, 'flow', config), true);
-    const capped = { ...run, protagonist: { ...run.protagonist, attributes: { ...run.protagonist.attributes, flow: 6 } } };
+    const capped = { ...run, protagonist: { ...run.protagonist, attributes: { ...run.protagonist.attributes, flow: cap } } };
     assert.equal(canRaiseAttribute({ ...capped, points: 5 }, 'flow', { ...config, budgets: { hard: 99 } }), false);
     assert.equal(raiseAttribute({ ...run, points: 0 }, 'health', config).points, 0);
   });

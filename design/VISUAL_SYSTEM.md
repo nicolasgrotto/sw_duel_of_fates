@@ -52,12 +52,14 @@ Cores do Fluxo (energia dos poderes, por tier de nível; nunca usadas na lâmina
 
 | Token | Valor | Níveis |
 | --- | --- | --- |
-| `powerTierFaint` | `#9cc4ff` | 1–3 (azul pálido) |
-| `powerTierSteady` | `#5d8dff` | 4–7 (azul) |
-| `powerTierDeep` | `#b26bff` | 8–11 (roxo) |
-| `powerTierApex` | `#ff2b45` | 12 (vermelho; só o Predestinado) |
+| `powerTierFaint` | `#9cc4ff` | 1–2 (azul pálido) |
+| `powerTierSteady` | `#5d8dff` | 3–7 (azul) |
+| `powerTierDeep` | `#b26bff` | 8–9 (roxo; Ancião e Soberano) |
+| `powerTierApex` | `#ff2b45` | 10 (vermelho; só o Predestinado) |
 
-Barras de atributo: segmentos acima de 9 (potencial dos secretos) usam `attributePotential` (`#e0c46a`, dourado) cheios e `attributePotentialTrack` vazios.
+Escala 7/8/9/10 (v1.12): o elenco comum vai até 7, então todo o elenco fica no azul; o roxo é dos secretos com potencial e o vermelho é exclusivo do nível 10.
+
+Barras de atributo: sete segmentos para a escala comum; segmentos acima de 7 (potencial dos secretos, até 10) usam `attributePotential` (`#e0c46a`, dourado) cheios e `attributePotentialTrack` vazios.
 
 ## Tipografia
 

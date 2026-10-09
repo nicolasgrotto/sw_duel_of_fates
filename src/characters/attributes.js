@@ -1,11 +1,11 @@
-export function getRatingLimit(name, config, potential = 0) {
-  return potential > 0 ? config.maxRating + potential : config.ratingLimits[name] ?? config.maxRating;
+export function getRatingLimit(config, potential = 0) {
+  return config.maxRating + potential;
 }
 
 export function applyAttributes(base, attributes, config, { potential = 0 } = {}) {
   const ratings = { ...config.defaults, ...attributes };
   for (const name of Object.keys(config.defaults)) {
-    if (!Number.isInteger(ratings[name]) || ratings[name] < config.minRating || ratings[name] > getRatingLimit(name, config, potential)) {
+    if (!Number.isInteger(ratings[name]) || ratings[name] < config.minRating || ratings[name] > getRatingLimit(config, potential)) {
       throw new RangeError(`Invalid attribute: ${name}=${ratings[name]}`);
     }
   }

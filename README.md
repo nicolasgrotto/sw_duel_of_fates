@@ -20,7 +20,7 @@ Jogo 2D de duelo de lâminas de energia para navegador, feito com HTML5, CSS3, J
 
 ## O que tem no jogo
 
-- **10 personagens** com atributos (seis notas de 1 a 9), golpes, habilidade, alinhamento e IA próprios: Guardião, Sombra, Bastião, Vespa, Espelho, Haste, Brasa, Forja, Garça e Eco. Mais um chefe no Arcade e na Sobrevivência e **três personagens secretos**, liberados pela História ou por um segredo na tela de abertura.
+- **10 personagens** com atributos (seis notas de 1 a 7; os secretos chegam a 8, 9 e 10), golpes, habilidade, alinhamento e IA próprios: Guardião, Sombra, Bastião, Vespa, Espelho, Haste, Brasa, Forja, Garça e Eco. Mais um chefe no Arcade e na Sobrevivência e **três personagens secretos**, liberados pela História ou por um segredo na tela de abertura.
 - **6 arenas** desenhadas por código: Plataforma de Refino, Santuário Alagado, Mina de Cristal, Telhado Neon, Anel Orbital e Floresta Lumínica.
 - **Combate por timing**: rápido, forte, bloqueio, parry e parry perfeito com riposta, empurrão, esquiva (dash) e esquiva de precisão, sequências, golpe aéreo, pulo duplo (Vespa) e habilidade de cada personagem.
 - **Poderes do Fluxo** (opcionais): medidor próprio, quatro poderes em dois caminhos (Aurora: Repulsão e Barreira; Eclipse: Raio e Puxão) e resistência pela diferença de nível entre os lutadores.

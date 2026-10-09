@@ -13,8 +13,8 @@ it('reports hits received by the loser separately from hits by both fighters', (
 });
 
 it('applies attribute overrides before creating fighters in the simulator', () => {
-  const output = execFileSync(process.execPath, ['tools/simulate.js', '--duels', '2', '--set', 'attributes.guardian.health=9', '--set', 'attributes.shadow.agility=1'], { encoding: 'utf8' });
-  assert.match(output, /attributes.guardian.health=9/);
+  const output = execFileSync(process.execPath, ['tools/simulate.js', '--duels', '2', '--set', 'attributes.guardian.health=7', '--set', 'attributes.shadow.agility=1'], { encoding: 'utf8' });
+  assert.match(output, /attributes.guardian.health=7/);
   assert.match(output, /Duels: 2/);
-  assert.throws(() => execFileSync(process.execPath, ['tools/simulate.js', '--duels', '1', '--set', 'attributes.guardian.health=10'], { stdio: 'pipe' }));
+  assert.throws(() => execFileSync(process.execPath, ['tools/simulate.js', '--duels', '1', '--set', 'attributes.guardian.health=8'], { stdio: 'pipe' }));
 });

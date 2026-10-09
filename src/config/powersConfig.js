@@ -14,7 +14,6 @@ const CHANNEL_GUARD = { guardDamage: 0.25, guardSlide: 0.5 };
 
 export const powersConfig = {
   modes: ['versus', 'local', 'training'],
-  maxLevel: 12,
   cooldown: 1.2,
   impactHeight: 0.55,
   castHeight: 0.6,
@@ -52,7 +51,7 @@ export const powersConfig = {
     start: 20,
     regenPerSecond: 3,
     gain: { hitLanded: 7, hitTaken: 9, blocked: 4, parried: 10 },
-    baseLevel: 5,
+    baseLevel: 4,
     gainPerLevel: 0.05,
     potencyPerLevel: 0.03,
   },
@@ -87,8 +86,8 @@ export const powersConfig = {
   },
   tiers: [
     { id: 'faint', color: colors.powerTierFaint, minLevel: 1, glowRadius: 34, glowAlpha: 0.45, boltWidth: 2, particles: [4, 6] },
-    { id: 'steady', color: colors.powerTierSteady, minLevel: 4, glowRadius: 42, glowAlpha: 0.55, boltWidth: 2.5, particles: [6, 8] },
+    { id: 'steady', color: colors.powerTierSteady, minLevel: 3, glowRadius: 42, glowAlpha: 0.55, boltWidth: 2.5, particles: [6, 8] },
     { id: 'deep', color: colors.powerTierDeep, minLevel: 8, glowRadius: 52, glowAlpha: 0.65, boltWidth: 3, particles: [8, 10] },
-    { id: 'apex', color: colors.powerTierApex, minLevel: 12, glowRadius: 64, glowAlpha: 0.75, boltWidth: 3.5, particles: [10, 12] },
+    { id: 'apex', color: colors.powerTierApex, minLevel: 10, glowRadius: 64, glowAlpha: 0.75, boltWidth: 3.5, particles: [10, 12] },
   ],
 };
