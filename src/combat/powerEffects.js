@@ -19,8 +19,8 @@ function applyGuarded(context) {
 }
 
 function getStagger(context) {
-  const { power, scale, interaction } = context;
-  return power.stagger * Math.min(1, scale) * interaction.stagger;
+  const { power, scale, interaction, air } = context;
+  return power.stagger * Math.min(1, scale) * interaction.stagger * air.stagger;
 }
 
 function push(context) {
@@ -53,7 +53,7 @@ function pull(context) {
 }
 
 function lightning(context) {
-  const { combat, caster, target, power, interaction, scale, guarded } = context;
+  const { combat, caster, target, power, interaction, air, scale, guarded } = context;
   if (guarded) {
     target.vx = caster.facing * power.knockback * interaction.guardSlide;
     applyGuarded(context);
@@ -61,7 +61,7 @@ function lightning(context) {
   }
   target.vx = caster.facing * power.knockback * scale;
   if (combat.dealPowerDamage(caster, target, power, power.damage * scale, CombatEvent.POWER_HIT)) {
-    interrupt(target, FighterState.HIT, power.stun * interaction.duration);
+    interrupt(target, FighterState.HIT, power.stun * interaction.duration * air.duration);
   }
 }
 

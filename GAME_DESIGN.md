@@ -553,7 +553,9 @@ Progressão sem grind nos modos de duelo: desafios, Arcade e finais da História
 
 EVADE (S/baixo) é separado do dash (Shift). No chão, consome zero stamina, recua poucos pixels, fica invulnerável por 0,066 s e recupera até 0,4 s. Sem contato, a recuperação é vulnerável. Quando uma hitbox cruza a hurtbox na janela, EVADE_SUCCESS consome esse contato e libera o defensor imediatamente para punir, sem dano nem ganho de stamina. Repetir a ação exige novo toque; nenhuma defesa passiva ao segurar baixo. Config global pode desligar a mecânica; arquétipos podem fornecer perfil completo em stats.evade.
 
-Pulo duplo: todos os arquétipos usam movement.maxJumps = 1, exceto Vespa = 2. Novo toque no ar aplica 80% da velocidade vertical do primeiro pulo. jumpsUsed zera ao tocar o chão ou reiniciar round. Pulo na parede tem prioridade e preserva quantos pulos já foram gastos; não devolve o aéreo. Pulo duplo não rearma ataque aéreo (um por voo), evitando sequências no ar.
+Pulo duplo (v1.13): todos os arquétipos usam movement.maxJumps = 2. Novo toque no ar aplica 70% da velocidade vertical do primeiro pulo; a Vespa, 90% (é a identidade dela no ar, junto com o dash aéreo mais barato). jumpsUsed zera ao tocar o chão ou reiniciar round. Pulo na parede tem prioridade e preserva quantos pulos já foram gastos; não devolve o aéreo. Pulo duplo não rearma ataque aéreo (um por voo), evitando sequências no ar.
+
+**Dash aéreo (v1.13).** A esquiva (Shift, B no controle, botão Esquiva no toque) apertada no ar vira um dash curto na horizontal: uma vez por salto, custa stamina (18; Vespa 8), segue a direção apertada (sem direção, vai para a frente), dá uma pequena elevação e atravessa o corpo do oponente. Não tem invulnerabilidade: um golpe que pegue o dash acerta. Para trocar de lado é preciso pular, passar por cima e acertar o tempo; o lutador só se vira ao pousar. Sem stamina ou com o dash já usado, a esquiva no ar é recusada com o mesmo aviso da stamina. Perfil em `airDashConfig` (com override por arquétipo).
 
 ## 21.2. Atributos v1.4
 
@@ -591,7 +593,8 @@ Na guarda, Repulsão e Puxão não causam dano e empurram pela metade; o Raio ca
 | Puxão | Eclipse | frente + Poder | traz o alvo para perto e o desequilibra: abre punição |
 
 - Quem lança fica vulnerável na preparação: um golpe interrompe o poder.
-- Esquiva e EVADE com invulnerabilidade fazem o poder passar.
+- Esquiva e EVADE com invulnerabilidade fazem o poder passar. O dash aéreo não tem invulnerabilidade.
+- **No ar** não há guarda contra poderes, e o alcance vertical cobre o pulo duplo (`powersConfig.airReach`). Quem está no ar sofre o modificador aéreo da habilidade: a Repulsão empurra 30% mais e desequilibra 20% mais, o Puxão desequilibra 20% mais e o Raio prende 60% mais a cada pulso.
 - A Barreira contra a Repulsão segura, mas o dono recua um pouco.
 - Poderes não têm projétil: o efeito é decidido no instante ativo (Repulsão e Puxão) ou em cada pulso (Raio).
 - Nomes de tela em `uiConfig.texts.powers`; os ids no código são `push`, `pull`, `lightning` e `barrier`.

@@ -94,7 +94,7 @@ function readOptions(argv) {
   return options;
 }
 
-function createController(self, opponent, { characterId, difficulty, profile }, random, rules) {
+function createController(self, opponent, { characterId, difficulty, profile }, random, rules, arena) {
   return new EnemyAI({
     self,
     opponent,
@@ -103,6 +103,7 @@ function createController(self, opponent, { characterId, difficulty, profile }, 
     perception: aiConfig.perception,
     random,
     rules,
+    arena,
   });
 }
 
@@ -121,8 +122,8 @@ function runDuel(leftSetup, rightSetup, random, rules) {
   const right = createFighterFromCharacter(resolveCharacter(rightId), { x: centerX + half, y: arena.floorY, facing: -1 });
   const fighters = [left, right];
   const controllers = [
-    createController(left, right, leftSetup, random, rules),
-    createController(right, left, rightSetup, random, rules),
+    createController(left, right, leftSetup, random, rules, arena),
+    createController(right, left, rightSetup, random, rules, arena),
   ];
   const simulation = new DuelSimulation({
     arena,
@@ -132,7 +133,7 @@ function runDuel(leftSetup, rightSetup, random, rules) {
     animationConfig: animationStyle,
     rules,
   });
-  const counts = { hits: 0, blocks: 0, clashes: 0, guardBreaks: 0, parries: 0, perfectParries: 0, shoves: 0, evades: 0, evadeAttempts: 0, jumps: 0, airJumps: 0, powers: 0, powerHits: 0, powerResisted: 0, powerAbsorbed: 0 };
+  const counts = { hits: 0, blocks: 0, clashes: 0, guardBreaks: 0, parries: 0, perfectParries: 0, shoves: 0, evades: 0, evadeAttempts: 0, jumps: 0, airJumps: 0, airDashes: 0, powers: 0, powerHits: 0, powerResisted: 0, powerAbsorbed: 0 };
 
   const hitsReceived = new Map([[left, 0], [right, 0]]);
   let time = 0;
@@ -142,12 +143,14 @@ function runDuel(leftSetup, rightSetup, random, rules) {
       if (fighters[i].intent.evade) counts.evadeAttempts += 1;
     }
     const jumpsBefore = fighters.map((fighter) => fighter.combat.jumpsUsed);
+    const dashesBefore = fighters.map((fighter) => fighter.combat.airDashUsed);
     simulation.step(STEP);
     for (let i = 0; i < fighters.length; i++) {
       if (fighters[i].combat.jumpsUsed > jumpsBefore[i]) {
         counts.jumps += 1;
         if (fighters[i].combat.jumpsUsed > 1) counts.airJumps += 1;
       }
+      if (fighters[i].combat.airDashUsed && !dashesBefore[i]) counts.airDashes += 1;
     }
     for (const event of simulation.events) {
       if (event.type === CombatEvent.HIT) {
@@ -218,7 +221,7 @@ function main() {
   console.log(`avg guard breaks: ${average(results.map((result) => result.counts.guardBreaks)).toFixed(2)}`);
   console.log(`avg parries: ${average(results.map((result) => result.counts.parries)).toFixed(2)}  perfect: ${average(results.map((result) => result.counts.perfectParries)).toFixed(2)}`);
   console.log(`avg evades : ${average(results.map((result) => result.counts.evades)).toFixed(2)}  attempts: ${average(results.map((result) => result.counts.evadeAttempts)).toFixed(2)}`);
-  console.log(`avg jumps  : ${average(results.map((result) => result.counts.jumps)).toFixed(2)}  air: ${average(results.map((result) => result.counts.airJumps)).toFixed(2)}`);
+  console.log(`avg jumps  : ${average(results.map((result) => result.counts.jumps)).toFixed(2)}  air: ${average(results.map((result) => result.counts.airJumps)).toFixed(2)}  air dashes: ${average(results.map((result) => result.counts.airDashes)).toFixed(2)}`);
   console.log(`avg shoves : ${average(results.map((result) => result.counts.shoves)).toFixed(2)}`);
   if (rules.powers) {
     const counts = (name) => average(results.map((result) => result.counts[name])).toFixed(2);

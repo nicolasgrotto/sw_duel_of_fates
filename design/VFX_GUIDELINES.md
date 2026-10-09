@@ -36,7 +36,7 @@ Os valores reais ficam em `src/config/effectsConfig.js`.
 | `perfect-parry` | `perfectParry` | 16–22 faíscas, anel maior, lâmina clareia, **mundo dessatura** por 0,15 s, punch-in | médio | fraco |
 | `shove-impact` | `shove` | 4–6 faíscas baixas, luz pequena | muito leve | — |
 | `hit-flash` | `hit` | silhueta do atingido fica branca por ~0,06 s | — | — |
-| `dodge-afterimage` | (render) durante a esquiva | 3 silhuetas transparentes que somem rápido | — | — |
+| `dodge-afterimage` | (render) durante a esquiva e o dash aéreo | 3 silhuetas transparentes que somem rápido | — | — |
 | `power-charge` | (render) preparação de um poder | glow na mão da frente, na cor do tier | — | — |
 | `power-wave` | `powerActive` | anel à frente de quem lança: abre na Repulsão, fecha no Puxão; luz pequena | — | — |
 | `power-impact` | `powerHit` da Repulsão e do Puxão | 6–10 partículas (metade na cor do tier), luz média | leve | — |
@@ -117,3 +117,5 @@ Camada de cor sobre a cena inteira (abaixo da UI), com blend aditivo e alpha que
 ### EVADE (v1.3)
 
 A esquiva de precisao usa uma inclinacao breve para tras, joelhos baixos e recuo minimo. A pose vem de combatPoses.evade e volta suavemente durante a recuperacao. Silhueta permanece legivel; sem cor, anel, flash, shake ou camera lenta novos. Afterimage curto de 0,12 s com alpha 0,18 reaproveita o pool da esquiva. EVADE_SUCCESS pede esse afterimage ao EffectsSystem e reutiliza o som sintetizado de esquiva. Controles e lista de golpes incluem o gesto para baixo nos estilos existentes.
+
+Dash aéreo (v1.13): reaproveita o estado e a pose da esquiva, as silhuetas `dodge-afterimage` e o som sintetizado de esquiva. Sem cor, rastro, anel ou shake novos; o lutador continua na cor da própria paleta e a lâmina não muda.

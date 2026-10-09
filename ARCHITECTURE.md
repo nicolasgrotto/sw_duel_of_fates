@@ -152,6 +152,7 @@ src/
     movesConfig.js          ✅ golpes por personagem: base de atributos, tipo, pose e cancelsInto
     touchLayoutConfig.js    ✅ geometria e limiares do toque
     evadeConfig.js          ✅ flag e perfil global de esquiva de precisão
+    airDashConfig.js        ✅ flag e perfil global do dash aéreo (override por arquétipo em `stats.airDash`)
     attributesConfig.js     ✅ tabela 1–10 (escala 7/8/9/10), bases na nota 4, calibração por arquétipo e regra de conversão da escala antiga
     powersConfig.js         ✅ modos com poderes, medidor, tabelas de interação por habilidade e tiers visuais do Fluxo
     storyConfig.js          ✅ regras da História, opções do protagonista, encontros (rotas, recompensas, liberações) e finais
@@ -514,7 +515,9 @@ Arquivos: [src/combat/](src/combat/). Regras em [GAME_DESIGN.md](GAME_DESIGN.md#
 
 `evadeConfig.js` define enabled e perfil global; stats.evade opcional substitui o perfil completo. CombatSystem.tryEvade reaproveita startDodge e DODGING, com combat.evading/evadeSucceeded no snapshot. Deslocamento para trás só durante movementTime. findContacts detecta hitbox contra hurtbox invulnerável do EVADE e captura evaded antes de resolver; marca hasHit do atacante e emite EVADE_SUCCESS, libera IDLE e zera velocidade. Dash comum continua ignorando contatos invulneráveis. EffectsSystem guarda timer visual por defensor; DuelRenderer e DodgeAfterimage usam esse sinal para uma silhueta inclinada curta, inclusive depois da liberação imediata. Audio reutiliza DODGE. Sem novas cores/assets ou estado de combate.
 
-Pulo duplo: MovementSystem incrementa combat.jumpsUsed (snapshot automático) no pulo terrestre e aéreo, com limite movement.maxJumps. PhysicsSystem zera no contato com chão, mesmo em estados de combate; resetForRound também zera. tryWallJump retorna se executou para dar prioridade ao pulo na parede e não muda jumpsUsed. Saltos de habilidade consomem o primeiro pulo. airJumpVelocityScale configura a velocidade do aéreo. Um voo continua permitindo um único ataque aéreo. F3 mostra contador e tempo do EVADE.
+Pulo duplo: MovementSystem incrementa combat.jumpsUsed (snapshot automático) no pulo terrestre e aéreo, com limite movement.maxJumps (2 em todos os arquétipos desde a v1.13). PhysicsSystem zera no contato com chão, mesmo em estados de combate; resetForRound também zera. tryWallJump retorna se executou para dar prioridade ao pulo na parede e não muda jumpsUsed. Saltos de habilidade consomem o primeiro pulo. airJumpVelocityScale configura a velocidade do aéreo. Um voo continua permitindo um único ataque aéreo. F3 mostra contador e tempo do EVADE.
+
+**Dash aéreo (v1.13).** Sem flag nova no intent: `intent.dodge` no ar continua virando a ação `dodge` no buffer. Em `startActions`, quando o lutador não pode agir (está no ar), `CombatSystem.tryAirDash` roda antes de `tryAirAttack`: só em `JUMPING`, consome o buffer, recusa (`actionRejected`) sem stamina ou com `combat.airDashUsed`, e senão cobra `stats.airDash.staminaCost` e chama o mesmo `startDodge` da esquiva com o perfil aéreo (`airDashConfig.profile`, ou `stats.airDash` do arquétipo, montado na factory como o `evade`). O perfil tem `invulnerableTime: 0` (o `hasHurtbox` continua verdadeiro), `passThrough: true` (o `CollisionSystem` não separa os corpos) e `lift` (velocidade para cima no início). Direção: a apertada, ou o `facing`. `combat.airDashUsed` zera no chão junto com `airAttackUsed` e entra no snapshot do replay por estar em `combat`. O `MovementSystem` só vira o lutador para o oponente quando ele está no chão, então o lado se ajusta ao pousar. O F3 mostra se o dash aéreo do salto já foi usado. Ao fim do `DODGING` no ar o estado volta a `IDLE` e o `updateStates` o leva a `JUMPING`, permitindo ainda o pulo aéreo.
 
 ## Effects e Camera
 
@@ -578,7 +581,7 @@ Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 22).
 - **Estados e ação.** `CASTING` (poderes instantâneos) e `CHANNELING` (raio e barreira). A ação `power` (`intent.power`, segurar = `intent.powerHeld`) entra no buffer depois do empurrão e antes da habilidade, e também sai de dentro do `BLOCKING` fora do blockstun. Com os poderes desligados, a ação é descartada sem evento. Sem medidor ou em recarga, `actionRejected` sai com `attackType: 'power'`.
 - **Escolha.** `selectPower` lê `stats.power.loadout` (de `powersConfig.loadouts[alinhamento]`): direção relativa ao `facing` escolhe `forward`, `back` ou `neutral`, e um espaço vazio cai no `neutral`.
 - **Fases.** `PowerSystem.resolve` roda no fim de `CombatSystem.update`, antes do movimento. Instantâneo: no fim do startup aplica o efeito uma vez (`affect(..., 'active')`), emite `powerActive` e termina depois de active + recovery. Canal: depois do startup, enquanto `powerHeld`, há medidor e o tempo não passou de `maxChannel`, drena o medidor e chama `tick`; sempre há pelo menos um passo de canal (um toque dá um pulso). `powerEndTime` marca o fim do canal; a recuperação conta a partir dele. `finish` limpa o poder, volta a `IDLE` e liga `powerCooldown` (`powersConfig.cooldown`).
-- **Efeito.** `affect` confere alcance (`isInPowerRange`: à frente, gap ≤ `range`, mesma altura), invulnerabilidade (esquiva e EVADE passam), Barreira (`isBarrierUp` → `powerAbsorbed`, com recuo pequeno para empurrões), interação (`powerResisted` quando a faixa é `resisted`) e guarda de frente (`isGuardingAgainst`, só se a faixa for `blockable`). Depois chama o handler do registro `powerEffects[effect][fase]` com um contexto reaproveitado (sem objeto novo por chamada), que carrega a faixa em `context.interaction`. O dano passa por `CombatSystem.dealPowerDamage`, que emite `powerHit` ou `powerBlocked`, dá medidor ao atingido e usa o mesmo `knockOut` do golpe de lâmina.
+- **Efeito.** `affect` confere alcance (`isInPowerRange`: à frente, gap ≤ `range`; na vertical, uma altura de corpo com os dois no chão e `powersConfig.airReach` quando um deles está no ar), invulnerabilidade (esquiva e EVADE passam), Barreira (`isBarrierUp` → `powerAbsorbed`, com recuo pequeno para empurrões), interação (`powerResisted` quando a faixa é `resisted`) e guarda de frente (`isGuardingAgainst`, só se a faixa for `blockable`). Depois chama o handler do registro `powerEffects[effect][fase]` com um contexto reaproveitado (sem objeto novo por chamada), que carrega a faixa em `context.interaction` e o modificador aéreo em `context.air` (`table.air` com o alvo no ar; um objeto neutro congelado no chão). Cada tabela é `{ air, bands }`: `air.scale` multiplica a escala do efeito, `air.duration` o stun do Raio e `air.stagger` o desequilíbrio. O dano passa por `CombatSystem.dealPowerDamage`, que emite `powerHit` ou `powerBlocked`, dá medidor ao atingido e usa o mesmo `knockOut` do golpe de lâmina.
 - **Barreira na lâmina.** Em `resolveContact`, depois do empurrão de corpo e antes do counter: com a barreira de pé, `resolveBarrierBlock` segura o golpe sem gastar stamina e emite `powerAbsorbed`. O empurrão de corpo continua vencendo (`applyShove` limpa o poder).
 - **Interrupção.** `Fighter.clearAttack` também limpa o poder (`clearPower`), então qualquer golpe, empurrão ou desequilíbrio interrompe quem está lançando.
 - **Puxão.** A velocidade vem do atrito de ação da física (`friction`, repassado pela `DuelSimulation`): `√(2 × atrito × distância)` faz o alvo parar perto de `endGap`.
@@ -840,6 +843,70 @@ Alvo: fortes, mas vencíveis (cerca de 60%). Com base no Espelho, o Soberano dep
 
 Antes da v1.12 (mesma bateria, 40 duelos): Soberano com piloto do mesmo nível 14,6 / 26,3 / 28,8 e Predestinado com piloto Difícil (só medido no Difícil) 27,5. Os tetos e totais novos (7/33, 6/30, 5/28) deixam o Soberano vencível em todas as dificuldades e o Predestinado muito difícil, mas possível: um bom jogador vence de um quarto a um terço das tentativas; um mediano, raramente. No Fácil, o piloto Fácil (que avisa os golpes e reage devagar) não representa o jogador; a faixa relevante ali é a do piloto Normal.
 
+### Movimento aéreo (v1.13)
+
+`npm run matrix` e `npm run matrix -- --rules powers` (Normal e Difícil, perfis próprios, seed 1, 60 duelos por par ordenado). O movimento novo vale para todos, então esta passa a ser a referência do modo clássico. **Todas as médias do clássico ficam dentro de ±5 pontos da v1.0** (maior desvio: Sombra no Difícil, +4,5). Sem o `aerialWeight` dos perfis, Espelho (Normal, +6,4), Haste (Normal, −6,5), Forja (Difícil, −6,4) e Garça (Difícil, −5,9) saíam da faixa; medindo cada alavanca isolada, o pulo de movimento e o dash aéreo eram o que derrubava os lutadores de chão.
+
+| Normal v1.13 | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco | média | delta v1.0 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Guardião | — | 42 | 27 | 52 | 57 | 37 | 50 | 48 | 68 | 57 | 48,5 | +0,2 |
+| Sombra | 53 | — | 55 | 70 | 72 | 57 | 73 | 52 | 70 | 62 | 62,6 | -2,2 |
+| Bastião | 73 | 47 | — | 77 | 65 | 50 | 85 | 62 | 68 | 60 | 65,2 | +1,1 |
+| Vespa | 37 | 38 | 33 | — | 40 | 30 | 70 | 52 | 53 | 60 | 45,9 | -1,5 |
+| Espelho | 48 | 27 | 28 | 42 | — | 10 | 45 | 22 | 42 | 30 | 32,6 | +2,0 |
+| Haste | 67 | 35 | 55 | 57 | 87 | — | 70 | 60 | 63 | 73 | 63,0 | -3,3 |
+| Brasa | 42 | 45 | 33 | 48 | 43 | 33 | — | 23 | 33 | 27 | 36,5 | -1,6 |
+| Forja | 55 | 37 | 37 | 43 | 65 | 48 | 73 | — | 67 | 63 | 54,3 | -0,9 |
+| Garça | 35 | 33 | 30 | 42 | 67 | 12 | 52 | 50 | — | 43 | 40,4 | -0,4 |
+| Eco | 40 | 37 | 42 | 47 | 63 | 33 | 53 | 53 | 43 | — | 45,7 | -2,1 |
+
+| Difícil v1.13 | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco | média | delta v1.0 |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Guardião | — | 68 | 47 | 67 | 38 | 30 | 50 | 47 | 52 | 63 | 51,3 | -1,5 |
+| Sombra | 20 | — | 60 | 25 | 33 | 57 | 38 | 47 | 40 | 55 | 41,7 | +4,5 |
+| Bastião | 53 | 47 | — | 32 | 17 | 27 | 40 | 43 | 35 | 42 | 37,2 | -2,1 |
+| Vespa | 35 | 68 | 75 | — | 45 | 83 | 50 | 75 | 80 | 67 | 64,3 | -2,0 |
+| Espelho | 53 | 70 | 92 | 40 | — | 75 | 43 | 60 | 55 | 75 | 62,6 | +2,6 |
+| Haste | 72 | 32 | 63 | 23 | 30 | — | 50 | 30 | 23 | 30 | 39,3 | +2,3 |
+| Brasa | 58 | 58 | 63 | 53 | 50 | 47 | — | 50 | 52 | 77 | 56,5 | -3,9 |
+| Forja | 42 | 58 | 45 | 23 | 22 | 58 | 47 | — | 37 | 57 | 43,2 | -3,6 |
+| Garça | 50 | 68 | 72 | 37 | 45 | 65 | 58 | 62 | — | 63 | 57,8 | -2,9 |
+| Eco | 30 | 50 | 55 | 40 | 30 | 65 | 28 | 55 | 33 | — | 43,0 | +0,6 |
+
+| Normal v1.13, poderes | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco | média |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Guardião | — | 30 | 38 | 43 | 48 | 45 | 55 | 22 | 52 | 38 | 41,3 |
+| Sombra | 63 | — | 38 | 77 | 72 | 57 | 65 | 48 | 77 | 67 | 62,6 |
+| Bastião | 72 | 57 | — | 72 | 70 | 45 | 63 | 62 | 75 | 58 | 63,7 |
+| Vespa | 28 | 22 | 32 | — | 55 | 28 | 30 | 52 | 63 | 43 | 39,3 |
+| Espelho | 38 | 28 | 30 | 47 | — | 30 | 47 | 23 | 40 | 22 | 33,9 |
+| Haste | 77 | 42 | 52 | 62 | 85 | — | 67 | 55 | 80 | 72 | 65,6 |
+| Brasa | 47 | 37 | 20 | 48 | 47 | 25 | — | 33 | 42 | 48 | 38,5 |
+| Forja | 68 | 48 | 43 | 40 | 87 | 35 | 67 | — | 67 | 48 | 55,9 |
+| Garça | 52 | 22 | 25 | 38 | 55 | 20 | 55 | 40 | — | 30 | 37,4 |
+| Eco | 55 | 43 | 45 | 57 | 70 | 28 | 68 | 40 | 75 | — | 53,5 |
+
+| Difícil v1.13, poderes | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco | média |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Guardião | — | 58 | 52 | 57 | 42 | 28 | 50 | 42 | 55 | 55 | 48,7 |
+| Sombra | 37 | — | 62 | 52 | 47 | 53 | 25 | 53 | 52 | 57 | 48,5 |
+| Bastião | 52 | 47 | — | 22 | 22 | 17 | 23 | 30 | 33 | 27 | 30,2 |
+| Vespa | 38 | 50 | 78 | — | 57 | 70 | 35 | 77 | 62 | 63 | 58,9 |
+| Espelho | 58 | 55 | 75 | 55 | — | 60 | 40 | 58 | 45 | 53 | 55,5 |
+| Haste | 65 | 35 | 82 | 27 | 30 | — | 52 | 52 | 53 | 25 | 46,7 |
+| Brasa | 62 | 67 | 72 | 62 | 60 | 62 | — | 58 | 57 | 63 | 62,4 |
+| Forja | 65 | 42 | 67 | 27 | 40 | 58 | 42 | — | 47 | 48 | 48,3 |
+| Garça | 30 | 47 | 62 | 35 | 42 | 52 | 42 | 67 | — | 52 | 47,4 |
+| Eco | 47 | 47 | 68 | 50 | 45 | 75 | 27 | 57 | 58 | — | 52,6 |
+
+| Média das duas, poderes | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| % | 45 | 56 | 47 | 49 | 45 | 56 | 50 | 52 | 42 | 53 |
+
+Com poderes, a média das duas dificuldades foi de 46–54% (v1.6) para 42–56%. O modificador aéreo quase não pesa nisso (zerá-lo muda as linhas da Garça e da Haste dentro do ruído); o desvio vem do movimento novo em geral. Como as etapas v1.14–v1.18 refazem as interações e os loadouts, o ajuste da matriz com poderes fica para a v1.19. Uso medido (Guardião × Sombra, 60 duelos): Normal 0,07 pulo e 0,00 dash aéreo por duelo; Difícil 0,43 e 0,05.
+
+Secretos e chefes depois do movimento novo (40 duelos): Ancião 61,5/77,3, Soberano 76,0/74,0, Predestinado 78,3/80,8 contra o elenco (a ordem se mantém); protagonista contra o Soberano com piloto do mesmo nível 14,6/32,9/26,7 e contra o Predestinado com piloto Difícil 37,5/27,1/21,3.
+
 ## AI
 
 Arquivos: [src/ai/](src/ai/), [src/config/aiConfig.js](src/config/aiConfig.js). Regras em [GAME_DESIGN.md](GAME_DESIGN.md#7-ia).
@@ -882,7 +949,7 @@ IA de poderes (v1.6): a `EnemyAI` recebe `rules` e só pensa em poderes com `rul
 
 IA EVADE: getTimeUntilAttackActive expõe startup restante, zero no active ainda não conectado e Infinity fora da ameaça. No pensamento de defesa, a rolagem já existente escolhe EVADE por evadeChance e evadeWeight do perfil, somente contra active. evadeTimingJitter agenda atraso; a cada passo o plano valida se aquele golpe ainda existe e solicita intent.evade uma vez. Nenhuma mutação no lutador. Fora de blockstun, EVADE também pode sair de BLOCKING. Chances iniciais pequenas preservam o combate clássico; calibração final pela matriz.
 
-IA de movimento só pede intent.jump: inicia o salto ao aproximar/recuar/recuperar stamina com maxJumps > 1 e tenta o segundo a partir do ápice, respeitando jumpsUsed. O simulador usa os mesmos controllers/sistemas e agora informa pulos, pulos aéreos, tentativas e sucessos de EVADE. --set evade.enabled=false permite comparar sem EVADE, sem criar rules.
+IA de movimento só pede intent.jump: inicia o salto ao aproximar/recuar/recuperar stamina com maxJumps > 1 e tenta o segundo a partir do ápice, respeitando jumpsUsed. Desde a v1.13 a IA recebe `arena` (DuelState e simulador) para saber quando está no canto (`perception.cornerMargin` atrás dela): `tryCornerJump` pula na direção do oponente com `difficulty.cornerJumpChance`, e `tryAirDash` (decisão `airDash`, depois do pulo aéreo) pede `intent.dodge` no ar quando está acima do oponente (`airDashClearance` da altura dele) e perto (`airDashCrossGap`), para cruzar, ou quando está no canto. As três chances de movimento aéreo (`jumpChance`, `cornerJumpChance`, `airDashChance`) são multiplicadas por `profile.aerialWeight`: 0,3 nos pesados (Bastião, Haste, Forja, Soberano), 1 nos acrobatas (Vespa, Garça, Eco, Ancião, Predestinado) e 0,6 no resto. O peso existe porque, com todo o elenco pulando, Haste e Forja (lutadores de chão) perdiam mais de 5 pontos na matriz clássica. O simulador usa os mesmos controllers/sistemas e agora informa pulos, pulos aéreos, tentativas e sucessos de EVADE. --set evade.enabled=false permite comparar sem EVADE, sem criar rules.
 
 ## Debug
 
@@ -912,7 +979,7 @@ Testes rodam em Node (`npm test`), sem navegador. Por isso:
 - Quando um módulo do core precisa do navegador (`Input`, `TouchInput`, `GameLoop`, `textPrompt`), a dependência é injetada.
 - `computePose` é uma função pura e também é testada.
 
-Testes atuais: 463 testes em `tests/`, um arquivo por área (loop, input e toque, estados e modos, combate, especiais, EVADE, atributos, Fluxo e poderes, IA, simulação, replay, áudio, efeitos, UI, desbloqueios e skins, Arcade, Sobrevivência, História, segredos, remapeamento, save). `tests/states.test.js` cobre o fluxo de telas; `goToMenuItem(game, id)` navega no menu pelo id, sem depender da posição dos itens. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
+Testes atuais: 470 testes em `tests/`, um arquivo por área (loop, input e toque, estados e modos, combate, especiais, EVADE, atributos, Fluxo e poderes, IA, simulação, replay, áudio, efeitos, UI, desbloqueios e skins, Arcade, Sobrevivência, História, segredos, remapeamento, save). `tests/states.test.js` cobre o fluxo de telas; `goToMenuItem(game, id)` navega no menu pelo id, sem depender da posição dos itens. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
 
 ---
 

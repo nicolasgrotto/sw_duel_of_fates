@@ -17,6 +17,7 @@ export const powersConfig = {
   cooldown: 1.2,
   impactHeight: 0.55,
   castHeight: 0.6,
+  airReach: 320,
   loadouts: {
     light: { neutral: 'push', back: 'barrier' },
     dark: { neutral: 'lightning', forward: 'pull' },
@@ -56,9 +57,18 @@ export const powersConfig = {
     potencyPerLevel: 0.03,
   },
   interactions: {
-    push: [{ ...NORMAL_BAND, ...STRIKE_GUARD }, { ...REDUCED_BAND, ...STRIKE_GUARD }, { ...RESISTED_BAND, ...STRIKE_GUARD }],
-    pull: [{ ...NORMAL_BAND, ...STRIKE_GUARD }, { ...REDUCED_BAND, ...STRIKE_GUARD }, { ...RESISTED_BAND, ...STRIKE_GUARD }],
-    lightning: [{ ...NORMAL_BAND, ...CHANNEL_GUARD }, { ...REDUCED_BAND, ...CHANNEL_GUARD }, { ...RESISTED_BAND, ...CHANNEL_GUARD }],
+    push: {
+      air: { scale: 1.3, duration: 1, stagger: 1.2 },
+      bands: [{ ...NORMAL_BAND, ...STRIKE_GUARD }, { ...REDUCED_BAND, ...STRIKE_GUARD }, { ...RESISTED_BAND, ...STRIKE_GUARD }],
+    },
+    pull: {
+      air: { scale: 1, duration: 1, stagger: 1.2 },
+      bands: [{ ...NORMAL_BAND, ...STRIKE_GUARD }, { ...REDUCED_BAND, ...STRIKE_GUARD }, { ...RESISTED_BAND, ...STRIKE_GUARD }],
+    },
+    lightning: {
+      air: { scale: 1, duration: 1.6, stagger: 1 },
+      bands: [{ ...NORMAL_BAND, ...CHANNEL_GUARD }, { ...REDUCED_BAND, ...CHANNEL_GUARD }, { ...RESISTED_BAND, ...CHANNEL_GUARD }],
+    },
   },
   render: {
     seed: 7,

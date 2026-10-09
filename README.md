@@ -22,7 +22,7 @@ Jogo 2D de duelo de lâminas de energia para navegador, feito com HTML5, CSS3, J
 
 - **10 personagens** com atributos (seis notas de 1 a 7; os secretos chegam a 8, 9 e 10), golpes, habilidade, alinhamento e IA próprios: Guardião, Sombra, Bastião, Vespa, Espelho, Haste, Brasa, Forja, Garça e Eco. Mais um chefe no Arcade e na Sobrevivência e **três personagens secretos**, liberados pela História ou por um segredo na tela de abertura.
 - **6 arenas** desenhadas por código: Plataforma de Refino, Santuário Alagado, Mina de Cristal, Telhado Neon, Anel Orbital e Floresta Lumínica.
-- **Combate por timing**: rápido, forte, bloqueio, parry e parry perfeito com riposta, empurrão, esquiva (dash) e esquiva de precisão, sequências, golpe aéreo, pulo duplo (Vespa) e habilidade de cada personagem.
+- **Combate por timing**: rápido, forte, bloqueio, parry e parry perfeito com riposta, empurrão, esquiva (dash) e esquiva de precisão, sequências, golpe aéreo, pulo duplo, dash aéreo e habilidade de cada personagem.
 - **Poderes do Fluxo** (opcionais): medidor próprio, quatro poderes em dois caminhos (Aurora: Repulsão e Barreira; Eclipse: Raio e Puxão) e resistência pela diferença de nível entre os lutadores.
 - **Modos**: **História** (campanha com protagonista criado e evoluído pelo jogador, diálogos, dois finais e um duelo secreto), Duelar (contra a IA, em Fácil, Normal ou Difícil), Arcade, Sobrevivência, 2 Jogadores no mesmo teclado ou com dois controles, Tutorial, Desafio de parry e Treino (boneco configurável, gravação e reprodução de inputs, hitboxes).
 - **Apresentação**: abertura com a lâmina acendendo, replay em câmera lenta do golpe final, música e som sintetizados que reagem à luta, cores de lâmina e trajes desbloqueáveis, teclas configuráveis e suporte a gamepad.
@@ -113,7 +113,7 @@ Habilidade do personagem: `I`. Gamepad: ataques nos botões frontais (X rápido,
 
 As teclas de luta podem ser trocadas em **Opções → Configurar teclas** (fica salvo no navegador).
 
-A esquiva de precisão evita um golpe com timing curto, sem stamina; se errar o tempo, a recuperação fica vulnerável. A Vespa pode pular uma segunda vez no ar. No teclado numérico do J2, `Numpad2` faz a esquiva de precisão e `Numpad4` aciona o forte.
+A esquiva de precisão evita um golpe com timing curto, sem stamina; se errar o tempo, a recuperação fica vulnerável. Todos podem pular uma segunda vez no ar; a esquiva apertada no ar vira um dash curto (uma vez por salto, sem invulnerabilidade) que atravessa o oponente. No teclado numérico do J2, `Numpad2` faz a esquiva de precisão e `Numpad4` aciona o forte.
 
 Os controles ficam em [src/config/controlsConfig.js](src/config/controlsConfig.js).
 

@@ -16,6 +16,7 @@ export const AiDecision = Object.freeze({
   DODGE: 'dodge',
   EVADE: 'evade',
   JUMP: 'jump',
+  AIR_DASH: 'airDash',
   COUNTER: 'counter',
   SHOVE: 'shove',
   SPECIAL: 'special',
@@ -72,8 +73,9 @@ const PendingAction = Object.freeze({
 });
 
 export class EnemyAI {
-  constructor({ self, opponent, profile, difficulty, perception, random, rules = {} }) {
+  constructor({ self, opponent, profile, difficulty, perception, random, rules = {}, arena = null }) {
     this.self = self;
+    this.arena = arena;
     this.opponent = opponent;
     this.profile = profile;
     this.difficulty = difficulty;
@@ -234,6 +236,7 @@ export class EnemyAI {
       return AiDecision.ATTACK;
     }
     if (!self.grounded && self.canMove && this.tryAirJump()) return AiDecision.JUMP;
+    if (!self.grounded && self.state === FighterState.JUMPING && this.tryAirDash()) return AiDecision.AIR_DASH;
     if (!self.canAct && self.state !== FighterState.BLOCKING) {
       this.planRecoveryGuard();
       return AiDecision.BUSY;
@@ -629,7 +632,7 @@ export class EnemyAI {
     }
     if (gap < preferredGap * this.profile.closeGapRatio) {
       this.plan.moveX = -direction;
-      if (this.tryMovementJump()) return AiDecision.JUMP;
+      if (this.tryCornerJump() || this.tryMovementJump()) return AiDecision.JUMP;
       return AiDecision.BACK_OFF;
     }
     return null;
@@ -637,9 +640,43 @@ export class EnemyAI {
 
   tryMovementJump() {
     if (!this.self.canAct || this.self.stats.movement.maxJumps < 2 || !(this.difficulty.jumpChance > 0)) return false;
-    if (this.random() >= this.difficulty.jumpChance) return false;
+    if (this.random() >= this.difficulty.jumpChance * this.getAerialWeight()) return false;
     this.plan.blockTime = 0;
     this.plan.pendingAction = PendingAction.JUMP;
+    return true;
+  }
+
+  getAerialWeight() {
+    return this.profile.aerialWeight ?? 1;
+  }
+
+  isCornered() {
+    const { self, opponent, arena } = this;
+    if (!arena) return false;
+    const wallGap = opponent.x > self.x ? self.left - arena.left : arena.right - self.right;
+    return wallGap <= this.perception.cornerMargin;
+  }
+
+  tryCornerJump() {
+    const chance = (this.difficulty.cornerJumpChance ?? 0) * this.getAerialWeight();
+    if (!this.self.canAct || !(chance > 0) || !this.isCornered() || this.random() >= chance) return false;
+    this.plan.moveX = getDirectionTo(this.self, this.opponent);
+    this.plan.blockTime = 0;
+    this.plan.pendingAction = PendingAction.JUMP;
+    return true;
+  }
+
+  tryAirDash() {
+    const { self, opponent } = this;
+    const chance = (this.difficulty.airDashChance ?? 0) * this.getAerialWeight();
+    if (!(chance > 0) || self.combat.airDashUsed || !canAfford(self, self.stats.airDash.staminaCost)) return false;
+    const above = opponent.y - self.y >= opponent.height * this.perception.airDashClearance;
+    const crossing = above && getGap(self, opponent) <= this.perception.airDashCrossGap;
+    if (!crossing && !this.isCornered()) return false;
+    if (this.random() >= chance) return false;
+    this.plan.moveX = getDirectionTo(self, opponent);
+    this.plan.blockTime = 0;
+    this.plan.pendingAction = PendingAction.DODGE;
     return true;
   }
 

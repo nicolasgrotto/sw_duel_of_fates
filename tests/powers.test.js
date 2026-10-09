@@ -37,13 +37,16 @@ describe('flow interactions', () => {
       }
       const table = powersConfig.interactions[power.interaction];
       assert.ok(table, power.id);
-      for (const band of table) {
+      for (const field of ['scale', 'duration', 'stagger']) {
+        assert.equal(typeof table.air[field], 'number', `${power.id}.air.${field}`);
+      }
+      for (const band of table.bands) {
         assert.equal(typeof band.blockable, 'boolean');
         for (const field of ['atLeast', 'scale', 'guardDamage', 'guardSlide', 'guardStamina', 'duration', 'stagger']) {
           assert.equal(typeof band[field], 'number', `${power.id}.${field}`);
         }
       }
-      assert.equal(table[table.length - 1].atLeast, -Infinity);
+      assert.equal(table.bands[table.bands.length - 1].atLeast, -Infinity);
     }
     assert.equal(resolveInteraction(powersConfig.interactions.lightning, 0).guardDamage, 0.25);
     assert.equal(resolveInteraction(powersConfig.interactions.push, 0).guardDamage, 0);

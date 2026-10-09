@@ -1,4 +1,4 @@
-import { PowerOutcome } from '../config/powersConfig.js';
+import { PowerOutcome, powersConfig } from '../config/powersConfig.js';
 import { FighterState } from '../entities/fighterStates.js';
 import { CombatEvent } from './combatEvents.js';
 import { isGuardingAgainst, isInvulnerable } from './hitboxes.js';
@@ -6,6 +6,7 @@ import { powerEffects } from './powerEffects.js';
 import { getFlowDifference, resolveInteraction } from './flowInteractions.js';
 
 const POWER_STATES = new Set([FighterState.CASTING, FighterState.CHANNELING]);
+const GROUNDED = Object.freeze({ scale: 1, duration: 1, stagger: 1 });
 
 export function isUsingPower(fighter) {
   return POWER_STATES.has(fighter.state) && fighter.combat.power !== null;
@@ -30,10 +31,11 @@ export function selectPower(fighter) {
   return loadout[slot] ?? loadout.neutral;
 }
 
-export function isInPowerRange(caster, target, power) {
+export function isInPowerRange(caster, target, power, airReach = powersConfig.airReach) {
   const side = Math.sign(target.x - caster.x) || caster.facing;
   const gap = Math.abs(target.x - caster.x) - (caster.width + target.width) / 2;
-  return side === caster.facing && gap <= power.range && Math.abs(target.y - caster.y) <= caster.height;
+  const verticalReach = caster.grounded && target.grounded ? caster.height : Math.max(caster.height, airReach);
+  return side === caster.facing && gap <= power.range && Math.abs(target.y - caster.y) <= verticalReach;
 }
 
 export class PowerSystem {
@@ -42,7 +44,7 @@ export class PowerSystem {
     this.config = config;
     this.enabled = enabled;
     this.friction = friction;
-    this.context = { system: this, combat, caster: null, target: null, power: null, interaction: null, scale: 1, guarded: false };
+    this.context = { system: this, combat, caster: null, target: null, power: null, interaction: null, air: GROUNDED, scale: 1, guarded: false };
   }
 
   update(fighters, dt) {
@@ -170,7 +172,7 @@ export class PowerSystem {
   }
 
   affect(caster, target, power, phase) {
-    const inRange = target !== null && isInPowerRange(caster, target, power);
+    const inRange = target !== null && isInPowerRange(caster, target, power, this.config.airReach);
     this.aim(caster, inRange ? target : null, power);
     if (!inRange || isInvulnerable(target)) {
       return;
@@ -179,7 +181,8 @@ export class PowerSystem {
       this.absorb(caster, target, power);
       return;
     }
-    const interaction = resolveInteraction(this.config.interactions[power.interaction], getFlowDifference(caster, target));
+    const table = this.config.interactions[power.interaction];
+    const interaction = resolveInteraction(table, getFlowDifference(caster, target));
     if (interaction.outcome === PowerOutcome.RESISTED) {
       this.combat.emit(CombatEvent.POWER_RESISTED, this.combat.createPowerContact(caster, target, power, 0));
       return;
@@ -189,7 +192,8 @@ export class PowerSystem {
     context.target = target;
     context.power = power;
     context.interaction = interaction;
-    context.scale = interaction.scale * caster.stats.power.potency;
+    context.air = target.grounded ? GROUNDED : table.air;
+    context.scale = interaction.scale * caster.stats.power.potency * context.air.scale;
     context.guarded = interaction.blockable && isGuardingAgainst(target, caster);
     powerEffects[power.effect][phase](context);
   }

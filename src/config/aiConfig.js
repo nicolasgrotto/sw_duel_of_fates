@@ -22,6 +22,8 @@ export const aiConfig = {
       powerAware: false,
       jumpChance: 0.005,
       airJumpChance: 0.5,
+      airDashChance: 0.1,
+      cornerJumpChance: 0.05,
       evadeTimingJitter: 0.06,
       defenseMultiplier: 0.35,
       mistakeChance: 0.3,
@@ -45,6 +47,8 @@ export const aiConfig = {
       powerAware: true,
       jumpChance: 0.008,
       airJumpChance: 0.7,
+      airDashChance: 0.3,
+      cornerJumpChance: 0.12,
       evadeTimingJitter: 0.04,
       defenseMultiplier: 0.7,
       mistakeChance: 0.12,
@@ -68,6 +72,8 @@ export const aiConfig = {
       powerAware: true,
       jumpChance: 0.01,
       airJumpChance: 0.85,
+      airDashChance: 0.5,
+      cornerJumpChance: 0.2,
       evadeTimingJitter: 0.025,
       defenseMultiplier: 1,
       mistakeChance: 0.04,
@@ -91,6 +97,8 @@ export const aiConfig = {
       powerAware: true,
       jumpChance: 0.01,
       airJumpChance: 0.85,
+      airDashChance: 0.5,
+      cornerJumpChance: 0.2,
       evadeTimingJitter: 0.025,
       defenseMultiplier: 1,
       mistakeChance: 0.02,
@@ -171,6 +179,7 @@ export const aiConfig = {
       closeGapRatio: 0.5,
       chargeHold: 0.4,
       feintChance: 0,
+      aerialWeight: 0.6,
       priorities: ['defend', 'counter', 'shove', 'recover', 'special', 'power', 'attack', 'guard', 'position'],
     },
     shadow: {
@@ -187,6 +196,7 @@ export const aiConfig = {
       closeGapRatio: 0.5,
       chargeHold: 0.4,
       feintChance: 0,
+      aerialWeight: 0.6,
       priorities: ['defend', 'counter', 'special', 'power', 'shove', 'attack', 'recover', 'guard', 'position'],
     },
     bastion: {
@@ -203,6 +213,7 @@ export const aiConfig = {
       closeGapRatio: 0.5,
       chargeHold: 0.4,
       feintChance: 0,
+      aerialWeight: 0.3,
       priorities: ['defend', 'counter', 'special', 'power', 'attack', 'guard', 'shove', 'recover', 'position'],
     },
     wasp: {
@@ -220,6 +231,7 @@ export const aiConfig = {
       closeGapRatio: 0.4,
       chargeHold: 0.4,
       feintChance: 0,
+      aerialWeight: 1,
       priorities: ['defend', 'counter', 'power', 'attack', 'shove', 'recover', 'guard', 'position'],
     },
     mirror: {
@@ -236,6 +248,7 @@ export const aiConfig = {
       closeGapRatio: 0.5,
       chargeHold: 0.4,
       feintChance: 0,
+      aerialWeight: 0.6,
       priorities: ['defend', 'counter', 'guard', 'special', 'power', 'recover', 'shove', 'attack', 'position'],
     },
     haste: {
@@ -252,6 +265,7 @@ export const aiConfig = {
       closeGapRatio: 0.6,
       chargeHold: 0.4,
       feintChance: 0,
+      aerialWeight: 0.3,
       priorities: ['defend', 'counter', 'shove', 'recover', 'special', 'power', 'attack', 'position', 'guard'],
     },
     ember: {
@@ -268,6 +282,7 @@ export const aiConfig = {
       closeGapRatio: 0.5,
       chargeHold: 0.4,
       feintChance: 0,
+      aerialWeight: 0.6,
       priorities: ['defend', 'counter', 'special', 'power', 'recover', 'attack', 'guard', 'shove', 'position'],
     },
     forge: {
@@ -284,6 +299,7 @@ export const aiConfig = {
       closeGapRatio: 0.5,
       chargeHold: 0.6,
       feintChance: 0,
+      aerialWeight: 0.3,
       priorities: ['defend', 'counter', 'shove', 'recover', 'special', 'power', 'attack', 'guard', 'position'],
     },
     heron: {
@@ -301,6 +317,7 @@ export const aiConfig = {
       closeGapRatio: 0.5,
       chargeHold: 0.4,
       feintChance: 0,
+      aerialWeight: 1,
       priorities: ['defend', 'counter', 'shove', 'recover', 'special', 'power', 'attack', 'guard', 'position'],
     },
     sovereign: {
@@ -318,6 +335,7 @@ export const aiConfig = {
       closeGapRatio: 0.6,
       chargeHold: 0.4,
       feintChance: 0,
+      aerialWeight: 0.3,
       priorities: ['defend', 'counter', 'power', 'shove', 'recover', 'special', 'attack', 'position', 'guard'],
     },
     elder: {
@@ -336,6 +354,7 @@ export const aiConfig = {
       closeGapRatio: 0.5,
       chargeHold: 0.4,
       feintChance: 0,
+      aerialWeight: 1,
       priorities: ['defend', 'counter', 'shove', 'recover', 'special', 'power', 'attack', 'guard', 'position'],
     },
     foretold: {
@@ -353,6 +372,7 @@ export const aiConfig = {
       closeGapRatio: 0.5,
       chargeHold: 0.4,
       feintChance: 0.25,
+      aerialWeight: 1,
       priorities: ['defend', 'counter', 'shove', 'recover', 'special', 'power', 'attack', 'guard', 'position'],
     },
     echo: {
@@ -369,6 +389,7 @@ export const aiConfig = {
       closeGapRatio: 0.5,
       chargeHold: 0.4,
       feintChance: 0.2,
+      aerialWeight: 1,
       priorities: ['defend', 'counter', 'shove', 'recover', 'special', 'power', 'attack', 'guard', 'position'],
     },
   },
@@ -376,6 +397,9 @@ export const aiConfig = {
     reactionJitter: 0.4,
     evadeWeight: 1,
     airJumpFallSpeed: 0,
+    airDashCrossGap: 70,
+    airDashClearance: 0.7,
+    cornerMargin: 110,
     reachMargin: 10,
     threatMargin: 20,
     safeGapExtra: 80,

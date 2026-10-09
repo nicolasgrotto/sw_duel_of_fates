@@ -1,3 +1,4 @@
+import { airDashConfig } from '../config/airDashConfig.js';
 import { evadeConfig } from '../config/evadeConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { FighterState } from '../entities/fighterStates.js';
@@ -77,6 +78,7 @@ export class CombatSystem {
 
     if (fighter.grounded) {
       combat.airAttackUsed = false;
+      combat.airDashUsed = false;
     }
     this.updateParryTimers(fighter, dt);
     this.updateCharge(fighter, dt);
@@ -152,7 +154,9 @@ export class CombatSystem {
       return;
     }
     if (!fighter.canAct) {
-      this.tryAirAttack(fighter);
+      if (!this.tryAirDash(fighter)) {
+        this.tryAirAttack(fighter);
+      }
       return;
     }
 
@@ -179,6 +183,25 @@ export class CombatSystem {
     fighter.clearAttack();
     fighter.setState(FighterState.IDLE);
     this.emitAction(CombatEvent.FEINT, fighter, attackType);
+    return true;
+  }
+
+  tryAirDash(fighter) {
+    const { combat, stats } = fighter;
+    if (combat.bufferedAction !== CombatAction.DODGE || fighter.grounded || fighter.state !== FighterState.JUMPING) {
+      return false;
+    }
+    clearActionBuffer(fighter);
+    const profile = stats.airDash;
+    if (!airDashConfig.enabled || combat.airDashUsed || !canAfford(fighter, profile.staminaCost)) {
+      this.emitAction(CombatEvent.ACTION_REJECTED, fighter, null);
+      return true;
+    }
+    spendStamina(fighter, profile.staminaCost);
+    combat.airDashUsed = true;
+    const { moveX } = fighter.intent;
+    this.startDodge(fighter, profile, moveX !== 0 ? Math.sign(moveX) : fighter.facing, profile.passThrough);
+    fighter.vy = -profile.lift;
     return true;
   }
 

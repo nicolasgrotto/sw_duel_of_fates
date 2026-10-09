@@ -3,12 +3,13 @@ export function getFlowDifference(caster, target) {
 }
 
 export function resolveInteraction(table, flowDifference) {
-  for (const band of table) {
+  const { bands } = table;
+  for (const band of bands) {
     if (flowDifference >= band.atLeast) {
       return band;
     }
   }
-  return table[table.length - 1];
+  return bands[bands.length - 1];
 }
 
 export function getPowerTier(level, tiers) {

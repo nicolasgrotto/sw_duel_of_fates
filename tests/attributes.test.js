@@ -27,7 +27,11 @@ it('preserves every legacy scalar, move damage and reserved flow without changin
     const fighter = createFighter(id, spawn);
     const stats = fighter.stats;
     for (const [key, value] of Object.entries(expected)) {
-      if (key !== 'damage') assert.deepEqual(stats[key], value, `${id}.${key}`);
+      if (key === 'movement') {
+        const { maxJumps, airJumpVelocityScale, ...scalars } = stats.movement;
+        const { maxJumps: legacyJumps, airJumpVelocityScale: legacyScale, ...legacyScalars } = value;
+        assert.deepEqual(scalars, legacyScalars, `${id}.movement`);
+      } else if (key !== 'damage') assert.deepEqual(stats[key], value, `${id}.${key}`);
     }
     for (const [move, damage] of Object.entries(expected.damage)) assert.equal(fighter.moves[move].damage, damage, `${id}.${move}`);
     assert.equal(stats.evade.invulnerableTime, evadeConfig.profile.invulnerableTime);

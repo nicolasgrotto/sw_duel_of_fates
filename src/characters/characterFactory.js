@@ -1,4 +1,5 @@
 import { attributesConfig } from '../config/attributesConfig.js';
+import { airDashConfig } from '../config/airDashConfig.js';
 import { evadeConfig } from '../config/evadeConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { applyAttributes } from './attributes.js';
@@ -36,6 +37,7 @@ export function createFighterFromCharacter(character, { x, y, facing }, { saberC
     dodge: { ...stats.dodge, ...scalars.dodge },
     parry: { ...stats.parry, ...scalars.parry },
     evade: stats.evade ?? evadeConfig.profile,
+    airDash: stats.airDash ?? airDashConfig.profile,
     attacks: moves,
   }, character.attributes, attributesConfig, { potential: character.potential ?? 0 });
 

@@ -121,9 +121,9 @@ describe('instant powers', () => {
   });
 
   it('applies the modifiers of the interaction band', () => {
-    const band = powersConfig.interactions.push[0];
+    const table = powersConfig.interactions.push;
     const withBand = (setup, override) => {
-      setup.simulation.combat.powers.config = { ...powersConfig, interactions: { ...powersConfig.interactions, push: [{ ...band, ...override }] } };
+      setup.simulation.combat.powers.config = { ...powersConfig, interactions: { ...powersConfig.interactions, push: { ...table, bands: [{ ...table.bands[0], ...override }] } } };
     };
     const unblockable = duel('guardian', 'shadow');
     withBand(unblockable, { blockable: false });
