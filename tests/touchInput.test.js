@@ -94,3 +94,23 @@ it('shows the power button only when the duel enables powers', () => {
   pointer('pointerdown', 2, 860, 570);
   assert.equal(input.isDown('power'), true);
 });
+
+it('anchors duel buttons to the screen edges and keeps menu taps in content space on wide screens', () => {
+  const target = new EventTarget();
+  target.getBoundingClientRect = () => ({ left: 0, top: 0, width: 1560, height: 720 });
+  const input = new Input({ target, bindings: keyboardPresets.classic });
+  const touch = new TouchInput({ target, getView: () => ({ width: 1560, offsetX: 140 }) });
+  input.addSource(touch);
+  const pointer = (type, id, x, y) => {
+    const event = new Event(type, { cancelable: true });
+    Object.assign(event, { pointerId: id, pointerType: 'touch', clientX: x, clientY: y });
+    target.dispatchEvent(event);
+  };
+  touch.setContext('duel');
+  pointer('pointerdown', 1, 1220 + 280, 630);
+  assert.equal(input.isDown('lightAttack'), true);
+  pointer('pointerup', 1, 1500, 630);
+  touch.setContext('menu');
+  pointer('pointerdown', 2, 780, 300);
+  assert.deepEqual(touch.taps[0], { x: 640, y: 300 });
+});

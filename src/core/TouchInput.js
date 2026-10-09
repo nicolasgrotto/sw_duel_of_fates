@@ -6,9 +6,10 @@ export function containsTouch(point, circle) {
 }
 
 export class TouchInput {
-  constructor({ target, config = touchLayoutConfig }) {
+  constructor({ target, config = touchLayoutConfig, getView = () => ({ width: config.width, offsetX: 0 }) }) {
     this.target = target;
     this.config = config;
+    this.getView = getView;
     this.kind = 'touch';
     this.actions = new Set();
     this.nextActions = new Set();
@@ -45,7 +46,20 @@ export class TouchInput {
 
   point(event) {
     const rect = this.target.getBoundingClientRect();
-    return { x: (event.clientX - rect.left) * this.config.width / rect.width, y: (event.clientY - rect.top) * this.config.height / rect.height };
+    const view = this.getView();
+    return { x: (event.clientX - rect.left) * view.width / rect.width, y: (event.clientY - rect.top) * this.config.height / rect.height };
+  }
+
+  toView(item) {
+    const { offsetX } = this.getView();
+    if (item.anchor === 'left') {
+      return { x: item.x, y: item.y, radius: item.radius };
+    }
+    return { x: item.x + (item.anchor === 'right' ? offsetX * 2 : offsetX), y: item.y, radius: item.radius };
+  }
+
+  get viewJoystickIdle() {
+    return this.toView({ x: this.config.joystick.idleX, y: this.config.joystick.idleY, anchor: 'left' });
   }
 
   handleDown(event) {
@@ -56,14 +70,14 @@ export class TouchInput {
     this.target.setPointerCapture?.(event.pointerId);
     let action = null;
     if (this.mode === 'duel') {
-      action = this.config.buttons.find((button) => this.hasButton(button) && containsTouch(point, button))?.action ?? null;
-      if (!action && !this.joystick && point.x < this.config.joystick.halfWidth && point.y >= this.config.joystick.top) {
+      action = this.config.buttons.find((button) => this.hasButton(button) && containsTouch(point, this.toView(button)))?.action ?? null;
+      if (!action && !this.joystick && point.x < this.getView().width / 2 && point.y >= this.config.joystick.top) {
         this.joystick = { id: event.pointerId, originX: point.x, originY: point.y, x: point.x, y: point.y, evaded: false };
       }
-    } else if (this.hasBack && containsTouch(point, this.config.back)) {
+    } else if (this.hasBack && containsTouch(point, this.toView(this.config.back))) {
       action = Action.BACK;
     } else {
-      this.taps.push(point);
+      this.taps.push({ x: point.x - this.getView().offsetX, y: point.y });
     }
     this.pointers.set(event.pointerId, action);
     this.refreshActions();

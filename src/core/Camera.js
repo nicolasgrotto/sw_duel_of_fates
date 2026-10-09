@@ -55,8 +55,9 @@ export class Camera {
   applyTransform(renderer) {
     renderer.translate(this.offsetX, this.offsetY);
     if (this.isFramed) {
+      const zoom = this.framingZoom * (renderer.viewScale ?? 1);
       renderer.translate(renderer.width / 2, this.anchorY);
-      renderer.scale(this.framingZoom, this.framingZoom);
+      renderer.scale(zoom, zoom);
       renderer.translate(-this.centerX, -this.anchorY);
     }
     renderer.translate(this.focusX, this.focusY);

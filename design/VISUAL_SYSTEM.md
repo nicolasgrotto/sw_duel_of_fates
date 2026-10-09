@@ -8,7 +8,8 @@ Os valores desta página existem no código em [src/config/themeConfig.js](../sr
 
 - Resolução lógica: **1280×720** (`gameConfig.canvas`).
 - Todo desenho usa coordenadas lógicas. Nunca use o tamanho real do canvas na lógica.
-- O canvas escala proporcionalmente (16:9) e respeita o `devicePixelRatio` para ficar nítido (`Renderer.fitToDisplay`).
+- O canvas ocupa toda a largura disponível até a proporção 19,5:9 (`gameConfig.canvas.maxViewWidth`, 1560 de largura lógica para 720 de altura); acima disso sobram faixas laterais, e abaixo de 16:9 sobram faixas em cima e embaixo. Respeita o `devicePixelRatio` para ficar nítido (`Renderer.fitToDisplay`).
+- **Tela larga**: o conteúdo de 1280×720 fica centralizado (menus, textos, telas). O fundo, a pausa, o letterbox, o flash e a vinheta cobrem a largura toda. No duelo e no fundo dos diálogos, o mundo ganha um zoom que preenche a largura (`renderer.viewScale`, ancorado no chão): corta um pouco do céu e do chão, nunca as laterais. A HUD e os controles de toque ficam presos às bordas reais da tela.
 - O DPR fica limitado a `gameConfig.canvas.maxPixelRatio` (2) pelo Game, sem alterar as coordenadas lógicas.
 - O chão da arena fica em `gameConfig.arena.floorY`.
 

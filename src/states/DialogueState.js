@@ -65,8 +65,15 @@ export class DialogueState extends GameState {
     const { boxY, boxHeight, speakerY, textY, hintY, titleY, fadeTime, dimAlpha } = layout.dialogue;
     if (this.arenaView) {
       renderer.clear(colors.background);
+      const { floorY } = this.arenaBounds;
+      const fill = renderer.viewScale ?? 1;
+      renderer.save();
+      renderer.translate(renderer.width / 2, floorY);
+      renderer.scale(fill, fill);
+      renderer.translate(-renderer.width / 2, -floorY);
       this.arenaView.renderBackground(renderer, this.arenaBounds, [], []);
       this.arenaView.renderFloor(renderer, this.arenaBounds);
+      renderer.restore();
     }
     renderer.save();
     renderer.setAlpha(dimAlpha);

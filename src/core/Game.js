@@ -29,7 +29,7 @@ export class Game {
     const getGamepads = () => navigator.getGamepads?.() ?? [];
     this.input = new Input({ bindings: keyBindings, target: window, getGamepads });
     this.secondInput = new Input({ bindings: twoPlayerBindings.p2, target: window, getGamepads, gamepadSlot: 1 });
-    this.touch = new TouchInput({ target: canvas });
+    this.touch = new TouchInput({ target: canvas, getView: () => ({ width: this.renderer.viewWidth, offsetX: this.renderer.offsetX }) });
     this.input.addSource(this.touch);
     this.touchControls = new TouchControls(this.touch);
     this.states = new StateMachine();
@@ -58,7 +58,14 @@ export class Game {
   createTextPrompt(options) {
     this.input.handleBlur();
     this.input.handleFocus();
-    return createTextPrompt({ target: document, host: this.renderer.canvas.parentElement, getBounds: () => this.renderer.canvas.getBoundingClientRect(), ...options });
+    return createTextPrompt({ target: document, host: this.renderer.canvas.parentElement, getBounds: () => this.getContentBounds(), ...options });
+  }
+
+  getContentBounds() {
+    const { renderer } = this;
+    const rect = renderer.canvas.getBoundingClientRect();
+    const scale = rect.height / renderer.height;
+    return { left: rect.left + renderer.offsetX * scale, top: rect.top, width: renderer.width * scale, height: rect.height };
   }
 
   start() {
@@ -120,7 +127,7 @@ export class Game {
       this.secondInput.handleFocus();
     }
     this.states.current?.namePrompt?.reposition();
-    this.renderer.fitToDisplay(Math.min(window.devicePixelRatio || 1, gameConfig.canvas.maxPixelRatio));
+    this.renderer.fitToDisplay(Math.min(window.devicePixelRatio || 1, gameConfig.canvas.maxPixelRatio), gameConfig.canvas.maxViewWidth);
   }
 
   update(dt) {
@@ -136,13 +143,19 @@ export class Game {
   }
 
   render() {
-    this.renderer.clear(colors.background);
+    const { renderer } = this;
+    renderer.resetView();
+    renderer.fillRect(0, 0, renderer.viewWidth, renderer.height, colors.background);
+    renderer.save();
+    renderer.translate(renderer.offsetX, 0);
     if (this.portrait) {
-      this.renderer.text(texts.touch.rotate, this.renderer.width / 2, layout.touch.rotateY, textStyles.heading);
-      this.renderer.text(texts.touch.landscape, this.renderer.width / 2, layout.touch.rotateHintY, textStyles.hint);
+      renderer.text(texts.touch.rotate, renderer.width / 2, layout.touch.rotateY, textStyles.heading);
+      renderer.text(texts.touch.landscape, renderer.width / 2, layout.touch.rotateHintY, textStyles.hint);
+      renderer.restore();
       return;
     }
-    this.states.render(this.renderer);
+    this.states.render(renderer);
+    renderer.restore();
     this.touchControls.render(this.renderer, this.input.lastInputKind === 'touch');
     this.debug.render(this.renderer, this.states, this.loop.timings);
   }

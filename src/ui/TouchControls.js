@@ -4,8 +4,9 @@ import { texts } from '../config/uiConfig.js';
 export class TouchControls {
   constructor(source) { this.source = source; }
 
-  button(renderer, button, label) {
+  button(renderer, item, label) {
     const { style } = this.source.config;
+    const button = { ...this.source.toView(item), action: item.action };
     renderer.save();
     renderer.setAlpha(style.backgroundAlpha);
     renderer.fillCircle(button.x, button.y, button.radius, colors.background);
@@ -27,8 +28,9 @@ export class TouchControls {
     }
     const { joystick: config, style } = source.config;
     const joystick = source.joystick;
-    const x = joystick?.originX ?? config.idleX;
-    const y = joystick?.originY ?? config.idleY;
+    const idle = source.viewJoystickIdle;
+    const x = joystick?.originX ?? idle.x;
+    const y = joystick?.originY ?? idle.y;
     renderer.save();
     renderer.setAlpha(style.idleAlpha);
     renderer.strokeCircle(x, y, config.radius, colors.accent, style.lineWidth);

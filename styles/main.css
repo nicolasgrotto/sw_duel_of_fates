@@ -35,11 +35,13 @@ body {
 }
 
 .game-canvas {
+  --safe-width: calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right));
+  --safe-height: calc(100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom));
   display: block;
-  width: min(calc(100vw - env(safe-area-inset-left) - env(safe-area-inset-right)), calc((100dvh - env(safe-area-inset-top) - env(safe-area-inset-bottom)) * 16 / 9));
+  width: min(var(--safe-width), calc(var(--safe-height) * 1560 / 720));
+  height: min(var(--safe-height), calc(var(--safe-width) * 9 / 16));
   touch-action: none;
   user-select: none;
-  aspect-ratio: 16 / 9;
   background: #05070d;
   outline: none;
 }

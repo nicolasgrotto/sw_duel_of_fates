@@ -70,6 +70,6 @@ export function drawFlash(renderer, flash) {
   renderer.save();
   renderer.setBlendMode('lighter');
   renderer.setAlpha(flash.alpha);
-  renderer.fillRect(0, 0, renderer.width, renderer.height, flash.color);
+  renderer.fillRect(renderer.viewLeft ?? 0, 0, renderer.viewWidth ?? renderer.width, renderer.height, flash.color);
   renderer.restore();
 }

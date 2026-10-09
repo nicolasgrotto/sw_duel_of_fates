@@ -105,11 +105,13 @@ export class Hud {
     const { fighter, side } = state;
     const { margin, nameY, healthY, healthWidth, healthHeight, staminaGap, staminaHeight } = layout.hud;
     const isLeft = side === Side.LEFT;
-    const barX = isLeft ? margin : renderer.width - margin - healthWidth;
+    const viewLeft = renderer.viewLeft ?? 0;
+    const viewRight = viewLeft + (renderer.viewWidth ?? renderer.width);
+    const barX = isLeft ? viewLeft + margin : viewRight - margin - healthWidth;
     const staminaY = healthY + healthHeight + staminaGap;
     const { maxHealth, maxStamina } = fighter.stats;
 
-    renderer.text(this.names[isLeft ? 0 : 1], isLeft ? margin : renderer.width - margin, nameY, isLeft ? textStyles.hudNameLeft : textStyles.hudNameRight);
+    renderer.text(this.names[isLeft ? 0 : 1], isLeft ? viewLeft + margin : viewRight - margin, nameY, isLeft ? textStyles.hudNameLeft : textStyles.hudNameRight);
 
     renderer.fillRect(barX, healthY, healthWidth, healthHeight, colors.hudTrack);
     this.fillBar(renderer, barX, healthY, healthWidth, healthHeight, state.ghostHealth / maxHealth, isLeft, colors.hudGhost);
@@ -118,7 +120,7 @@ export class Hud {
     renderer.fillRect(barX, staminaY, healthWidth, staminaHeight, colors.hudTrack);
     this.fillBar(renderer, barX, staminaY, healthWidth, staminaHeight, fighter.stamina / maxStamina, isLeft, this.getStaminaColor(state));
     this.renderPower(renderer, state, barX, staminaY + staminaHeight, isLeft);
-    this.renderRounds(renderer, isLeft);
+    this.renderRounds(renderer, isLeft, viewLeft, viewRight);
     if (state.rejectTime > 0) {
       renderer.strokeRect(barX, staminaY, healthWidth, staminaHeight, this.getStaminaColor(state));
     }
@@ -138,7 +140,7 @@ export class Hud {
     this.fillBar(renderer, barX, barY, healthWidth, powerHeight, fighter.powerMeter / fighter.stats.power.max, isLeft, color);
   }
 
-  renderRounds(renderer, isLeft) {
+  renderRounds(renderer, isLeft, viewLeft = 0, viewRight = renderer.width) {
     if (!this.rounds) {
       return;
     }
@@ -146,7 +148,7 @@ export class Hud {
     const won = this.rounds.wins[isLeft ? 0 : 1];
     for (let index = 0; index < this.rounds.roundsToWin; index += 1) {
       const offset = index * (roundSize + roundGap);
-      const x = isLeft ? margin + offset : renderer.width - margin - roundSize - offset;
+      const x = isLeft ? viewLeft + margin + offset : viewRight - margin - roundSize - offset;
       if (index < won) {
         renderer.fillRect(x, roundY, roundSize, roundSize, colors.hudHealth);
       } else {

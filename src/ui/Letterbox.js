@@ -31,7 +31,7 @@ export class Letterbox {
       return;
     }
     const barHeight = this.height * this.amount;
-    renderer.fillRect(0, 0, renderer.width, barHeight, colors.letterbox);
-    renderer.fillRect(0, renderer.height - barHeight, renderer.width, barHeight, colors.letterbox);
+    renderer.fillRect(renderer.viewLeft ?? 0, 0, renderer.viewWidth ?? renderer.width, barHeight, colors.letterbox);
+    renderer.fillRect(renderer.viewLeft ?? 0, renderer.height - barHeight, renderer.viewWidth ?? renderer.width, barHeight, colors.letterbox);
   }
 }

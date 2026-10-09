@@ -52,6 +52,14 @@ export class Renderer {
     this.height = height;
     this.glowSprites = new Map();
     this.vignette = null;
+    this.viewWidth = width;
+    this.offsetX = 0;
+    this.viewScale = 1;
+    this.pixelScale = 1;
+  }
+
+  get viewLeft() {
+    return -this.offsetX;
   }
 
   createLayer(draw, padding = 0) {
@@ -69,10 +77,10 @@ export class Renderer {
   }
 
   drawVignette(style) {
-    if (!this.vignette) {
-      this.vignette = createVignette(this.width, this.height, style);
+    if (!this.vignette || this.vignette.width !== Math.round(this.viewWidth)) {
+      this.vignette = createVignette(Math.round(this.viewWidth), this.height, style);
     }
-    this.context.drawImage(this.vignette, 0, 0, this.width, this.height);
+    this.context.drawImage(this.vignette, this.viewLeft, 0, this.viewWidth, this.height);
   }
 
   getGlowSprite(color) {
@@ -89,21 +97,30 @@ export class Renderer {
     this.context.drawImage(this.getGlowSprite(color), x - radius, y - radius, radius * 2, radius * 2);
   }
 
-  fitToDisplay(pixelRatio) {
+  fitToDisplay(pixelRatio, maxViewWidth = this.width) {
     const displayWidth = this.canvas.clientWidth || this.width;
-    const scale = (displayWidth * pixelRatio) / this.width;
+    const displayHeight = this.canvas.clientHeight || this.height;
+    const scale = Math.min(displayWidth / this.width, displayHeight / this.height);
 
-    this.canvas.width = Math.round(this.width * scale);
-    this.canvas.height = Math.round(this.height * scale);
-    this.context.setTransform(scale, 0, 0, scale, 0, 0);
+    this.viewWidth = Math.max(this.width, Math.min(maxViewWidth, displayWidth / scale));
+    this.offsetX = (this.viewWidth - this.width) / 2;
+    this.viewScale = this.viewWidth / this.width;
+    this.pixelScale = scale * pixelRatio;
+    this.canvas.width = Math.round(displayWidth * pixelRatio);
+    this.canvas.height = Math.round(displayHeight * pixelRatio);
+    this.resetView();
+  }
+
+  resetView() {
+    this.context.setTransform(this.pixelScale, 0, 0, this.pixelScale, 0, 0);
   }
 
   clear(color) {
-    this.fillRect(0, 0, this.width, this.height, color);
+    this.fillRect(this.viewLeft, 0, this.viewWidth, this.height, color);
   }
 
   overlay(color) {
-    this.fillRect(0, 0, this.width, this.height, color);
+    this.fillRect(this.viewLeft, 0, this.viewWidth, this.height, color);
   }
 
   fillRect(x, y, width, height, color) {

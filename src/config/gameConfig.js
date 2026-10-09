@@ -5,6 +5,7 @@ export const gameConfig = {
     width: 1280,
     height: 720,
     maxPixelRatio: 2,
+    maxViewWidth: 1560,
   },
   loop: {
     fixedStep: 1 / 60,
