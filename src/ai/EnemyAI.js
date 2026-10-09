@@ -1,5 +1,5 @@
 import { AttackPhase, AttackType, getAttackDuration, getAttackPhase, isHeavyAttack } from '../combat/attackPhases.js';
-import { isChannelOpen, isInPowerRange, isUsingPower } from '../combat/PowerSystem.js';
+import { isBarrierUp, isChannelOpen, isInPowerRange, isUsingPower } from '../combat/PowerSystem.js';
 import { getFlowDifference, resolveInteraction, resolveLevelBand } from '../combat/flowInteractions.js';
 import { projectilesConfig } from '../config/projectilesConfig.js';
 import { evadeConfig } from '../config/evadeConfig.js';
@@ -7,7 +7,7 @@ import { powersConfig } from '../config/powersConfig.js';
 import { FighterState } from '../entities/fighterStates.js';
 import { canAfford } from '../systems/StaminaSystem.js';
 import { HabitMemory } from './HabitMemory.js';
-import { canReach, getDirectionTo, getGap, getVulnerableTime, getTimeUntilAttackActive, isPunishable, isThreatening } from './perception.js';
+import { canReach, findIncomingProjectile, getDirectionTo, getGap, getVulnerableTime, getTimeUntilAttackActive, isPunishable, isThreatening } from './perception.js';
 
 export const AiDecision = Object.freeze({
   BUSY: 'busy',
@@ -75,9 +75,10 @@ const PendingAction = Object.freeze({
 });
 
 export class EnemyAI {
-  constructor({ self, opponent, profile, difficulty, perception, random, rules = {}, arena = null }) {
+  constructor({ self, opponent, profile, difficulty, perception, random, rules = {}, arena = null, projectiles = null }) {
     this.self = self;
     this.arena = arena;
+    this.projectiles = projectiles;
     this.opponent = opponent;
     this.profile = profile;
     this.difficulty = difficulty;
@@ -230,6 +231,10 @@ export class EnemyAI {
       this.plan.parryDelay = -1;
       return AiDecision.WAIT;
     }
+    if (this.powersEnabled && this.difficulty.powerAware && isChannelOpen(self)
+      && self.combat.power.effect === 'lightning' && opponent.combat.redirectTime > 0) {
+      this.plan.powerHoldTime = 0;
+    }
     if (this.plan.evadeDelay >= 0) return AiDecision.EVADE;
     if (this.plan.parryDelay >= 0) {
       return AiDecision.PARRY;
@@ -281,7 +286,7 @@ export class EnemyAI {
 
   tryTechnique() {
     const { self, opponent } = this;
-    if (!this.powersEnabled || this.attackCooldown > 0 || self.combat.attack) {
+    if (!this.powersEnabled || this.attackCooldown > 0 || self.combat.attack || self.combat.saberThrown) {
       return null;
     }
     for (const [slot, id] of Object.entries(self.stats.techniques ?? {})) {
@@ -349,6 +354,8 @@ export class EnemyAI {
   }
 
   tryDefend() {
+    const projectileAnswer = this.tryDefendProjectile();
+    if (projectileAnswer) return projectileAnswer;
     const powerAnswer = this.tryDefendPower();
     if (powerAnswer) {
       return powerAnswer;
@@ -400,6 +407,8 @@ export class EnemyAI {
   }
 
   isPowerBlocked(power) {
+    if (this.difficulty.powerAware && isBarrierUp(this.opponent)) return true;
+    if (power.effect === 'lightning' && this.difficulty.powerAware && this.opponent.combat.redirectTime > 0) return true;
     if (this.opponent.state !== FighterState.BLOCKING) {
       return false;
     }
@@ -467,15 +476,40 @@ export class EnemyAI {
   }
 
   tryBarrier(holdTime) {
-    const barrier = this.self.stats.power.loadout?.back;
-    if (!this.powersEnabled || barrier?.effect !== 'barrier' || !this.canUsePower(barrier)) {
-      return false;
-    }
+    if (!this.powersEnabled) return false;
     if (!this.self.canAct && !(this.self.state === FighterState.BLOCKING && this.self.combat.blockstun === 0)) {
       return false;
     }
-    this.startPower('back', holdTime);
-    return true;
+    for (const slot of POWER_SLOTS) {
+      const barrier = this.self.stats.power.loadout?.[slot];
+      if (barrier?.effect === 'barrier' && this.canUsePower(barrier)) {
+        this.startPower(slot, holdTime);
+        return true;
+      }
+    }
+    return false;
+  }
+
+  tryDefendProjectile() {
+    if (!this.powersEnabled) return null;
+    const projectile = findIncomingProjectile(this.self, this.projectiles, this.perception.projectileHorizon);
+    if (!projectile) return null;
+    if (this.plan.powerHoldTime > 0) return AiDecision.POWER;
+    if (this.plan.blockTime > 0 && Math.sign(projectile.vx) === -this.self.facing && !this.self.combat.saberThrown) return AiDecision.BLOCK;
+    if (this.random() >= this.profile.blockChance * this.difficulty.defenseMultiplier) return null;
+    if (this.tryBarrier(this.perception.projectileHorizon)) return AiDecision.POWER;
+    if (this.self.combat.saberThrown || Math.sign(projectile.vx) !== -this.self.facing) return this.dodgePower();
+    this.plan.blockTime = this.perception.projectileHorizon;
+    this.plan.punishAfterBlock = false;
+    return AiDecision.BLOCK;
+  }
+
+  dodgePower() {
+    if (!canAfford(this.self, this.self.stats.dodge.staminaCost)) return null;
+    this.plan.blockTime = 0;
+    this.plan.moveX = -getDirectionTo(this.self, this.opponent);
+    this.plan.pendingAction = PendingAction.DODGE;
+    return AiDecision.DODGE;
   }
 
   tryDefendPower() {
@@ -491,9 +525,11 @@ export class EnemyAI {
       }
     }
     const { power } = opponent.combat;
-    if (power.effect === 'barrier' || !isInPowerRange(opponent, self, power) || this.plan.blockTime > 0 || this.plan.powerHoldTime > 0) {
+    if (power.effect === 'barrier' || power.self || opponent.combat.powerEndTime > 0 || !isInPowerRange(opponent, self, power)) {
       return null;
     }
+    if (this.plan.powerHoldTime > 0) return AiDecision.POWER;
+    if (this.plan.blockTime > 0) return AiDecision.BLOCK;
     if (this.random() >= this.profile.blockChance * this.difficulty.defenseMultiplier) {
       return null;
     }
@@ -501,6 +537,8 @@ export class EnemyAI {
     if (this.random() < this.perception.barrierPreference && this.tryBarrier(remaining)) {
       return AiDecision.POWER;
     }
+    const interaction = resolveInteraction(powersConfig.interactions[power.interaction], getFlowDifference(opponent, self));
+    if (self.combat.saberThrown || (this.difficulty.powerAware && !interaction.blockable)) return this.dodgePower();
     this.plan.blockTime = remaining + this.perception.blockHoldTime;
     this.plan.punishAfterBlock = false;
     return AiDecision.BLOCK;
@@ -610,7 +648,8 @@ export class EnemyAI {
   }
 
   tryShove() {
-    if (this.opponent.state !== FighterState.BLOCKING || this.attackCooldown > 0 || !this.canReachWith(AttackType.SHOVE)) {
+    const barrier = this.powersEnabled && isBarrierUp(this.opponent);
+    if ((!barrier && this.opponent.state !== FighterState.BLOCKING) || this.attackCooldown > 0 || !this.canReachWith(AttackType.SHOVE)) {
       return null;
     }
     if (!canAfford(this.self, this.self.stats.attacks.shove.staminaCost)) {
@@ -628,6 +667,12 @@ export class EnemyAI {
   }
 
   tryCounter() {
+    const power = this.opponent.combat.power;
+    if (this.powersEnabled && power?.self && !power.reaction && this.attackCooldown === 0) {
+      if (this.canReachWith(AttackType.LIGHT)) return this.startAttack(false, true) ? AiDecision.COUNTER : null;
+      this.plan.moveX = getDirectionTo(this.self, this.opponent);
+      return AiDecision.APPROACH;
+    }
     if (!isPunishable(this.opponent) || this.attackCooldown > 0 || !this.canReachWith(AttackType.LIGHT)) {
       return null;
     }

@@ -424,7 +424,7 @@ Finalizadores são só cinemáticos (câmera lenta e lâmina apagando), sem inpu
 
 ### Habilidades exclusivas e traços
 
-Cada personagem tem **um traço passivo** (sempre ligado) e **uma habilidade** no botão `I` (gamepad: RB ou RT; preset de setas: `B`). A habilidade é só mais um golpe em dados (`moves.special`), de um destes tipos:
+Cada personagem tem **um traço passivo** (sempre ligado) e **uma habilidade** no botão `I` (gamepad: RB; preset de setas: `B`). A habilidade é só mais um golpe em dados (`moves.special`), de um destes tipos:
 
 - **golpe**: ataque comum com propriedades extras (armadura, alcance enorme, carga);
 - **postura de contra-golpe**: o lutador fica parado em guarda por um tempo curto; um golpe de frente nesse tempo é desviado (o atacante fica desequilibrado) e respondido na hora com um golpe próprio. Se nada vier, a postura termina com recovery e fica punível. É uma **leitura antecipada**, diferente do parry, que é reação;
@@ -571,9 +571,9 @@ O Fluxo é a energia dos poderes. Nomes de tela em `uiConfig`; no código, `powe
 
 - **Nível do Fluxo** (1–7 no elenco comum; 8, 9 e 10 nos secretos, pelo potencial) vem do atributo Fluxo. Ele define a potência, o ganho do medidor, a resistência e a cor da energia.
 - **Medidor** (0–100): começa cada round com 20, enche devagar com o tempo e mais rápido ao acertar, ao ser atingido, ao bloquear e ao aparar. É separado da stamina.
-- Depois de qualquer poder há uma recarga curta, igual para todos os poderes do lutador.
+- Depois de qualquer poder há uma recarga compartilhada pelos poderes do lutador: 1,2 s, exceto o Arremesso, cuja faixa define a recarga.
 
-**Interações pelo Fluxo.** Diferença de Fluxo = nível de quem lança − nível do alvo (positiva quando quem lança é mais forte). Cada habilidade tem a própria tabela de faixas em dados; cada faixa diz a escala do efeito, se a guarda vale, quanto dano e quanto recuo passam pela guarda, o gasto de stamina na guarda e a escala de duração e de desequilíbrio. Falhar é sempre por limiar, nunca por sorte. Resultado atual, igual para Repulsão, Puxão e Raio:
+**Interações pelo Fluxo.** Diferença de Fluxo = nível de quem lança − nível do alvo (positiva quando quem lança é mais forte). Cada habilidade tem a própria tabela de faixas em dados; cada faixa diz a escala do efeito, se a guarda vale, quanto dano e quanto recuo passam pela guarda, o gasto de stamina na guarda e a escala de duração e de desequilíbrio. Falhar é sempre por limiar, nunca por sorte. Faixas básicas do Puxão e do Raio (a Repulsão tem a tabela própria abaixo):
 
 | Diferença | Resultado |
 | --- | --- |
@@ -622,10 +622,10 @@ Na guarda, o Puxão não causa dano e puxa pela metade; o Raio causa um quarto d
 - **Arremesso da lâmina** (técnica, v1.16): a lâmina sai girando para a frente, vai até cerca de 380 px e volta para a mão. Acerta uma vez (na ida ou, se errou, na volta); a guarda de frente bloqueia e a Barreira absorve, e a lâmina volta mesmo assim. Enquanto ela não volta, o lutador não ataca, não bloqueia e não apara com a lâmina (empurrão, esquiva e poderes continuam valendo).
 
 **Efeitos de estado (v1.17).** Duram um tempo e ficam no lutador.
-- **Estrangular** (Eclipse, 240 px): prende o alvo (não age) e drena vida enquanto dura (0,7 s, 4 de dano por segundo). +3 ou mais fura a guarda; −2 dura metade e drena metade; −3 ou menos falha.
+- **Estrangular** (Eclipse, 240 px): custa 45, prende o alvo (não age) e drena vida enquanto dura (0,5 s, 4 de dano por segundo). +3 ou mais fura a guarda; −2 dura metade e drena metade; −3 ou menos falha. Janela reduzida na v1.19 para limitar a punição garantida.
 - **Congelar** (Eclipse, 340 px): prende o alvo por 1,1 s sem dano; o primeiro dano quebra o gelo (janela de punição). −1 dura 75%, −2 dura 40%, −3 ou menos não tem efeito; +3 fura a guarda.
 - **Foco** (Aurora, em si): por 4 s × potência, atacar, bloquear e esquivar custam metade da stamina (drenos como empurrão e quebra de guarda não mudam).
-- **Cura** (Aurora, em si): devolve vida ao longo de 2 s, até 14 × potência e nunca mais que 35% da vida perdida; ser atingido interrompe.
+- **Cura** (Aurora, em si): custa 40, devolve vida ao longo de 2 s, até 14 × potência e nunca mais que 35% da vida perdida; ser atingido interrompe. Custo reduzido na v1.19.
 
 **Redirecionamento e Tempestade (v1.18).**
 
@@ -641,27 +641,41 @@ Na guarda, o Puxão não causa dano e puxa pela metade; o Raio causa um quarto d
 
 O retorno interrompe o canal. A parcela não absorvida causa hit; a falha extrema causa stagger em quem tentou. Ganhos normais por sofrer dano continuam valendo. A reação abre antes da resolução dos canais no mesmo passo, independentemente do lado do jogador.
 
-- **Tempestade** (Eclipse): exige Fluxo 6, custa 30 e drena 35/s; preparação de 0,35 s, canal segurado até 1,2 s e recuperação de 0,4 s. A área circular tem raio 180 px entre os centros dos corpos, inclui atrás e acima e não usa a extensão vertical dos poderes direcionais. Cada pulso de 0,2 s causa 4 × intensidade × potência, sem travar movimento. Diferença −2 reduz à metade; −3 ou menos é resistida; +3 aumenta a escala para 1,2 e ignora guarda. Nas outras faixas, guarda frontal deixa passar um quarto do dano e custa 6 de stamina; Barreira e invulnerabilidade continuam funcionando. Soltar, ficar sem medidor ou sofrer interrupção encerra o canal pelas regras existentes.
+- **Tempestade** (Eclipse): exige Fluxo 6, custa 20 e drena 25/s; preparação de 0,35 s, canal segurado até 1,2 s e recuperação de 0,4 s. A área circular tem raio 240 px entre os centros dos corpos, inclui atrás e acima e não usa a extensão vertical dos poderes direcionais. Cada pulso de 0,2 s causa 8 × intensidade × potência, sem travar movimento. Diferença −2 reduz à metade; −3 ou menos é resistida; +3 aumenta a escala para 1,2 e ignora guarda. Nas outras faixas, guarda frontal deixa passar um quarto do dano e custa 6 de stamina; Barreira e invulnerabilidade continuam funcionando. Soltar, ficar sem medidor ou sofrer interrupção encerra o canal pelas regras existentes.
 
 Loadouts da v1.18: Garça troca Barreira por Redirecionamento (trás + Poder); Soberano troca Puxão por Tempestade (frente + Poder). Demais espaços e atributos permanecem iguais. IA reage ao Raio com Redirecionamento a partir de diferença −1 e usa Tempestade de perto, respeitando o requisito de Fluxo.
 
-**Loadouts atuais.** Aurora (Guardião, Bastião, Vespa, Espelho, Garça, Ancião, Predestinado): Repulsão (neutro) e Barreira (trás); Vespa, Espelho, Garça, Ancião e Predestinado também têm o Arremesso (frente). Eclipse (Sombra, Haste, Brasa, Forja, Eco, chefe do Arcade, Soberano): Raio (neutro) e Puxão (frente); Haste, Forja, Eco e Soberano também têm o Arremesso (trás). Trocas da v1.17: Guardião e Ancião com Cura (frente), Bastião com Foco (frente), Sombra, chefe do Arcade e Soberano com Estrangular (trás), Brasa com Congelar (trás). Técnicas: Guardião, Vespa e Brasa com Avanço com corte (frente) e Arremesso da lâmina (trás); Forja com Arremesso da lâmina (frente) e Giro (trás); Giro para Bastião, Espelho, Haste, Garça, Ancião e Soberano; Avanço e Giro para a Sombra e o chefe do Arcade. O protagonista recebe os poderes do caminho (`storyConfig.protagonist.loadouts`) e as técnicas do personagem-base do estilo.
+**Loadouts atuais (v1.19).** Direções relativas à frente do lutador. Todos os espaços abaixo vêm de `characterData.loadout`; a lista de golpes mostra os comandos do preset ativo.
 
-| Poder | Alinhamento | Comando | Efeito |
-| --- | --- | --- | --- |
-| Repulsão | Aurora | Poder | onda à frente: afasta e desequilibra (STAGGERED); com guarda, só recua e gasta stamina |
-| Barreira | Aurora | trás + Poder (segurar) | domo enquanto segura e há medidor: absorve poderes e segura golpes de lâmina sem gastar stamina; o Empurrão de corpo quebra |
-| Raio | Eclipse | Poder (segurar) | canalizado: dano em pulsos curtos com pequeno recuo; a guarda reduz o dano a um quarto e gasta stamina; entre pulsos o alvo pode agir |
-| Puxão | Eclipse | frente + Poder | traz o alvo para perto e o desequilibra: abre punição |
+| Personagem | Poder neutro | Frente + Poder | Trás + Poder | Frente + Habilidade | Trás + Habilidade |
+| --- | --- | --- | --- | --- | --- |
+| Guardião | Repulsão | Cura | Barreira | Avanço com corte | Arremesso da lâmina |
+| Sombra | Raio | Puxão | Estrangular | Avanço com corte | Giro |
+| Bastião | Repulsão | Foco | Barreira | — | Giro |
+| Vespa | Repulsão | Arremesso | Barreira | Avanço com corte | Arremesso da lâmina |
+| Espelho | Repulsão | Arremesso | Barreira | — | Giro |
+| Haste | Raio | Puxão | Arremesso | — | Giro |
+| Brasa | Raio | Puxão | Congelar | Avanço com corte | Arremesso da lâmina |
+| Forja | Raio | Puxão | Arremesso | Arremesso da lâmina | Giro |
+| Garça | Repulsão | Arremesso | Redirecionamento | — | Giro |
+| Eco | Raio | Puxão | Arremesso | — | — |
+| Sombra Desperta | Raio | Puxão | Estrangular | Avanço com corte | Giro |
+| Soberano | Raio | Tempestade | Estrangular | — | Giro |
+| Predestinado | Repulsão | Arremesso | Barreira | — | — |
+| Ancião | Repulsão | Cura | Barreira | — | Giro |
+
+O protagonista recebe os poderes do caminho (`storyConfig.protagonist.loadouts`) e as técnicas do personagem-base do estilo. Sem técnica direcional, vale a habilidade própria; sem poder direcional, vale o neutro.
 
 - Quem lança fica vulnerável na preparação: um golpe interrompe o poder.
 - Esquiva e EVADE com invulnerabilidade fazem o poder passar. O dash aéreo não tem invulnerabilidade.
 - **No ar** não há guarda contra poderes, e o alcance vertical cobre o pulo duplo (`powersConfig.airReach`). Quem está no ar sofre o modificador aéreo da habilidade: a Repulsão empurra 30% mais e desequilibra 20% mais, o Puxão desequilibra 20% mais e o Raio prende 60% mais a cada pulso.
 - A Barreira contra a Repulsão segura, mas o dono recua um pouco.
-- Repulsão, Puxão e Raio não têm projétil: o efeito é decidido no instante ativo ou em cada pulso. O Arremesso e o Arremesso da lâmina são projéteis (abaixo).
-- Nomes de tela em `uiConfig.texts.powers`; os ids no código são `push`, `pull`, `lightning` e `barrier`.
+- Repulsão, Puxão e Raio não têm projétil: o efeito é decidido no instante ativo ou em cada pulso. O Arremesso e o Arremesso da lâmina são projéteis (descritos acima).
+- Nomes de tela em `uiConfig.texts.powers`; os 11 ids e suas categorias ficam em `powersConfig.categories`.
 
 **Elenco.** Aurora: Guardião, Bastião, Vespa, Espelho, Garça. Eclipse: Sombra, Haste, Brasa, Forja, Eco. Chefe do Arcade: Eclipse, nível 7.
+
+**IA (v1.19).** Usa os 11 poderes e as três técnicas por loadout. Acompanha projéteis em voo, mantém defesa pelo tempo da ameaça, esquiva de faixas imbloqueáveis quando as reconhece, evita Raio na janela de Redirecionamento, tenta quebrar Barreira com empurrão e pune a preparação de Cura e Foco. Dificuldade e perfil continuam limitando percepção e reação; a IA só solicita ações.
 
 ## 23. História (v2)
 
@@ -677,7 +691,7 @@ Campanha linear com um protagonista criado pelo jogador. Textos em `src/config/s
 | Normal | 6 | 30 |
 | Difícil | 5 | 28 |
 
-O total máximo impede um protagonista com tudo no teto: ele termina forte, mas especializado (o elenco comum tem totais entre 24 e 32; o chefe do Arcade, 35). O teto do Fluxo também decide a interação contra os chefes: contra o Soberano (Fluxo 9), o Fácil chega a −2 (poderes pela metade), o Normal a −3 e o Difícil a −4 (resistidos; a luta vira de lâmina). Os chefes são medidos no simulador (ARCHITECTURE → Balanceamento → escala v1.12): o Soberano é vencível em todas as dificuldades e o Predestinado, sempre com IA de chefe, é muito difícil, mas possível.
+O total máximo impede um protagonista com tudo no teto: ele termina forte, mas especializado (o elenco comum tem totais entre 24 e 32; o chefe do Arcade, 35). O teto do Fluxo também decide a interação contra os chefes: contra o Soberano (Fluxo 9), o Fácil chega a −2 (poderes pela metade), o Normal a −3 e o Difícil a −4 (resistidos; a luta vira de lâmina). Os chefes são medidos no simulador (ARCHITECTURE → Balanceamento → fechamento v1.19): o Soberano é vencível em todas as dificuldades e o Predestinado, sempre com IA de chefe, é muito difícil, mas possível.
 
 **Poderes.** O protagonista começa só com o poder principal do caminho; o segundo vem como recompensa de um capítulo. Na História os poderes estão sempre ligados.
 
@@ -690,7 +704,7 @@ O total máximo impede um protagonista com tudo no teto: ele termina forte, mas 
 | Personagem | Base | Notas | Alinhamento | Ideia |
 | --- | --- | --- | --- | --- |
 | Ancião | Garça (acrobacia) | potencial +1 (até 8): Vida 6, Stamina 6, Lâmina 6, Defesa 8, Agilidade 7, Fluxo 8 | Aurora | Mestre da Aurora: defesa e técnica acima de todos |
-| Soberano | Haste (alcance) | potencial +2 (até 9): Vida 7, Stamina 6, Lâmina 6, Defesa 6, Agilidade 4, Fluxo 9 | Eclipse | Vence de longe com Raio e Puxão; colado, é lento |
+| Soberano | Haste (alcance) | potencial +2 (até 9): Vida 7, Stamina 6, Lâmina 6, Defesa 6, Agilidade 4, Fluxo 9 | Eclipse | Pressiona com Raio e Estrangular; Tempestade cobre a aproximação, mas o corpo é lento |
 | Predestinado | Eco (fintas) | potencial +3 (até 10): Vida 8, Stamina 8, Lâmina 9, Defesa 7, Agilidade 9, Fluxo 10 | Aurora | O ápice: único no tier vermelho do Fluxo |
 
 **Escala 7/8/9/10.** O elenco comum vai até 7 em todos os atributos (`attributesConfig.maxRating`). Secretos têm `potential` (+1, +2, +3): o teto de todos os atributos sobe nesse valor (8, 9 e 10), e a tela de seleção mostra os segmentos extras em dourado (`attributePotential`). Tiers do Fluxo: azul até 7 (todo o elenco), roxo em 8–9 (Ancião e Soberano), vermelho só no 10 (Predestinado).
@@ -700,7 +714,7 @@ O total máximo impede um protagonista com tudo no teto: ele termina forte, mas 
 - **Pelo segredo da intro**: uma sequência digitada no teclado, feita no direcional/stick ou tocando o título várias vezes libera os três de uma vez, com som e frase próprios. As sequências ficam em `src/config/secretsConfig.js`; a tela não dá pista.
 - **Final secreto**: na História, vencer o Soberano com mais de 75% de vida leva ao duelo contra o Predestinado em vez do final normal. Esse duelo usa sempre a IA de chefe, em qualquer dificuldade.
 - **Trajes**: outra sequência da intro (teclado, direcional ou toques na frase de apoio) libera todas as skins de todos os personagens, sem mexer nas cores de lâmina.
-- Equilíbrio medido com poderes ligados (40 duelos por par, v1.12): Ancião 64% (Normal) e 79% (Difícil), média 72%; Soberano 77% e 75%, média 76%; Predestinado 84% e 83%, média 84%. Ordem Ancião < Soberano < Predestinado, todos propositalmente acima do elenco.
+- Equilíbrio com poderes ligados (40 duelos por par, v1.19): médias Normal/Difícil de 78,9% para o Ancião, 82,5% para o Soberano e 87,5% para o Predestinado. Ordem Ancião < Soberano < Predestinado, todos acima do elenco; tabela por dificuldade na ARCHITECTURE.
 
 ## 25. Skins e personalização
 

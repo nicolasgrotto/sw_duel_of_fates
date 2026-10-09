@@ -410,6 +410,7 @@ export const aiConfig = {
     leapGap: 120,
     powerChance: 0.35,
     powerChannelReserve: 0.4,
+    projectileHorizon: 0.45,
     lightningHold: [0.4, 1],
     barrierPreference: 0.6,
     barrierVsSaberChance: 0.15,

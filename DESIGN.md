@@ -145,6 +145,8 @@ Mecânicas e sistemas descartados de propósito (complexidade sem ganho):
 - online, campanha com diálogos, perigos de arena que matam (ring-out);
 - mais de 6 botões de combate.
 
+Exceções aprovadas para a v2: campanha linear com diálogos e evolução limitada do protagonista, sem XP, moeda ou grind; dano parcial de poderes na guarda conforme a diferença de Fluxo; ação Poder além dos comandos originais. Habilidades adicionais usam Poder ou Habilidade com direção, sem acrescentar botões. O elenco mantém atributos fixos. Regras atuais nas seções 21–24 de GAME_DESIGN.md.
+
 ---
 
 ## Propriedade intelectual

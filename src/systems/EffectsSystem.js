@@ -69,7 +69,7 @@ export class EffectsSystem {
     this.flashScale = 1;
     this.punchScale = 1;
     this.reduced = false;
-    this.eventParams = { x: 0, y: 0, direction: 1, color: '', secondaryColor: null };
+    this.eventParams = { x: 0, y: 0, direction: 1, color: '', secondaryColor: null, particleScale: 1 };
     this.evadeAfterimages = new Map();
     this.hitFlashes = new Map();
     this.tremors = new Map();
@@ -115,6 +115,7 @@ export class EffectsSystem {
     params.direction = attacker.facing;
     params.color = attacker.appearance.saberColor;
     params.secondaryColor = null;
+    params.particleScale = 1;
 
     switch (event.type) {
       case CombatEvent.EVADE_SUCCESS:
@@ -159,6 +160,7 @@ export class EffectsSystem {
         break;
       case CombatEvent.POWER_HIT:
         params.color = getTierColor(attacker);
+        params.particleScale = getPowerTier(attacker.flowLevel, powersConfig.tiers).particleScale;
         if (this.flashScale > 0 && event.attackType !== 'storm') {
           this.hitFlashes.set(defender, this.config.hitFlashDuration);
         }
@@ -166,6 +168,7 @@ export class EffectsSystem {
         break;
       case CombatEvent.POWER_BLOCKED:
         params.color = getTierColor(attacker);
+        params.particleScale = getPowerTier(attacker.flowLevel, powersConfig.tiers).particleScale;
         this.spawn(EffectType.POWER_BLOCKED, params);
         break;
       case CombatEvent.POWER_RESISTED:
@@ -197,7 +200,7 @@ export class EffectsSystem {
     const style = powersConfig.render.storm;
     const power = powersConfig.powers.storm;
     const tier = getPowerTier(caster.flowLevel, powersConfig.tiers);
-    const count = this.reduced ? style.reducedParticles : style.particles;
+    const count = Math.round((this.reduced ? style.reducedParticles : style.particles) * tier.particleScale);
     for (let i = 0; i < count; i += 1) {
       const particle = this.particles.acquire();
       if (!particle) return;
@@ -217,6 +220,7 @@ export class EffectsSystem {
   spawnPowerWave(caster, contract, params) {
     const recipe = this.config.recipes[EffectType.POWER_WAVE];
     params.color = getTierColor(caster);
+    params.particleScale = getPowerTier(caster.flowLevel, powersConfig.tiers).particleScale;
     params.x = caster.x + caster.facing * (caster.width / 2 + powersConfig.render.waveOffset);
     params.y = caster.y - caster.height * powersConfig.castHeight;
     this.spawn(EffectType.POWER_WAVE, params);
@@ -225,6 +229,7 @@ export class EffectsSystem {
 
   spawnPowerRing(type, owner, params) {
     params.color = getTierColor(owner);
+    params.particleScale = getPowerTier(owner.flowLevel, powersConfig.tiers).particleScale;
     params.direction = -params.direction;
     this.spawn(type, params);
     this.spawnRing(this.config.recipes[type].ring, params.x, params.y, params.color);
@@ -264,10 +269,10 @@ export class EffectsSystem {
     return remaining / this.config.saberFlare.duration;
   }
 
-  spawn(type, { x, y, direction, color, secondaryColor }) {
+  spawn(type, { x, y, direction, color, secondaryColor, particleScale = 1 }) {
     const recipe = this.config.recipes[type];
 
-    this.spawnSparks(recipe, x, y, direction, recipe.tinted ? color : null);
+    this.spawnSparks(recipe, x, y, direction, recipe.tinted ? color : null, particleScale);
     if (recipe.light) {
       this.spawnLight(recipe.light, x, y, color);
       if (secondaryColor) {
@@ -291,8 +296,8 @@ export class EffectsSystem {
     }
   }
 
-  spawnSparks(recipe, x, y, direction, tint = null) {
-    const count = randomInt(this.random, recipe.count);
+  spawnSparks(recipe, x, y, direction, tint = null, scale = 1) {
+    const count = Math.round(randomInt(this.random, recipe.count) * scale);
     const upward = degreesToRadians(recipe.upwardDegrees);
     const baseAngle = direction >= 0 ? -upward : Math.PI + upward;
     const spread = degreesToRadians(recipe.spreadDegrees);

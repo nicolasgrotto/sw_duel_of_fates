@@ -8,6 +8,8 @@ import { CombatEvent } from '../src/combat/combatEvents.js';
 import { evadeConfig } from '../src/config/evadeConfig.js';
 import { aiConfig } from '../src/config/aiConfig.js';
 import { powersConfig } from '../src/config/powersConfig.js';
+import { projectilesConfig } from '../src/config/projectilesConfig.js';
+import { bladeTechniques } from '../src/config/movesConfig.js';
 import { fighterArchetypes } from '../src/config/fightersConfig.js';
 import { animation as animationStyle } from '../src/config/fighterVisualConfig.js';
 import { gameConfig } from '../src/config/gameConfig.js';
@@ -42,12 +44,15 @@ function resolveCharacter(id) {
 const CONFIG_ROOTS = {
   fighters: fighterArchetypes,
   attributes: Object.fromEntries(Object.entries(characters).map(([id, character]) => [id, character.attributes])),
+  loadouts: Object.fromEntries(Object.entries(characters).map(([id, character]) => [id, character.loadout])),
   attributeBases: attributesConfig.bases,
   attributeConfig: attributesConfig,
   ai: aiConfig,
   game: gameConfig,
   evade: evadeConfig,
   powers: powersConfig,
+  projectiles: projectilesConfig,
+  techniques: bladeTechniques,
   story: storyConfig,
 };
 
@@ -133,6 +138,7 @@ function runDuel(leftSetup, rightSetup, random, rules) {
     animationConfig: animationStyle,
     rules,
   });
+  for (const controller of controllers) controller.projectiles = simulation.projectiles;
   const counts = { hits: 0, blocks: 0, clashes: 0, guardBreaks: 0, parries: 0, perfectParries: 0, shoves: 0, evades: 0, evadeAttempts: 0, jumps: 0, airJumps: 0, airDashes: 0, powers: 0, powerHits: 0, powerResisted: 0, powerAbsorbed: 0 };
 
   const hitsReceived = new Map([[left, 0], [right, 0]]);

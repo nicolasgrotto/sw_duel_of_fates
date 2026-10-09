@@ -32,8 +32,8 @@ export const powersConfig = {
     },
     storm: {
       id: 'storm', effect: 'storm', channel: true, pose: 'channel', interaction: 'storm', around: true,
-      minFlowLevel: 6, cost: 30, drainPerSecond: 35, startup: 0.35, maxChannel: 1.2, recovery: 0.4,
-      range: 180, tickInterval: 0.2, damage: 4, intensity: 1, guard: { staminaCost: 6 },
+      minFlowLevel: 6, cost: 20, drainPerSecond: 25, startup: 0.35, maxChannel: 1.2, recovery: 0.4,
+      range: 240, tickInterval: 0.2, damage: 8, intensity: 1, guard: { staminaCost: 6 },
     },
     push: {
       id: 'push', effect: 'push', channel: false, pose: 'cast', interaction: 'push',
@@ -61,7 +61,7 @@ export const powersConfig = {
     choke: {
       id: 'choke', effect: 'choke', channel: false, pose: 'cast', interaction: 'choke',
       cost: 45, startup: 0.3, active: 0.08, recovery: 0.4, range: 240,
-      damage: 2, damagePerSecond: 4, duration: 0.7,
+      damage: 2, damagePerSecond: 4, duration: 0.5,
       guard: { staminaCost: 14 },
     },
     freeze: {
@@ -72,7 +72,7 @@ export const powersConfig = {
     },
     heal: {
       id: 'heal', effect: 'heal', channel: false, pose: 'barrier', self: true,
-      cost: 50, startup: 0.35, active: 0.08, recovery: 0.4,
+      cost: 40, startup: 0.35, active: 0.08, recovery: 0.4,
       amount: 14, duration: 2, maxMissingFraction: 0.35,
     },
     focus: {
@@ -206,9 +206,9 @@ export const powersConfig = {
     },
   },
   tiers: [
-    { id: 'faint', color: colors.powerTierFaint, minLevel: 1, glowRadius: 34, glowAlpha: 0.45, boltWidth: 2, particles: [4, 6] },
-    { id: 'steady', color: colors.powerTierSteady, minLevel: 3, glowRadius: 42, glowAlpha: 0.55, boltWidth: 2.5, particles: [6, 8] },
-    { id: 'deep', color: colors.powerTierDeep, minLevel: 8, glowRadius: 52, glowAlpha: 0.65, boltWidth: 3, particles: [8, 10] },
-    { id: 'apex', color: colors.powerTierApex, minLevel: 10, glowRadius: 64, glowAlpha: 0.75, boltWidth: 3.5, particles: [10, 12] },
+    { id: 'faint', particleScale: 2 / 3, color: colors.powerTierFaint, minLevel: 1, glowRadius: 34, glowAlpha: 0.45, boltWidth: 2, particles: [4, 6] },
+    { id: 'steady', particleScale: 1, color: colors.powerTierSteady, minLevel: 3, glowRadius: 42, glowAlpha: 0.55, boltWidth: 2.5, particles: [6, 8] },
+    { id: 'deep', particleScale: 4 / 3, color: colors.powerTierDeep, minLevel: 8, glowRadius: 52, glowAlpha: 0.65, boltWidth: 3, particles: [8, 10] },
+    { id: 'apex', particleScale: 5 / 3, color: colors.powerTierApex, minLevel: 10, glowRadius: 64, glowAlpha: 0.75, boltWidth: 3.5, particles: [10, 12] },
   ],
 };

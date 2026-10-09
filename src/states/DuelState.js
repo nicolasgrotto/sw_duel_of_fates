@@ -110,6 +110,7 @@ export class DuelState extends GameState {
       animationConfig: animationStyle,
       rules: this.rules,
     });
+    if (this.opponentController instanceof EnemyAI) this.opponentController.projectiles = this.simulation.projectiles;
     this.camera = new Camera(effectsConfig, this.random);
     this.timeControl = new TimeControl();
     this.effects = new EffectsSystem(effectsConfig, this.camera, this.random, this.timeControl);
@@ -347,6 +348,7 @@ export class DuelState extends GameState {
       self: opponent,
       opponent: player,
       profile: aiConfig.profiles[characters[characterId].aiProfile],
+      projectiles: this.simulation?.projectiles ?? null,
       difficulty: aiConfig.difficulties[this.difficultyId],
       perception: aiConfig.perception,
       random: this.random,

@@ -133,7 +133,7 @@ src/
     PowerRenderer.js        ✅ brilho de carga, raio (polilinhas) e domo da Barreira, só lendo o estado
     ProjectileRenderer.js   ✅ fragmento do Arremesso e lâmina girando, só lendo o pool
   ui/                       ✅ peças de interface desenhadas no canvas
-    attributeBars.js        ✅ seis linhas de nove segmentos (dez para nota 10); posição por parâmetro; somente leitura
+    attributeBars.js        ✅ seis linhas de sete segmentos (até dez com potencial); posição por parâmetro; somente leitura
     TouchControls.js        ✅ desenho de joystick e botões sem alterar input
     MenuList.js             ✅ lista de opções navegável
     Hud.js                  ✅ nomes, barras de vida (com fantasma) e stamina
@@ -236,7 +236,7 @@ Vida escala maxHealth; Stamina escala maxStamina e regenPerSecond; Lâmina escal
 
 Agilidade escala caminhada, velocidade vertical de pulo, dash e invulnerabilidade do EVADE pelo perfil de evadeConfig. Coeficientes calibrados preservam a janela 0,066 s atual. Também escala avanços/saltos de habilidade e pulo na parede, sem alterar durações, maxJumps ou regras de ataque aéreo. Fluxo vira stats.flowLevel, acessível pelo getter Fighter.flowLevel, imutável na luta e coberto pelo snapshot via stats; sem medidor ou efeito nesta etapa.
 
-Factory junta estrutura, bases e golpes antes de aplicar notas; nenhum snapshot de stats é criado no import. Simulador aceita --set attributes.guardian.health=7, attributeBases.guardian.maxHealth=100, attributeConfig.perfectParryBonus=0, story.budgets.easy=33 e powers.cooldown=1 (raízes `story` e `powers` desde a v1.12). Overrides ocorrem antes da factory; caminhos fighters continuam para tempos, custos e traços.
+Factory junta estrutura, bases e golpes antes de aplicar notas; nenhum snapshot de stats é criado no import. Simulador aceita --set attributes.guardian.health=7, attributeBases.guardian.maxHealth=100, attributeConfig.perfectParryBonus=0, story.budgets.easy=33 e powers.cooldown=1 (raízes `story` e `powers` desde a v1.12; `projectiles`, `techniques` e `loadouts`, para `projectilesConfig`, `movesConfig.bladeTechniques` e os conjuntos em `characterData`, desde a v1.19). Overrides ocorrem antes da factory; caminhos fighters continuam para tempos, custos e traços.
 
 ### Controllers
 
@@ -465,7 +465,7 @@ Treino: `IntentRecorder` guarda até 600 frames de intent em Uint16Array (10 s d
 
 Toque mobile (v1.2): Game injeta coarsePointer e tamanho do viewport, registra TouchInput e troca seu contexto ao mudar a pilha. MenuList calcula regiões de toque no update usando layout, sem mutar no render. Seleção lê as setas de cor; BACK reutiliza os fluxos existentes. TouchControls desenha somente após toque. Retrato suspende updates de estados, solta inputs e desenha orientação; voltar à paisagem retoma. CSS respeita safe areas. Efeitos reduzidos usam coarsePointer como default; loadSettings preserva qualquer booleano salvo, incluindo v1. Nenhum campo extra nem migração necessária.
 
-Seleção v1.4 desenha AttributeBars usando stats.attributes da factory, nove segmentos neutros e nota numérica. Geometria em uiConfig.layout.attributes; estilos em themeConfig. Preview do personagem fica à direita das barras; arena preserva seu layout. F3 mostra notas e flowLevel.
+Seleção v1.4 desenha AttributeBars usando stats.attributes da factory, sete segmentos neutros, extras de potencial em dourado e nota numérica (escala atual da v1.12). Geometria em uiConfig.layout.attributes; estilos em themeConfig. Preview do personagem fica à direita das barras; arena preserva seu layout. F3 mostra notas e flowLevel.
 
 ## Renderer
 
@@ -579,6 +579,7 @@ Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 22).
 - **Medidor.** A `DuelSimulation` repassa `rules` ao `CombatSystem`, que cria o `PowerSystem` (desligado quando `rules.powers` não é `true`). O `PowerSystem` regenera `fighter.flowMeter` depois da stamina e soma ganhos nos ganchos do `CombatSystem` (`onHit` no `applyHit`, `onBlock` no `resolveBlock`, `onParry` no `resolveParry`). `flowMeter` fica no `Fighter` (como `stamina`), começa em `stats.power.start` e volta a esse valor no `resetForRound`; o snapshot do replay o inclui.
 - **Nível.** `stats.flowLevel` vem do atributo Fluxo. A factory soma `stats.alignment` (do `characterData`) e `stats.power` (`resolvePowerStats`): o nível muda o ganho do medidor e a potência dos poderes, não o máximo.
 - **Interações.** `getFlowDifference(caster, target)` = `caster.flowLevel − target.flowLevel` (positivo: quem lança é mais forte). Cada poder aponta para sua tabela em `powersConfig.interactions[power.interaction]`. `resolveInteraction(table, diff)` devolve a primeira faixa com `diff ≥ atLeast` (a última tem `atLeast: -Infinity`). A faixa é o conjunto de modificadores que os handlers leem: `outcome` (`normal`, `reduced`, `resisted`), `scale` (escala do efeito, multiplicada pela potência), `knockback` (fator do deslocamento: empurrão, puxão, recuo do Raio; 0 = não desloca), `blockable` (a guarda de frente vale), `guardDamage` (fração do dano escalado que passa pela guarda), `guardSlide` (fator do recuo na guarda), `guardStamina` (fator sobre `power.guard.staminaCost`), `duration` (stun e efeitos com duração) e `stagger` (desequilíbrio). Falhar é sempre por limiar (`outcome: resisted`), nunca por sorteio, para o replay continuar determinístico. Nenhum `if` por poder: um poder novo ganha uma tabela, e um modificador novo entra em todas as faixas e no handler que o usa. As faixas atuais (v1.11) reproduzem a regra da v1.6 com o sinal novo: −1 ou mais normal, −2 metade, −3 ou menos resistido; guarda da Repulsão e do Puxão sem dano e com metade do recuo, guarda do Raio com um quarto do dano. Na v1.14 a Repulsão ganhou sete faixas (+3 imbloqueável; +2 e +1 guarda com dano e mais deslize; 0 como antes; −1 menos deslize e stamina; −2 meio efeito sem empurrar; −3 resistida), tabela em GAME_DESIGN seção 22. A IA (`isPowerBlocked`) só deixa de lançar contra quem bloqueia quando a faixa é bloqueável; sem `powerAware` ela continua evitando qualquer guarda.
+- **Emissão por tier (v1.19).** `powersConfig.tiers[].particleScale` multiplica as receitas de partículas de poderes: 2/3, 1, 4/3 e 5/3. Tempestade emite 8/12/16/20 partículas por pulso; efeitos reduzidos partem de 5 antes do multiplicador. `EffectsSystem` reaproveita os parâmetros de evento e o `ParticlePool` de 300; esgotar o pool só descarta partículas. Nada muda na simulação ou no replay.
 - **Tier visual.** `getPowerTier(level, powersConfig.tiers)` escolhe cor (`themeConfig`) e intensidade. A HUD desenha o medidor na cor do tier, abaixo da stamina, só com `rules.powers`.
 
 ### Poderes
@@ -586,7 +587,7 @@ Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 22).
 - **Reação e área (v1.18).** Redirecionamento usa `self`, `reaction` e `combat.redirectTime`, incluído automaticamente no snapshot e zerado em `clearPower` e no round. `PowerSystem.resolve` resolve reações antes dos outros poderes para não favorecer a ordem de `fighters`. `strike` só encaminha Raio com canal aberto e janela positiva para `redirect`: consome a janela e lê `interactions.redirect` com diferença defensor − canalizador (`absorb`, `reflect`, `gain`, `backlash`). Retorno e dano residual passam por `dealPowerDamage`; retorno interrompe o canal, falha extrema desequilibra quem reagiu. Não há RNG de gameplay novo.
 - **Tempestade (v1.18).** Poder de canal com `minFlowLevel` validado em `canCast` e na IA; `around` faz `isInPowerRange` medir a distância circular entre centros, sem depender de facing ou airReach. Handler `powerEffects.storm.tick` usa intensidade, escala e guarda sem stun contínuo. `powerPulse` é emitido nos pulsos mesmo sem alvo, e só o EffectsSystem cria partículas no pool existente, descartando excedentes; usa parâmetros de evento reutilizados. PowerRenderer desenha o limite circular e o brilho da janela sem alterar gameplay. IA consulta `perception.powerUse.redirect/storm`; F3 mostra poder e tempo da reação. Garça e Soberano recebem os poderes por loadout, sem condições por personagem nem alterações de input, save ou atributos.
 
-- **Estados e ação.** `CASTING` (poderes instantâneos) e `CHANNELING` (raio e barreira). A ação `power` (`intent.power`, segurar = `intent.powerHeld`) entra no buffer depois do empurrão e antes da habilidade, e também sai de dentro do `BLOCKING` fora do blockstun. Com os poderes desligados, a ação é descartada sem evento. Sem medidor ou em recarga, `actionRejected` sai com `attackType: 'power'`.
+- **Estados e ação.** `CASTING` (poderes instantâneos) e `CHANNELING` (Raio, Barreira e Tempestade). A ação `power` (`intent.power`, segurar = `intent.powerHeld`) entra no buffer depois do empurrão e antes da habilidade, e também sai de dentro do `BLOCKING` fora do blockstun. Com os poderes desligados, a ação é descartada sem evento. Sem medidor ou em recarga, `actionRejected` sai com `attackType: 'power'`.
 - **Escolha.** `getIntentSlot` converte a direção relativa ao `facing` em `forward`, `back` ou `neutral`. `selectPower` lê `stats.power.loadout` e cai no `neutral` com espaço vazio; `selectTechnique` lê `stats.techniques` e devolve `null` com espaço vazio (a habilidade própria continua no neutro).
 - **Catálogo e loadout (v1.15).** `powersConfig.categories` lista as habilidades de cada categoria e os alinhamentos que a abrem. Cada personagem tem `characterData.loadout = { powers: { slot: id }, techniques: { slot: id } }`; `findLoadoutProblems` (em `characters/powers.js`, puro) aponta id desconhecido ou categoria fora do alinhamento, e um teste roda isso no elenco inteiro. A factory monta `stats.power.loadout` (`resolvePowerStats` com os espaços do personagem, filtrados por `powerSlots` no protagonista), `stats.techniques` (ids por espaço) e acrescenta os golpes das técnicas em `fighter.moves` a partir de `movesConfig.bladeTechniques`. O dano de técnica vem de `damage` da própria definição (base na nota 4), multiplicado pela Lâmina em `applyAttributes`. O protagonista recebe `loadout` em `createProtagonistCharacter`: poderes de `storyConfig.protagonist.loadouts[caminho]` (que também alimenta a liberação do segundo espaço na campanha) e técnicas do personagem-base do estilo.
 - **Projéteis (v1.16).** `ProjectileSystem` é criado pelo `CombatSystem` (exposto como `simulation.projectiles`) e roda logo depois de `resolveHits`. O pool tem `projectilesConfig.capacity` objetos criados uma vez; cada um guarda só dados simples (`kind`, índice do dono em `fighters`, id de origem, posição, velocidade, raio, dano, empurrão, desequilíbrio, idade, `returning`, `hit`). Pool cheio descarta o lançamento. **Arremesso:** poder instantâneo com `projectile: true`; no fim do startup o `PowerSystem` chama `spawnThrow` em vez de `affect`. A faixa do Fluxo de quem lança (`resolveLevelBand`, o mesmo algoritmo dos tiers) define raio, dano, velocidade, empurrão, desequilíbrio, custo (`PowerSystem.getCost`) e recarga (`finish`). No contato com a hurtbox, `PowerSystem.strike` (a parte de `affect` depois do alcance) aplica invulnerabilidade, Barreira, interação (tabela `throw`), guarda e chama `powerEffects.throw.impact`, que lê dano e empurrão do projétil. Sai do pool ao acertar, na parede ou no tempo máximo. **Arremesso da lâmina:** técnica com `projectile: true`; no início do ativo, `applyActionMovement` chama `spawnSaber` e liga `combat.saberThrown`. O golpe não tem hitbox corpo a corpo nem rastro (`hasActiveHitbox` e `isSaberStrikeActive` ignoram golpes de projétil); o `hitbox.reach` só informa a IA. A lâmina vai até `saber.range`, vira (`returning`, libera um novo acerto se ainda não acertou), persegue o dono e sai do pool ao chegar, desligando `saberThrown`. No contato: Barreira → `powerAbsorbed`; guarda de frente (pelo sentido do voo) → `resolveBlock`; senão `applyHit`, com o dono como atacante. Com `saberThrown`, `tryAttack` recusa golpes de lâmina e `startParry`/guarda não entram. O render esconde a lâmina do dono (`pose.bladeVisible`). **Replay:** `ReplayBuffer.record(fighters, dt, projectiles)` guarda `captureProjectiles` na foto e o `ReplayState` chama `restoreProjectiles`; o `DuelState` limpa o pool a cada round. O F3 mostra quantos projéteis estão ativos.
@@ -598,7 +599,7 @@ Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 22).
 - **Interrupção.** `Fighter.clearAttack` também limpa o poder (`clearPower`), então qualquer golpe, empurrão ou desequilíbrio interrompe quem está lançando.
 - **Puxão.** A velocidade vem do atrito de ação da física (`friction`, repassado pela `DuelSimulation`): `√(2 × atrito × distância)` faz o alvo parar perto de `endGap`.
 - **Estado.** Tudo que muda fica em `fighter.combat` (`power`, `powerEndTime`, `powerTick`, `powerTargeted`, `powerCooldown`, `powerTargetX/Y`) e em `fighter.flowMeter`; o replay re-simula igual (teste dedicado). `powerTargetX/Y` guarda o ponto mirado para o render, sem lógica no renderer.
-- **Apresentação.** O `PowerRenderer` (chamado pelo `DuelRenderer` depois das lâminas) só lê o estado: brilho de carga na mão durante o startup, domo da Barreira enquanto `isBarrierUp`, raio enquanto o canal está aberto, da mão até `powerTargetX/Y`. O raio guarda, por lutador, deslocamentos perpendiculares em `Float32Array` (RNG próprio com seed, renovados a cada `render.boltRefresh` do tempo de animação) e recalcula os pontos a cada frame sem alocar. Cores e intensidade vêm do tier (`getPowerTier`); toda luz usa `drawGlow` (sprite em cache por cor). O `EffectsSystem` trata `powerActive` (anel que abre ou, no Puxão, fecha: `ring.contract`), `powerHit`, `powerBlocked`, `powerResisted` (anel na cor do tier do alvo) e `powerAbsorbed`; receitas com `tinted` pintam metade das faíscas na cor do tier. Poses em `fighterVisualConfig.combatPoses.powers` (`cast`, `channel`, `barrier`), com entrada no startup e volta na recuperação. Sons sintetizados em `audioConfig.sounds` (carga, onda, puxão, impacto, raio, barreira, resistido, absorvido). A HUD pisca o medidor quando a rejeição vem com `attackType: 'power'`. A lista de golpes (aberta pela pausa, que recebe `rules`) mostra os poderes do alinhamento quando eles estão ligados.
+- **Apresentação.** O `PowerRenderer` (chamado pelo `DuelRenderer` depois das lâminas) só lê o estado: brilho de carga na mão durante o startup, domo da Barreira enquanto `isBarrierUp`, raio enquanto o canal está aberto, da mão até `powerTargetX/Y`. O raio guarda, por lutador, deslocamentos perpendiculares em `Float32Array` (RNG próprio com seed, renovados a cada `render.boltRefresh` do tempo de animação) e recalcula os pontos a cada frame sem alocar. Cores e intensidade vêm do tier (`getPowerTier`); toda luz usa `drawGlow` (sprite em cache por cor). O `EffectsSystem` trata `powerActive` (anel que abre ou, no Puxão, fecha: `ring.contract`), `powerHit`, `powerBlocked`, `powerResisted` (anel na cor do tier do alvo) e `powerAbsorbed`; receitas com `tinted` pintam metade das faíscas na cor do tier. Poses em `fighterVisualConfig.combatPoses.powers` (`cast`, `channel`, `barrier`), com entrada no startup e volta na recuperação. Sons sintetizados em `audioConfig.sounds` (carga, onda, puxão, impacto, raio, barreira, resistido, absorvido). A HUD pisca o medidor quando a rejeição vem com `attackType: 'power'`. A lista de golpes (aberta pela pausa, que recebe `rules`) mostra poderes e técnicas do loadout quando estão ligados.
 - **Entrada.** Teclado `U` (preset de setas: `N`; 2 Jogadores: J1 `R`, J2 `O`/Numpad6), gamepad RT, botão de toque `Poder` (só aparece quando o `DuelState` chama `touch.setFeatures(['powers'])`). `POWER` está em `remappableActions`; o `IntentRecorder` grava `power` e `powerHeld` no fim da lista de flags.
 
 ## História, secretos e personalização
@@ -954,7 +955,81 @@ Matriz com poderes: `npm run matrix -- --rules powers`, 60 duelos por par ordena
 | Garça | 40,0 | 58,7 | 49,4 |
 | Eco | 47,2 | 51,9 | 49,6 |
 
+### Fechamento e calibração (v1.19)
+
+**Configuração final.** Nenhum atributo, perfil de personagem ou loadout mudou. Cura custa 40 (antes 50); Estrangular dura 0,5 s (antes 0,7), ainda com custo 45 e dreno 4/s. A Tempestade passa a custo 20, dreno 25/s, dano 8 por pulso e raio 240 px (antes 30, 35/s, 4 e 180 px). A resposta defensiva nova da IA elevou o Ancião; calibrar a Tempestade restaurou a ordem média dos secretos sem alterar o elenco comum, que não a equipa.
+
+**Clássico.** Comparação da saída completa do simulador com a base v1.18: 364 cenários, todos os pares ordenados distintos dos 14 personagens, Normal e Difícil, 20 duelos por par e seed 1. Zero diferenças. Os valores clássicos da tabela v1.13 permanecem válidos, dentro de ±5 pontos da v1.0 (maior desvio +4,5). Configurações de poderes não são consumidas com a regra desligada.
+
+**Elenco com poderes.** 180 cenários, 60 duelos por par ordenado, seed 1, perfis próprios, 10.800 duelos. Tabelas mostram vitória de quem está na linha; abreviações seguem a ordem do elenco. A média entre Normal e Difícil fica entre 47,9% e 53,3%, dentro do alvo 46–54%.
+
+Dois duelos sem vencedor foram confirmados como K.O. simultâneo: Forja × Vespa/Normal em 22,43 s e Espelho × Brasa/Difícil em 16,53 s. O campo histórico `timeouts` do simulador inclui esses empates; nenhum atingiu o limite de 120 s. Secretos e História não tiveram duelos sem vencedor.
+
+| Normal | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco | média |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Guardião | — | 55,0 | 30,0 | 63,3 | 45,0 | 48,3 | 55,0 | 31,7 | 60,0 | 51,7 | 48,9 |
+| Sombra | 43,3 | — | 38,3 | 75,0 | 70,0 | 61,7 | 63,3 | 60,0 | 56,7 | 61,7 | 58,9 |
+| Bastião | 76,7 | 56,7 | — | 76,7 | 63,3 | 36,7 | 76,7 | 53,3 | 63,3 | 66,7 | 63,3 |
+| Vespa | 35,0 | 28,3 | 15,0 | — | 45,0 | 23,3 | 46,7 | 45,0 | 41,7 | 53,3 | 37,0 |
+| Espelho | 45,0 | 33,3 | 28,3 | 56,7 | — | 41,7 | 56,7 | 28,3 | 43,3 | 48,3 | 42,4 |
+| Haste | 71,7 | 40,0 | 56,7 | 70,0 | 70,0 | — | 60,0 | 61,7 | 66,7 | 61,7 | 62,0 |
+| Brasa | 46,7 | 36,7 | 36,7 | 46,7 | 51,7 | 36,7 | — | 35,0 | 48,3 | 48,3 | 43,0 |
+| Forja | 73,3 | 28,3 | 40,0 | 66,7 | 68,3 | 41,7 | 56,7 | — | 56,7 | 56,7 | 54,3 |
+| Garça | 31,7 | 43,3 | 40,0 | 63,3 | 51,7 | 23,3 | 48,3 | 30,0 | — | 50,0 | 42,4 |
+| Eco | 60,0 | 43,3 | 35,0 | 55,0 | 61,7 | 33,3 | 55,0 | 46,7 | 55,0 | — | 49,4 |
+
+| Difícil | Gua | Som | Bas | Ves | Esp | Has | Bra | For | Gar | Eco | média |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Guardião | — | 73,3 | 40,0 | 48,3 | 31,7 | 43,3 | 38,3 | 38,3 | 41,7 | 66,7 | 46,9 |
+| Sombra | 31,7 | — | 48,3 | 30,0 | 35,0 | 76,7 | 31,7 | 56,7 | 55,0 | 65,0 | 47,8 |
+| Bastião | 56,7 | 38,3 | — | 26,7 | 25,0 | 20,0 | 48,3 | 40,0 | 15,0 | 28,3 | 33,1 |
+| Vespa | 51,7 | 55,0 | 71,7 | — | 45,0 | 81,7 | 55,0 | 75,0 | 51,7 | 56,7 | 60,4 |
+| Espelho | 70,0 | 66,7 | 70,0 | 61,7 | — | 68,3 | 43,3 | 46,7 | 58,3 | 68,3 | 61,5 |
+| Haste | 55,0 | 31,7 | 81,7 | 10,0 | 28,3 | — | 41,7 | 28,3 | 21,7 | 43,3 | 38,0 |
+| Brasa | 38,3 | 61,7 | 60,0 | 48,3 | 40,0 | 71,7 | — | 53,3 | 63,3 | 60,0 | 55,2 |
+| Forja | 53,3 | 41,7 | 66,7 | 36,7 | 48,3 | 76,7 | 45,0 | — | 40,0 | 48,3 | 50,7 |
+| Garça | 53,3 | 61,7 | 85,0 | 38,3 | 51,7 | 65,0 | 43,3 | 48,3 | — | 55,0 | 55,7 |
+| Eco | 60,0 | 38,3 | 70,0 | 36,7 | 38,3 | 71,7 | 33,3 | 56,7 | 45,0 | — | 50,0 |
+
+| Personagem | Média Normal/Difícil |
+| --- | --- |
+| Guardião | 47,9% |
+| Sombra | 53,3% |
+| Bastião | 48,2% |
+| Vespa | 48,7% |
+| Espelho | 51,9% |
+| Haste | 50,0% |
+| Brasa | 49,1% |
+| Forja | 52,5% |
+| Garça | 49,1% |
+| Eco | 49,7% |
+
+**Secretos contra o elenco.** 60 cenários, 40 duelos por par, seed 1, poderes ligados (2.400 duelos). A ordem exigida é a média das duas dificuldades; ela não implica vitória em cada confronto individual.
+
+| Secreto | Normal | Difícil | média |
+| --- | --- | --- | --- |
+| Ancião | 73,3 | 84,5 | 78,9 |
+| Soberano | 82,0 | 83,0 | 82,5 |
+| Predestinado | 85,8 | 89,3 | 87,5 |
+
+**Chefes da História.** Mesmo método de três pilotos da v1.12: protagonista no teto e total por dificuldade, ambos os alinhamentos × três estilos, 60 duelos cada, seed 1. 108 cenários, 6.480 duelos; 360 duelos por célula. Soberano usa a dificuldade da campanha; Predestinado usa `boss`.
+
+| % de vitória do protagonista | Piloto | Fácil | Normal | Difícil |
+| --- | --- | --- | --- | --- |
+| contra o Soberano | mesmo nível | 13,6 | 23,9 | 20,8 |
+| contra o Soberano | Normal | 87,8 | 23,9 | 3,1 |
+| contra o Soberano | Difícil | 96,9 | 54,2 | 20,8 |
+| contra o Predestinado | mesmo nível | 0,0 | 1,4 | 13,3 |
+| contra o Predestinado | Normal | 2,2 | 1,4 | 1,4 |
+| contra o Predestinado | Difícil | 23,3 | 15,0 | 13,3 |
+
+O Soberano permanece vencível em todas as dificuldades. O Predestinado fica muito difícil, mas possível: piloto Difícil vence 13,3–23,3%; Normal, 1,4–2,2%. Piloto Fácil zerou as vitórias contra o chefe secreto nesta amostra, como na referência v1.12; isso não representa um limite de possibilidade para o jogador. Resultados de IA são uma referência determinística de calibração, não estimativas de taxa de vitória humana.
+
 ## AI
+
+**Respostas às habilidades (v1.19).** `EnemyAI` recebe uma referência opcional ao `ProjectileSystem` da simulação. O `DuelState` conecta essa referência depois de criar a simulação e ao reconstruir a IA entre rounds; o simulador faz a mesma conexão. `findIncomingProjectile` só lê o pool: ignora projéteis próprios, inativos, já consumidos, fora da altura do corpo ou que se afastam; escolhe o de menor tempo até a borda do corpo, dentro de `perception.projectileHorizon` (0,45 s). Assim, a defesa continua depois que o lançador saiu da recuperação, inclusive contra a lâmina voltando por trás. A IA pede Barreira, guarda frontal ou esquiva; não altera projéteis, vida ou medidor.
+
+Barreira é procurada nos três espaços do loadout; em curta distância, a resposta ofensiva é o empurrão de corpo. A IA atenta evita desperdiçar poderes contra Barreira e Raio contra Redirecionamento, soltando o próprio canal quando detecta a janela. Contra uma faixa imbloqueável ou sem a lâmina em mãos, pede esquiva se não usar Barreira. Planos de guarda e canal permanecem até o fim previsto, em vez de serem abandonados na próxima decisão. Cura e Foco provocam aproximação e punição durante a preparação; técnicas não são solicitadas com a lâmina fora. Todas essas decisões ficam atrás de `rules.powers`, preservando ações e consumo de RNG do clássico. O F3 continua expondo a decisão, o poder, a janela de reação e a quantidade de projéteis.
 
 Arquivos: [src/ai/](src/ai/), [src/config/aiConfig.js](src/config/aiConfig.js). Regras em [GAME_DESIGN.md](GAME_DESIGN.md#7-ia).
 
@@ -992,7 +1067,7 @@ DuelSimulation → CombatSystem executa (igual ao jogador)
 
 ---
 
-IA de poderes (v1.6): a `EnemyAI` recebe `rules` e só pensa em poderes com `rules.powers`; sem a regra, nenhum passo novo consome o RNG, então o duelo clássico fica idêntico. O passo `power` (depois de `special` nas `priorities` de todos os perfis) testa os espaços `forward` e `neutral` do loadout (a Barreira é só defensiva): precisa de recarga zerada, medidor para o custo (mais uma reserva de canal, `perception.powerChannelReserve`), alcance, o oponente fora da guarda, distância dentro de `perception.powerUse[efeito]` (Repulsão de perto, Raio a meia distância, Puxão de longe) e, com `difficulty.powerAware`, uma faixa de interação com escala maior que zero (o Fácil não sabe disso e gasta medidor à toa). A chance é `profile.powerChance` (ou `perception.powerChance`) × `difficulty.powerMultiplier`. `startPower` aponta o `moveX` para o espaço escolhido e segura `powerHeld` por `plan.powerHoldTime` (Raio: sorteio em `perception.lightningHold`). Na defesa, `tryDefendPower` roda antes da ameaça de lâmina: contra um poder do oponente que alcança, com a chance de bloqueio do perfil, levanta a Barreira (se tiver, com `perception.barrierPreference`) ou segura a guarda até o fim do poder. Contra golpes de lâmina, a Barreira também entra com `perception.barrierVsSaberChance`.
+IA de poderes (v1.6): a `EnemyAI` recebe `rules` e só pensa em poderes com `rules.powers`; sem a regra, nenhum passo novo consome o RNG, então o duelo clássico fica idêntico. O passo `power` (depois de `special` nas `priorities` de todos os perfis) testa os três espaços do loadout (a Barreira é só defensiva): precisa de recarga zerada, medidor para o custo (mais uma reserva de canal, `perception.powerChannelReserve`), alcance, o oponente fora da guarda, distância dentro de `perception.powerUse[efeito]` (Repulsão de perto, Raio a meia distância, Puxão de longe) e, com `difficulty.powerAware`, uma faixa de interação com escala maior que zero (o Fácil não sabe disso e gasta medidor à toa). A chance é `profile.powerChance` (ou `perception.powerChance`) × `difficulty.powerMultiplier`. `startPower` aponta o `moveX` para o espaço escolhido e segura `powerHeld` por `plan.powerHoldTime` (Raio: sorteio em `perception.lightningHold`). Na defesa, `tryDefendPower` roda antes da ameaça de lâmina: contra um poder do oponente que alcança, com a chance de bloqueio do perfil, levanta a Barreira (se tiver, com `perception.barrierPreference`) ou segura a guarda até o fim do poder. Contra golpes de lâmina, a Barreira também entra com `perception.barrierVsSaberChance`.
 
 IA EVADE: getTimeUntilAttackActive expõe startup restante, zero no active ainda não conectado e Infinity fora da ameaça. No pensamento de defesa, a rolagem já existente escolhe EVADE por evadeChance e evadeWeight do perfil, somente contra active. evadeTimingJitter agenda atraso; a cada passo o plano valida se aquele golpe ainda existe e solicita intent.evade uma vez. Nenhuma mutação no lutador. Fora de blockstun, EVADE também pode sair de BLOCKING. Chances iniciais pequenas preservam o combate clássico; calibração final pela matriz.
 
@@ -1026,7 +1101,7 @@ Testes rodam em Node (`npm test`), sem navegador. Por isso:
 - Quando um módulo do core precisa do navegador (`Input`, `TouchInput`, `GameLoop`, `textPrompt`), a dependência é injetada.
 - `computePose` é uma função pura e também é testada.
 
-Testes atuais: 505 testes em `tests/`, um arquivo por área (loop, input e toque, estados e modos, combate, especiais, EVADE, atributos, Fluxo e poderes, IA, simulação, replay, áudio, efeitos, UI, desbloqueios e skins, Arcade, Sobrevivência, História, segredos, remapeamento, save). `tests/states.test.js` cobre o fluxo de telas; `goToMenuItem(game, id)` navega no menu pelo id, sem depender da posição dos itens. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
+Testes atuais: 580 testes em `tests/`, um arquivo por área (loop, input e toque, estados e modos, combate, especiais, EVADE, atributos, Fluxo e poderes, IA, simulação, replay, áudio, efeitos, UI, desbloqueios e skins, Arcade, Sobrevivência, História, segredos, remapeamento, save). `tests/states.test.js` cobre o fluxo de telas; `goToMenuItem(game, id)` navega no menu pelo id, sem depender da posição dos itens. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
 
 ---
 
@@ -1059,7 +1134,7 @@ Evitar dependências circulares.
 
 Roteiro, tarefas e validações em [versions/v2.md](versions/v2.md). O detalhe de cada sistema está nas seções acima (Input, Combat, Fluxo e poderes, História, Balanceamento, AI).
 
-**Princípios.** Tudo que muda o resultado de uma luta roda dentro da `DuelSimulation` com o dt fixo, guarda estado em `fighter.combat` (copiado inteiro pelo snapshot do replay) ou em campos do `Fighter` cobertos pelo teste de snapshot, e é configurado em `src/config/`. Game, Renderer, Audio, Effects e Input não contêm regra de gameplay. Os modos clássicos (Arcade, Sobrevivência, Tutorial, Desafio) recebem `rules` padrão e ficam idênticos à v1.0; a matriz sem poderes continua igual à v1.3.
+**Princípios.** Tudo que muda o resultado de uma luta roda dentro da `DuelSimulation` com o dt fixo, guarda estado em `fighter.combat` (copiado inteiro pelo snapshot do replay) no pool fixo de projéteis (também fotografado pelo replay) ou em campos do `Fighter` cobertos pelo teste de snapshot, e é configurado em `src/config/`. Game, Renderer, Audio, Effects e Input não contêm regra de gameplay. Os modos clássicos (Arcade, Sobrevivência, Tutorial, Desafio) recebem `rules` padrão, sem poderes ou técnicas. O movimento aéreo da v1.13 também vale nesses modos; a matriz sem poderes permanece igual à v1.13 e dentro de ±5 pontos da v1.0.
 
 **Refactors da v1.1.** `Input` com fontes (teclado, gamepad, toque); save versionado com migrações (hoje v5: `{ version, settings, story }`); `DuelResult` e `duelOutcomes` fora do `DuelState`; teste que falha se um campo mutável do `Fighter` ficar fora do `captureFighter`; DPR limitado e tempos de update/render no F3.
 
@@ -1068,7 +1143,7 @@ Roteiro, tarefas e validações em [versions/v2.md](versions/v2.md). O detalhe d
 - **Atributos** (escala 7/8/9/10: elenco até 7, secretos até 7 + `potential`) são a única fonte dos stats escalares; o arquétipo continua dono de tempos, golpes e traços. Tier do Fluxo: azul até 7, roxo 8–9, vermelho só no 10.
 - **Fluxo**: `flowLevel` (permanente) define potência, ganho do medidor, resistência e tier visual; `flowMeter` é o recurso da luta; `stamina` continua o recurso físico.
 - **Interações**: `flowDifference = quem lança − alvo`; uma tabela de faixas por habilidade, cada faixa com modificadores (escala, guarda, dano e deslize na guarda, duração, stagger); um resolvedor puro, sem `if` por poder; falha só por limiar.
-- **Poderes** têm fases como os golpes, são pagos com `flowMeter` e não têm projétil. Estados `CASTING` e `CHANNELING`.
+- **Poderes** têm fases como os golpes e são pagos com `flowMeter`. O Arremesso usa o pool de projéteis; a técnica Arremesso da lâmina usa o mesmo pool e custa stamina. Estados `CASTING` e `CHANNELING`.
 - **EVADE** fica no "baixo" (S/↓, direcional, joystick); o Shift continua o dash. **Pulo duplo** por `movement.maxJumps`.
 - **Rotas e finais** são dados avaliados por um registro de condições contra o `DuelResult`.
 - **Protagonista** é dado gerado do save e entra em `createFighterFromCharacter`; sem sistema de animação novo.
@@ -1102,3 +1177,18 @@ Update e render dentro do alvo em todas as janelas. Sem mudanças de visual ou o
 - **Sem comentários no código.** Nomes claros substituem comentários. Contexto e decisões ficam neste documento.
 - Evitar criar objetos dentro do loop sem necessidade.
 - Listeners adicionados devem ter forma de remoção (`destroy()`).
+
+**Medição final (v1.19).** Chrome headless no Windows, GPU habilitada, CPU 6× via CDP. Mesmo método da v1.x final: 11 s por caso, primeiros 120 frames descartados, médias de janelas de 60 frames do GameLoop/F3. Viewport 844×390, DPR emulado 3 limitado a 2. O layout atual usa canvas 1688×780, mais largo que o 1386×780 histórico; por isso foi repetido também o cenário de referência. Nenhuma matriz ou suíte concorria com a medição. O máximo é a maior média de janela, não o pior frame isolado.
+
+Santuário com reflexos e F3: referência Sombra/Raio contra Guardião/Barreira; casos novos Soberano com Raio ou Tempestade contra Barreira, fragmentos e lâminas em voo (até 4 projéteis) e os quatro indicadores de estado. O cenário repõe recursos, mantém canais/estados e emite projéteis a cada 0,2 s somente no harness de QA. Não representa uma combinação de estados alcançável numa luta comum; exercita o custo simultâneo dos desenhos. Entre 613 e 661 frames nos casos de referência/projéteis, 639/657 na Tempestade final; 8–9 janelas válidas por caso. Pool de partículas nunca passou de 57/300.
+
+| Cenário | Efeitos | Janelas | Update médio / máximo | Render médio / máximo | FPS final |
+| --- | --- | --- | --- | --- | --- |
+| Raio + Barreira | completos | 8 | 0,33 / 0,60 ms | 3,59 / 6,37 ms | 59,57 |
+| Raio + Barreira | reduzidos | 8 | 0,26 / 0,33 ms | 2,62 / 3,26 ms | 59,79 |
+| Raio + projéteis + estados | completos | 9 | 0,32 / 0,43 ms | 3,99 / 5,16 ms | 60,05 |
+| Raio + projéteis + estados | reduzidos | 8 | 0,27 / 0,36 ms | 2,63 / 4,58 ms | 58,72 |
+| Tempestade + projéteis + estados | completos | 8 | 0,94 / 1,30 ms | 7,37 / 9,54 ms | 59,38 |
+| Tempestade + projéteis + estados | reduzidos | 8 | 0,67 / 0,97 ms | 6,95 / 9,79 ms | 59,88 |
+
+Todas as janelas dentro de update ≤ 2 ms e render ≤ 10 ms; sem erros JavaScript. Capturas desktop e mobile conferidas no QA. A medição emulada não substitui hardware: os testes em Chrome Android/Safari iOS e teclado nativo são os já concluídos pelo autor nas etapas anteriores, não foram refeitos nesta etapa. Arquivos temporários e perfil do Chrome são removidos ao concluir.

@@ -125,7 +125,8 @@ describe('storm', () => {
 
   it('uses a circular area centered on the body, including behind and above', () => {
     const s = setup('storm');
-    for (const [dx, dy, inside] of [[180, 0, true], [-180, 0, true], [0, -180, true], [181, 0, false], [130, -130, false]]) {
+    const radius = storm.range;
+    for (const [dx, dy, inside] of [[radius, 0, true], [-radius, 0, true], [0, -radius, true], [radius + 1, 0, false], [radius * 0.75, -radius * 0.75, false]]) {
       s.target.x = s.caster.x + dx;
       s.target.y = s.caster.y - s.caster.height / 2 + s.target.height / 2 + dy;
       assert.equal(isInPowerRange(s.caster, s.target, storm), inside);

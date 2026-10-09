@@ -17,6 +17,10 @@ Tempestade usa a pose de canal, preparação luminosa e um círculo fino de baix
 
 ## Fluxo
 
+Na calibração final da v1.19, o alcance da Tempestade passa a 240 px. O contorno e a distribuição das partículas continuam lendo o mesmo raio de gameplay em `powersConfig`; não há área invisível nem aumento do limite do pool. A quantidade por tier permanece a definida abaixo.
+
+Fechamento v1.19: as emissões de poder acompanham os quatro tiers com fatores 2/3, 1, 4/3 e 5/3, definidos em `powersConfig.tiers`. A Tempestade emite 8/12/16/20 partículas por pulso (nos níveis que permitem lançar, 12/16/20); efeitos reduzidos usam a mesma escala sobre a emissão base de 5. O pool continua limitado a 300. Tamanho de área, duração, cores e regras de gameplay não mudam com essa escala visual. Os indicadores de estado e o Redirecionamento conservam os glows por tier existentes.
+
 ```
 CombatSystem → evento (hit, block, clash, death)
 EffectsSystem → escolhe e cria os efeitos

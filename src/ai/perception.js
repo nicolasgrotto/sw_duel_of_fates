@@ -51,3 +51,21 @@ export function getTimeUntilAttackActive(fighter) {
   if (!attack || hasHit || getAttackPhase(attack, fighter.stateTime) === AttackPhase.RECOVERY) return Infinity;
   return Math.max(0, attack.startup - fighter.stateTime);
 }
+
+export function findIncomingProjectile(self, system, horizon) {
+  if (!system) return null;
+  let nearest = null;
+  let shortest = horizon;
+  for (const projectile of system.pool) {
+    if (!projectile.active || projectile.hit || system.fighters[projectile.owner] === self) continue;
+    if (projectile.y + projectile.radius < self.top || projectile.y - projectile.radius > self.y) continue;
+    const distance = self.x - projectile.x;
+    if (distance * projectile.vx <= 0) continue;
+    const time = Math.max(0, (Math.abs(distance) - self.width / 2 - projectile.radius) / Math.abs(projectile.vx));
+    if (time <= shortest) {
+      nearest = projectile;
+      shortest = time;
+    }
+  }
+  return nearest;
+}
