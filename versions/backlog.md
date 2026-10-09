@@ -5,7 +5,7 @@ O ciclo aprovado v2.1 → v3.0 está em [v3.md](v3.md). As sugestões abaixo fic
 ## Reconciliação do backlog anterior
 
 - Cura, poderes com projéteis e três poderes por personagem já existem na v2.
-- Fúria, expansão da História por alinhamento, offline e quatro poderes exclusivos do Predestinado foram incorporados ao plano v3.
+- Fúria (agora o poder Ira), expansão da História por alinhamento, offline e quatro poderes exclusivos do Predestinado foram incorporados ao plano v3.
 - As duas rotas aprovadas não incluem novas ramificações por escolhas de diálogo.
 - Ocaso é uma skin específica do ciclo, não aprovação de um sistema geral de equipamentos ou animações exclusivas para cada skin.
 
