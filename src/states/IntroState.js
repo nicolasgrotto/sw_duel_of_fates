@@ -5,7 +5,9 @@ import { introConfig } from '../config/introConfig.js';
 import { SecretToken, secretsConfig } from '../config/secretsConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
 import { layout, texts } from '../config/uiConfig.js';
+import { characters } from '../characters/characterData.js';
 import { SecretUnlockSystem } from '../modes/SecretUnlockSystem.js';
+import { unlockAllSkins } from '../modes/unlocks.js';
 import { clamp } from '../utils/math.js';
 import { GameState } from './GameState.js';
 import { StateId } from './stateIds.js';
@@ -14,9 +16,15 @@ function fadeIn(time, { start, duration }) {
   return clamp((time - start) / duration, 0, 1);
 }
 
-export function isInTitleArea(point, width) {
-  const { titleArea } = introConfig;
-  return Math.abs(point.x - width / 2) <= titleArea.width / 2 && Math.abs(point.y - layout.intro.titleY) <= titleArea.height / 2;
+const TAP_AREA_Y = { title: 'titleY', tagline: 'taglineY' };
+
+export function findTapArea(point, width) {
+  for (const [name, area] of Object.entries(introConfig.tapAreas)) {
+    if (Math.abs(point.x - width / 2) <= area.width / 2 && Math.abs(point.y - layout.intro[TAP_AREA_Y[name]]) <= area.height / 2) {
+      return name;
+    }
+  }
+  return null;
 }
 
 export class IntroState extends GameState {
@@ -43,8 +51,9 @@ export class IntroState extends GameState {
     const { input } = this.game;
     let start = input.wasPressed(Action.CONFIRM);
     for (const tap of input.touchTaps ?? []) {
-      if (isInTitleArea(tap, gameConfig.canvas.width)) {
-        this.feed(SecretToken.tap('title'));
+      const area = findTapArea(tap, gameConfig.canvas.width);
+      if (area) {
+        this.feed(SecretToken.tap(area));
       } else {
         start = true;
       }
@@ -74,15 +83,18 @@ export class IntroState extends GameState {
     }
   }
 
-  reward({ unlocks }) {
+  reward({ unlocks = [], allSkins = false, message }) {
     const { settings } = this.game;
     const current = settings.unlockedCharacters ?? [];
     const fresh = unlocks.filter((id) => !current.includes(id));
-    if (fresh.length > 0) {
+    const skins = allSkins ? unlockAllSkins(settings.unlocks, Object.values(characters)) : settings.unlocks;
+    const changed = fresh.length > 0 || JSON.stringify(skins) !== JSON.stringify(settings.unlocks ?? {});
+    if (changed) {
       settings.unlockedCharacters = [...current, ...fresh];
+      settings.unlocks = skins;
       this.game.saveSettings();
     }
-    this.message = fresh.length > 0 ? texts.intro.secretUnlocked : texts.intro.secretKnown;
+    this.message = texts.intro.secrets[message][changed ? 'unlocked' : 'known'];
     this.messageTime = introConfig.secret.messageDuration;
     this.time = Math.max(this.time, introConfig.prompt.start);
     this.game.audio.play(SoundName.SECRET);

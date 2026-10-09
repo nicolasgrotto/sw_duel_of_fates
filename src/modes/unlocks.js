@@ -39,6 +39,16 @@ export function getSkinOptions(character, settings) {
   }));
 }
 
+export function unlockAllSkins(unlocks, characters) {
+  let next = unlocks ?? {};
+  for (const character of characters) {
+    const owned = next[character.id] ?? [];
+    const skins = (character.skins ?? []).filter((skin) => skin.unlock && !owned.includes(skin.id));
+    if (skins.length) next = addUnlocks(next, character.id, skins);
+  }
+  return next;
+}
+
 export function unlockProgressSkins(unlocks, characters, milestone) {
   let next = unlocks ?? {};
   for (const character of characters) {

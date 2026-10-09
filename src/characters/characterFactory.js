@@ -37,7 +37,7 @@ export function createFighterFromCharacter(character, { x, y, facing }, { saberC
     parry: { ...stats.parry, ...scalars.parry },
     evade: stats.evade ?? evadeConfig.profile,
     attacks: moves,
-  }, character.attributes, attributesConfig, { apex: character.apex === true });
+  }, character.attributes, attributesConfig, { potential: character.potential ?? 0 });
 
   const appearance = resolveAppearance(character, skin);
   if (saberColor) appearance.saberColor = saberColor;

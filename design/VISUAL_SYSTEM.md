@@ -43,6 +43,7 @@ Cores de sabre (ficam em `characterData`, por personagem; uma cor por personagem
 | rosa-pálido | `#ffa6e0` | Eco |
 | ouro-velho | `#e0b84a` | Soberano (secreto) |
 | azul-aurora | `#6fb2ff` | Predestinado (secreto) |
+| verde-jade | `#3fd07a` | Ancião (secreto) |
 | núcleo | `#ffffff` | todos |
 
 Não crie cores novas direto no código. Adicione um token aqui e no `themeConfig`.
@@ -53,8 +54,10 @@ Cores do Fluxo (energia dos poderes, por tier de nível; nunca usadas na lâmina
 | --- | --- | --- |
 | `powerTierFaint` | `#9cc4ff` | 1–3 (azul pálido) |
 | `powerTierSteady` | `#5d8dff` | 4–7 (azul) |
-| `powerTierDeep` | `#b26bff` | 8–9 (roxo) |
-| `powerTierApex` | `#ff2b45` | 10 (vermelho; só o Predestinado) |
+| `powerTierDeep` | `#b26bff` | 8–11 (roxo) |
+| `powerTierApex` | `#ff2b45` | 12 (vermelho; só o Predestinado) |
+
+Barras de atributo: segmentos acima de 9 (potencial dos secretos) usam `attributePotential` (`#e0c46a`, dourado) cheios e `attributePotentialTrack` vazios.
 
 ## Tipografia
 

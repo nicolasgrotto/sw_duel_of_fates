@@ -48,10 +48,10 @@ export const storyConfig = {
         { condition: { type: 'always' }, ending: 'normal' },
       ],
     },
-    { id: 'foretold', opponent: 'foretold', arena: 'sanctuary', aiOffset: 0, secret: true, unlocks: ['foretold'], ending: 'secret' },
+    { id: 'foretold', opponent: 'foretold', arena: 'sanctuary', difficulty: 'boss', secret: true, unlocks: ['foretold'], ending: 'secret' },
   ],
   endings: {
-    normal: { unlocks: [] },
-    secret: { unlocks: [] },
+    normal: { unlocks: [], conditionalUnlocks: [{ condition: { type: 'alignmentIs', alignment: 'light' }, ids: ['elder'] }] },
+    secret: { unlocks: [], conditionalUnlocks: [{ condition: { type: 'alignmentIs', alignment: 'light' }, ids: ['elder'] }] },
   },
 };

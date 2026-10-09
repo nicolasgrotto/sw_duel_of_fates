@@ -29,6 +29,8 @@ export const colors = {
   powerTierDeep: '#b26bff',
   powerTierApex: '#ff2b45',
   introBlade: '#7fe4ff',
+  attributePotential: '#e0c46a',
+  attributePotentialTrack: 'rgba(224, 196, 106, 0.18)',
   desaturateGray: '#808080',
   desaturateDim: '#000000',
   hitFlash: '#ffffff',

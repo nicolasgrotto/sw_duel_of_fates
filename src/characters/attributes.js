@@ -1,11 +1,11 @@
-export function getRatingLimit(name, config, apex = false) {
-  return apex && name === config.apexAttribute ? config.apexRating : config.maxRating;
+export function getRatingLimit(name, config, potential = 0) {
+  return potential > 0 ? config.maxRating + potential : config.ratingLimits[name] ?? config.maxRating;
 }
 
-export function applyAttributes(base, attributes, config, { apex = false } = {}) {
+export function applyAttributes(base, attributes, config, { potential = 0 } = {}) {
   const ratings = { ...config.defaults, ...attributes };
   for (const name of Object.keys(config.defaults)) {
-    if (!Number.isInteger(ratings[name]) || ratings[name] < config.minRating || ratings[name] > getRatingLimit(name, config, apex)) {
+    if (!Number.isInteger(ratings[name]) || ratings[name] < config.minRating || ratings[name] > getRatingLimit(name, config, potential)) {
       throw new RangeError(`Invalid attribute: ${name}=${ratings[name]}`);
     }
   }
@@ -23,6 +23,7 @@ export function applyAttributes(base, attributes, config, { apex = false } = {})
   return {
     ...stats,
     attributes: ratings,
+    potential,
     maxHealth: rounded(base.maxHealth * multiplier('health')),
     maxStamina: rounded(base.maxStamina * multiplier('stamina')),
     stamina: { ...base.stamina, regenPerSecond: rounded(base.stamina.regenPerSecond * multiplier('stamina')) },

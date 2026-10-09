@@ -43,7 +43,7 @@ it('applies the rating table at every level and changes only the relevant attrib
   const normal = applyAttributes(original, defaults, attributesConfig);
   for (let rating = 1; rating <= 9; rating++) {
     const multiplier = attributesConfig.multipliers[rating];
-    const rated = applyAttributes(original, { ...defaults, health: rating, stamina: rating, blade: rating, defense: rating, agility: rating, flow: rating }, attributesConfig);
+    const rated = applyAttributes(original, { ...defaults, health: rating, stamina: rating, blade: rating, defense: rating, agility: rating, flow: rating }, attributesConfig, { potential: rating > attributesConfig.ratingLimits.flow ? 1 : 0 });
     assert.ok(Math.abs(rated.maxHealth - normal.maxHealth * multiplier) < 1e-8);
     assert.ok(Math.abs(rated.stamina.regenPerSecond - normal.stamina.regenPerSecond * multiplier) < 1e-8);
     assert.ok(Math.abs(rated.attacks.heavy.damage - normal.attacks.heavy.damage * multiplier) < 1e-8);

@@ -248,3 +248,15 @@ it('uses an injected name prompt, keeps ready names and removes the prompt on st
   game.step(Action.BACK);
   assert.equal(removed, 2);
 });
+
+describe('story secrets', () => {
+  it('fights the foretold at the boss difficulty and frees the elder only on the Aurora path', () => {
+    const atForetold = { ...createStoryRun(PROFILE, 'easy', storyConfig), encounter: 'foretold' };
+    assert.equal(getStoryStage(atForetold, storyConfig, ORDER).difficulty, 'boss');
+    const dark = resolveStoryResult(atForetold, result(0), storyConfig, powersConfig.loadouts);
+    assert.equal(dark.ending, 'secret');
+    assert.ok(!dark.unlocks.includes('elder'));
+    const light = resolveStoryResult({ ...atForetold, protagonist: { ...atForetold.protagonist, alignment: 'light' } }, result(0), storyConfig, powersConfig.loadouts);
+    assert.deepEqual(light.unlocks, ['foretold', 'elder']);
+  });
+});

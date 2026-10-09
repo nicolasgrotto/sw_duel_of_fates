@@ -106,7 +106,7 @@ describe('IntroState', () => {
     for (const letter of 'EQUILIBRIO') {
       game.type(`Key${letter}`);
     }
-    assert.deepEqual(game.settings.unlockedCharacters, ['sovereign', 'foretold']);
+    assert.deepEqual(game.settings.unlockedCharacters, ['elder', 'sovereign', 'foretold']);
     assert.equal(game.saved, 1);
     assert.ok(game.states.current.messageTime > 0);
     assert.deepEqual(game.stateNames(), ['IntroState']);
@@ -118,7 +118,7 @@ describe('IntroState', () => {
     for (let index = 0; index < 7; index += 1) {
       game.tap(640, layout.intro.titleY);
     }
-    assert.deepEqual(game.settings.unlockedCharacters, ['sovereign', 'foretold']);
+    assert.deepEqual(game.settings.unlockedCharacters, ['elder', 'sovereign', 'foretold']);
     game.tap(640, 650);
     assert.deepEqual(game.stateNames(), ['MenuState']);
     assert.ok(introConfig.prompt.start > 0);
@@ -126,13 +126,34 @@ describe('IntroState', () => {
 });
 
 describe('secret fighters', () => {
-  it('are strong, hidden from the roster and only the foretold reaches flow 10', () => {
-    assert.equal(characters.sovereign.selectable, false);
-    assert.equal(characters.foretold.selectable, false);
-    assert.equal(createFighter('sovereign', { x: 0, y: 0, facing: 1 }).powerLevel, 9);
-    assert.equal(createFighter('foretold', { x: 0, y: 0, facing: 1 }).powerLevel, 10);
-    const ordinary = { ...characters.guardian, attributes: { ...characters.guardian.attributes, flow: 10 } };
+  it('have elevated potential (+1, +2, +3) while ordinary fighters keep flow at 8 or less', () => {
+    for (const [id, potential] of [['elder', 1], ['sovereign', 2], ['foretold', 3]]) {
+      assert.equal(characters[id].selectable, false);
+      const fighter = createFighter(id, { x: 0, y: 0, facing: 1 });
+      assert.equal(fighter.stats.potential, potential);
+      assert.ok(Object.values(fighter.stats.attributes).every((value) => value <= 9 + potential));
+    }
+    assert.equal(createFighter('foretold', { x: 0, y: 0, facing: 1 }).powerLevel, 12);
+    for (const character of Object.values(characters).filter((entry) => !entry.secret)) {
+      assert.ok(character.attributes.flow <= 8, character.id);
+    }
+    const ordinary = { ...characters.guardian, attributes: { ...characters.guardian.attributes, flow: 9 } };
     assert.throws(() => createFighterFromCharacter(ordinary, { x: 0, y: 0, facing: 1 }), RangeError);
+  });
+
+  it('unlocks every skin with the wardrobe phrase without touching blade colors', () => {
+    const game = createFakeGame();
+    game.changeState(StateId.INTRO);
+    for (const letter of 'GUARDAROUPA') {
+      game.type(`Key${letter}`);
+    }
+    for (const character of Object.values(characters)) {
+      for (const skin of (character.skins ?? []).filter((entry) => entry.unlock)) {
+        assert.ok(game.settings.unlocks[character.id].includes(skin.id), `${character.id} ${skin.id}`);
+      }
+      assert.ok(!(game.settings.unlocks[character.id] ?? []).includes('arcade'));
+    }
+    assert.equal(game.saved, 1);
   });
 
   it('appear in the selection only after being unlocked and stay out of the arcade ladder', () => {

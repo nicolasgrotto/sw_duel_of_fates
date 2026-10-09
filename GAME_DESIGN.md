@@ -567,7 +567,7 @@ O Fluxo é a energia dos poderes. Nomes de tela em `uiConfig`; no código, `powe
 
 **Nível e medidor.**
 
-- **Nível do Fluxo** (1–9; 10 reservado ao Predestinado) vem do atributo Fluxo. Ele define a potência, o ganho do medidor, a resistência e a cor da energia.
+- **Nível do Fluxo** (1–8 no elenco comum; até 12 nos secretos, pelo potencial) vem do atributo Fluxo. Ele define a potência, o ganho do medidor, a resistência e a cor da energia.
 - **Medidor** (0–100): começa cada round com 20, enche devagar com o tempo e mais rápido ao acertar, ao ser atingido, ao bloquear e ao aparar. É separado da stamina.
 - Depois de qualquer poder há uma recarga curta, igual para todos os poderes do lutador.
 
@@ -622,14 +622,18 @@ O total máximo impede um protagonista com tudo no teto: ele termina forte, mas 
 
 | Personagem | Base | Notas | Alinhamento | Ideia |
 | --- | --- | --- | --- | --- |
-| Soberano | Haste (alcance) | Vida 6, Stamina 6, Lâmina 5, Defesa 5, Agilidade 3, Fluxo 9 | Eclipse | Vence de longe com Raio e Puxão; colado, é lento |
-| Predestinado | Eco (fintas) | Vida 7, Stamina 6, Lâmina 8, Defesa 6, Agilidade 7, Fluxo 10 | Aurora | Único com Fluxo 10: resiste a quase tudo e quase nada o resiste |
+| Ancião | Garça (acrobacia) | potencial +1 (até 10): Vida 7, Stamina 8, Lâmina 9, Defesa 10, Agilidade 9, Fluxo 10 | Aurora | Mestre da Aurora: defesa e técnica acima de todos |
+| Soberano | Haste (alcance) | potencial +2 (até 11): Vida 9, Stamina 8, Lâmina 8, Defesa 8, Agilidade 5, Fluxo 11 | Eclipse | Vence de longe com Raio e Puxão; colado, é lento |
+| Predestinado | Eco (fintas) | potencial +3 (até 12): Vida 10, Stamina 10, Lâmina 12, Defesa 9, Agilidade 11, Fluxo 12 | Aurora | O ápice: único no tier vermelho do Fluxo |
+
+**Escala (provisória, ver a próxima etapa em `versions/v2.md`).** O elenco comum vai até 9 nos atributos e até 8 no Fluxo (`attributesConfig.ratingLimits`). Secretos têm `potential` (+1, +2, +3): o teto de todos os atributos sobe nesse valor, e a tela de seleção mostra os segmentos extras em dourado (`attributePotential`).
 
 - Não aparecem na seleção até serem liberados. Liberação salva no navegador (`settings.unlockedCharacters`).
-- **Pela História**: vencer o Soberano libera o Soberano; vencer o Predestinado (final secreto) libera o Predestinado.
-- **Pelo segredo da intro**: uma sequência digitada no teclado, feita no direcional/stick ou tocando o título várias vezes libera os dois de uma vez, com som e frase próprios. As sequências ficam em `src/config/secretsConfig.js`; a tela não dá pista.
-- **Final secreto**: na História, vencer o Soberano com mais de 75% de vida leva ao duelo contra o Predestinado em vez do final normal.
-- Equilíbrio medido com poderes ligados: cada um vence cerca de 60% contra o elenco no Normal e no Difícil (fortes, mas vencíveis). Ver a ARCHITECTURE → Balanceamento.
+- **Pela História**: vencer o Soberano libera o Soberano; vencer o Predestinado (final secreto) libera o Predestinado; terminar a campanha pelo Caminho da Aurora (qualquer final) libera o Ancião.
+- **Pelo segredo da intro**: uma sequência digitada no teclado, feita no direcional/stick ou tocando o título várias vezes libera os três de uma vez, com som e frase próprios. As sequências ficam em `src/config/secretsConfig.js`; a tela não dá pista.
+- **Final secreto**: na História, vencer o Soberano com mais de 75% de vida leva ao duelo contra o Predestinado em vez do final normal. Esse duelo usa sempre a IA de chefe, em qualquer dificuldade.
+- **Trajes**: outra sequência da intro (teclado, direcional ou toques na frase de apoio) libera todas as skins de todos os personagens, sem mexer nas cores de lâmina.
+- Equilíbrio medido com poderes ligados (40 duelos por par): Ancião 74% (Normal) e 84% (Difícil); Soberano 83% e 75%; Predestinado 84% e 83%. São propositalmente superiores ao elenco.
 
 ## 25. Skins e personalização
 

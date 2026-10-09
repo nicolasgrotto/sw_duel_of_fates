@@ -5,5 +5,8 @@ export const introConfig = {
   prompt: { start: 2.6, blinkPeriod: 1.2 },
   blade: { halfLength: 300, glowWidth: 18, glowAlpha: 0.35, coreWidth: 3, centerGlowRadius: 90, centerGlowAlpha: 0.35 },
   secret: { messageDuration: 3.2, glowRadius: 260, glowAlpha: 0.5 },
-  titleArea: { width: 900, height: 140 },
+  tapAreas: {
+    title: { width: 900, height: 140 },
+    tagline: { width: 760, height: 50 },
+  },
 };

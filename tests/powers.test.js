@@ -26,7 +26,7 @@ describe('power resistance', () => {
 
   it('maps levels to the four visual tiers', () => {
     const { tiers } = powersConfig;
-    assert.deepEqual([1, 3, 4, 7, 8, 9, 10].map((level) => getPowerTier(level, tiers).id), ['faint', 'faint', 'steady', 'steady', 'deep', 'deep', 'apex']);
+    assert.deepEqual([1, 3, 4, 7, 8, 11, 12].map((level) => getPowerTier(level, tiers).id), ['faint', 'faint', 'steady', 'steady', 'deep', 'deep', 'apex']);
   });
 
   it('scales meter gain and potency around the base level', () => {

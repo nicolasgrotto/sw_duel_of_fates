@@ -237,8 +237,10 @@ export const texts = {
   intro: {
     prompt: 'Pressione Enter',
     touchPrompt: 'Toque para começar',
-    secretUnlocked: 'O EQUILÍBRIO DESPERTA',
-    secretKnown: 'O EQUILÍBRIO JÁ DESPERTOU',
+    secrets: {
+      balance: { unlocked: 'O EQUILÍBRIO DESPERTA', known: 'O EQUILÍBRIO JÁ DESPERTOU' },
+      wardrobe: { unlocked: 'TODOS OS TRAJES REVELADOS', known: 'OS TRAJES JÁ ESTÃO À MOSTRA' },
+    },
   },
   dialogue: {
     hint: '{confirm}  continuar  ·  {back}  pular',

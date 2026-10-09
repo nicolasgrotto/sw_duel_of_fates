@@ -1,8 +1,9 @@
 export const attributesConfig = {
   "minRating": 1,
   "maxRating": 9,
-  "apexRating": 10,
-  "apexAttribute": "flow",
+  "ratingLimits": {
+    "flow": 8
+  },
   "baseRating": 5,
   "multipliers": {
     "1": 0.76,
@@ -14,7 +15,9 @@ export const attributesConfig = {
     "7": 1.12,
     "8": 1.18,
     "9": 1.24,
-    "10": 1.3
+    "10": 1.3,
+    "11": 1.36,
+    "12": 1.42
   },
   "perfectParryBonus": 0.002,
   "guardBreakStep": 1,

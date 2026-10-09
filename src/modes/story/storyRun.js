@@ -23,6 +23,9 @@ export function isStoryFinished(run) {
 }
 
 export function getEncounterDifficulty(run, encounter, difficultyOrder) {
+  if (encounter.difficulty) {
+    return encounter.difficulty;
+  }
   const index = difficultyOrder.indexOf(run.difficulty) + (encounter.aiOffset ?? 0);
   return difficultyOrder[Math.max(0, Math.min(difficultyOrder.length - 1, index))];
 }
@@ -81,7 +84,12 @@ export function resolveStoryResult(run, result, config, loadouts) {
     return { run, won: false, ending: null, unlocks: [], encounter };
   }
   const { next, ending } = resolveRoute(encounter, { result, run });
-  const unlocks = [...(encounter.unlocks ?? []), ...(ending ? config.endings[ending].unlocks : [])];
+  const context = { result, run };
+  const endingUnlocks = ending ? [
+    ...config.endings[ending].unlocks,
+    ...(config.endings[ending].conditionalUnlocks ?? []).filter((entry) => evaluateCondition(entry.condition, context)).flatMap((entry) => entry.ids),
+  ] : [];
+  const unlocks = [...(encounter.unlocks ?? []), ...endingUnlocks];
   return {
     won: true,
     encounter,

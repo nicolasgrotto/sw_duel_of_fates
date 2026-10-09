@@ -34,7 +34,7 @@ export class CharacterSelectState extends GameState {
   enter() {
     this.rosterIds = Object.keys(characters).filter((id) => characters[id].selectable);
     const unlocked = this.game.settings.unlockedCharacters ?? [];
-    this.characterIds = [...this.rosterIds, ...Object.keys(characters).filter((id) => characters[id].secret && unlocked.includes(id))];
+    this.characterIds = [...this.rosterIds, ...Object.keys(characters).filter((id) => characters[id].secret && unlocked.includes(id)).sort((a, b) => characters[a].potential - characters[b].potential)];
     const listLayout = this.characterIds.length > this.rosterIds.length ? { ...layout.characterSelect, itemSpacing: layout.characterSelect.compactItemSpacing } : layout.characterSelect;
     this.step = SelectStep.PLAYER;
     this.playerChoice = null;
@@ -282,7 +282,7 @@ export class CharacterSelectState extends GameState {
     const fighter = this.previews.get(character.id);
     computePose(fighter, this.pose);
     renderer.save();
-    drawAttributeBars(renderer, fighter.stats.attributes);
+    drawAttributeBars(renderer, fighter.stats.attributes, layout.attributes, fighter.stats.potential ?? 0);
     renderer.translate(layout.attributes.previewX, previewY);
     renderer.scale(layout.attributes.previewScale, layout.attributes.previewScale);
     drawFighterBody(renderer, fighter, this.pose, 0);
