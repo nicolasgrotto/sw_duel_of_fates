@@ -5,6 +5,7 @@ export const PROTAGONIST_ID = 'protagonist';
 
 export function createProtagonistCharacter(profile, { protagonist }, slots = null) {
   const template = characters[protagonist.styles[profile.style].base];
+  const loadout = { powers: protagonist.loadouts[profile.alignment], techniques: template.loadout?.techniques ?? {} };
   return {
     id: PROTAGONIST_ID,
     name: profile.name,
@@ -18,6 +19,7 @@ export function createProtagonistCharacter(profile, { protagonist }, slots = nul
     altSaberColors: [],
     skins: protagonist.skins,
     sound: template.sound,
+    loadout,
     powerSlots: slots,
     appearance: resolveAppearance({ appearance: { ...template.appearance, ...protagonist.appearance, saberColor: profile.saberColor }, skins: protagonist.skins }, profile.skin),
   };

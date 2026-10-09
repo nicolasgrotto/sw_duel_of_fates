@@ -20,14 +20,23 @@ function keys(bindings, ...actions) {
 
 const SLOT_DIRECTIONS = { neutral: null, forward: Action.MOVE_RIGHT, back: Action.MOVE_LEFT };
 
+function slotKeys(bindings, slot, action) {
+  const direction = SLOT_DIRECTIONS[slot];
+  return direction ? keys(bindings, direction, action) : keys(bindings, action);
+}
+
 function buildPowerRows(character, bindings) {
-  const slots = powersConfig.loadouts[character.alignment] ?? {};
-  return Object.entries(slots).map(([slot, id]) => {
+  const slots = Object.entries(character.loadout?.powers ?? {}).filter(([slot]) => !character.powerSlots || character.powerSlots.includes(slot));
+  const powerRows = slots.map(([slot, id]) => {
     const power = powersConfig.powers[id];
     const label = formatText(power.channel ? texts.moveList.powerHeld : texts.moveList.power, { name: texts.powers[id] });
-    const direction = SLOT_DIRECTIONS[slot];
-    return { label, keys: direction ? keys(bindings, direction, Action.POWER) : keys(bindings, Action.POWER) };
+    return { label, keys: slotKeys(bindings, slot, Action.POWER) };
   });
+  const techniqueRows = Object.entries(character.loadout?.techniques ?? {}).map(([slot, id]) => ({
+    label: formatText(texts.moveList.technique, { name: texts.powers[id] }),
+    keys: slotKeys(bindings, slot, Action.SPECIAL),
+  }));
+  return [...powerRows, ...techniqueRows];
 }
 
 export function buildMoveList(character, bindings, powers = false) {

@@ -107,7 +107,7 @@ O preset alternativo, selecionável em Opções, usa setas para mover/pular e Z/
 
 Habilidade do personagem: `I`. Gamepad: ataques nos botões frontais (X rápido, Y forte), guarda em LB/LT, habilidade em RB, poder em RT, esquiva em B, pulo em A.
 
-**Poderes do Fluxo** (opção **Poderes**, ligada por padrão em Duelar, 2 Jogadores e Treino): `U` usa o poder principal do alinhamento (Aurora: Repulsão; Eclipse: Raio, segurando); com direção usa o segundo (trás + `U`: Barreira, segurando; frente + `U`: Puxão). O medidor fica abaixo da stamina. No celular há um botão **Poder**.
+**Poderes do Fluxo** (opção **Poderes**, ligada por padrão em Duelar, 2 Jogadores e Treino): `U` usa o poder principal do alinhamento (Aurora: Repulsão; Eclipse: Raio, segurando); com direção usa o segundo (trás + `U`: Barreira, segurando; frente + `U`: Puxão). Habilidade (`I`) com direção usa as técnicas de lâmina do personagem (por exemplo, frente + `I`: Avanço com corte; trás + `I`: Giro), também só com Poderes ligados. A lista de golpes (pausa) mostra o loadout de cada um. O medidor fica abaixo da stamina. No celular há um botão **Poder**; o joystick escolhe a direção.
 
 **Dois jogadores no mesmo teclado:** J1 usa `W A S D`, `F G H` (rápido, forte, guarda), `T` (habilidade), `R` (poder) e `Shift` esquerdo; J2 usa as setas, `J K L`, `I`, `O` (poder) e `Shift` direito (ou o teclado numérico). Cada jogador também pode usar um controle.
 

@@ -17,6 +17,10 @@ export const storyConfig = {
       { id: 'pilgrim', name: 'Peregrino', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', longCape: true, hoodUp: false, masked: false, pauldrons: true, scarf: false }, unlock: null },
     ],
     alignments: ['light', 'dark'],
+    loadouts: {
+      light: { neutral: 'push', back: 'barrier' },
+      dark: { neutral: 'lightning', forward: 'pull' },
+    },
     styles: {
       technique: { base: 'guardian' },
       fury: { base: 'shadow' },

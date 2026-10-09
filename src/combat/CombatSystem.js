@@ -8,7 +8,7 @@ import { clamp } from '../utils/math.js';
 import { ATTACK_STATES, AttackPhase, AttackType, getAttackDuration, getAttackPhase, getChargeLevel, isSaberAttack } from './attackPhases.js';
 import { CombatEvent, createCombatEvent } from './combatEvents.js';
 import { boxesOverlap, comesFromFront, createBox, getAttackHitbox, getHurtbox, hasActiveHitbox, hasHurtbox, isGuardingAgainst, isInvulnerable } from './hitboxes.js';
-import { PowerSystem, isBarrierUp } from './PowerSystem.js';
+import { PowerSystem, isBarrierUp, selectTechnique } from './PowerSystem.js';
 
 const PUNISHED_STATES = new Set([FighterState.STAGGERED, FighterState.STUNNED]);
 
@@ -291,6 +291,10 @@ export class CombatSystem {
   }
 
   trySpecial(fighter) {
+    const technique = this.powers.enabled ? selectTechnique(fighter) : null;
+    if (technique) {
+      return this.tryAttack(fighter, technique);
+    }
     const move = fighter.moves[AttackType.SPECIAL];
     if (!move) {
       return false;

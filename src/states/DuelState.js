@@ -608,7 +608,7 @@ export class DuelState extends GameState {
     const outcome = resolveDuelOutcome(result, {
       params: this.params, settings: this.game.settings,
       character: this.playerCharacterData ?? characters[this.playerCharacter], survivalConfig: gameConfig.survival,
-      story: this.storyStage ? { config: storyConfig, texts: storyTexts, loadouts: powersConfig.loadouts, names: getCharacterNames() } : null,
+      story: this.storyStage ? { config: storyConfig, texts: storyTexts, loadouts: storyConfig.protagonist.loadouts, names: getCharacterNames() } : null,
     });
     if (outcome.story) {
       this.game.story = outcome.story;

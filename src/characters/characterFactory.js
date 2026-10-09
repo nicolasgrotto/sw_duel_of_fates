@@ -5,6 +5,7 @@ import { powersConfig } from '../config/powersConfig.js';
 import { applyAttributes } from './attributes.js';
 import { resolvePowerStats } from './powers.js';
 import { fighterArchetypes } from '../config/fightersConfig.js';
+import { bladeTechniques } from '../config/movesConfig.js';
 import { Fighter } from '../entities/Fighter.js';
 import { resolveAppearance } from './skins.js';
 import { characters } from './characterData.js';
@@ -27,6 +28,10 @@ export function createFighterFromCharacter(character, { x, y, facing }, { saberC
   for (const [id, definition] of Object.entries(character.moves)) {
     moves[id] = { ...stats.attacks[definition.attack], ...definition };
   }
+  const techniques = character.loadout?.techniques ?? {};
+  for (const id of Object.values(techniques)) {
+    moves[id] = { ...stats.attacks[bladeTechniques[id].attack], ...bladeTechniques[id] };
+  }
 
   const scalars = attributesConfig.bases[character.archetype];
   const derived = applyAttributes({
@@ -47,7 +52,7 @@ export function createFighterFromCharacter(character, { x, y, facing }, { saberC
   return new Fighter({
     id: character.id,
     name: character.name,
-    stats: { ...derived, alignment: character.alignment, power: resolvePowerStats(derived.flowLevel, powersConfig, character.alignment, character.powerSlots ?? null) },
+    stats: { ...derived, alignment: character.alignment, techniques, power: resolvePowerStats(derived.flowLevel, powersConfig, character.loadout?.powers ?? null, character.powerSlots ?? null) },
     appearance,
     sound: character.sound,
     x,

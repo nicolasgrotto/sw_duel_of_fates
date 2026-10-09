@@ -397,6 +397,7 @@ export const aiConfig = {
     reactionJitter: 0.4,
     evadeWeight: 1,
     airJumpFallSpeed: 0,
+    techniqueChance: 0.2,
     airDashCrossGap: 70,
     airDashClearance: 0.7,
     cornerMargin: 110,

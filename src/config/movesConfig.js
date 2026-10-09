@@ -226,3 +226,15 @@ export const movesByCharacter = {
     },
   },
 };
+
+export const bladeTechniques = {
+  spin: {
+    attack: 'heavy', type: 'heavy', pose: 'spin', cancelsInto: [], damage: 18,
+    staminaCost: 24, startup: 0.26, active: 0.16, recovery: 0.42, lunge: 0, knockback: 260,
+    hitbox: { reach: 62, top: 0.85, bottom: 0.3, around: true },
+  },
+  dashSlash: {
+    attack: 'heavy', type: 'heavy', pose: 'dashSlash', cancelsInto: [], damage: 13,
+    staminaCost: 34, startup: 0.3, active: 0.14, recovery: 0.62, lunge: 900,
+  },
+};

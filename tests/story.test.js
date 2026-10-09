@@ -4,7 +4,6 @@ import { createFighterFromCharacter } from '../src/characters/characterFactory.j
 import { createProtagonistCharacter } from '../src/characters/protagonist.js';
 import { Action } from '../src/config/controlsConfig.js';
 import { audioConfig } from '../src/config/audioConfig.js';
-import { powersConfig } from '../src/config/powersConfig.js';
 import { storyConfig } from '../src/config/storyConfig.js';
 import { storyTexts } from '../src/config/storyTexts.js';
 import { layout } from '../src/config/uiConfig.js';
@@ -73,8 +72,8 @@ describe('story run', () => {
   it('keeps the encounter on a defeat and advances with points and rewards on a victory', () => {
     const config = testConfig();
     const run = createStoryRun(PROFILE, 'normal', config);
-    assert.equal(resolveStoryResult(run, result(1), config, powersConfig.loadouts).run, run);
-    const won = resolveStoryResult(run, result(0), config, powersConfig.loadouts);
+    assert.equal(resolveStoryResult(run, result(1), config, storyConfig.protagonist.loadouts).run, run);
+    const won = resolveStoryResult(run, result(0), config, storyConfig.protagonist.loadouts);
     assert.equal(won.run.encounter, 'b');
     assert.equal(won.run.points, run.points + config.pointsPerVictory);
     assert.deepEqual(won.run.slots, ['neutral', 'forward']);
@@ -84,13 +83,13 @@ describe('story run', () => {
   it('routes the final duel by the remaining health and unlocks by ending', () => {
     const config = testConfig();
     const atB = { ...createStoryRun(PROFILE, 'normal', config), encounter: 'b' };
-    const normal = resolveStoryResult(atB, result(0, 0.6), config, powersConfig.loadouts);
+    const normal = resolveStoryResult(atB, result(0, 0.6), config, storyConfig.protagonist.loadouts);
     assert.equal(normal.ending, 'normal');
     assert.equal(normal.run.encounter, null);
     assert.deepEqual(normal.unlocks, ['shadow']);
-    const secret = resolveStoryResult(atB, result(0, 0.8), config, powersConfig.loadouts);
+    const secret = resolveStoryResult(atB, result(0, 0.8), config, storyConfig.protagonist.loadouts);
     assert.equal(secret.run.encounter, 'c');
-    const final = resolveStoryResult(secret.run, result(0), config, powersConfig.loadouts);
+    const final = resolveStoryResult(secret.run, result(0), config, storyConfig.protagonist.loadouts);
     assert.equal(final.ending, 'secret');
     assert.deepEqual(final.unlocks, ['echo', 'guardian']);
   });
@@ -257,10 +256,10 @@ describe('story secrets', () => {
   it('fights the foretold at the boss difficulty and frees the elder only on the Aurora path', () => {
     const atForetold = { ...createStoryRun(PROFILE, 'easy', storyConfig), encounter: 'foretold' };
     assert.equal(getStoryStage(atForetold, storyConfig, ORDER).difficulty, 'boss');
-    const dark = resolveStoryResult(atForetold, result(0), storyConfig, powersConfig.loadouts);
+    const dark = resolveStoryResult(atForetold, result(0), storyConfig, storyConfig.protagonist.loadouts);
     assert.equal(dark.ending, 'secret');
     assert.ok(!dark.unlocks.includes('elder'));
-    const light = resolveStoryResult({ ...atForetold, protagonist: { ...atForetold.protagonist, alignment: 'light' } }, result(0), storyConfig, powersConfig.loadouts);
+    const light = resolveStoryResult({ ...atForetold, protagonist: { ...atForetold.protagonist, alignment: 'light' } }, result(0), storyConfig, storyConfig.protagonist.loadouts);
     assert.deepEqual(light.unlocks, ['foretold', 'elder']);
   });
 });

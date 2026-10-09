@@ -6,11 +6,12 @@ export function createBox() {
 }
 
 export function getAttackHitbox(fighter, attack, box) {
-  const { reach, top, bottom } = attack.hitbox;
+  const { reach, top, bottom, around } = attack.hitbox;
   const farX = fighter.x + fighter.facing * (fighter.width / 2 + reach);
+  const nearX = around ? fighter.x - fighter.facing * (fighter.width / 2 + reach) : fighter.x;
 
-  box.left = Math.min(fighter.x, farX);
-  box.right = Math.max(fighter.x, farX);
+  box.left = Math.min(nearX, farX);
+  box.right = Math.max(nearX, farX);
   box.top = fighter.y - fighter.height * top;
   box.bottom = fighter.y - fighter.height * bottom;
   return box;

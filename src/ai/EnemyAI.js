@@ -17,6 +17,7 @@ export const AiDecision = Object.freeze({
   EVADE: 'evade',
   JUMP: 'jump',
   AIR_DASH: 'airDash',
+  TECHNIQUE: 'technique',
   COUNTER: 'counter',
   SHOVE: 'shove',
   SPECIAL: 'special',
@@ -277,7 +278,35 @@ export class EnemyAI {
     }
   }
 
+  tryTechnique() {
+    const { self, opponent } = this;
+    if (!this.powersEnabled || this.attackCooldown > 0 || self.combat.attack) {
+      return null;
+    }
+    for (const [slot, id] of Object.entries(self.stats.techniques ?? {})) {
+      const move = self.moves[id];
+      const reach = move.hitbox.reach + (move.lunge ?? 0) * move.active;
+      if (!canAfford(self, move.staminaCost) || getGap(self, opponent) >= reach - this.perception.reachMargin) {
+        continue;
+      }
+      if (this.random() >= (this.profile.techniqueChance ?? this.perception.techniqueChance) * this.difficulty.specialMultiplier) {
+        return null;
+      }
+      const direction = getDirectionTo(self, opponent);
+      this.plan.moveX = slot === 'forward' ? direction : -direction;
+      this.plan.blockTime = 0;
+      this.plan.pendingAction = PendingAction.SPECIAL;
+      this.attackCooldown = this.difficulty.attackCooldown;
+      return AiDecision.TECHNIQUE;
+    }
+    return null;
+  }
+
   trySpecialAttack() {
+    const technique = this.tryTechnique();
+    if (technique) {
+      return technique;
+    }
     const special = this.self.moves.special;
     if (!special || this.attackCooldown > 0 || this.self.combat.attack || !canAfford(this.self, special.staminaCost)) {
       return null;

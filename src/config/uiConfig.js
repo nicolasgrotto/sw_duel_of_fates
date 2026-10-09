@@ -201,6 +201,7 @@ export const texts = {
     },
     power: 'Poder: {name}',
     powerHeld: 'Poder: {name} (segurar)',
+    technique: 'Técnica: {name}',
   },
   story: {
     title: 'HISTÓRIA',
@@ -251,6 +252,8 @@ export const texts = {
     pull: 'Puxão',
     lightning: 'Raio',
     barrier: 'Barreira',
+    spin: 'Giro',
+    dashSlash: 'Avanço com corte',
     alignments: { light: 'Aurora', dark: 'Eclipse' },
   },
   pause: {
@@ -421,6 +424,7 @@ export const layout = {
   moveList: {
     titleY: 100,
     firstRowY: 165,
+    lastRowY: 615,
     rowSpacing: 36,
     keysX: 330,
     labelX: 370,

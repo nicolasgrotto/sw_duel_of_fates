@@ -24,14 +24,15 @@ export class MoveListState extends GameState {
   }
 
   render(renderer) {
-    const { titleY, firstRowY, rowSpacing, keysX, labelX, footerY } = layout.moveList;
+    const { titleY, firstRowY, lastRowY, rowSpacing, keysX, labelX, footerY } = layout.moveList;
     const centerX = renderer.width / 2;
+    const spacing = Math.min(rowSpacing, (lastRowY - firstRowY) / Math.max(1, this.rows.length - 1));
 
     renderer.clear(colors.background);
     renderer.text(this.title, centerX, titleY, textStyles.heading);
     for (let index = 0; index < this.rows.length; index += 1) {
       const row = this.rows[index];
-      const y = firstRowY + index * rowSpacing;
+      const y = firstRowY + index * spacing;
       renderer.text(row.keys, keysX, y, textStyles.tableKey);
       renderer.text(row.label, labelX, y, textStyles.tableDescription);
     }

@@ -595,7 +595,21 @@ Na guarda, o Puxão não causa dano e puxa pela metade; o Raio causa um quarto d
 | −2 | metade do dano e do desequilíbrio, **não empurra** o mais forte | não desliza e gasta metade da stamina |
 | −3 ou menos | resistida | resistida |
 
-**Alinhamentos e poderes.** Cada personagem tem um alinhamento e dois poderes. Comando: `Poder` parado (ou com o direcional que não pede outro poder) usa o principal; com direção usa o secundário.
+**Catálogo, categorias e loadout (v1.15).** As habilidades ficam num catálogo por categoria (`powersConfig.categories`); o alinhamento só libera categorias, e cada personagem tem um loadout em dados (`characterData.loadout`):
+
+| Categoria | Alinhamento | Habilidades |
+| --- | --- | --- |
+| Fluxo comum | os dois | Repulsão, Puxão (Arremesso e Redirecionamento entram nas próximas etapas) |
+| Aurora | Aurora | Barreira (Cura e Foco nas próximas etapas) |
+| Eclipse | Eclipse | Raio (Estrangular, Tempestade e Congelar nas próximas etapas) |
+| Técnicas de lâmina | os dois | Giro, Avanço com corte (Arremesso da lâmina na próxima etapa); custam stamina e escalam com a Lâmina |
+
+**Comandos.** Nenhum botão novo. `Poder` + direção (neutro, frente, trás) escolhe entre até três habilidades do Fluxo; `Habilidade` + direção escolhe entre a habilidade própria (neutro) e até duas técnicas de lâmina (frente, trás). Espaço vazio cai no neutro. Técnicas só valem com a opção Poderes (os modos clássicos não mudam). O Eco e o Predestinado não têm técnicas: o avanço deles já segue a direção.
+
+- **Giro** (técnica): a lâmina dá a volta no corpo e acerta dos dois lados; quem estava atrás não consegue bloquear (a guarda só vale de frente).
+- **Avanço com corte** (técnica): avanço longo que termina num corte; recuperação longa se errar.
+
+**Loadouts atuais.** Aurora (Guardião, Bastião, Vespa, Espelho, Garça, Ancião, Predestinado): Repulsão (neutro) e Barreira (trás). Eclipse (Sombra, Haste, Brasa, Forja, Eco, chefe do Arcade, Soberano): Raio (neutro) e Puxão (frente). Técnicas: Avanço com corte para Guardião, Vespa e Brasa; Giro para Bastião, Espelho, Haste, Forja, Garça, Ancião e Soberano; os dois para a Sombra e o chefe do Arcade. O protagonista recebe os poderes do caminho (`storyConfig.protagonist.loadouts`) e as técnicas do personagem-base do estilo.
 
 | Poder | Alinhamento | Comando | Efeito |
 | --- | --- | --- | --- |

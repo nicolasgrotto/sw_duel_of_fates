@@ -6,7 +6,6 @@ import { storyConfig } from '../config/storyConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
 import { difficultyNames, layout, texts } from '../config/uiConfig.js';
 import { attributeOrder } from '../config/attributesConfig.js';
-import { powersConfig } from '../config/powersConfig.js';
 import { canRaiseAttribute, createStoryRun, getAttributeTotal, raiseAttribute } from '../modes/story/storyRun.js';
 import { createPose } from '../rendering/fighterPose.js';
 import { drawFighterPreview } from '../rendering/fighterPreview.js';
@@ -31,7 +30,7 @@ export const CreationStep = Object.freeze({
 });
 
 export function getPowerNames(alignment) {
-  return Object.values(powersConfig.loadouts[alignment]).map((id) => texts.powers[id]).join(' · ');
+  return Object.values(storyConfig.protagonist.loadouts[alignment]).map((id) => texts.powers[id]).join(' · ');
 }
 
 const STEPS = [CreationStep.NAME, CreationStep.ALIGNMENT, CreationStep.STYLE, CreationStep.SKIN, CreationStep.COLOR, CreationStep.DIFFICULTY];

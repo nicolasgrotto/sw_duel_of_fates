@@ -15,7 +15,7 @@ export function applyAttributes(base, attributes, config, { potential = 0 } = {}
   const mobility = agility * base.abilityMobilityScale;
   const attacks = {};
   for (const [id, move] of Object.entries(base.attacks)) {
-    attacks[id] = { ...move, damage: rounded(base.damage[id] * multiplier('blade')) };
+    attacks[id] = { ...move, damage: rounded((base.damage[id] ?? move.damage) * multiplier('blade')) };
     if (move.dash) attacks[id].dash = { ...move.dash, speed: rounded(move.dash.speed * mobility) };
     if (move.leap) attacks[id].leap = { ...move.leap, speedX: rounded(move.leap.speedX * mobility), speedY: rounded(move.leap.speedY * mobility) };
   }

@@ -1,7 +1,6 @@
 import { storyConfig } from '../src/config/storyConfig.js';
 import { storyTexts } from '../src/config/storyTexts.js';
 import { createStoryRun } from '../src/modes/story/storyRun.js';
-import { powersConfig } from '../src/config/powersConfig.js';
 import { it } from 'node:test';
 import assert from 'node:assert/strict';
 import { createDuelResult } from '../src/modes/DuelResult.js';
@@ -57,7 +56,7 @@ it('unlocks Arcade skins with challenge rewards and preserves ladder customizati
 
 it('unlocks roster skins at either story ending and secret skins only at the secret ending', () => {
   const profile = { name: 'Kael', alignment: 'light', style: 'technique', saberColor: storyConfig.protagonist.saberColors[0] };
-  const story = { config: storyConfig, texts: storyTexts, loadouts: powersConfig.loadouts, names: Object.fromEntries(Object.values(characters).map((character) => [character.id, character.name])) };
+  const story = { config: storyConfig, texts: storyTexts, loadouts: storyConfig.protagonist.loadouts, names: Object.fromEntries(Object.values(characters).map((character) => [character.id, character.name])) };
   for (const encounter of ['trial', 'sovereign', 'foretold']) {
     const run = { ...createStoryRun(profile, 'normal', storyConfig), encounter };
     const result = { mode: 'story', winnerSide: 0, fighters: [{ healthRatio: 0.5 }, {}], stats: [{}, {}] };

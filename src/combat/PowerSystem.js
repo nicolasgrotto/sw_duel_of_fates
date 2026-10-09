@@ -21,14 +21,21 @@ export function isBarrierUp(fighter) {
   return isChannelOpen(fighter) && fighter.combat.power.effect === 'barrier';
 }
 
+export function getIntentSlot(fighter) {
+  const direction = Math.sign(fighter.intent.moveX) * fighter.facing;
+  return direction > 0 ? 'forward' : direction < 0 ? 'back' : 'neutral';
+}
+
 export function selectPower(fighter) {
   const { loadout } = fighter.stats.power;
   if (!loadout) {
     return null;
   }
-  const direction = Math.sign(fighter.intent.moveX) * fighter.facing;
-  const slot = direction > 0 ? 'forward' : direction < 0 ? 'back' : 'neutral';
-  return loadout[slot] ?? loadout.neutral;
+  return loadout[getIntentSlot(fighter)] ?? loadout.neutral;
+}
+
+export function selectTechnique(fighter) {
+  return fighter.stats.techniques?.[getIntentSlot(fighter)] ?? null;
 }
 
 export function isInPowerRange(caster, target, power, airReach = powersConfig.airReach) {

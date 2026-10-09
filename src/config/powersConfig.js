@@ -18,9 +18,11 @@ export const powersConfig = {
   impactHeight: 0.55,
   castHeight: 0.6,
   airReach: 320,
-  loadouts: {
-    light: { neutral: 'push', back: 'barrier' },
-    dark: { neutral: 'lightning', forward: 'pull' },
+  categories: {
+    flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull'] },
+    aurora: { alignments: ['light'], abilities: ['barrier'] },
+    eclipse: { alignments: ['dark'], abilities: ['lightning'] },
+    blade: { alignments: ['light', 'dark'], abilities: ['spin', 'dashSlash'] },
   },
   powers: {
     push: {

@@ -35,6 +35,22 @@ export const animation = {
 
 export const combatPoses = {
   attacks: {
+    spin: {
+      windupDegrees: 150,
+      strikeDegrees: -200,
+      windupLean: 5,
+      strikeLean: -4,
+      windupLift: 0.06,
+      strikeReach: 0.04,
+    },
+    dashSlash: {
+      windupDegrees: 35,
+      strikeDegrees: -80,
+      windupLean: 14,
+      strikeLean: 20,
+      windupLift: 0.02,
+      strikeReach: 0.2,
+    },
     light: {
       windupDegrees: -115,
       strikeDegrees: 30,

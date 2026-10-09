@@ -140,11 +140,13 @@ describe('power effects and sounds', () => {
 });
 
 describe('move list powers', () => {
-  it('lists the alignment powers only when powers are on', () => {
+  it('lists the loadout powers and blade techniques only when powers are on', () => {
     const rows = buildMoveList(characters.guardian, keyBindings);
     const withPowers = buildMoveList(characters.guardian, keyBindings, true);
-    assert.equal(withPowers.length, rows.length + 2);
+    assert.equal(withPowers.length, rows.length + 3);
     assert.ok(withPowers.some((row) => row.label.includes(texts.powers.push)));
     assert.ok(withPowers.some((row) => row.label.includes(texts.powers.barrier) && row.keys.includes('U')));
+    assert.ok(withPowers.some((row) => row.label.includes(texts.powers.dashSlash) && row.keys.includes('I') && row.keys.includes('D')));
+    assert.equal(buildMoveList(characters.echo, keyBindings, true).length, rows.length + 2);
   });
 });
