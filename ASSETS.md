@@ -43,3 +43,5 @@ assets/
 | media/v1.4-attributes-desktop.png, media/v1.4-attributes-mobile.png | capturas de QA | próprio jogo, Chrome headless | MIT | Barras na seleção em 1280×720 e 844×390 |
 
 | media/v1.10-skins-desktop.png, media/v1.10-skins-mobile.png | capturas de QA | próprio jogo, Chrome headless | MIT | Skins na seleção em desktop e toque emulado |
+
+| media/v1.10-name-desktop.png, media/v1.10-name-mobile.png, media/v1.10-protagonist-desktop.png | capturas de QA | próprio jogo, Chrome headless | MIT | Campo temporário de nome e visual do protagonista, sem assets externos |

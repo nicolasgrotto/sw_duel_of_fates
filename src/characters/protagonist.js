@@ -1,3 +1,4 @@
+import { resolveAppearance } from './skins.js';
 import { characters } from './characterData.js';
 
 export const PROTAGONIST_ID = 'protagonist';
@@ -15,8 +16,9 @@ export function createProtagonistCharacter(profile, { protagonist }, slots = nul
     aiProfile: template.aiProfile,
     info: template.info,
     altSaberColors: [],
+    skins: protagonist.skins,
     sound: template.sound,
     powerSlots: slots,
-    appearance: { ...template.appearance, ...protagonist.appearance, saberColor: profile.saberColor },
+    appearance: resolveAppearance({ appearance: { ...template.appearance, ...protagonist.appearance, saberColor: profile.saberColor }, skins: protagonist.skins }, profile.skin),
   };
 }

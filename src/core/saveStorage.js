@@ -1,8 +1,9 @@
-export const SAVE_VERSION = 3;
+export const SAVE_VERSION = 4;
 
 export const saveMigrations = [
   { from: 1, to: 2, migrate: (settings) => ({ version: 2, settings }) },
   { from: 2, to: 3, migrate: (save) => ({ ...save, version: 3, story: null }) },
+  { from: 3, to: 4, migrate: (save) => ({ ...save, version: 4, story: save.story ? { ...save.story, protagonist: { ...save.story.protagonist, skin: save.story.protagonist?.skin ?? 'base' } } : null }) },
 ];
 
 export function loadSave(storage, key) {

@@ -1,0 +1,33 @@
+import { it } from 'node:test';
+import assert from 'node:assert/strict';
+import { createTextPrompt } from '../src/core/textPrompt.js';
+
+it('uses an injected DOM target, limits names, handles composition and cleans up every listener', () => {
+  const listeners = new Map();
+  let removed = false;
+  const input = { style: {}, setAttribute() {}, addEventListener: (id, listener) => listeners.set(id, listener), removeEventListener: (id) => listeners.delete(id), remove: () => { removed = true; }, blur: () => listeners.get('blur')() };
+  const target = { createElement: (tag) => { assert.equal(tag, 'input'); return input; } };
+  const host = { appendChild: (element) => assert.equal(element, input) };
+  const prompt = createTextPrompt({ target, host, getBounds: () => ({ left: 10, top: 20, width: 640 }), maxLength: 16, value: 'Kael', placeholder: 'Name' });
+  assert.equal(input.maxLength, 16);
+  assert.equal(input.style.transform, 'scale(0.5)');
+  input.value = '  a very long custom name  ';
+  assert.equal(prompt.value, 'a very long cust');
+  let stopped = 0;
+  let prevented = 0;
+  const event = { key: 'Enter', stopPropagation: () => { stopped += 1; }, preventDefault: () => { prevented += 1; } };
+  listeners.get('keydown')({ ...event, isComposing: true });
+  assert.equal(prompt.consumeSubmit(), false);
+  listeners.get('keydown')(event);
+  assert.equal(prompt.consumeSubmit(), true);
+  assert.equal(prompt.consumeSubmit(), false);
+  assert.equal(stopped, 2);
+  assert.equal(prevented, 1);
+  listeners.get('focus')();
+  assert.equal(prompt.focused, true);
+  listeners.get('keydown')({ ...event, key: 'Escape' });
+  assert.equal(prompt.focused, false);
+  prompt.destroy();
+  assert.equal(removed, true);
+  assert.equal(listeners.size, 0);
+});

@@ -1,3 +1,4 @@
+import { createTextPrompt } from './textPrompt.js';
 import { aiConfig } from '../config/aiConfig.js';
 import { audioConfig } from '../config/audioConfig.js';
 import { loadSettings, loadStory, saveSettings } from './settingsStorage.js';
@@ -52,6 +53,12 @@ export class Game {
       render: (alpha) => this.render(alpha),
     });
     this.resizeObserver = new ResizeObserver(() => this.handleResize());
+  }
+
+  createTextPrompt(options) {
+    this.input.handleBlur();
+    this.input.handleFocus();
+    return createTextPrompt({ target: document, host: this.renderer.canvas.parentElement, getBounds: () => this.renderer.canvas.getBoundingClientRect(), ...options });
   }
 
   start() {
@@ -112,6 +119,7 @@ export class Game {
       this.input.handleFocus();
       this.secondInput.handleFocus();
     }
+    this.states.current?.namePrompt?.reposition();
     this.renderer.fitToDisplay(Math.min(window.devicePixelRatio || 1, gameConfig.canvas.maxPixelRatio));
   }
 

@@ -4,7 +4,7 @@ const NEUTRAL_SLOT = 'neutral';
 
 export function createStoryRun(profile, difficulty, config) {
   return {
-    protagonist: { ...profile, attributes: { ...config.startAttributes } },
+    protagonist: { ...profile, skin: profile.skin ?? 'base', attributes: { ...config.startAttributes } },
     difficulty,
     encounter: config.start,
     points: config.startPoints,
@@ -118,6 +118,7 @@ export function sanitizeStoryRun(raw, config) {
   }
   return {
     ...raw,
-    protagonist: { ...protagonist, name: protagonist.name.slice(0, config.protagonist.maxNameLength), saberColor: saberColors.includes(protagonist.saberColor) ? protagonist.saberColor : saberColors[0] },
+    protagonist: { ...protagonist, skin: config.protagonist.skins.some((skin) => skin.id === protagonist.skin) ? protagonist.skin : 'base',
+      name: protagonist.name.slice(0, config.protagonist.maxNameLength), saberColor: saberColors.includes(protagonist.saberColor) ? protagonist.saberColor : saberColors[0] },
   };
 }

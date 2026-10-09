@@ -185,7 +185,7 @@ describe('story flow', () => {
     assert.deepEqual(game.stateNames(), ['StoryState']);
     game.step(Action.CONFIRM);
     assert.deepEqual(game.stateNames(), ['ProtagonistState']);
-    for (let step = 0; step < 5; step += 1) {
+    for (let step = 0; step < 6; step += 1) {
       game.step(Action.CONFIRM);
     }
     assert.ok(game.story);
@@ -217,4 +217,34 @@ describe('story flow', () => {
     assert.deepEqual(game.stateNames(), ['StoryState']);
     assert.ok(game.states.current.menu.items[0].label.includes('2'));
   });
+});
+
+it('applies protagonist skins independently of style, powers, ratings and blade color', () => {
+  const base = createStoryRun(PROFILE, 'normal', storyConfig);
+  const profile = { ...base.protagonist, skin: 'watcher' };
+  const fighter = createFighterFromCharacter(createProtagonistCharacter(profile, storyConfig), { x: 0, y: 0, facing: 1 });
+  assert.equal(fighter.appearance.hoodUp, true);
+  assert.equal(fighter.appearance.masked, true);
+  assert.equal(fighter.appearance.longCape, false);
+  assert.equal(fighter.appearance.saberColor, PROFILE.saberColor);
+  assert.deepEqual(fighter.stats.attributes, profile.attributes);
+  assert.equal(sanitizeStoryRun({ ...base, protagonist: profile }, storyConfig).protagonist.skin, 'watcher');
+  assert.equal(sanitizeStoryRun({ ...base, protagonist: { ...profile, skin: 'invalid' } }, storyConfig).protagonist.skin, 'base');
+});
+
+it('uses an injected name prompt, keeps ready names and removes the prompt on step change and exit', () => {
+  const game = createFakeGame();
+  let removed = 0;
+  let submitted = false;
+  game.createTextPrompt = () => ({ value: 'Nara', focused: false, consumeSubmit: () => { const result = submitted; submitted = false; return result; }, destroy: () => { removed += 1; } });
+  game.changeState(StateId.PROTAGONIST);
+  assert.ok(game.states.current.menu.items.some((item) => item.id === 'Kael'));
+  submitted = true;
+  game.step();
+  assert.equal(game.states.current.profile.name, 'Nara');
+  assert.equal(game.states.current.step, 'alignment');
+  assert.equal(removed, 1);
+  game.step(Action.BACK);
+  game.step(Action.BACK);
+  assert.equal(removed, 2);
 });

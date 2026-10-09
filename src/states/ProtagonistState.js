@@ -25,6 +25,7 @@ export const CreationStep = Object.freeze({
   NAME: 'name',
   ALIGNMENT: 'alignment',
   STYLE: 'style',
+  SKIN: 'skin',
   COLOR: 'saberColor',
   DIFFICULTY: 'difficulty',
 });
@@ -33,17 +34,19 @@ export function getPowerNames(alignment) {
   return Object.values(powersConfig.loadouts[alignment]).map((id) => texts.powers[id]).join(' · ');
 }
 
-const STEPS = [CreationStep.NAME, CreationStep.ALIGNMENT, CreationStep.STYLE, CreationStep.COLOR, CreationStep.DIFFICULTY];
+const STEPS = [CreationStep.NAME, CreationStep.ALIGNMENT, CreationStep.STYLE, CreationStep.SKIN, CreationStep.COLOR, CreationStep.DIFFICULTY];
 
 function getStepOptions(step) {
   const { protagonist, difficulties, ratingCaps } = storyConfig;
   switch (step) {
     case CreationStep.NAME:
-      return protagonist.names.map((name) => ({ id: name, label: name }));
+      return [{ id: 'customName', label: texts.story.customName }, ...protagonist.names.map((name) => ({ id: name, label: name }))];
     case CreationStep.ALIGNMENT:
       return protagonist.alignments.map((id) => ({ id, label: texts.story.alignments[id] }));
     case CreationStep.STYLE:
       return Object.keys(protagonist.styles).map((id) => ({ id, label: texts.story.styles[id] }));
+    case CreationStep.SKIN:
+      return protagonist.skins.map(({ id, name }) => ({ id, label: name }));
     case CreationStep.COLOR:
       return protagonist.saberColors.map((color, index) => ({ id: color, label: texts.story.colorNames[index] }));
     default:
@@ -65,6 +68,7 @@ export class ProtagonistState extends GameState {
       const { protagonist, startAttributes, difficulties } = storyConfig;
       this.profile = {
         name: protagonist.names[0],
+        skin: 'base',
         alignment: protagonist.alignments[0],
         style: Object.keys(protagonist.styles)[0],
         saberColor: protagonist.saberColors[0],
@@ -82,10 +86,20 @@ export class ProtagonistState extends GameState {
   }
 
   openStep() {
+    this.namePrompt?.destroy();
+    this.namePrompt = null;
     const options = getStepOptions(this.step);
     this.menu = new MenuList(options, layout.story.list, this.game.audio);
     const current = this.step === CreationStep.DIFFICULTY ? this.difficulty : this.profile[this.step];
     this.menu.selectedIndex = Math.max(0, options.findIndex((option) => option.id === current));
+    if (this.step === CreationStep.NAME) {
+      this.namePrompt = this.game.createTextPrompt?.({ value: this.profile.name, maxLength: storyConfig.protagonist.maxNameLength, placeholder: texts.story.namePlaceholder }) ?? null;
+    }
+  }
+
+  exit() {
+    this.namePrompt?.destroy();
+    this.namePrompt = null;
   }
 
   refreshUpgradeLabels() {
@@ -138,6 +152,12 @@ export class ProtagonistState extends GameState {
   }
 
   updateCreation() {
+    if (this.namePrompt?.consumeSubmit()) {
+      this.applySelection('customName');
+      this.confirmStep();
+      return;
+    }
+    if (this.namePrompt?.focused) return;
     if (this.game.input.wasPressed(Action.BACK)) {
       this.goBack();
       return;
@@ -154,6 +174,11 @@ export class ProtagonistState extends GameState {
   }
 
   applySelection(value) {
+    if (this.step === CreationStep.NAME && value === 'customName') {
+      this.profile = { ...this.profile, name: this.namePrompt?.value || this.profile.name };
+      this.refreshPreview();
+      return;
+    }
     if (this.step === CreationStep.DIFFICULTY) {
       this.difficulty = value;
       return;

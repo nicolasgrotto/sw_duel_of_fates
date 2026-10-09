@@ -1,3 +1,4 @@
+import { loadSave } from '../src/core/saveStorage.js';
 import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -60,12 +61,12 @@ it('migrates a complete v1 save without losing progress or bindings', () => {
   const storage = createStorage({ [KEY]: legacy });
   assert.deepEqual(loadSettings({ difficulty: 'normal', sound: true, music: false, reducedEffects: false, finalReplay: true, keyboardPreset: 'classic', customBindings: {}, arcadeCleared: [], unlocks: {}, survivalBest: 0, parryChallengeBest: 0 }, storage, KEY), settings);
   saveSettings(settings, storage, KEY);
-  assert.deepEqual(JSON.parse(storage.data[KEY]), { version: 3, settings, story: null });
+  assert.deepEqual(JSON.parse(storage.data[KEY]), { version: 4, settings, story: null });
   assert.deepEqual(loadSettings({ difficulty: 'normal', sound: true, music: false, reducedEffects: false, finalReplay: true, keyboardPreset: 'classic', customBindings: {}, arcadeCleared: [], unlocks: {}, survivalBest: 0, parryChallengeBest: 0 }, storage, KEY), settings);
 });
 
 it('rejects future versions and invalid envelopes without overwriting storage', () => {
-  for (const saved of [{ version: 4, settings: { sound: false } }, { version: 2, settings: [] }, { version: 0 }, []]) {
+  for (const saved of [{ version: 5, settings: { sound: false } }, { version: 2, settings: [] }, { version: 0 }, []]) {
     const storage = createStorage({ [KEY]: JSON.stringify(saved) });
     assert.deepEqual(loadSettings(defaults, storage, KEY, allowed), defaults);
     assert.equal(storage.data[KEY], JSON.stringify(saved));
@@ -81,4 +82,16 @@ it('uses coarse defaults only without a valid saved effects preference, includin
     }
   }
   assert.equal(loadSettings(coarse, createStorage({ [KEY]: JSON.stringify({ reducedEffects: 'invalid' }) }), KEY).reducedEffects, true);
+});
+
+it('migrates v3 story appearance without losing settings, progress or an existing skin', () => {
+  for (const skin of [undefined, 'watcher']) {
+    const story = { encounter: 'mine', points: 3, protagonist: { name: 'Iria', skin } };
+    const settings = { unlocks: { guardian: ['challenge'] }, arcadeCleared: ['guardian'] };
+    const storage = createStorage({ [KEY]: JSON.stringify({ version: 3, settings, story }) });
+    const save = loadSave(storage, KEY);
+    assert.equal(save.version, 4);
+    assert.deepEqual(save.settings, settings);
+    assert.deepEqual(save.story, { ...story, protagonist: { ...story.protagonist, skin: skin ?? 'base' } });
+  }
 });
