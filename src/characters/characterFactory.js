@@ -45,7 +45,7 @@ export function createFighterFromCharacter(character, { x, y, facing }, { saberC
   return new Fighter({
     id: character.id,
     name: character.name,
-    stats: { ...derived, alignment: character.alignment, power: resolvePowerStats(derived.powerLevel, powersConfig, character.alignment, character.powerSlots ?? null) },
+    stats: { ...derived, alignment: character.alignment, power: resolvePowerStats(derived.flowLevel, powersConfig, character.alignment, character.powerSlots ?? null) },
     appearance,
     sound: character.sound,
     x,

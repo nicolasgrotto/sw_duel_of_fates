@@ -133,7 +133,7 @@ describe('secret fighters', () => {
       assert.equal(fighter.stats.potential, potential);
       assert.ok(Object.values(fighter.stats.attributes).every((value) => value <= 9 + potential));
     }
-    assert.equal(createFighter('foretold', { x: 0, y: 0, facing: 1 }).powerLevel, 12);
+    assert.equal(createFighter('foretold', { x: 0, y: 0, facing: 1 }).flowLevel, 12);
     for (const character of Object.values(characters).filter((entry) => !entry.secret)) {
       assert.ok(character.attributes.flow <= 8, character.id);
     }

@@ -25,7 +25,7 @@ export const EffectType = Object.freeze({
 });
 
 function getTierColor(fighter) {
-  return getPowerTier(fighter.powerLevel, powersConfig.tiers).color;
+  return getPowerTier(fighter.flowLevel, powersConfig.tiers).color;
 }
 
 function createLight() {

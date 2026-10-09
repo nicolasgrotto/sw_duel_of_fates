@@ -133,11 +133,11 @@ export class Hud {
     const { fighter } = state;
     const { healthWidth, powerGap, powerHeight } = layout.hud;
     const barY = y + powerGap;
-    const tierColor = getPowerTier(fighter.powerLevel, powersConfig.tiers).color;
+    const tierColor = getPowerTier(fighter.flowLevel, powersConfig.tiers).color;
     const period = layout.hud.rejectBlinkPeriod;
     const color = state.powerRejectTime > 0 && state.powerRejectTime % period >= period / 2 ? colors.hudDanger : tierColor;
     renderer.fillRect(barX, barY, healthWidth, powerHeight, colors.hudTrack);
-    this.fillBar(renderer, barX, barY, healthWidth, powerHeight, fighter.powerMeter / fighter.stats.power.max, isLeft, color);
+    this.fillBar(renderer, barX, barY, healthWidth, powerHeight, fighter.flowMeter / fighter.stats.power.max, isLeft, color);
   }
 
   renderRounds(renderer, isLeft, viewLeft = 0, viewRight = renderer.width) {

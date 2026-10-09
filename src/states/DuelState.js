@@ -722,8 +722,8 @@ export class DuelState extends GameState {
 
     for (const fighter of this.fighters) {
       lines.push(
-        `${fighter.id}: ${fighter.state}  hp ${fighter.health.toFixed(0)}  st ${fighter.stamina.toFixed(0)}  flow ${this.rules.powers ? fighter.powerMeter.toFixed(0) : 'off'}`,
-        `  ratings ${Object.values(fighter.stats.attributes).join("/")}  flow ${fighter.powerLevel}`,
+        `${fighter.id}: ${fighter.state}  hp ${fighter.health.toFixed(0)}  st ${fighter.stamina.toFixed(0)}  flow ${this.rules.powers ? fighter.flowMeter.toFixed(0) : 'off'}`,
+        `  ratings ${Object.values(fighter.stats.attributes).join("/")}  flow ${fighter.flowLevel}`,
         `  jumps ${fighter.combat.jumpsUsed}/${fighter.stats.movement.maxJumps}  evade ${fighter.combat.evading ? fighter.stateTime.toFixed(2) : '-'}`,
         `  pos ${fighter.x.toFixed(0)}, ${fighter.y.toFixed(0)}  vel ${fighter.vx.toFixed(0)}, ${fighter.vy.toFixed(0)}`,
         `  parry ${fighter.combat.parryArmed ? fighter.combat.parryTime.toFixed(2) : '-'}  lockout ${fighter.combat.parryLockout.toFixed(2)}  buffer ${fighter.combat.bufferedAction ?? '-'}`,

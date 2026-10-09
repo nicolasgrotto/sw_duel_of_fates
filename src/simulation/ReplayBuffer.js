@@ -14,7 +14,7 @@ export function captureFighter(fighter) {
     grounded: fighter.grounded,
     health: fighter.health,
     stamina: fighter.stamina,
-    powerMeter: fighter.powerMeter,
+    flowMeter: fighter.flowMeter,
     state: fighter.state,
     stateTime: fighter.stateTime,
     combat: { ...fighter.combat },

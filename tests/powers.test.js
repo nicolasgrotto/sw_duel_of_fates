@@ -20,8 +20,8 @@ describe('power resistance', () => {
   });
 
   it('measures the difference as target level minus caster level', () => {
-    assert.equal(getLevelDifference({ powerLevel: 5 }, { powerLevel: 8 }), 3);
-    assert.equal(getLevelDifference({ powerLevel: 8 }, { powerLevel: 5 }), -3);
+    assert.equal(getLevelDifference({ flowLevel: 5 }, { flowLevel: 8 }), 3);
+    assert.equal(getLevelDifference({ flowLevel: 8 }, { flowLevel: 5 }), -3);
   });
 
   it('maps levels to the four visual tiers', () => {
@@ -56,8 +56,8 @@ describe('duel rules', () => {
 describe('power meter', () => {
   it('starts each fighter with the configured meter and level from the flow rating', () => {
     const fighter = spawnFighter(400, 1, 'mirror');
-    assert.equal(fighter.powerMeter, powersConfig.meter.start);
-    assert.equal(fighter.powerLevel, 7);
+    assert.equal(fighter.flowMeter, powersConfig.meter.start);
+    assert.equal(fighter.flowLevel, 7);
     assert.equal(fighter.stats.alignment, 'light');
     assert.equal(spawnFighter(400, 1, 'shadow').stats.alignment, 'dark');
   });
@@ -66,7 +66,7 @@ describe('power meter', () => {
     const fighters = [spawnFighter(300), spawnFighter(900, -1, 'shadow')];
     const simulation = createSimulation(fighters);
     repeat(120, () => simulation.step(STEP));
-    assert.equal(fighters[0].powerMeter, powersConfig.meter.start);
+    assert.equal(fighters[0].flowMeter, powersConfig.meter.start);
   });
 
   it('regenerates over time with powers on and never passes the maximum', () => {
@@ -74,9 +74,9 @@ describe('power meter', () => {
     const simulation = createSimulation(fighters, { powers: true });
     repeat(60, () => simulation.step(STEP));
     const expected = powersConfig.meter.start + powersConfig.meter.regenPerSecond * fighters[0].stats.power.gainScale;
-    assert.ok(Math.abs(fighters[0].powerMeter - expected) < 0.01);
+    assert.ok(Math.abs(fighters[0].flowMeter - expected) < 0.01);
     repeat(60 * 60, () => simulation.step(STEP));
-    assert.equal(fighters[0].powerMeter, fighters[0].stats.power.max);
+    assert.equal(fighters[0].flowMeter, fighters[0].stats.power.max);
   });
 
   it('rewards both sides of a hit and resets for a new round', () => {
@@ -92,9 +92,9 @@ describe('power meter', () => {
     }
     assert.ok(hit);
     const { gain } = powersConfig.meter;
-    assert.ok(attacker.powerMeter >= powersConfig.meter.start + gain.hitLanded * attacker.stats.power.gainScale);
-    assert.ok(defender.powerMeter >= powersConfig.meter.start + gain.hitTaken * defender.stats.power.gainScale);
+    assert.ok(attacker.flowMeter >= powersConfig.meter.start + gain.hitLanded * attacker.stats.power.gainScale);
+    assert.ok(defender.flowMeter >= powersConfig.meter.start + gain.hitTaken * defender.stats.power.gainScale);
     attacker.resetForRound(400, 1);
-    assert.equal(attacker.powerMeter, powersConfig.meter.start);
+    assert.equal(attacker.flowMeter, powersConfig.meter.start);
   });
 });

@@ -31,7 +31,7 @@ it('preserves every legacy scalar, move damage and reserved flow without changin
     for (const [move, damage] of Object.entries(expected.damage)) assert.equal(fighter.moves[move].damage, damage, `${id}.${move}`);
     assert.equal(stats.evade.invulnerableTime, evadeConfig.profile.invulnerableTime);
     assert.equal(stats.guardBreakThreshold, 0);
-    assert.equal(fighter.powerLevel, characters[id].attributes.flow);
+    assert.equal(fighter.flowLevel, characters[id].attributes.flow);
     assert.equal('maxHealth' in fighterArchetypes[id], false);
     assert.equal('damage' in fighterArchetypes[id].attacks.light, false);
   }
@@ -51,7 +51,7 @@ it('applies the rating table at every level and changes only the relevant attrib
     assert.ok(Math.abs(rated.dodge.speed - normal.dodge.speed * multiplier) < 1e-8);
     assert.ok(Math.abs(rated.evade.invulnerableTime - normal.evade.invulnerableTime * multiplier) < 1e-8);
     assert.ok(Math.abs(rated.blockStaminaScale - normal.blockStaminaScale / multiplier) < 1e-8);
-    assert.equal(rated.powerLevel, rating);
+    assert.equal(rated.flowLevel, rating);
     assert.equal(rated.attacks.heavy.startup, normal.attacks.heavy.startup);
   }
 });
@@ -90,8 +90,8 @@ it('changing flow alone has no combat effects and agility scales special movemen
   const ratings = characters.heron.attributes;
   const normal = applyAttributes(original, ratings, attributesConfig);
   const flow = applyAttributes(original, { ...ratings, flow: 1 }, attributesConfig);
-  const { powerLevel, attributes, ...physical } = flow;
-  const { powerLevel: oldLevel, attributes: oldRatings, ...expected } = normal;
+  const { flowLevel, attributes, ...physical } = flow;
+  const { flowLevel: oldLevel, attributes: oldRatings, ...expected } = normal;
   assert.deepEqual(physical, expected);
   const slow = applyAttributes(original, { ...ratings, agility: 1 }, attributesConfig);
   assert.ok(slow.attacks.special.leap.speedY < normal.attacks.special.leap.speedY);

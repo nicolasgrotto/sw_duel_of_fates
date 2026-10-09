@@ -368,7 +368,7 @@ export class EnemyAI {
   canUsePower(power) {
     const { self } = this;
     const reserve = power.channel ? power.drainPerSecond * this.perception.powerChannelReserve : 0;
-    return self.combat.powerCooldown === 0 && self.powerMeter >= power.cost + reserve;
+    return self.combat.powerCooldown === 0 && self.flowMeter >= power.cost + reserve;
   }
 
   wantsPower(power) {

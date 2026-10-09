@@ -36,6 +36,6 @@ export function applyAttributes(base, attributes, config, { potential = 0 } = {}
     guardBreakThreshold: Math.max(0, base.guardBreakThreshold + (config.baseRating - ratings.defense) * config.guardBreakStep),
     wallJump: base.wallJump ? { ...base.wallJump, speed: rounded(base.wallJump.speed * mobility) } : null,
     attacks,
-    powerLevel: ratings.flow,
+    flowLevel: ratings.flow,
   };
 }

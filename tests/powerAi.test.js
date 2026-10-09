@@ -15,8 +15,8 @@ function setup(selfId, opponentId, gap, { profile = SINGLE_STEP, difficulty = CA
   const self = spawnFighter(800, -1, selfId);
   const opponent = spawnFighter(0, 1, opponentId);
   opponent.x = self.x - (self.width + opponent.width) / 2 - gap;
-  self.powerMeter = 100;
-  opponent.powerMeter = 100;
+  self.flowMeter = 100;
+  opponent.flowMeter = 100;
   const ai = new EnemyAI({ self, opponent, profile, difficulty, perception: aiConfig.perception, random: () => 0, rules });
   return { self, opponent, ai };
 }
@@ -49,16 +49,16 @@ describe('AI powers', () => {
 
   it('skips a power the opponent would resist, unless it does not know better', () => {
     const resisted = setup('shadow', 'guardian', 200);
-    resisted.opponent.stats = { ...resisted.opponent.stats, powerLevel: 9 };
+    resisted.opponent.stats = { ...resisted.opponent.stats, flowLevel: 9 };
     assert.equal(think(resisted.ai), AiDecision.WAIT);
     const naive = setup('shadow', 'guardian', 200, { difficulty: { ...CAREFUL, powerAware: false } });
-    naive.opponent.stats = { ...naive.opponent.stats, powerLevel: 9 };
+    naive.opponent.stats = { ...naive.opponent.stats, flowLevel: 9 };
     assert.equal(think(naive.ai), AiDecision.POWER);
   });
 
   it('waits for meter and cooldown and never casts in the classic rules', () => {
     const empty = setup('shadow', 'guardian', 200);
-    empty.self.powerMeter = 10;
+    empty.self.flowMeter = 10;
     assert.equal(think(empty.ai), AiDecision.WAIT);
     const cooling = setup('shadow', 'guardian', 200);
     cooling.self.combat.powerCooldown = 0.5;

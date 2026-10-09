@@ -1,5 +1,5 @@
 export function getLevelDifference(caster, target) {
-  return target.powerLevel - caster.powerLevel;
+  return target.flowLevel - caster.flowLevel;
 }
 
 export function resolvePowerOutcome(rule, levelDifference) {

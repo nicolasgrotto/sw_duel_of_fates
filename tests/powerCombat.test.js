@@ -14,8 +14,8 @@ function duel(casterId, targetId, gap = 160) {
   const caster = spawnFighter(400, 1, casterId);
   const target = spawnFighter(400 + caster.width / 2 + gap + 23, -1, targetId);
   const simulation = createSimulation([caster, target], { powers: true });
-  caster.powerMeter = 100;
-  target.powerMeter = 100;
+  caster.flowMeter = 100;
+  target.flowMeter = 100;
   return { caster, target, simulation, events: [] };
 }
 
@@ -44,7 +44,7 @@ function stepsFor(seconds) {
 }
 
 function setLevel(fighter, level) {
-  fighter.stats = { ...fighter.stats, powerLevel: level };
+  fighter.stats = { ...fighter.stats, flowLevel: level };
 }
 
 describe('power selection', () => {
@@ -68,7 +68,7 @@ describe('instant powers', () => {
     const { caster, target } = setup;
     cast(setup, caster);
     assert.equal(caster.state, FighterState.CASTING);
-    assert.ok(Math.abs(caster.powerMeter - (100 - push.cost)) < 1);
+    assert.ok(Math.abs(caster.flowMeter - (100 - push.cost)) < 1);
     step(setup, stepsFor(push.startup));
     assert.ok(setup.events.includes(CombatEvent.POWER_HIT));
     assert.equal(target.state, FighterState.STAGGERED);
@@ -172,7 +172,7 @@ describe('channeled powers', () => {
     const ticks = setup.events.filter((type) => type === CombatEvent.POWER_HIT).length;
     assert.ok(ticks >= 3);
     assert.ok(target.health < target.stats.maxHealth);
-    assert.ok(caster.powerMeter < 100 - lightning.cost);
+    assert.ok(caster.flowMeter < 100 - lightning.cost);
     caster.intent.powerHeld = false;
     step(setup, stepsFor(lightning.recovery) + 1);
     assert.equal(caster.state, FighterState.IDLE);
@@ -216,7 +216,7 @@ describe('channeled powers', () => {
     step(setup, stepsFor(lightning.startup + lightning.tickInterval));
     assert.ok(setup.events.includes(CombatEvent.POWER_ABSORBED));
     assert.equal(holder.health, holder.stats.maxHealth);
-    assert.ok(holder.powerMeter < 100 - barrier.cost);
+    assert.ok(holder.flowMeter < 100 - barrier.cost);
   });
 
   it('blocks saber hits without stamina and falls to a shove', () => {
@@ -257,7 +257,7 @@ describe('powers and rules', () => {
 
   it('rejects a power without enough meter and tags the rejection', () => {
     const setup = duel('guardian', 'shadow');
-    setup.caster.powerMeter = push.cost - 1;
+    setup.caster.flowMeter = push.cost - 1;
     setup.caster.intent.power = true;
     setup.simulation.step(STEP);
     const rejection = setup.simulation.events.find((event) => event.type === CombatEvent.ACTION_REJECTED);
@@ -296,7 +296,7 @@ describe('powers and rules', () => {
     for (let index = 0; index < fighters.length; index += 1) {
       assert.equal(replayed[index].x, fighters[index].x);
       assert.equal(replayed[index].health, fighters[index].health);
-      assert.equal(replayed[index].powerMeter, fighters[index].powerMeter);
+      assert.equal(replayed[index].flowMeter, fighters[index].flowMeter);
       assert.equal(replayed[index].state, fighters[index].state);
     }
   });

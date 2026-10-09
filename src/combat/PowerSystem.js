@@ -61,7 +61,7 @@ export class PowerSystem {
       return;
     }
     const { power } = fighter.stats;
-    fighter.powerMeter = Math.min(power.max, fighter.powerMeter + amount * power.gainScale);
+    fighter.flowMeter = Math.min(power.max, fighter.flowMeter + amount * power.gainScale);
   }
 
   onHit(attacker, defender) {
@@ -78,7 +78,7 @@ export class PowerSystem {
   }
 
   canCast(fighter, power) {
-    return this.enabled && power !== null && fighter.combat.powerCooldown === 0 && fighter.powerMeter >= power.cost;
+    return this.enabled && power !== null && fighter.combat.powerCooldown === 0 && fighter.flowMeter >= power.cost;
   }
 
   tryCast(fighter) {
@@ -86,7 +86,7 @@ export class PowerSystem {
     if (!this.canCast(fighter, power)) {
       return false;
     }
-    fighter.powerMeter -= power.cost;
+    fighter.flowMeter -= power.cost;
     fighter.clearAttack();
     fighter.combat.power = power;
     fighter.restartState(power.channel ? FighterState.CHANNELING : FighterState.CASTING);
@@ -142,10 +142,10 @@ export class PowerSystem {
     }
     if (combat.powerEndTime === 0) {
       const channelTime = caster.stateTime - power.startup;
-      const holding = caster.intent.powerHeld && caster.powerMeter > 0 && channelTime < power.maxChannel;
+      const holding = caster.intent.powerHeld && caster.flowMeter > 0 && channelTime < power.maxChannel;
       if (holding || !combat.powerTargeted) {
         combat.powerTargeted = true;
-        caster.powerMeter = Math.max(0, caster.powerMeter - power.drainPerSecond * dt);
+        caster.flowMeter = Math.max(0, caster.flowMeter - power.drainPerSecond * dt);
         this.tick(caster, target, power, dt);
         return;
       }

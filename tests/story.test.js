@@ -129,7 +129,7 @@ describe('protagonist', () => {
     const fighter = createFighterFromCharacter(character, { x: 0, y: 0, facing: 1 });
     assert.equal(fighter.name, 'Kael');
     assert.equal(fighter.appearance.saberColor, PROFILE.saberColor);
-    assert.equal(fighter.powerLevel, storyConfig.startAttributes.flow);
+    assert.equal(fighter.flowLevel, storyConfig.startAttributes.flow);
     assert.deepEqual(Object.keys(fighter.stats.power.loadout), ['neutral']);
     assert.equal(fighter.stats.power.loadout.neutral.id, 'lightning');
   });

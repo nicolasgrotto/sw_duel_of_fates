@@ -174,7 +174,7 @@ A v2 traz poderes, alinhamentos e personagens secretos. Para manter a identidade
 
 | Conceito | No código | Na tela (provisório) |
 | --- | --- | --- |
-| Energia dos poderes | `power`, `powerLevel` (1–10, permanente), `powerMeter` (recurso da luta) | o Fluxo |
+| Energia dos poderes | `power`, `flowLevel` (1–10, permanente), `flowMeter` (recurso da luta) | o Fluxo |
 | Alinhamentos | `alignment`: `light` ou `dark` | Caminho da Aurora, Caminho do Eclipse |
 | Chefe secreto | `sovereign` | o Soberano |
 | Personagem secreto de nível 10 | `foretold` | o Predestinado |

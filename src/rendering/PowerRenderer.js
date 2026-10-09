@@ -46,7 +46,7 @@ export class PowerRenderer {
 
   drawFighter(renderer, fighter) {
     const { power } = fighter.combat;
-    const tier = getPowerTier(fighter.powerLevel, powersConfig.tiers);
+    const tier = getPowerTier(fighter.flowLevel, powersConfig.tiers);
     const originX = fighter.x + fighter.facing * (fighter.width / 2 + style.handOffset);
     const originY = fighter.y - fighter.height * powersConfig.castHeight;
 

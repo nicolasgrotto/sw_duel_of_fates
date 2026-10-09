@@ -226,7 +226,7 @@ Personagens atuais: Guardião, Sombra, Bastião, Vespa, Espelho, Haste, Brasa, F
 
 Vida escala maxHealth; Stamina escala maxStamina e regenPerSecond; Lâmina escala o dano de todos os golpes e soma 0,002 s por nota acima de 5 ao parry perfeito (limitado à janela total). Defesa divide custo e recuo do bloqueio pelo multiplicador e muda guardBreakThreshold em 1 de stamina por nota, com piso zero. Bases de reserva compensam as notas atuais para preservar quebra somente quando faltar stamina. CombatSystem compara custo + reserva; dano recebido permanece igual. blockStaminaScale e blockPushbackScale no arquétipo continuam apenas como traços passivos (Guardião/Bastião), compostos com os fatores de Defesa.
 
-Agilidade escala caminhada, velocidade vertical de pulo, dash e invulnerabilidade do EVADE pelo perfil de evadeConfig. Coeficientes calibrados preservam a janela 0,066 s atual. Também escala avanços/saltos de habilidade e pulo na parede, sem alterar durações, maxJumps ou regras de ataque aéreo. Fluxo vira stats.powerLevel, acessível pelo getter Fighter.powerLevel, imutável na luta e coberto pelo snapshot via stats; sem medidor ou efeito nesta etapa.
+Agilidade escala caminhada, velocidade vertical de pulo, dash e invulnerabilidade do EVADE pelo perfil de evadeConfig. Coeficientes calibrados preservam a janela 0,066 s atual. Também escala avanços/saltos de habilidade e pulo na parede, sem alterar durações, maxJumps ou regras de ataque aéreo. Fluxo vira stats.flowLevel, acessível pelo getter Fighter.flowLevel, imutável na luta e coberto pelo snapshot via stats; sem medidor ou efeito nesta etapa.
 
 Factory junta estrutura, bases e golpes antes de aplicar notas; nenhum snapshot de stats é criado no import. Simulador aceita --set attributes.guardian.health=9, attributeBases.guardian.maxHealth=100 e attributeConfig.perfectParryBonus=0. Overrides ocorrem antes da factory; caminhos fighters continuam para tempos, custos e traços. Orçamento e teto do protagonista permanecem na v1.7.
 
@@ -456,7 +456,7 @@ Treino: `IntentRecorder` guarda até 600 frames de intent em Uint16Array (10 s d
 
 Toque mobile (v1.2): Game injeta coarsePointer e tamanho do viewport, registra TouchInput e troca seu contexto ao mudar a pilha. MenuList calcula regiões de toque no update usando layout, sem mutar no render. Seleção lê as setas de cor; BACK reutiliza os fluxos existentes. TouchControls desenha somente após toque. Retrato suspende updates de estados, solta inputs e desenha orientação; voltar à paisagem retoma. CSS respeita safe areas. Efeitos reduzidos usam coarsePointer como default; loadSettings preserva qualquer booleano salvo, incluindo v1. Nenhum campo extra nem migração necessária.
 
-Seleção v1.4 desenha AttributeBars usando stats.attributes da factory, nove segmentos neutros e nota numérica. Geometria em uiConfig.layout.attributes; estilos em themeConfig. Preview do personagem fica à direita das barras; arena preserva seu layout. F3 mostra notas e powerLevel.
+Seleção v1.4 desenha AttributeBars usando stats.attributes da factory, nove segmentos neutros e nota numérica. Geometria em uiConfig.layout.attributes; estilos em themeConfig. Preview do personagem fica à direita das barras; arena preserva seu layout. F3 mostra notas e flowLevel.
 
 ## Renderer
 
@@ -565,8 +565,8 @@ Arquivos: [src/combat/PowerSystem.js](src/combat/PowerSystem.js), [src/combat/po
 Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 22).
 
 - **Regra por modo.** `createDuelRules(mode, settings, powersConfig.modes)` devolve `{ powers }`: ligado só em Duelar, 2 Jogadores e Treino, e só se `settings.powers` não for `false`. O `DuelState` guarda `this.rules` (ou usa `params.rules`, para o Story) e passa para a `DuelSimulation`, para a HUD e para o `ReplayState` (o replay re-simula com as mesmas regras). O simulador aceita `--rules powers` e a matriz repassa a opção.
-- **Medidor.** A `DuelSimulation` repassa `rules` ao `CombatSystem`, que cria o `PowerSystem` (desligado quando `rules.powers` não é `true`). O `PowerSystem` regenera `fighter.powerMeter` depois da stamina e soma ganhos nos ganchos do `CombatSystem` (`onHit` no `applyHit`, `onBlock` no `resolveBlock`, `onParry` no `resolveParry`). `powerMeter` fica no `Fighter` (como `stamina`), começa em `stats.power.start` e volta a esse valor no `resetForRound`; o snapshot do replay o inclui.
-- **Nível.** `stats.powerLevel` vem do atributo Fluxo. A factory soma `stats.alignment` (do `characterData`) e `stats.power` (`resolvePowerStats`): o nível muda o ganho do medidor e a potência dos poderes, não o máximo.
+- **Medidor.** A `DuelSimulation` repassa `rules` ao `CombatSystem`, que cria o `PowerSystem` (desligado quando `rules.powers` não é `true`). O `PowerSystem` regenera `fighter.flowMeter` depois da stamina e soma ganhos nos ganchos do `CombatSystem` (`onHit` no `applyHit`, `onBlock` no `resolveBlock`, `onParry` no `resolveParry`). `flowMeter` fica no `Fighter` (como `stamina`), começa em `stats.power.start` e volta a esse valor no `resetForRound`; o snapshot do replay o inclui.
+- **Nível.** `stats.flowLevel` vem do atributo Fluxo. A factory soma `stats.alignment` (do `characterData`) e `stats.power` (`resolvePowerStats`): o nível muda o ganho do medidor e a potência dos poderes, não o máximo.
 - **Resistência.** `getLevelDifference(caster, target)` = nível do alvo − nível de quem lança. `resolvePowerOutcome(rule, diff)` percorre as faixas da regra (`powersConfig.resistance`) e devolve `{ scale, outcome }`. Cada poder aponta para uma regra pelo nome; nenhum `if` por poder.
 - **Tier visual.** `getPowerTier(level, powersConfig.tiers)` escolhe cor (`themeConfig`) e intensidade. A HUD desenha o medidor na cor do tier, abaixo da stamina, só com `rules.powers`.
 
@@ -579,7 +579,7 @@ Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 22).
 - **Barreira na lâmina.** Em `resolveContact`, depois do empurrão de corpo e antes do counter: com a barreira de pé, `resolveBarrierBlock` segura o golpe sem gastar stamina e emite `powerAbsorbed`. O empurrão de corpo continua vencendo (`applyShove` limpa o poder).
 - **Interrupção.** `Fighter.clearAttack` também limpa o poder (`clearPower`), então qualquer golpe, empurrão ou desequilíbrio interrompe quem está lançando.
 - **Puxão.** A velocidade vem do atrito de ação da física (`friction`, repassado pela `DuelSimulation`): `√(2 × atrito × distância)` faz o alvo parar perto de `endGap`.
-- **Estado.** Tudo que muda fica em `fighter.combat` (`power`, `powerEndTime`, `powerTick`, `powerTargeted`, `powerCooldown`, `powerTargetX/Y`) e em `fighter.powerMeter`; o replay re-simula igual (teste dedicado). `powerTargetX/Y` guarda o ponto mirado para o render, sem lógica no renderer.
+- **Estado.** Tudo que muda fica em `fighter.combat` (`power`, `powerEndTime`, `powerTick`, `powerTargeted`, `powerCooldown`, `powerTargetX/Y`) e em `fighter.flowMeter`; o replay re-simula igual (teste dedicado). `powerTargetX/Y` guarda o ponto mirado para o render, sem lógica no renderer.
 - **Apresentação.** O `PowerRenderer` (chamado pelo `DuelRenderer` depois das lâminas) só lê o estado: brilho de carga na mão durante o startup, domo da Barreira enquanto `isBarrierUp`, raio enquanto o canal está aberto, da mão até `powerTargetX/Y`. O raio guarda, por lutador, deslocamentos perpendiculares em `Float32Array` (RNG próprio com seed, renovados a cada `render.boltRefresh` do tempo de animação) e recalcula os pontos a cada frame sem alocar. Cores e intensidade vêm do tier (`getPowerTier`); toda luz usa `drawGlow` (sprite em cache por cor). O `EffectsSystem` trata `powerActive` (anel que abre ou, no Puxão, fecha: `ring.contract`), `powerHit`, `powerBlocked`, `powerResisted` (anel na cor do tier do alvo) e `powerAbsorbed`; receitas com `tinted` pintam metade das faíscas na cor do tier. Poses em `fighterVisualConfig.combatPoses.powers` (`cast`, `channel`, `barrier`), com entrada no startup e volta na recuperação. Sons sintetizados em `audioConfig.sounds` (carga, onda, puxão, impacto, raio, barreira, resistido, absorvido). A HUD pisca o medidor quando a rejeição vem com `attackType: 'power'`. A lista de golpes (aberta pela pausa, que recebe `rules`) mostra os poderes do alinhamento quando eles estão ligados.
 - **Entrada.** Teclado `U` (preset de setas: `N`; 2 Jogadores: J1 `R`, J2 `O`/Numpad6), gamepad RT, botão de toque `Poder` (só aparece quando o `DuelState` chama `touch.setFeatures(['powers'])`). `POWER` está em `remappableActions`; o `IntentRecorder` grava `power` e `powerHeld` no fim da lista de flags.
 
@@ -924,9 +924,9 @@ Roteiro, tarefas e validações em [versions/v2.md](versions/v2.md). O detalhe d
 **Decisões.**
 
 - **Atributos** (1–9; Fluxo 10 só com `apex: true`) são a única fonte dos stats escalares; o arquétipo continua dono de tempos, golpes e traços.
-- **Fluxo**: `powerLevel` (permanente) define potência, ganho do medidor, resistência e tier visual; `powerMeter` é o recurso da luta; `stamina` continua o recurso físico.
+- **Fluxo**: `flowLevel` (permanente) define potência, ganho do medidor, resistência e tier visual; `flowMeter` é o recurso da luta; `stamina` continua o recurso físico.
 - **Resistência**: `levelDiff = alvo − conjurador`; regras em dados, um resolvedor puro, sem `if` por poder.
-- **Poderes** têm fases como os golpes, são pagos com `powerMeter` e não têm projétil. Estados `CASTING` e `CHANNELING`.
+- **Poderes** têm fases como os golpes, são pagos com `flowMeter` e não têm projétil. Estados `CASTING` e `CHANNELING`.
 - **EVADE** fica no "baixo" (S/↓, direcional, joystick); o Shift continua o dash. **Pulo duplo** por `movement.maxJumps`.
 - **Rotas e finais** são dados avaliados por um registro de condições contra o `DuelResult`.
 - **Protagonista** é dado gerado do save e entra em `createFighterFromCharacter`; sem sistema de animação novo.
