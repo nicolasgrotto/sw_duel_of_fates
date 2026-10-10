@@ -1234,7 +1234,7 @@ Consequências: dano do passo 4 ou 5 interrompe a Cura antes do passo 7, então 
 
 **Pontos únicos.** Custos de Vigor passam por `getStaminaCost` (multiplicadores de Foco e ferimento sobre o custo derivado, com o tipo do custo) e gastos por `spendStamina` (entrada na exaustão pelo limiar de gasto em config). Todo dano efetivo passa pelo pipeline, inclusive `applyStatusDamage`. Nenhuma regra nova fica espalhada em estados, renderers ou IA.
 
-**Término de efeitos.** Efeitos de duração registram o motivo de término: `completed`, `interrupted`, `death`, `reset` ou `replaced`. Só `completed` dispara consequências de conclusão (a Cura limpar o ferimento). O motivo fica em `fighter.combat` até o próximo início do efeito, para o F3 e os testes.
+**Término de efeitos.** `StatusSystem.start`, `advance` e `end` controlam Cura, Foco e Ira. `healEnd`, `focusEnd` e `wrathEnd` registram `completed`, `interrupted`, `death`, `reset`, `replaced` ou `depleted`. Só `completed` dispara consequências de conclusão (a Cura limpar o ferimento). Um início novo limpa o motivo anterior; reaplicação ativa registra `replaced` enquanto reinicia a duração. Dano não letal interrompe Cura, mas não encerra os buffs Foco e Ira; K.O. encerra todos por `death`. Reset de round zera durações e registra `reset`. Estado e motivos ficam em `fighter.combat`, copiados pelo replay.
 
 **Render.** Interpolação visual (2.1) usa o `alpha` do `GameLoop` e dados pré-alocados do passo anterior, fora do snapshot. Desligar ou ligar a interpolação não muda nenhum resultado.
 

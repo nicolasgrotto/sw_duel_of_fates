@@ -9,7 +9,7 @@ function findOpponent(fighter, fighters) {
 
 export function hasStatus(fighter) {
   const { combat } = fighter;
-  return combat.chokeTime > 0 || combat.freezeTime > 0 || combat.focusTime > 0 || combat.healTime > 0;
+  return combat.chokeTime > 0 || combat.freezeTime > 0 || combat.focusTime > 0 || combat.healTime > 0 || combat.wrathTime > 0;
 }
 
 export class StatusSystem {
@@ -20,7 +20,12 @@ export class StatusSystem {
   update(fighters, dt) {
     for (const fighter of fighters) {
       const { combat } = fighter;
-      combat.focusTime = Math.max(0, combat.focusTime - dt);
+      if (!fighter.isAlive) {
+        this.onDeath(fighter);
+        continue;
+      }
+      this.advance(fighter, 'focus', dt);
+      this.advance(fighter, 'wrath', dt);
       combat.freezeTime = Math.max(0, combat.freezeTime - dt);
       if (combat.healTime > 0) {
         this.heal(fighter, dt);
@@ -31,13 +36,46 @@ export class StatusSystem {
     }
   }
 
+  start(fighter, effect, duration) {
+    const { combat } = fighter;
+    const replaced = combat[`${effect}Time`] > 0;
+    if (replaced) {
+      this.end(fighter, effect, 'replaced');
+    }
+    combat[`${effect}Time`] = duration;
+    combat[`${effect}End`] = replaced ? 'replaced' : null;
+  }
+
+  end(fighter, effect, reason) {
+    const { combat } = fighter;
+    if (!(combat[`${effect}Time`] > 0)) {
+      return;
+    }
+    combat[`${effect}Time`] = 0;
+    combat[`${effect}End`] = reason;
+    if (effect === 'focus') {
+      combat.focusScale = 1;
+    } else if (effect === 'heal') {
+      combat.healRate = 0;
+    }
+  }
+
+  advance(fighter, effect, dt) {
+    const remaining = fighter.combat[`${effect}Time`];
+    if (remaining > 0 && remaining <= dt) {
+      this.end(fighter, effect, 'completed');
+    } else if (remaining > 0) {
+      fighter.combat[`${effect}Time`] = remaining - dt;
+    }
+  }
+
   heal(fighter, dt) {
     const { combat } = fighter;
     const step = Math.min(dt, combat.healTime);
-    combat.healTime -= step;
     if (fighter.isAlive) {
       fighter.health = Math.min(combat.healCap, fighter.health + combat.healRate * step);
     }
+    this.advance(fighter, 'heal', step);
   }
 
   choke(fighter, opponent, dt) {
@@ -52,6 +90,12 @@ export class StatusSystem {
 
   onDamaged(fighter) {
     fighter.combat.freezeTime = 0;
-    fighter.combat.healTime = 0;
+    this.end(fighter, 'heal', fighter.health === 0 ? 'death' : 'interrupted');
+  }
+
+  onDeath(fighter) {
+    this.end(fighter, 'heal', 'death');
+    this.end(fighter, 'focus', 'death');
+    this.end(fighter, 'wrath', 'death');
   }
 }

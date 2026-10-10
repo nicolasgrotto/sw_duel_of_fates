@@ -60,10 +60,14 @@ function createCombat() {
     chokeDamageRate: 0,
     freezeTime: 0,
     focusTime: 0,
+    focusEnd: 'reset',
     focusScale: 1,
     healTime: 0,
+    healEnd: 'reset',
     healRate: 0,
     healCap: 0,
+    wrathTime: 0,
+    wrathEnd: 'reset',
   };
 }
 

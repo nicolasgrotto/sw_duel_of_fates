@@ -119,18 +119,18 @@ function freeze(context) {
 }
 
 function heal(context) {
-  const { caster, power, scale } = context;
+  const { combat, caster, power, scale } = context;
   const missing = caster.stats.maxHealth - caster.health;
   const amount = Math.min(power.amount * scale, missing * power.maxMissingFraction);
-  caster.combat.healTime = power.duration;
+  combat.statuses.start(caster, 'heal', power.duration);
   caster.combat.healRate = amount / power.duration;
   caster.combat.healCap = caster.health + amount;
   caster.combat.statusLevel = caster.flowLevel;
 }
 
 function focus(context) {
-  const { caster, power, scale } = context;
-  caster.combat.focusTime = power.duration * scale;
+  const { combat, caster, power, scale } = context;
+  combat.statuses.start(caster, 'focus', power.duration * scale);
   caster.combat.focusScale = power.staminaScale;
   caster.combat.statusLevel = caster.flowLevel;
 }

@@ -694,6 +694,7 @@ export class CombatSystem {
   }
 
   knockOut(defender, contact) {
+    this.statuses.onDeath(defender);
     defender.clearAttack();
     defender.combat.fallDirection = chooseFallDirection(defender, this.arena, this.fallRoomMargin);
     defender.restartState(FighterState.DEAD);
