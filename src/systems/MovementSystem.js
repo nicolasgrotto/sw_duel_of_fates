@@ -1,5 +1,10 @@
 import { FighterState } from '../entities/fighterStates.js';
 import { approach } from '../utils/math.js';
+import { combatRulesConfig } from '../config/combatRulesConfig.js';
+
+export function getMaxJumps(fighter) {
+  return fighter.combat.wound === 'leg' ? combatRulesConfig.wounds.leg.maxJumps : fighter.stats.movement.maxJumps ?? 1;
+}
 
 function findOpponent(fighter, fighters) {
   for (const other of fighters) {
@@ -78,7 +83,7 @@ export class MovementSystem {
     if (this.tryWallJump(fighter)) return;
     const { movement } = fighter.stats;
     const jumpsUsed = Math.max(1, fighter.combat.jumpsUsed);
-    if (jumpsUsed >= (movement.maxJumps ?? 1)) return;
+    if (jumpsUsed >= getMaxJumps(fighter)) return;
     fighter.combat.jumpsUsed = jumpsUsed + 1;
     fighter.vy = -movement.jumpVelocity * movement.airJumpVelocityScale;
   }

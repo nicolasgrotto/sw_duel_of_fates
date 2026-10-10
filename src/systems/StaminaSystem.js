@@ -5,8 +5,17 @@ export function canAfford(fighter, cost) {
   return fighter.stamina >= cost;
 }
 
-export function getStaminaCost(fighter, cost) {
-  return fighter.combat.focusTime > 0 ? cost * fighter.combat.focusScale : cost;
+export function getStaminaCost(fighter, cost, type = 'action') {
+  const { combat } = fighter;
+  if (combat.focusTime > 0) {
+    cost *= combat.focusScale;
+  }
+  if (combat.wound === 'arm' && type === 'block') {
+    cost *= combatRulesConfig.wounds.arm.blockCostScale;
+  } else if (combat.wound === 'leg' && type === 'dash') {
+    cost *= combatRulesConfig.wounds.leg.dashCostScale;
+  }
+  return cost;
 }
 
 export function spendStamina(fighter, amount, cause = 'spend', rules = {}) {

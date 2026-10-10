@@ -212,11 +212,11 @@ export class CombatSystem {
     }
     clearActionBuffer(fighter);
     const profile = stats.airDash;
-    if (!airDashConfig.enabled || combat.airDashUsed || !canAfford(fighter, getStaminaCost(fighter, profile.staminaCost))) {
+    if (!airDashConfig.enabled || combat.airDashUsed || !canAfford(fighter, getStaminaCost(fighter, profile.staminaCost, 'dash'))) {
       this.emitAction(CombatEvent.ACTION_REJECTED, fighter, null);
       return true;
     }
-    this.spendStamina(fighter, getStaminaCost(fighter, profile.staminaCost));
+    this.spendStamina(fighter, getStaminaCost(fighter, profile.staminaCost, 'dash'));
     combat.airDashUsed = true;
     const { moveX } = fighter.intent;
     this.startDodge(fighter, profile, moveX !== 0 ? Math.sign(moveX) : fighter.facing, profile.passThrough);
@@ -340,10 +340,10 @@ export class CombatSystem {
   }
 
   tryDash(fighter, move) {
-    if (!canAfford(fighter, getStaminaCost(fighter, move.staminaCost))) {
+    if (!canAfford(fighter, getStaminaCost(fighter, move.staminaCost, 'dash'))) {
       return false;
     }
-    this.spendStamina(fighter, getStaminaCost(fighter, move.staminaCost));
+    this.spendStamina(fighter, getStaminaCost(fighter, move.staminaCost, 'dash'));
     const { moveX } = fighter.intent;
     const direction = move.dash.followInput ? (moveX !== 0 ? Math.sign(moveX) : -fighter.facing) : fighter.facing;
     this.startDodge(fighter, move.dash, direction, move.dash.passThrough);
@@ -400,11 +400,11 @@ export class CombatSystem {
 
   tryDodge(fighter) {
     const { dodge } = fighter.stats;
-    if (!canAfford(fighter, getStaminaCost(fighter, dodge.staminaCost))) {
+    if (!canAfford(fighter, getStaminaCost(fighter, dodge.staminaCost, 'dash'))) {
       return false;
     }
 
-    this.spendStamina(fighter, getStaminaCost(fighter, dodge.staminaCost));
+    this.spendStamina(fighter, getStaminaCost(fighter, dodge.staminaCost, 'dash'));
     const { moveX } = fighter.intent;
     this.startDodge(fighter, dodge, moveX !== 0 ? Math.sign(moveX) : -fighter.facing, dodge.passThrough === true);
     return true;
@@ -620,7 +620,7 @@ export class CombatSystem {
 
   resolveBlock(contact) {
     const { attacker, defender, attack } = contact;
-    const staminaCost = getStaminaCost(defender, attack.blockStaminaCost * defender.stats.blockStaminaScale);
+    const staminaCost = getStaminaCost(defender, attack.blockStaminaCost * defender.stats.blockStaminaScale, 'block');
     attacker.combat.attackConnected = true;
     defender.vx = attacker.facing * attack.blockPushback * defender.stats.blockPushbackScale;
 
@@ -711,10 +711,25 @@ export class CombatSystem {
     attacker.combat.attackConnected = true;
     attacker.stamina = Math.min(attacker.stats.maxStamina, attacker.stamina + attacker.stats.staminaOnHit);
     this.powers.onHit(attacker, defender);
+    this.applyWound(contact);
     if (!armored) {
       defender.vx = attacker.facing * attack.knockback * attacker.stats.knockbackScale;
       defender.clearAttack();
     }
+  }
+
+  applyWound(contact) {
+    const { defender, attack, damage } = contact;
+    const { combat } = defender;
+    if (!this.rules.wounds || !combat.exhausted || combat.woundUsed || damage <= 0 || defender.health === 0 || !['arm', 'leg'].includes(attack.wound)) {
+      return;
+    }
+    combat.wound = attack.wound;
+    combat.woundUsed = true;
+    if (combat.wound === 'leg') {
+      combat.jumpsUsed = Math.min(combat.jumpsUsed, combatRulesConfig.wounds.leg.maxJumps);
+    }
+    this.emit(CombatEvent.WOUND, contact);
   }
 
   knockOut(defender, contact) {

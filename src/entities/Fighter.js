@@ -44,6 +44,8 @@ function createCombat() {
     exhausted: false,
     exhaustionTime: 0,
     exhaustionCause: null,
+    wound: null,
+    woundUsed: false,
     bufferedAction: null,
     bufferTime: 0,
     parryArmed: false,

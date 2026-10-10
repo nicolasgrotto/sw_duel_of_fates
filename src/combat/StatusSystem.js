@@ -27,11 +27,11 @@ export class StatusSystem {
       this.advance(fighter, 'focus', dt);
       this.advance(fighter, 'wrath', dt);
       combat.freezeTime = Math.max(0, combat.freezeTime - dt);
-      if (combat.healTime > 0) {
-        this.heal(fighter, dt);
-      }
       if (combat.chokeTime > 0) {
         this.choke(fighter, findOpponent(fighter, fighters), dt);
+      }
+      if (combat.healTime > 0) {
+        this.heal(fighter, dt);
       }
     }
   }
@@ -57,6 +57,9 @@ export class StatusSystem {
       combat.focusScale = 1;
     } else if (effect === 'heal') {
       combat.healRate = 0;
+      if (reason === 'completed' && this.combat.rules.wounds) {
+        combat.wound = null;
+      }
     }
   }
 

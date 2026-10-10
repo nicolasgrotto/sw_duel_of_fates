@@ -11,6 +11,10 @@ export const combatRulesConfig = {
     wounds: ['versus', 'local', 'training'],
     focusEvade: ['versus', 'local', 'training'],
   },
+  wounds: {
+    arm: { blockCostScale: 1.35 },
+    leg: { dashCostScale: 1.35, maxJumps: 1 },
+  },
 };
 
 export function resolveCombatRules(rules = {}) {
