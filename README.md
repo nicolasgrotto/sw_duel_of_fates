@@ -133,7 +133,7 @@ Use o aparelho em paisagem. Joystick na esquerda; rápido, forte, guarda, esquiv
 | [design/REFERENCES.md](design/REFERENCES.md) | Referências |
 | [GAME_DESIGN.md](GAME_DESIGN.md) | Regras de gameplay |
 | [ARCHITECTURE.md](ARCHITECTURE.md) | Como o código é organizado e como os módulos se comunicam |
-| [TASKS.md](TASKS.md) | Índice do roadmap e ponto de continuidade |
+| [versions/TASKS.md](versions/TASKS.md) | Índice do roadmap e ponto de continuidade |
 | [versions/](versions/) | Tarefas de cada versão (v1 e v2 fechadas, backlog) |
 | [AGENTS.md.example](AGENTS.md.example) | Modelo de instruções para agentes de IA (Claude Code, Codex, GPT). Copie para `AGENTS.md` (ignorado pelo git) e personalize |
 | [CREDITS.md](CREDITS.md) | Créditos e aviso de marca |

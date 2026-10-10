@@ -24,7 +24,7 @@ Antes de implementar qualquer coisa, leia:
 2. [DESIGN.md](DESIGN.md): intenção, sensação e o que não fazer
 3. [GAME_DESIGN.md](GAME_DESIGN.md): regras de gameplay
 4. [ARCHITECTURE.md](ARCHITECTURE.md): como o código é organizado
-5. [TASKS.md](TASKS.md): índice e ponto de continuidade; as tarefas da versão atual ficam em [versions/](versions/)
+5. [versions/TASKS.md](versions/TASKS.md): índice e ponto de continuidade; as tarefas da versão atual ficam em [versions/](versions/)
 
 Não contradiga uma decisão registrada sem explicar o motivo e atualizar o documento. Em caso de conflito, vale a hierarquia do DESIGN.md:
 
@@ -87,7 +87,7 @@ Para cada tarefa:
 
 1. Leia a documentação e identifique os módulos responsáveis.
 2. Implemente e teste (`npm test`; com mudança visual, rode o jogo com `npm start`).
-3. Marque a task no arquivo da versão em `versions/` e, se a etapa terminou, atualize o ponto de continuidade do TASKS.md.
+3. Marque a task no arquivo da versão em `versions/` e, se a etapa terminou, atualize o ponto de continuidade do `versions/TASKS.md`.
 4. Atualize ARCHITECTURE.md se a estrutura ou a comunicação entre módulos mudou, e os docs de design se uma decisão visual foi tomada.
 
 Decisão de arquitetura não definida: escolha a solução mais simples, modular e extensível, e registre-a.
