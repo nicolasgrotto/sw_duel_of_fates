@@ -1236,6 +1236,8 @@ Consequências: dano do passo 4 ou 5 interrompe a Cura antes do passo 7, então 
 
 **Término de efeitos.** `StatusSystem.start`, `advance` e `end` controlam Cura, Foco e Ira. `healEnd`, `focusEnd` e `wrathEnd` registram `completed`, `interrupted`, `death`, `reset`, `replaced` ou `depleted`. Só `completed` dispara consequências de conclusão (a Cura limpar o ferimento). Um início novo limpa o motivo anterior; reaplicação ativa registra `replaced` enquanto reinicia a duração. Dano não letal interrompe Cura, mas não encerra os buffs Foco e Ira; K.O. encerra todos por `death`. Reset de round zera durações e registra `reset`. Estado e motivos ficam em `fighter.combat`, copiados pelo replay.
 
+**Exaustão (2.4).** `spendStamina` recebe causa e regras, marca `combat.exhausted`, `exhaustionCause` e `exhaustionTime` ao atingir o limiar. `CombatSystem.spendStamina` conecta gastos de ações, guarda e drenos e emite `EXHAUSTION`. Quebra de guarda reinicia o relógio e prolonga o mínimo, inclusive com Vigor já zerado. `StaminaSystem` acumula o tempo e libera quando ambos os limiares são atendidos, emitindo `EXHAUSTION_RECOVERED` por callback injetado. Regeneração não inicia exaustão. A factory resolve `exhaustionBonus` nos golpes comuns; técnicas, especiais e projéteis só recebem se declararem. `getDamageAmount` aplica bônus antes da armadura, sem alterar os dados compartilhados.
+
 **Render.** Interpolação visual (2.1) usa o `alpha` do `GameLoop` e dados pré-alocados do passo anterior, fora do snapshot. Desligar ou ligar a interpolação não muda nenhum resultado.
 
 ---

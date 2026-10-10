@@ -4,17 +4,19 @@ import { CollisionSystem } from '../systems/CollisionSystem.js';
 import { MovementSystem } from '../systems/MovementSystem.js';
 import { PhysicsSystem } from '../systems/PhysicsSystem.js';
 import { StaminaSystem } from '../systems/StaminaSystem.js';
+import { CombatEvent } from '../combat/combatEvents.js';
+import { resolveCombatRules } from '../config/combatRulesConfig.js';
 
 export class DuelSimulation {
   constructor({ arena, fighters, physicsConfig, combatConfig, animationConfig, rules = {} }) {
     this.arena = arena;
     this.fighters = fighters;
-    this.rules = rules;
-    this.combat = new CombatSystem(arena, combatConfig, { rules, friction: physicsConfig.actionFriction });
+    this.rules = resolveCombatRules(rules);
+    this.combat = new CombatSystem(arena, combatConfig, { rules: this.rules, friction: physicsConfig.actionFriction });
     this.movement = new MovementSystem(physicsConfig, arena);
     this.physics = new PhysicsSystem(physicsConfig, arena);
     this.collision = new CollisionSystem(arena);
-    this.stamina = new StaminaSystem();
+    this.stamina = new StaminaSystem(this.rules, (fighter) => this.combat.emitAction(CombatEvent.EXHAUSTION_RECOVERED, fighter, null));
     this.animator = new AnimationSystem(animationConfig);
   }
 

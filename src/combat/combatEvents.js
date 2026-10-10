@@ -7,6 +7,8 @@ export const CombatEvent = Object.freeze({
   ATTACK_START: 'attackStart',
   DODGE: 'dodge',
   EVADE_SUCCESS: 'evadeSuccess',
+  EXHAUSTION: 'exhaustion',
+  EXHAUSTION_RECOVERED: 'exhaustionRecovered',
   ACTION_REJECTED: 'actionRejected',
   PARRY: 'parry',
   PERFECT_PARRY: 'perfectParry',

@@ -26,7 +26,8 @@ export function createFighterFromCharacter(character, { x, y, facing }, { saberC
 
   const moves = {};
   for (const [id, definition] of Object.entries(character.moves)) {
-    moves[id] = { ...stats.attacks[definition.attack], ...definition };
+    const exhaustionBonus = id !== 'special' && !definition.projectile && ['light', 'heavy', 'riposte'].includes(definition.type);
+    moves[id] = { ...stats.attacks[definition.attack], exhaustionBonus, ...definition };
   }
   const techniques = character.loadout?.techniques ?? {};
   for (const id of Object.values(techniques)) {

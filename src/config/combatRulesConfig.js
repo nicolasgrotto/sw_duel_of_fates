@@ -1,4 +1,11 @@
 export const combatRulesConfig = {
+  exhaustion: {
+    enterRatio: 0.1,
+    exitRatio: 0.4,
+    minDuration: 1,
+    guardBreakMinDuration: 1.6,
+    damageScale: 1.2,
+  },
   modes: {
     exhaustion: ['versus', 'local', 'training'],
     wounds: ['versus', 'local', 'training'],

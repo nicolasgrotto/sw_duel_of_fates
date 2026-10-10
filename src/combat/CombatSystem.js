@@ -1,6 +1,7 @@
 import { airDashConfig } from '../config/airDashConfig.js';
 import { evadeConfig } from '../config/evadeConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
+import { combatRulesConfig, resolveCombatRules } from '../config/combatRulesConfig.js';
 import { FighterState } from '../entities/fighterStates.js';
 import { canAfford, getStaminaCost, spendStamina } from '../systems/StaminaSystem.js';
 import { CombatAction, clearActionBuffer, updateActionBuffer } from './actionBuffer.js';
@@ -53,6 +54,7 @@ function chooseFallDirection(fighter, arena, roomMargin) {
 export class CombatSystem {
   constructor(arena, { inputBuffer, fallRoomMargin, clash }, { rules = {}, friction = 0 } = {}) {
     this.arena = arena;
+    this.rules = resolveCombatRules(rules);
     this.inputBuffer = inputBuffer;
     this.fallRoomMargin = fallRoomMargin;
     this.clash = clash;
@@ -77,6 +79,14 @@ export class CombatSystem {
       this.applyActionMovement(fighter);
     }
     this.powers.resolve(fighters, dt);
+  }
+
+  spendStamina(fighter, amount, cause = 'spend') {
+    const exhausted = fighter.combat.exhausted;
+    spendStamina(fighter, amount, cause, this.rules);
+    if (!exhausted && fighter.combat.exhausted) {
+      this.emitAction(CombatEvent.EXHAUSTION, fighter, cause);
+    }
   }
 
   updateTimers(fighter, dt) {
@@ -187,7 +197,7 @@ export class CombatSystem {
       return false;
     }
     clearActionBuffer(fighter);
-    spendStamina(fighter, getStaminaCost(fighter, stats.feint.staminaCost));
+    this.spendStamina(fighter, getStaminaCost(fighter, stats.feint.staminaCost));
     const { attackType } = combat;
     fighter.clearAttack();
     fighter.setState(FighterState.IDLE);
@@ -206,7 +216,7 @@ export class CombatSystem {
       this.emitAction(CombatEvent.ACTION_REJECTED, fighter, null);
       return true;
     }
-    spendStamina(fighter, getStaminaCost(fighter, profile.staminaCost));
+    this.spendStamina(fighter, getStaminaCost(fighter, profile.staminaCost));
     combat.airDashUsed = true;
     const { moveX } = fighter.intent;
     this.startDodge(fighter, profile, moveX !== 0 ? Math.sign(moveX) : fighter.facing, profile.passThrough);
@@ -318,7 +328,7 @@ export class CombatSystem {
     if (!canAfford(fighter, getStaminaCost(fighter, move.staminaCost))) {
       return false;
     }
-    spendStamina(fighter, getStaminaCost(fighter, move.staminaCost));
+    this.spendStamina(fighter, getStaminaCost(fighter, move.staminaCost));
     fighter.vx = fighter.facing * move.leap.speedX;
     fighter.vy = -move.leap.speedY;
     fighter.grounded = false;
@@ -333,7 +343,7 @@ export class CombatSystem {
     if (!canAfford(fighter, getStaminaCost(fighter, move.staminaCost))) {
       return false;
     }
-    spendStamina(fighter, getStaminaCost(fighter, move.staminaCost));
+    this.spendStamina(fighter, getStaminaCost(fighter, move.staminaCost));
     const { moveX } = fighter.intent;
     const direction = move.dash.followInput ? (moveX !== 0 ? Math.sign(moveX) : -fighter.facing) : fighter.facing;
     this.startDodge(fighter, move.dash, direction, move.dash.passThrough);
@@ -366,7 +376,7 @@ export class CombatSystem {
       return false;
     }
 
-    spendStamina(fighter, getStaminaCost(fighter, attack.staminaCost));
+    this.spendStamina(fighter, getStaminaCost(fighter, attack.staminaCost));
     fighter.combat.riposteTime = 0;
     fighter.combat.evadeStreak = 0;
     fighter.clearAttack();
@@ -394,7 +404,7 @@ export class CombatSystem {
       return false;
     }
 
-    spendStamina(fighter, getStaminaCost(fighter, dodge.staminaCost));
+    this.spendStamina(fighter, getStaminaCost(fighter, dodge.staminaCost));
     const { moveX } = fighter.intent;
     this.startDodge(fighter, dodge, moveX !== 0 ? Math.sign(moveX) : -fighter.facing, dodge.passThrough === true);
     return true;
@@ -551,7 +561,7 @@ export class CombatSystem {
   applyShove(contact) {
     const { attacker, defender, attack } = contact;
 
-    spendStamina(defender, attack.staminaDamage);
+    this.spendStamina(defender, attack.staminaDamage, 'drain');
     defender.clearAttack();
     defender.vx = attacker.facing * attack.knockback;
     defender.combat.parryArmed = false;
@@ -589,7 +599,7 @@ export class CombatSystem {
     const stagger = perfect ? parry.perfectStagger : parry.stagger;
     const staminaDamage = attack.blockStaminaCost * (perfect ? parry.perfectStaminaDamageMultiplier : 1);
 
-    spendStamina(attacker, staminaDamage);
+    this.spendStamina(attacker, staminaDamage, 'drain');
     attacker.clearAttack();
     attacker.vx = -attacker.facing * parry.attackerRecoil;
     attacker.combat.stunDuration = stagger;
@@ -619,7 +629,7 @@ export class CombatSystem {
       return;
     }
     if (canAfford(defender, staminaCost + (defender.stats.guardBreakThreshold ?? 0))) {
-      spendStamina(defender, staminaCost);
+      this.spendStamina(defender, staminaCost, 'block');
       defender.combat.blockstun = attack.blockstun;
       this.powers.onBlock(defender);
       this.emit(CombatEvent.BLOCK, contact);
@@ -630,7 +640,7 @@ export class CombatSystem {
   }
 
   breakGuard(defender, contact) {
-    spendStamina(defender, defender.stamina);
+    this.spendStamina(defender, defender.stamina, 'guardBreak');
     defender.combat.stunDuration = defender.stats.guardBreakStun;
     defender.restartState(FighterState.STUNNED);
     this.emit(CombatEvent.GUARD_BREAK, contact);
@@ -645,7 +655,7 @@ export class CombatSystem {
   applyHit(contact) {
     const { attacker, defender, attack } = contact;
     const armored = hasArmor(defender);
-    const damage = this.getHitDamage(attacker, defender, attack) * (armored ? defender.combat.attack.armor.damageScale : 1);
+    const damage = this.getHitDamage(attacker, defender, attack);
     contact.armored = armored;
     if (!this.applyDamage(contact, damage, 'blade', CombatEvent.HIT)) {
       return;
@@ -660,7 +670,8 @@ export class CombatSystem {
   }
 
   applyDamage(contact, amount, source, eventType = null) {
-    const { attacker, defender } = contact;
+    const { defender } = contact;
+    amount = this.getDamageAmount(contact, amount, source);
     contact.damage = Math.min(defender.health, amount);
     defender.health = Math.max(0, defender.health - amount);
     if (contact.damage > 0) {
@@ -680,6 +691,19 @@ export class CombatSystem {
       return false;
     }
     return true;
+  }
+
+  getDamageAmount(contact, amount, source) {
+    const { defender, attack, armored } = contact;
+    if (source === 'blade') {
+      if (this.rules.exhaustion && defender.combat.exhausted && attack.exhaustionBonus === true) {
+        amount *= combatRulesConfig.exhaustion.damageScale;
+      }
+      if (armored) {
+        amount *= defender.combat.attack.armor.damageScale;
+      }
+    }
+    return amount;
   }
 
   onBladeDamage(contact) {
