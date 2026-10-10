@@ -173,6 +173,17 @@ NOME ESQUERDA                                         NOME DIREITA
 
 Duelar abre a seleção em três etapas: ESCOLHA SEU LUTADOR, ESCOLHA O ADVERSÁRIO (pode ser o mesmo personagem) e ESCOLHA A ARENA. Na etapa da arena, a coluna da direita mostra uma frase curta sobre ela e uma miniatura da arena com moldura fina em `accent`. A lista de nomes fica na coluna da esquerda, com a navegação e o marcador do MenuList. Na coluna da direita aparecem o estilo do personagem (`subtitle`), o traço e a habilidade (`hint`) e, embaixo, a silhueta em guarda com o sabre aceso. `Esc` volta uma etapa. A seleção acompanha pausa, reinício e revanche.
 
+### Galeria de poderes (2.11)
+
+Modo do menu, logo depois de **Treino**, sempre disponível. Mostra a cena de duelo normal (arena, dois lutadores, efeitos), sem rounds, sem placar e sem barras de vida; só o medidor de Fluxo de quem lança fica visível, para ler custo e gasto.
+
+- **Painel no topo** (mesma posição da instrução do tutorial): linha 1 em `subtitle` com o nome do poder ou técnica entre `‹` e `›`; linha 2 em `hint`: `Tier Firme · nível 6 · Alvo: bloqueando · Repetição: ligada`. Quando o tier escolhido está abaixo do nível mínimo do poder, a linha 2 troca o resto por `Exige nível {level}` em `hudDanger` e nada é lançado.
+- **Tiers como chips**: os quatro tiers numa fileira curta abaixo da linha 2 (Tênue, Firme, Profundo, Ápice), o escolhido sublinhado na cor do tier (as mesmas cores de energia de `powersConfig.tiers`); os outros em `hint`. A troca mantém a cena: só muda a cor, a emissão e a potência.
+- **Rodapé**: uma linha `hint` com os comandos do preset ativo, acima da dica de pausa.
+- **Comandos**: `↑`/`↓` (ações de menu) trocam o poder; `←`/`→` trocam o tier; Bloquear percorre o alvo; Ataque rápido lança agora; Ataque forte liga e desliga a repetição; Habilidade troca quem lança (estilo de movimento e silhueta); `Esc` sai. Gamepad: direcional, botões equivalentes às mesmas ações. Toque: as setas `‹` `›` do painel trocam o poder, os chips trocam o tier, e uma fileira de três chips no rodapé (alvo, lançar, repetição) substitui os botões de combate.
+- **Alvos**: parado, bloqueando, com Barreira, com Redirecionamento, no ar.
+- Sem painel DOM, sem caixas cobrindo a área de luta, sem números de dano. O F3 continua sendo o lugar dos números (fase, potência, alcance, custo, eventos).
+
 ### Ferramentas do Treino
 
 Inputs do jogador e do boneco aparecem em uma linha hint no rodapé (acima dos dados de frame), usando nomes de ações. F5 alterna gravação dos intents do jogador; F6 reproduz a gravação no boneco em loop, espelhando movimento pela direção de guarda. Estado e duração da gravação ficam na borda inferior esquerda. Hitboxes podem ser ligadas por F7 sem ligar todo o debug. As três teclas constam em Controles. Sem painel DOM ou elementos no centro da luta.
