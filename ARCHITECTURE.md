@@ -1306,3 +1306,5 @@ Todas as janelas dentro de update ≤ 2 ms e render ≤ 10 ms; sem erros JavaScr
 ### Galeria de poderes (2.11)
 
 O modo gallery entra pelo menu depois de Treino, reutiliza DuelState e DuelSimulation, não tem rounds nem término por morte e repõe vida entre passos. createDuelRules força Poderes e focusEvade e desliga as outras capacidades, independentemente das preferências de combate. A lista do menu usa espaçamento de 36 px para acomodar a entrada dentro do rodapé.
+
+GalleryDirector guarda seleção e disponibilidade por nível; galleryCatalog gera os poderes por categoria e acrescenta bladeTechniques, sem lista duplicada de itens. galleryConfig define níveis representativos e padrões. settingsStorage valida cada campo de settings.gallery no carregamento; DuelState salva só a seleção quando ela muda.

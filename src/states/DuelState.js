@@ -27,6 +27,7 @@ import { DummyController } from '../controllers/DummyController.js';
 import { tutorialConfig } from '../config/tutorialConfig.js';
 import { ParryChallenge } from '../modes/ParryChallenge.js';
 import { TutorialDirector } from '../modes/TutorialDirector.js';
+import { GalleryDirector } from '../modes/GalleryDirector.js';
 import { BannerKind, ModeBanner } from '../ui/ModeBanner.js';
 import { getArcadeStage } from '../modes/arcade.js';
 import { getSurvivalStage } from '../modes/survival.js';
@@ -142,7 +143,12 @@ export class DuelState extends GameState {
     this.banner = null;
     this.modeFinished = false;
     const bindings = this.game.input.bindings ?? keyBindings;
-    if (this.mode === DuelMode.TUTORIAL) {
+    if (this.mode === DuelMode.GALLERY) {
+      this.gallery = new GalleryDirector(this.game.settings.gallery, (selection) => {
+        this.game.settings.gallery = selection;
+        this.game.saveSettings();
+      });
+    } else if (this.mode === DuelMode.TUTORIAL) {
       this.director = new TutorialDirector(tutorialConfig.steps);
       this.banner = new ModeBanner(BannerKind.TUTORIAL, this.director, bindings);
     } else if (this.mode === DuelMode.CHALLENGE) {

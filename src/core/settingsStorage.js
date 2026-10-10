@@ -1,4 +1,5 @@
 import { loadSave, saveSave } from './saveStorage.js';
+import { sanitizeGallery } from '../modes/galleryCatalog.js';
 
 function isValid(value, defaultValue, allowedValues) {
   if (Array.isArray(defaultValue) && defaultValue.length > 0 && defaultValue.every((item) => typeof item === 'boolean')) {
@@ -12,6 +13,7 @@ function isValid(value, defaultValue, allowedValues) {
 
 export function loadSettings(defaults, storage, key, allowed = {}) {
   const settings = { ...defaults };
+  if (defaults.gallery) settings.gallery = sanitizeGallery(defaults.gallery);
   if (Array.isArray(defaults.bladeLockHold)) settings.bladeLockHold = [...defaults.bladeLockHold];
 
   try {
@@ -20,6 +22,10 @@ export function loadSettings(defaults, storage, key, allowed = {}) {
       return settings;
     }
     for (const name of Object.keys(defaults)) {
+      if (name === 'gallery') {
+        settings.gallery = sanitizeGallery(saved.gallery);
+        continue;
+      }
       if (isValid(saved[name], defaults[name], allowed[name])) {
         settings[name] = Array.isArray(saved[name]) ? [...saved[name]] : saved[name];
       }

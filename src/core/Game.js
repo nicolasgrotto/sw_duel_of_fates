@@ -1,4 +1,5 @@
 import { createTextPrompt } from './textPrompt.js';
+import { galleryConfig } from '../config/galleryConfig.js';
 import { aiConfig } from '../config/aiConfig.js';
 import { audioConfig } from '../config/audioConfig.js';
 import { loadSettings, loadStory, saveSettings } from './settingsStorage.js';
@@ -35,7 +36,7 @@ export class Game {
     this.touchControls = new TouchControls(this.touch);
     this.states = new StateMachine();
     this.settings = loadSettings(
-      { language: defaultLanguage, keyboardPreset: 'classic', difficulty: aiConfig.defaultDifficulty, reducedEffects: coarsePointer, sound: true, music: true, parryChallengeBest: 0, arcadeCleared: [], finalReplay: true, customBindings: {}, unlocks: {}, survivalBest: 0, powers: true, bladeLockHold: [false, false], unlockedCharacters: [] },
+      { language: defaultLanguage, keyboardPreset: 'classic', difficulty: aiConfig.defaultDifficulty, reducedEffects: coarsePointer, sound: true, music: true, parryChallengeBest: 0, arcadeCleared: [], finalReplay: true, customBindings: {}, unlocks: {}, survivalBest: 0, powers: true, gallery: galleryConfig.defaults, bladeLockHold: [false, false], unlockedCharacters: [] },
       globalThis.localStorage,
       gameConfig.settingsStorageKey,
       { language: languageIds, difficulty: aiConfig.difficultyOrder, keyboardPreset: keyboardPresetOrder },
