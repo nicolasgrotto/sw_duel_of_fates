@@ -14,7 +14,7 @@ it('enables combat capabilities only in their approved modes', () => {
     assert.equal(rules.exhaustion, taught);
     assert.equal(rules.wounds, taught);
     assert.equal(rules.focusEvade, enabled);
-    assert.equal(rules.bladeLock, enabled);
+    assert.equal(rules.bladeLock, taught);
   }
   assert.equal(storyConfig.rules.exhaustion, false);
   assert.equal(storyConfig.rules.wounds, false);

@@ -10,7 +10,7 @@ export const combatRulesConfig = {
     exhaustion: ['versus', 'local', 'training', 'tutorial'],
     wounds: ['versus', 'local', 'training', 'tutorial'],
     focusEvade: ['versus', 'local', 'training'],
-    bladeLock: ['versus', 'local', 'training'],
+    bladeLock: ['versus', 'local', 'training', 'tutorial'],
   },
   wounds: {
     arm: { blockCostScale: 1.25 },

@@ -475,6 +475,9 @@ Custos, tempos e números ficam em `src/config/movesConfig.js` e `fightersConfig
 | Aparar | aparar 2 fortes | ataca com fortes |
 | Riposta | acertar 1 riposta | ataca com fortes |
 | Empurrão | empurrar 1 vez | bloqueia |
+| Quebra de guarda | quebrar a guarda 1 vez (o boneco fica exausto) | bloqueia |
+| Ferimento | ferir o boneco exausto com um forte | bloqueia |
+| Disputa de lâminas | vencer 1 disputa: forte, e depois o ataque rápido repetido (ou segurado, com a opção) | fica a uma distância em que só as lâminas se encontram, responde ao forte com o próprio forte e aperta devagar (3 por segundo) |
 | Habilidade | usar a habilidade (`I`) 1 vez | parado |
 
 No fim, a tela de resultado oferece o desafio de parry.

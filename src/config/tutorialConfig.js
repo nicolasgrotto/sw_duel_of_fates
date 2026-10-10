@@ -10,6 +10,7 @@ export const tutorialConfig = {
     { id: 'shove', dummy: 'block', count: 1, goal: { type: 'event', events: ['shove'], role: 'attacker', attackTypes: null, minChainStep: 0 } },
     { id: 'guardBreak', dummy: 'block', count: 1, goal: { type: 'event', events: ['guardBreak'], role: 'attacker', attackTypes: null, minChainStep: 0 } },
     { id: 'wound', dummy: 'block', count: 1, goal: { type: 'event', events: ['wound'], role: 'attacker', attackTypes: null, minChainStep: 0 } },
+    { id: 'bladeLock', dummy: 'lock', count: 1, goal: { type: 'event', events: ['bladeLockEnd'], role: 'winner', attackTypes: null, minChainStep: 0 } },
     { id: 'special', dummy: 'idle', count: 1, goal: { type: 'event', events: ['attackStart'], role: 'attacker', attackTypes: ['special'], minChainStep: 0 } },
   ],
   challenge: {

@@ -17,6 +17,7 @@ export const controlsScreenRows = [
   { label: 'parry', actions: ['block'] },
   { label: 'riposte', actions: ['lightAttack'] },
   { label: 'shove', actions: ['block', 'lightAttack'] },
+  { label: 'bladeLock', actions: ['lightAttack'] },
   { label: 'dodge', actions: ['dodge'] },
   { label: 'evade', actions: ['evade'] },
   { label: 'special', actions: ['special'] },
@@ -85,7 +86,7 @@ export const layout = {
   controls: {
     titleY: 110,
     firstRowY: 148,
-    rowSpacing: 24,
+    rowSpacing: 23,
     columnGap: 16,
     gamepadY: 634,
     footerY: 672,

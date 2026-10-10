@@ -44,6 +44,9 @@ export const gameConfig = {
       attackInterval: 1.4,
       heavyInterval: [1.1, 2.1],
       approachGap: 40,
+      lockGapMargin: 40,
+      lockGapTolerance: 6,
+      lockPressRate: 3,
     },
   },
   replay: {
