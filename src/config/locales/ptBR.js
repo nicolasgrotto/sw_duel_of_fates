@@ -57,6 +57,7 @@ export const ptBR = {
       story: 'História',
       challenge: 'Desafio de parry',
       training: 'Treino',
+      gallery: 'Galeria de poderes',
       options: 'Opções',
       controls: 'Controles',
       navigation: '{up}  e  {down}  escolher   ·   {confirm}  confirmar',

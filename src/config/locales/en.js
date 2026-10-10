@@ -57,6 +57,7 @@ export const en = {
       story: 'Story',
       challenge: 'Parry challenge',
       training: 'Training',
+      gallery: 'Power gallery',
       options: 'Options',
       controls: 'Controls',
       navigation: '{up}  and  {down}  choose   ·   {confirm}  confirm',

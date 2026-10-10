@@ -38,7 +38,7 @@ export const layout = {
     titleY: 140,
     taglineY: 202,
     firstItemY: 270,
-    itemSpacing: 40,
+    itemSpacing: 36,
     footerY: 680,
   },
   replay: {

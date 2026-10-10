@@ -13,7 +13,7 @@ it('enables combat capabilities only in their approved modes', () => {
     const taught = enabled || mode === 'tutorial';
     assert.equal(rules.exhaustion, taught);
     assert.equal(rules.wounds, taught);
-    assert.equal(rules.focusEvade, enabled);
+    assert.equal(rules.focusEvade, enabled || mode === 'gallery');
     assert.equal(rules.bladeLock, taught);
   }
   assert.equal(storyConfig.rules.exhaustion, false);

@@ -241,6 +241,10 @@ export class DuelState extends GameState {
   }
 
   showRoundIntro() {
+    if (this.mode === DuelMode.GALLERY) {
+      this.introTime = layout.messages.introDuration;
+      return;
+    }
     const isFinal = this.hasRoundLimit && this.roundsToWin > 1 && this.roundWins.every((wins) => wins === this.roundsToWin - 1);
     const text = isFinal ? texts.duel.finalRound : formatText(texts.duel.intro, { number: this.roundNumber });
     this.message.show(text, layout.messages.introDuration);
@@ -454,6 +458,7 @@ export class DuelState extends GameState {
   }
 
   stepSimulation(dt) {
+    if (this.mode === DuelMode.GALLERY) this.keepFightersAlive();
     if (this.isPlaying()) {
       this.duelTime += dt;
       this.updateIntents(dt);
@@ -481,7 +486,8 @@ export class DuelState extends GameState {
     this.rememberLastEvent();
     this.countPlayerStats();
     this.updateFrameData();
-    this.checkForDeath();
+    if (this.mode === DuelMode.GALLERY) this.keepFightersAlive();
+    else this.checkForDeath();
   }
 
   updateIntents(dt) {

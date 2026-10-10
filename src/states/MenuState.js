@@ -18,6 +18,7 @@ export const MenuOption = Object.freeze({
   TUTORIAL: 'tutorial',
   CHALLENGE: 'challenge',
   TRAINING: 'training',
+  GALLERY: 'gallery',
   OPTIONS: 'options',
   CONTROLS: 'controls',
 });
@@ -31,6 +32,7 @@ const MENU_ORDER = Object.freeze([
   MenuOption.TUTORIAL,
   MenuOption.CHALLENGE,
   MenuOption.TRAINING,
+  MenuOption.GALLERY,
   MenuOption.OPTIONS,
   MenuOption.CONTROLS,
 ]);
@@ -91,6 +93,9 @@ export class MenuState extends GameState {
         break;
       case MenuOption.TRAINING:
         this.game.changeState(StateId.DUEL, { mode: DuelMode.TRAINING });
+        break;
+      case MenuOption.GALLERY:
+        this.game.changeState(StateId.DUEL, { mode: DuelMode.GALLERY });
         break;
       case MenuOption.OPTIONS:
         this.game.pushState(StateId.OPTIONS);

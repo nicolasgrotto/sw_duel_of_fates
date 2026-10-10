@@ -6,14 +6,16 @@ export const DuelMode = Object.freeze({
   SURVIVAL: 'survival',
   LOCAL: 'local',
   TRAINING: 'training',
+  GALLERY: 'gallery',
   TUTORIAL: 'tutorial',
   CHALLENGE: 'parryChallenge',
   STORY: 'story',
 });
 
-const DUMMY_MODES = new Set([DuelMode.TRAINING, DuelMode.TUTORIAL, DuelMode.CHALLENGE]);
+const DUMMY_MODES = new Set([DuelMode.TRAINING, DuelMode.TUTORIAL, DuelMode.CHALLENGE, DuelMode.GALLERY]);
 
 export function createDuelRules(mode, settings, powerModes) {
+  if (mode === DuelMode.GALLERY) return resolveCombatRules({ powers: true, focusEvade: true });
   const rules = { powers: powerModes.includes(mode) && settings.powers !== false };
   for (const [capability, modes] of Object.entries(combatRulesConfig.modes)) {
     rules[capability] = modes.includes(mode);

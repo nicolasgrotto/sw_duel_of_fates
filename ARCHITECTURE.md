@@ -1302,3 +1302,7 @@ Santuário com reflexos e F3: referência Sombra/Raio contra Guardião/Barreira;
 | Tempestade + projéteis + estados | reduzidos | 8 | 0,67 / 0,97 ms | 6,95 / 9,79 ms | 59,88 |
 
 Todas as janelas dentro de update ≤ 2 ms e render ≤ 10 ms; sem erros JavaScript. Capturas desktop e mobile conferidas no QA. A medição emulada não substitui hardware: os testes em Chrome Android/Safari iOS e teclado nativo são os já concluídos pelo autor nas etapas anteriores, não foram refeitos nesta etapa. Arquivos temporários e perfil do Chrome são removidos ao concluir.
+
+### Galeria de poderes (2.11)
+
+O modo gallery entra pelo menu depois de Treino, reutiliza DuelState e DuelSimulation, não tem rounds nem término por morte e repõe vida entre passos. createDuelRules força Poderes e focusEvade e desliga as outras capacidades, independentemente das preferências de combate. A lista do menu usa espaçamento de 36 px para acomodar a entrada dentro do rodapé.
