@@ -8,6 +8,8 @@ export const tutorialConfig = {
     { id: 'parry', dummy: 'heavy', count: 2, goal: { type: 'event', events: ['parry', 'perfectParry'], role: 'defender', attackTypes: null, minChainStep: 0 } },
     { id: 'riposte', dummy: 'heavy', count: 1, goal: { type: 'event', events: ['hit'], role: 'attacker', attackTypes: ['riposte'], minChainStep: 0 } },
     { id: 'shove', dummy: 'block', count: 1, goal: { type: 'event', events: ['shove'], role: 'attacker', attackTypes: null, minChainStep: 0 } },
+    { id: 'guardBreak', dummy: 'block', count: 1, goal: { type: 'event', events: ['guardBreak'], role: 'attacker', attackTypes: null, minChainStep: 0 } },
+    { id: 'wound', dummy: 'block', count: 1, goal: { type: 'event', events: ['wound'], role: 'attacker', attackTypes: null, minChainStep: 0 } },
     { id: 'special', dummy: 'idle', count: 1, goal: { type: 'event', events: ['attackStart'], role: 'attacker', attackTypes: ['special'], minChainStep: 0 } },
   ],
   challenge: {

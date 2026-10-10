@@ -7,8 +7,8 @@ export const combatRulesConfig = {
     damageScale: 1.2,
   },
   modes: {
-    exhaustion: ['versus', 'local', 'training'],
-    wounds: ['versus', 'local', 'training'],
+    exhaustion: ['versus', 'local', 'training', 'tutorial'],
+    wounds: ['versus', 'local', 'training', 'tutorial'],
     focusEvade: ['versus', 'local', 'training'],
   },
   wounds: {

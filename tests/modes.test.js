@@ -93,3 +93,17 @@ describe('DummyController heavy mode', () => {
     assert.equal(heavies, 2);
   });
 });
+
+it('teaches exhaustion through a guard break and then a wound on the exhausted dummy', () => {
+  const director = new TutorialDirector(tutorialConfig.steps);
+  const player = spawnFighter(400, 1);
+  const dummy = spawnFighter(500, -1, 'shadow');
+  while (director.step.id !== 'guardBreak') director.advance();
+  assert.equal(director.dummyBehavior, DummyBehavior.BLOCK);
+  director.handleEvents([{ type: 'guardBreak', attacker: dummy, defender: player, attackType: 'heavy' }], player);
+  assert.equal(director.step.id, 'guardBreak');
+  director.handleEvents([{ type: 'guardBreak', attacker: player, defender: dummy, attackType: 'heavy' }], player);
+  assert.equal(director.step.id, 'wound');
+  director.handleEvents([{ type: 'wound', attacker: player, defender: dummy, attackType: 'heavy' }], player);
+  assert.equal(director.step.id, 'special');
+});

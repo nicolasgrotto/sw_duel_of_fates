@@ -225,6 +225,8 @@ export const ptBR = {
         parry: 'Toque {block} na hora em que o golpe forte chegar',
         riposte: 'Depois de aparar, {light} vira o contra-ataque',
         shove: 'O boneco só defende: segure {block} e aperte {light} para empurrar',
+        guardBreak: 'Ataque a guarda até ela quebrar: sem Vigor, o boneco fica exausto',
+        wound: 'Quebre a guarda de novo e acerte o forte ({heavy}) no boneco exausto: o golpe fere',
         special: 'Use a habilidade do seu personagem: {special}',
       },
       progress: 'Passo {step} de {steps}   ·   {done} / {count}',

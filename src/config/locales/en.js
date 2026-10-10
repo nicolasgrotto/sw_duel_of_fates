@@ -225,6 +225,8 @@ export const en = {
         parry: 'Tap {block} right as the heavy blow arrives',
         riposte: 'After a parry, {light} becomes the counterattack',
         shove: 'The dummy only defends: hold {block} and press {light} to shove',
+        guardBreak: 'Attack the guard until it breaks: out of Stamina, the dummy is exhausted',
+        wound: 'Break the guard again and land a heavy ({heavy}) on the exhausted dummy: the blow wounds',
         special: 'Use your character ability: {special}',
       },
       progress: 'Step {step} of {steps}   ·   {done} / {count}',
