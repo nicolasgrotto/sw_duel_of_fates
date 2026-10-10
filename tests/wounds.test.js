@@ -103,6 +103,23 @@ it('arm and leg change only their derived costs and combine with focus', () => {
   assert.deepEqual(defender.stats, stats);
 });
 
+it('arm wounds also scale power guard drains while retaining the legacy focus policy for drains', () => {
+  const { attacker, defender, combat } = setup();
+  defender.x = attacker.x + 80;
+  defender.combat.wound = 'arm';
+  defender.combat.focusTime = 1;
+  defender.combat.focusScale = 0.5;
+  defender.setState(FighterState.BLOCKING);
+  defender.stats = { ...defender.stats, flowLevel: attacker.flowLevel };
+  const before = defender.stamina;
+  combat.powers.strike(attacker, defender, powersConfig.powers.lightning, 'tick', null);
+  assert.ok(Math.abs(before - defender.stamina - powersConfig.powers.lightning.guard.staminaCost * 1.35) < 1e-9);
+  defender.resetForRound(1000, -1);
+  defender.combat.focusTime = 1;
+  defender.combat.focusScale = 0.5;
+  assert.equal(getStaminaCost(defender, 20, 'blockDrain'), 20);
+});
+
 it('leg wound charges ground and air dashes correctly while manual evasion stays free', () => {
   const { defender, combat } = setup();
   defender.combat.wound = 'leg';

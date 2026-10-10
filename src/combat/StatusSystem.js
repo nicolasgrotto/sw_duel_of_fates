@@ -71,6 +71,7 @@ export class StatusSystem {
       return false;
     }
     defender.flowMeter -= cost;
+    defender.combat.autoEvadeCount += 1;
     contact.auto = true;
     this.checkFocusResource(defender);
     return true;

@@ -175,7 +175,7 @@ function runDuel(leftSetup, rightSetup, random, rules, maxSeconds) {
       if (event.type === CombatEvent.GUARD_BREAK) counts.guardBreaks += 1;
       if (event.type === CombatEvent.PARRY) counts.parries += 1;
       if (event.type === CombatEvent.PERFECT_PARRY) counts.perfectParries += 1;
-      if (event.type === CombatEvent.EVADE_SUCCESS) counts.evades += 1;
+      if (event.type === CombatEvent.EVADE_SUCCESS && !event.auto) counts.evades += 1;
       if (event.type === CombatEvent.SHOVE) counts.shoves += 1;
       if (event.type === CombatEvent.POWER_START) counts.powers += 1;
       if (event.type === CombatEvent.POWER_HIT) counts.powerHits += 1;
@@ -186,6 +186,9 @@ function runDuel(leftSetup, rightSetup, random, rules, maxSeconds) {
   }
 
   const winner = left.isAlive && !right.isAlive ? left : right.isAlive && !left.isAlive ? right : null;
+  for (const name of ['exhaustionSpendCount', 'exhaustionBlockCount', 'exhaustionGuardBreakCount', 'exhaustionDrainCount', 'woundArmCount', 'woundLegCount', 'autoEvadeCount', 'wrathExtraDamage']) {
+    counts[name] = left.combat[name] + right.combat[name];
+  }
   const winnerSetup = winner === left ? leftSetup : winner === right ? rightSetup : null;
   return { winnerSide: winnerSetup?.side ?? null, ending: describeEnding(left, right), time, counts, hitsToKnockout: winner ? hitsReceived.get(winner === left ? right : left) : null };
 }
@@ -241,6 +244,14 @@ function main() {
   if (rules.powers) {
     const counts = (name) => average(results.map((result) => result.counts[name])).toFixed(2);
     console.log(`avg powers : ${counts('powers')}  hits: ${counts('powerHits')}  resisted: ${counts('powerResisted')}  absorbed: ${counts('powerAbsorbed')}`);
+  }
+  const wrathEquipped = sides.some(({ characterId }) => Object.values(resolveCharacter(characterId).loadout?.powers ?? {}).includes('wrath'));
+  if (rules.exhaustion || rules.wounds || rules.focusEvade || wrathEquipped) {
+    const counts = (name) => average(results.map((result) => result.counts[name])).toFixed(2);
+    console.log(`avg exhaustion: spend ${counts('exhaustionSpendCount')}  block ${counts('exhaustionBlockCount')}  guardBreak ${counts('exhaustionGuardBreakCount')}  drain ${counts('exhaustionDrainCount')}`);
+    console.log(`avg wounds: arm ${counts('woundArmCount')}  leg ${counts('woundLegCount')}`);
+    console.log(`avg auto evades: ${counts('autoEvadeCount')}`);
+    console.log(`avg wrath extra damage: ${counts('wrathExtraDamage')}`);
   }
 }
 

@@ -7,10 +7,10 @@ export function canAfford(fighter, cost) {
 
 export function getStaminaCost(fighter, cost, type = 'action') {
   const { combat } = fighter;
-  if (combat.focusTime > 0) {
+  if (combat.focusTime > 0 && type !== 'blockDrain') {
     cost *= combat.focusScale;
   }
-  if (combat.wound === 'arm' && type === 'block') {
+  if (combat.wound === 'arm' && (type === 'block' || type === 'blockDrain')) {
     cost *= combatRulesConfig.wounds.arm.blockCostScale;
   } else if (combat.wound === 'leg' && type === 'dash') {
     cost *= combatRulesConfig.wounds.leg.dashCostScale;
@@ -23,6 +23,15 @@ export function spendStamina(fighter, amount, cause = 'spend', rules = {}) {
   fighter.combat.staminaRegenDelay = fighter.stats.stamina.regenDelay;
   if (rules.exhaustion && (amount > 0 || cause === 'guardBreak') && fighter.stamina <= fighter.stats.maxStamina * combatRulesConfig.exhaustion.enterRatio) {
     const { combat } = fighter;
+    if (!combat.exhausted) {
+      switch (cause) {
+        case 'spend': combat.exhaustionSpendCount += 1; break;
+        case 'block': combat.exhaustionBlockCount += 1; break;
+        case 'guardBreak': combat.exhaustionGuardBreakCount += 1; break;
+        case 'drain': combat.exhaustionDrainCount += 1; break;
+        default: break;
+      }
+    }
     if (!combat.exhausted || cause === 'guardBreak') {
       combat.exhaustionTime = 0;
       combat.exhaustionCause = cause;

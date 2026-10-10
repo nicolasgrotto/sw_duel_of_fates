@@ -40,6 +40,7 @@ import { DuelSimulation } from '../simulation/DuelSimulation.js';
 import { ReplayBuffer } from '../simulation/ReplayBuffer.js';
 import { EffectsSystem } from '../systems/EffectsSystem.js';
 import { TimeControl } from '../systems/TimeControl.js';
+import { getMaxJumps } from '../systems/MovementSystem.js';
 import { CombatMessage } from '../ui/CombatMessage.js';
 import { formatText } from '../ui/formatText.js';
 import { Hud } from '../ui/Hud.js';
@@ -729,7 +730,11 @@ export class DuelState extends GameState {
         `${fighter.id}: ${fighter.state}  hp ${fighter.health.toFixed(0)}  st ${fighter.stamina.toFixed(0)}  flow ${this.rules.powers ? fighter.flowMeter.toFixed(0) : 'off'}`,
         `  ratings ${Object.values(fighter.stats.attributes).join("/")}  flow ${fighter.flowLevel}`,
         `  power ${fighter.combat.power?.id ?? '-'}  redirect ${fighter.combat.redirectTime.toFixed(2)}`,
-        `  jumps ${fighter.combat.jumpsUsed}/${fighter.stats.movement.maxJumps}  air dash ${fighter.combat.airDashUsed ? 'used' : 'ready'}  evade ${fighter.combat.evading ? fighter.stateTime.toFixed(2) : '-'} streak ${fighter.combat.evadeStreak}`,
+        `  exhaustion ${fighter.combat.exhausted} ${fighter.combat.exhaustionTime.toFixed(2)}s cause ${fighter.combat.exhaustionCause ?? '-'}`,
+        `  wound ${fighter.combat.wound ?? '-'} quota ${fighter.combat.woundUsed ? 'used' : 'ready'}`,
+        `  heal ${fighter.combat.healTime.toFixed(2)} ${fighter.combat.healEnd ?? '-'} focus ${fighter.combat.focusTime.toFixed(2)} ${fighter.combat.focusEnd ?? '-'}`,
+        `  wrath ${fighter.combat.wrathTime.toFixed(2)} ${fighter.combat.wrathEnd ?? '-'} extra ${fighter.combat.wrathExtraDamage.toFixed(2)} auto evades ${fighter.combat.autoEvadeCount}`,
+        `  jumps ${fighter.combat.jumpsUsed}/${getMaxJumps(fighter)}  air dash ${fighter.combat.airDashUsed ? 'used' : 'ready'}  evade ${fighter.combat.evading ? fighter.stateTime.toFixed(2) : '-'} streak ${fighter.combat.evadeStreak}`,
         `  pos ${fighter.x.toFixed(0)}, ${fighter.y.toFixed(0)}  vel ${fighter.vx.toFixed(0)}, ${fighter.vy.toFixed(0)}`,
         `  parry ${fighter.combat.parryArmed ? fighter.combat.parryTime.toFixed(2) : '-'}  lockout ${fighter.combat.parryLockout.toFixed(2)}  buffer ${fighter.combat.bufferedAction ?? '-'}`,
       );

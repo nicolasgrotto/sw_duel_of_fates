@@ -1,4 +1,5 @@
 import { FighterState } from '../entities/fighterStates.js';
+import { getStaminaCost } from '../systems/StaminaSystem.js';
 import { CombatEvent } from './combatEvents.js';
 
 function interrupt(target, state, duration) {
@@ -13,7 +14,7 @@ function getGap(caster, target) {
 
 function applyGuarded(context, damage = context.power.damage) {
   const { combat, caster, target, power, interaction, scale } = context;
-  combat.spendStamina(target, power.guard.staminaCost * interaction.guardStamina, 'drain');
+  combat.spendStamina(target, getStaminaCost(target, power.guard.staminaCost * interaction.guardStamina, 'blockDrain'), 'drain');
   return combat.dealPowerDamage(caster, target, power, damage * scale * interaction.guardDamage, CombatEvent.POWER_BLOCKED);
 }
 

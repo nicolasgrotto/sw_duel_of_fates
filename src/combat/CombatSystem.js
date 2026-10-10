@@ -674,9 +674,13 @@ export class CombatSystem {
   }
 
   applyDamage(contact, amount, source, eventType = null) {
-    const { defender } = contact;
+    const { attacker, defender } = contact;
     amount = this.getDamageAmount(contact, amount, source);
     contact.damage = Math.min(defender.health, amount);
+    if ((source === 'blade' || source === 'power') && attacker?.combat.wrathTime > 0) {
+      const withoutWrath = Math.min(defender.health, amount / attacker.combat.wrathDamageDealtScale);
+      attacker.combat.wrathExtraDamage += Math.max(0, contact.damage - withoutWrath);
+    }
     defender.health = Math.max(0, defender.health - amount);
     if (contact.damage > 0) {
       defender.combat.evadeStreak = 0;
@@ -738,6 +742,11 @@ export class CombatSystem {
     }
     combat.wound = attack.wound;
     combat.woundUsed = true;
+    if (combat.wound === 'arm') {
+      combat.woundArmCount += 1;
+    } else {
+      combat.woundLegCount += 1;
+    }
     if (combat.wound === 'leg') {
       combat.jumpsUsed = Math.min(combat.jumpsUsed, combatRulesConfig.wounds.leg.maxJumps);
     }

@@ -617,6 +617,27 @@ it('shows localized frame data only for player contacts in training', () => {
   assert.equal(duel.frameDataLine, '');
 });
 
+it('exposes combat consequences and effect endings in F3 without altering fighter state', () => {
+  const game = createFakeGame();
+  game.changeState(StateId.DUEL, { mode: DuelMode.TRAINING });
+  const duel = game.states.current;
+  const { combat } = duel.fighters[0];
+  Object.assign(combat, {
+    exhausted: true, exhaustionCause: 'guardBreak', exhaustionTime: 0.5,
+    wound: 'leg', woundUsed: true, healTime: 1, healEnd: null,
+    focusTime: 2, focusEnd: 'replaced', wrathTime: 3, wrathEnd: null,
+    autoEvadeCount: 2, wrathExtraDamage: 5,
+  });
+  const before = { ...combat };
+  const lines = duel.getDebugInfo().join('\n');
+  assert.match(lines, /exhaustion true 0.50s cause guardBreak/);
+  assert.match(lines, /wound leg quota used/);
+  assert.match(lines, /jumps 0\/1/);
+  assert.match(lines, /heal 1.00 - focus 2.00 replaced/);
+  assert.match(lines, /wrath 3.00 - extra 5.00 auto evades 2/);
+  assert.deepEqual(combat, before);
+});
+
 it('selects the alternative keyboard preset and shows its guard combination', () => {
   const game = createFakeGame();
   game.changeState(StateId.OPTIONS);
