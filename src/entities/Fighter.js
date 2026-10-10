@@ -73,6 +73,8 @@ function createCombat() {
     healCap: 0,
     wrathTime: 0,
     wrathEnd: 'reset',
+    wrathDamageDealtScale: 1,
+    wrathDamageTakenScale: 1,
   };
 }
 

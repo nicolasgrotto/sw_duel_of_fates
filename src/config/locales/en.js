@@ -319,6 +319,7 @@ export const en = {
       freeze: 'Freeze',
       heal: 'Heal',
       focus: 'Focus',
+      wrath: 'Wrath',
       alignments: { light: 'Aurora', dark: 'Eclipse' },
     },
     pause: {

@@ -55,6 +55,9 @@ export class StatusSystem {
     combat[`${effect}End`] = reason;
     if (effect === 'focus') {
       combat.focusScale = 1;
+    } else if (effect === 'wrath') {
+      combat.wrathDamageDealtScale = 1;
+      combat.wrathDamageTakenScale = 1;
     } else if (effect === 'heal') {
       combat.healRate = 0;
       if (reason === 'completed' && this.combat.rules.wounds) {

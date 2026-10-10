@@ -11,6 +11,7 @@ const REDUCED_BAND = { atLeast: -2, outcome: PowerOutcome.REDUCED, scale: 0.5, k
 const RESISTED_BAND = { atLeast: -Infinity, outcome: PowerOutcome.RESISTED, scale: 0, knockback: 1, blockable: true, guardStamina: 1, duration: 1, stagger: 1 };
 const STRIKE_GUARD = { guardDamage: 0, guardSlide: 0.5 };
 const CHANNEL_GUARD = { guardDamage: 0.25, guardSlide: 0.5 };
+const SELF_BUFF_PHASES = { active: 0.08, recovery: 0.3 };
 
 export const powersConfig = {
   modes: ['versus', 'local', 'training'],
@@ -21,7 +22,7 @@ export const powersConfig = {
   categories: {
     flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull', 'throw', 'redirect'] },
     aurora: { alignments: ['light'], abilities: ['barrier', 'heal', 'focus'] },
-    eclipse: { alignments: ['dark'], abilities: ['lightning', 'choke', 'freeze', 'storm'] },
+    eclipse: { alignments: ['dark'], abilities: ['lightning', 'choke', 'freeze', 'storm', 'wrath'] },
     blade: { alignments: ['light', 'dark'], abilities: ['spin', 'dashSlash', 'saberThrow'] },
   },
   powers: {
@@ -77,8 +78,13 @@ export const powersConfig = {
     },
     focus: {
       id: 'focus', effect: 'focus', channel: false, pose: 'barrier', self: true,
-      cost: 35, startup: 0.25, active: 0.08, recovery: 0.3,
+      cost: 35, startup: 0.25, ...SELF_BUFF_PHASES,
       duration: 4, staminaScale: 0.5,
+    },
+    wrath: {
+      id: 'wrath', effect: 'wrath', channel: false, pose: 'cast', self: true,
+      cost: 35, startup: 0.3, ...SELF_BUFF_PHASES,
+      duration: 5, damageDealtScale: 1.2, damageTakenScale: 0.85,
     },
     barrier: {
       id: 'barrier', effect: 'barrier', channel: true, pose: 'barrier',

@@ -694,14 +694,22 @@ export class CombatSystem {
   }
 
   getDamageAmount(contact, amount, source) {
-    const { defender, attack, armored } = contact;
+    const { attacker, defender, attack, armored } = contact;
     if (source === 'blade') {
       if (this.rules.exhaustion && defender.combat.exhausted && attack.exhaustionBonus === true) {
         amount *= combatRulesConfig.exhaustion.damageScale;
       }
-      if (armored) {
-        amount *= defender.combat.attack.armor.damageScale;
+    }
+    if (source === 'blade' || source === 'power') {
+      if (attacker?.combat.wrathTime > 0) {
+        amount *= attacker.combat.wrathDamageDealtScale;
       }
+      if (defender.combat.wrathTime > 0) {
+        amount *= defender.combat.wrathDamageTakenScale;
+      }
+    }
+    if (source === 'blade' && armored) {
+      amount *= defender.combat.attack.armor.damageScale;
     }
     return amount;
   }

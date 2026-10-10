@@ -319,6 +319,7 @@ export const ptBR = {
       freeze: 'Congelar',
       heal: 'Cura',
       focus: 'Foco',
+      wrath: 'Ira',
       alignments: { light: 'Aurora', dark: 'Eclipse' },
     },
     pause: {

@@ -134,6 +134,14 @@ function focus(context) {
   caster.combat.statusLevel = caster.flowLevel;
 }
 
+function wrath(context) {
+  const { combat, caster, power, scale } = context;
+  combat.statuses.start(caster, 'wrath', power.duration * scale);
+  caster.combat.wrathDamageDealtScale = power.damageDealtScale;
+  caster.combat.wrathDamageTakenScale = power.damageTakenScale;
+  caster.combat.statusLevel = caster.flowLevel;
+}
+
 export const powerEffects = Object.freeze({
   redirect: { self: ({ caster, power }) => { caster.combat.redirectTime = power.window; } },
   storm: { tick: (context) => {
@@ -154,4 +162,5 @@ export const powerEffects = Object.freeze({
   freeze: { active: freeze },
   heal: { self: heal },
   focus: { self: focus },
+  wrath: { self: wrath },
 });
