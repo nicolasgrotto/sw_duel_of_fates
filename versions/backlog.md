@@ -8,7 +8,7 @@ O ciclo aprovado v2.1 → v3.0 está em [v3.md](v3.md). As sugestões abaixo fic
 - Fúria (agora o poder Ira), expansão da História por alinhamento, offline e quatro poderes exclusivos do Predestinado foram incorporados ao plano v3.
 - As duas rotas aprovadas não incluem novas ramificações por escolhas de diálogo.
 - Ocaso é uma skin específica do ciclo, não aprovação de um sistema geral de equipamentos ou animações exclusivas para cada skin.
-- No ponto de checagem da 2.5, os itens de custo baixo e médio (acessibilidade competitiva e disputa por timing como protótipos, treinos guiados, desafios locais e galeria de finais) entraram na etapa 2.15, como flexíveis. A tabela abaixo mantém só o que continua fora do ciclo.
+- No ponto de checagem da 2.5, os itens de custo baixo e médio (acessibilidade competitiva e disputa por timing como protótipos, treinos guiados, desafios locais e galeria de finais) entraram na etapa 2.15, como flexíveis. A tabela abaixo mantém só o que continua fora do ciclo. O autor confirmou que esses itens não serão feitos; só o criador detalhado de personagem fica como possibilidade futura.
 
 ## Possibilidades futuras
 
