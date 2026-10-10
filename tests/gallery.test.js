@@ -135,7 +135,8 @@ it('uses real reach and changes tiers without moving or resetting an active effe
   for (const item of galleryCatalog) {
     const scene = createScene({ ability: item.id });
     const [caster, target] = scene.fighters;
-    const expected = scene.range * galleryConfig.distanceRatio;
+    const expected = item.kind === 'power' && !item.data.range ? galleryConfig.selfGap
+      : Math.max(scene.range * galleryConfig.distanceRatio, item.data.around ? 0 : galleryConfig.minGap);
     const actual = item.data.around ? target.x - caster.x : target.left - caster.right;
     assert.ok(Math.abs(actual - expected) < 0.000001, item.id);
     scene.requestCast();

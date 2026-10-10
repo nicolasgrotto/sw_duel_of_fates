@@ -114,6 +114,8 @@ it('uses gallery taps in wide view coordinates without exposing combat buttons',
   assert.equal(scene.launchPending, true);
   tap(layout.gallery.repeatX, layout.gallery.footerY);
   assert.equal(director.selection.repeat, true);
+  tap(layout.gallery.casterX, layout.gallery.footerY);
+  assert.notEqual(director.selection.caster, 'guardian');
   assert.equal(input.isDown('lightAttack'), false);
   assert.equal(touch.joystick, null);
   input.destroy();
@@ -131,6 +133,18 @@ it('reads both gallery languages and the minimum-level warning from locale table
     assert.ok(panel.detail.includes(texts.gallery.tiers.steady));
   }
   setLanguage('pt-BR');
+  input.destroy();
+});
+
+it('describes blade techniques without flow tiers and ignores tier taps for them', () => {
+  const { input, scene, panel, director } = setup();
+  scene.changeSelection('ability', 'spin');
+  assert.equal(panel.showsTiers, false);
+  assert.ok(panel.detail.startsWith('Técnica de lâmina'));
+  assert.ok(!panel.detail.includes('nível'));
+  const tier = director.selection.tier;
+  panel.handleTap({ x: layout.gallery.firstTierX, y: layout.gallery.tiersY });
+  assert.equal(director.selection.tier, tier);
   input.destroy();
 });
 

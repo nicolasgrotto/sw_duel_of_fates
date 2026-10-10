@@ -3,9 +3,14 @@ import { galleryConfig } from '../config/galleryConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
 import { layout, texts } from '../config/uiConfig.js';
+import { characters } from '../characters/characterData.js';
 import { galleryCatalog, galleryCasters } from '../modes/galleryCatalog.js';
 import { formatText } from './formatText.js';
-import { formatActionKeys } from './keyLabels.js';
+import { formatKey } from './keyLabels.js';
+
+function pickFooterCode(codes) {
+  return codes.find((code) => code.startsWith('Arrow')) ?? codes[0] ?? '';
+}
 
 export class GalleryPanel {
   constructor(scene, input, onChange) {
@@ -45,7 +50,7 @@ export class GalleryPanel {
       if (Math.abs(x - config.previousX) <= config.arrowWidth / 2) this.cycle('ability', -1);
       if (Math.abs(x - config.nextX) <= config.arrowWidth / 2) this.cycle('ability');
     }
-    if (Math.abs(y - config.tiersY) <= config.tapHeight / 2) {
+    if (this.showsTiers && Math.abs(y - config.tiersY) <= config.tapHeight / 2) {
       for (let index = 0; index < powersConfig.tiers.length; index += 1) {
         if (Math.abs(x - (config.firstTierX + index * config.tierSpacing)) <= config.tierWidth / 2) this.select('tier', index);
       }
@@ -54,12 +59,19 @@ export class GalleryPanel {
     if (Math.abs(x - config.targetX) <= config.footerChipWidth / 2) this.cycle('target');
     if (Math.abs(x - config.castX) <= config.footerChipWidth / 2) this.scene.requestCast();
     if (Math.abs(x - config.repeatX) <= config.footerChipWidth / 2) this.select('repeat', !this.scene.director.selection.repeat);
+    if (Math.abs(x - config.casterX) <= config.footerChipWidth / 2) this.cycle('caster');
+  }
+
+  get showsTiers() {
+    return this.scene.director.item.kind === 'power';
   }
 
   get detail() {
     const { director } = this.scene;
     if (!director.allowed) return formatText(texts.gallery.required, { level: director.item.data.minFlowLevel });
     const { selection } = director;
+    const repeat = texts.gallery.repeat[selection.repeat ? 'on' : 'off'];
+    if (!this.showsTiers) return formatText(texts.gallery.techniqueDetail, { target: texts.gallery.targets[selection.target], repeat });
     return formatText(texts.gallery.detail, {
       tier: texts.gallery.tiers[powersConfig.tiers[selection.tier].id], level: director.level,
       target: texts.gallery.targets[selection.target], repeat: texts.gallery.repeat[selection.repeat ? 'on' : 'off'],
@@ -71,7 +83,7 @@ export class GalleryPanel {
     const bindings = this.input.bindings ?? keyBindings;
     for (const [name, action] of Object.entries({ up: Action.MENU_UP, down: Action.MENU_DOWN, left: Action.MOVE_LEFT, right: Action.MOVE_RIGHT,
       block: Action.BLOCK, light: Action.LIGHT_ATTACK, heavy: Action.HEAVY_ATTACK, special: Action.SPECIAL, back: Action.BACK })) {
-      keys[name] = this.input.lastInputKind === 'gamepad' ? texts.gallery.gamepad[name] : formatActionKeys(bindings, action);
+      keys[name] = this.input.lastInputKind === 'gamepad' ? texts.gallery.gamepad[name] : formatKey(pickFooterCode(bindings[action] ?? []));
     }
     return formatText(texts.gallery.footer, keys);
   }
@@ -83,16 +95,17 @@ export class GalleryPanel {
     renderer.text(texts.powers[director.item.id], renderer.width / 2, layout.banner.titleY, textStyles.subtitle);
     renderer.text(texts.touch.colorRight, config.nextX, layout.banner.titleY, textStyles.subtitle);
     renderer.text(this.detail, renderer.width / 2, layout.banner.detailY, director.allowed ? textStyles.hint : textStyles.galleryDanger);
-    for (let index = 0; index < powersConfig.tiers.length; index += 1) {
+    for (let index = 0; this.showsTiers && index < powersConfig.tiers.length; index += 1) {
       const tier = powersConfig.tiers[index];
       const x = config.firstTierX + index * config.tierSpacing;
       renderer.text(texts.gallery.tiers[tier.id], x, config.tiersY, textStyles.hint);
       if (index === director.selection.tier) renderer.line(x - config.underlineWidth / 2, config.underlineY, x + config.underlineWidth / 2, config.underlineY, tier.color, config.underlineThickness);
     }
     if (this.input.lastInputKind === 'touch') {
-      this.renderChip(renderer, config.targetX, texts.gallery.targets[director.selection.target]);
+      this.renderChip(renderer, config.targetX, formatText(texts.gallery.targetChip, { target: texts.gallery.targets[director.selection.target] }));
       this.renderChip(renderer, config.castX, texts.gallery.cast);
       this.renderChip(renderer, config.repeatX, formatText(texts.gallery.repeatChip, { repeat: texts.gallery.repeat[director.selection.repeat ? 'on' : 'off'] }));
+      this.renderChip(renderer, config.casterX, formatText(texts.gallery.casterChip, { name: characters[director.selection.caster].name }));
     } else {
       const footer = this.footer();
       const scale = Math.min(1, (renderer.width - config.footerMargin * 2) / renderer.measureText(footer, textStyles.hint));

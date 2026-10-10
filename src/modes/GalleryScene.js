@@ -45,6 +45,12 @@ export class GalleryScene {
     return item.kind === 'power' ? item.data.range ?? 0 : this.fighters[0].moves[item.id].hitbox.reach;
   }
 
+  get gap() {
+    const { item } = this.director;
+    if (item.kind === 'power' && !item.data.range) return galleryConfig.selfGap;
+    return Math.max(this.range * galleryConfig.distanceRatio, item.data.around ? 0 : galleryConfig.minGap);
+  }
+
   changeSelection(field, value) {
     this.director.select(field, value);
     if (field === 'repeat') return;
@@ -60,8 +66,7 @@ export class GalleryScene {
   reset() {
     const { arena } = this.simulation;
     const center = (arena.left + arena.right) / 2;
-    const distance = this.range * galleryConfig.distanceRatio + (this.fighters[0].width + this.fighters[1].width) / 2;
-    const gap = this.director.item.data.around ? this.range * galleryConfig.distanceRatio : distance;
+    const gap = this.director.item.data.around ? this.gap : this.gap + (this.fighters[0].width + this.fighters[1].width) / 2;
     this.simulation.bladeLocks.reset();
     this.simulation.projectiles.clear();
     this.simulation.events.length = 0;

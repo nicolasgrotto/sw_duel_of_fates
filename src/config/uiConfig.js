@@ -36,7 +36,7 @@ export const layout = {
     previousX: 330, nextX: 950, arrowWidth: 70,
     tiersY: 190, firstTierX: 430, tierSpacing: 140, tierWidth: 130,
     underlineY: 207, underlineWidth: 90, underlineThickness: 2,
-    footerY: 650, targetX: 280, castX: 640, repeatX: 1000, footerChipWidth: 320, tapHeight: 44,
+    footerY: 650, targetX: 220, castX: 500, repeatX: 780, casterX: 1060, footerChipWidth: 250, tapHeight: 44,
     footerMargin: 24,
     meterY: 100,
   },

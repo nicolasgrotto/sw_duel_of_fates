@@ -1297,6 +1297,8 @@ GalleryTargetController solicita guarda contínua, saltos ou um único poder def
 
 GalleryPanel lê a seleção e desenha painel, chips e rodapé no Canvas, com layout em uiConfig e estilos/cores em themeConfig. Atualização lê ações dos presets e gamepad; toque usa taps no contexto gallery, sem joystick nem botões de combate. Game.popState restaura o touchContext fornecido pelo duelo ao voltar da pausa. Troca de lançador sincroniza participantes, HUD e hum; Esc/B volta ao menu, P/Start abre pausa. As tabelas PT-BR/EN contêm as notas da etapa. F3 lê fase real da ação e fase do ciclo, potência, alcance, custo e últimos eventos. Não existe renderer ou efeito alternativo para a galeria.
 
+Conferência (2.11): `GalleryScene.gap` usa `selfGap` para poderes sem `range` e `minGap` como piso dos demais (exceto `around`). `GalleryPanel` mostra no rodapé uma tecla por ação (setas primeiro), esconde os tiers para técnicas (`showsTiers`) e, no toque, tem quatro chips: alvo, lançar, repetição e lançador (`layout.gallery.casterX`).
+
 ---
 
 ## Convenções de código
