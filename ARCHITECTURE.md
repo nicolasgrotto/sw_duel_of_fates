@@ -542,6 +542,8 @@ Pulo duplo: MovementSystem incrementa combat.jumpsUsed (snapshot automático) no
 
 ## Effects e Camera
 
+**Onda de choque da Repulsão (v2.4).** `powerActive` da Repulsão chama `EffectsSystem.spawnShockwave` em vez do anel: um pool de `maxShockwaves` (2) guarda origem, direção, alcance (`powers.push.range`, o mesmo do gameplay) e tempo; `drawShockwaves` desenha `shockwave.arcs` arcos defasados que crescem até o alcance com abertura limitada por `halfHeight`. A poeira usa o pool de partículas. O Puxão continua com o anel.
+
 Arquivos: [src/systems/EffectsSystem.js](src/systems/EffectsSystem.js), [src/systems/ParticlePool.js](src/systems/ParticlePool.js), [src/core/Camera.js](src/core/Camera.js), [src/config/effectsConfig.js](src/config/effectsConfig.js). Catálogo e limites em [design/VFX_GUIDELINES.md](design/VFX_GUIDELINES.md).
 
 ```

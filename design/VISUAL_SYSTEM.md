@@ -167,7 +167,9 @@ Cores compartilhadas (em `themeConfig`):
 | `hudHealth` | `#e8ecf5` | barra de vida |
 | `hudDanger` | `#e5484d` | barra de vida abaixo de 25% |
 | `hudGhost` | `rgba(232, 236, 245, 0.3)` | parte da vida perdida há pouco (barra fantasma) |
-| `hudStamina` | `#8a94ab` | barra de stamina |
+| `hudStamina` | `#8a94ab` | barra de Vigor |
+| `shockwaveCore` | `#eef2fb` | núcleo claro dos arcos da onda de choque da Repulsão |
+| `shockwaveDust` | `#8b8272` | poeira levantada do chão pela onda de choque |
 | `hudTrack` | `rgba(255, 255, 255, 0.08)` | fundo das barras |
 | `desaturateGray` | `#808080` | cor neutra do passo de dessaturação (parry perfeito) |
 | `desaturateDim` | `#000000` | escurecimento junto da dessaturação |

@@ -1,6 +1,7 @@
 import { getPowerTier } from '../combat/flowInteractions.js';
 import { isBarrierUp, isChannelOpen, isUsingPower } from '../combat/PowerSystem.js';
 import { hasStatus } from '../combat/StatusSystem.js';
+import { effectsConfig } from '../config/effectsConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { colors } from '../config/themeConfig.js';
 import { TAU, clamp, lerp } from '../utils/math.js';
@@ -81,7 +82,9 @@ export class PowerRenderer {
     const originY = fighter.y - fighter.height * powersConfig.castHeight;
 
     if (fighter.stateTime < power.startup) {
-      const scale = lerp(style.chargeMinScale, 1, clamp(fighter.stateTime / power.startup, 0, 1));
+      const scale = power.effect === 'push'
+        ? effectsConfig.shockwave.chargeScale
+        : lerp(style.chargeMinScale, 1, clamp(fighter.stateTime / power.startup, 0, 1));
       renderer.drawGlow(originX, originY, tier.glowRadius * scale, tier.color, tier.glowAlpha);
       return;
     }

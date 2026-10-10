@@ -49,7 +49,8 @@ Os valores reais ficam em `src/config/effectsConfig.js`.
 | `dodge-afterimage` | (render) durante a esquiva e o dash aéreo | 3 silhuetas transparentes que somem rápido | — | — |
 | `evade-glow` | `evadeSuccess` | luz curta na cor da lâmina de quem esquivou, sem anel nem faíscas | — | — |
 | `power-charge` | (render) preparação de um poder | glow na mão da frente, na cor do tier | — | — |
-| `power-wave` | `powerActive` | anel à frente de quem lança: abre na Repulsão, fecha no Puxão; luz pequena | — | — |
+| `power-wave` | `powerActive` do Puxão | anel à frente de quem lança, que fecha; luz pequena | — | — |
+| `shockwave` | `powerActive` da Repulsão | três arcos abertos para a frente viajam da mão até o alcance real; poeira no chão; luz pequena | — | — |
 | `power-impact` | `powerHit` da Repulsão e do Puxão | 6–10 partículas (metade na cor do tier), luz média | leve | — |
 | `lightning-tick` | `powerHit` do Raio | 2–4 partículas, luz pequena, flash branco no atingido | — | — |
 | `power-blocked` | `powerBlocked` | 4–6 partículas, luz pequena | — | — |
@@ -130,6 +131,8 @@ Camada de cor sobre a cena inteira (abaixo da UI), com blend aditivo e alpha que
 A esquiva de precisao usa uma inclinacao breve para tras, joelhos baixos e recuo minimo. A pose vem de combatPoses.evade e volta suavemente durante a recuperacao. Silhueta permanece legivel; sem cor, anel, flash, shake ou camera lenta novos. Afterimage curto de 0,12 s com alpha 0,18 reaproveita o pool da esquiva. EVADE_SUCCESS pede esse afterimage ao EffectsSystem e reutiliza o som sintetizado de esquiva. Controles e lista de golpes incluem o gesto para baixo nos estilos existentes.
 
 Sucesso em sequência (v2.1): cada esquiva bem-sucedida acende uma **luz curta** (`evade-glow`) no peito de quem esquivou, na cor da lâmina do próprio lutador, raio ~90 px, alpha 0,5 e 0,2 s, desenhada como as luzes de impacto (sprite em cache, modo aditivo). Sem anel, faíscas, flash, shake, hit stop, câmera lenta ou dessaturação: o anel e a dessaturação continuam assinatura do parry. Efeitos reduzidos mantêm a luz a 60%, porque ela não pisca a tela. A pose da esquiva alterna entre as variações do estilo de movimento do personagem (`motionStyles[motion].evade`), escolhida por `combat.evadeStreak`; a silhueta do sucesso mostra a variação que acabou de evitar o golpe. Som próprio `evadeSuccess` (sopro curto subindo e um toque agudo suave), diferente do metal do parry e do dash.
+
+Repulsão como onda de choque (v2.4, pedido do autor): a Repulsão deixa de parecer uma esfera arremessada. Na preparação, a mão só acende de leve (brilho com 35% do raio da carga dos outros poderes, sem crescer). Na liberação, três arcos finos voltados para a frente (abertura de até ±50°, limitada para a onda nunca passar de 80 px acima ou abaixo da mão, como uma parede de pressão) saem da mão com 0,045 s entre eles e viajam até o alcance de gameplay do poder (`powers.push.range`) em 0,3 s, abrindo e esmaecendo; o traço vai de 5 px a 2 px, na cor do tier do Fluxo com um núcleo claro mais fino. Ao mesmo tempo, poeira (`shockwaveDust`, 10 partículas do pool; 4 com efeitos reduzidos) sobe do chão ao longo do caminho e é empurrada para a frente. Sem anel circular, flash ou shake na liberação; o impacto no alvo continua o `power-impact`. O Puxão mantém o anel que fecha. O Arremesso continua sendo o projétil do Fluxo; trocar por pedras do chão é outra decisão, ainda não tomada.
 
 Consequências da v2.4:
 

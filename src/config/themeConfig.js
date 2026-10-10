@@ -23,6 +23,8 @@ export const colors = {
   hudDanger: '#e5484d',
   hudGhost: 'rgba(232, 236, 245, 0.3)',
   hudStamina: '#8a94ab',
+  shockwaveCore: '#eef2fb',
+  shockwaveDust: '#8b8272',
   hudTrack: 'rgba(255, 255, 255, 0.08)',
   powerTierFaint: '#9cc4ff',
   powerTierSteady: '#5d8dff',

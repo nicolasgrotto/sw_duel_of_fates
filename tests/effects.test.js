@@ -354,3 +354,27 @@ it('lights the evading fighter in its own blade color, dimmer with reduced effec
   const dim = reduced.effects.lights.find((candidate) => candidate.active);
   assert.equal(dim.peakAlpha, effectsConfig.evadeGlow.alpha * effectsConfig.evadeGlow.reducedScale);
 });
+
+it('turns the push into a travelling shockwave with floor dust while the pull keeps its ring', () => {
+  const { effects } = createEffects();
+  const push = createEvent(CombatEvent.POWER_ACTIVE, 'push');
+  effects.handleEvents([push]);
+  const wave = effects.shockwaves.find((candidate) => candidate.active);
+  assert.equal(wave.direction, push.attacker.facing);
+  assert.equal(wave.range, powersConfig.powers.push.range);
+  assert.equal(effects.rings.some((ring) => ring.active), false);
+  assert.equal(effects.particles.activeCount, effectsConfig.shockwave.dust.count);
+  const { duration, arcs, arcDelay } = effectsConfig.shockwave;
+  effects.update(duration + arcDelay * (arcs - 1));
+  assert.equal(effects.shockwaves.some((candidate) => candidate.active), false);
+
+  const pull = createEffects();
+  pull.effects.handleEvents([createEvent(CombatEvent.POWER_ACTIVE, 'pull')]);
+  assert.equal(pull.effects.rings.some((ring) => ring.active), true);
+  assert.equal(pull.effects.shockwaves.some((candidate) => candidate.active), false);
+
+  const reduced = createEffects();
+  reduced.effects.setReduced(true);
+  reduced.effects.handleEvents([createEvent(CombatEvent.POWER_ACTIVE, 'push')]);
+  assert.equal(reduced.effects.particles.activeCount, effectsConfig.shockwave.dust.reducedCount);
+});

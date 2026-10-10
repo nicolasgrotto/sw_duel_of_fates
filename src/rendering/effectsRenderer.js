@@ -31,6 +31,36 @@ export function drawParticles(renderer, particles, streakTime) {
   renderer.restore();
 }
 
+function drawShockwaveArc(renderer, wave, style, radius, progress) {
+  const opening = Math.min((style.openingDegrees * Math.PI) / 180, Math.asin(Math.min(1, style.halfHeight / radius)));
+  const center = wave.direction > 0 ? 0 : Math.PI;
+  const width = style.lineWidth[0] + (style.lineWidth[1] - style.lineWidth[0]) * progress;
+  const fade = 1 - progress;
+  renderer.setAlpha(style.alpha * fade);
+  renderer.strokeArc(wave.x, wave.y, radius, center - opening, center + opening, wave.color, width);
+  renderer.setAlpha(style.coreAlpha * fade);
+  renderer.strokeArc(wave.x, wave.y, radius, center - opening, center + opening, colors.shockwaveCore, width * style.coreWidthScale);
+}
+
+export function drawShockwaves(renderer, waves, style) {
+  renderer.save();
+  renderer.setBlendMode('lighter');
+  for (const wave of waves) {
+    if (!wave.active) {
+      continue;
+    }
+    for (let arc = 0; arc < style.arcs; arc += 1) {
+      const progress = (wave.time - arc * style.arcDelay) / style.duration;
+      if (progress <= 0 || progress >= 1) {
+        continue;
+      }
+      const radius = style.startRadius + (wave.range - style.startRadius) * (1 - (1 - progress) * (1 - progress));
+      drawShockwaveArc(renderer, wave, style, radius, progress);
+    }
+  }
+  renderer.restore();
+}
+
 export function drawRings(renderer, rings) {
   renderer.save();
   renderer.setBlendMode('lighter');

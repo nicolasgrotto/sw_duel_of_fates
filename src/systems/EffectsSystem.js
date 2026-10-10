@@ -2,6 +2,7 @@ import { isStrongAttack } from '../combat/attackPhases.js';
 import { CombatEvent } from '../combat/combatEvents.js';
 import { getPowerTier } from '../combat/flowInteractions.js';
 import { powersConfig } from '../config/powersConfig.js';
+import { colors } from '../config/themeConfig.js';
 import { degreesToRadians } from '../utils/math.js';
 import { pick, randomInt, randomRange } from '../utils/random.js';
 import { ParticlePool } from './ParticlePool.js';
@@ -26,6 +27,10 @@ export const EffectType = Object.freeze({
 
 function getTierColor(fighter) {
   return getPowerTier(fighter.flowLevel, powersConfig.tiers).color;
+}
+
+function createShockwave() {
+  return { active: false, x: 0, y: 0, direction: 1, range: 0, color: '', time: 0 };
 }
 
 function createLight() {
@@ -77,6 +82,7 @@ export class EffectsSystem {
     this.particles = new ParticlePool(config.maxParticles);
     this.lights = Array.from({ length: config.maxLights }, createLight);
     this.rings = Array.from({ length: config.maxRings }, createRing);
+    this.shockwaves = Array.from({ length: config.maxShockwaves }, createShockwave);
     this.saberFlares = new Map();
     this.desaturation = { amount: 0, peakAmount: 0, time: 0, duration: 0 };
     this.flash = {
@@ -159,7 +165,11 @@ export class EffectsSystem {
         this.spawnParry(EffectType.PERFECT_PARRY, defender, params);
         break;
       case CombatEvent.POWER_ACTIVE:
-        this.spawnPowerWave(attacker, event.attackType === 'pull', params);
+        if (event.attackType === 'push') {
+          this.spawnShockwave(attacker);
+        } else {
+          this.spawnPowerWave(attacker, event.attackType === 'pull', params);
+        }
         break;
       case CombatEvent.POWER_HIT:
         params.color = getTierColor(attacker);
@@ -217,6 +227,45 @@ export class EffectsSystem {
       particle.maxLife = style.life;
       particle.size = style.size;
       particle.color = tier.color;
+    }
+  }
+
+  spawnShockwave(caster) {
+    const style = this.config.shockwave;
+    let wave = this.shockwaves[0];
+    for (const candidate of this.shockwaves) {
+      if (!candidate.active) {
+        wave = candidate;
+        break;
+      }
+      if (candidate.time > wave.time) {
+        wave = candidate;
+      }
+    }
+    wave.active = true;
+    wave.x = caster.x + caster.facing * (caster.width / 2 + powersConfig.render.waveOffset);
+    wave.y = caster.y - caster.height * powersConfig.castHeight;
+    wave.direction = caster.facing;
+    wave.range = powersConfig.powers.push.range;
+    wave.color = getTierColor(caster);
+    wave.time = 0;
+    this.spawnLight(style.light, wave.x, wave.y, wave.color);
+    this.spawnShockwaveDust(caster, wave, style.dust);
+  }
+
+  spawnShockwaveDust(caster, wave, dust) {
+    const count = this.reduced ? dust.reducedCount : dust.count;
+    for (let i = 0; i < count; i += 1) {
+      const particle = this.particles.acquire();
+      if (!particle) return;
+      particle.x = wave.x + wave.direction * wave.range * this.random();
+      particle.y = caster.y;
+      particle.vx = wave.direction * randomRange(this.random, dust.speed);
+      particle.vy = -randomRange(this.random, dust.lift);
+      particle.life = randomRange(this.random, dust.life);
+      particle.maxLife = particle.life;
+      particle.size = randomRange(this.random, dust.size);
+      particle.color = colors.shockwaveDust;
     }
   }
 
@@ -407,11 +456,22 @@ export class EffectsSystem {
     this.updateLights(dt);
     this.updateFlash(dt);
     this.updateRings(dt);
+    this.updateShockwaves(dt);
     this.updateTimers(this.saberFlares, dt);
     this.updateTimers(this.hitFlashes, dt);
     this.updateTimers(this.evadeAfterimages, dt);
     this.updateTremors(dt);
     this.updateDesaturation(dt);
+  }
+
+  updateShockwaves(dt) {
+    const { duration, arcs, arcDelay } = this.config.shockwave;
+    const lifetime = duration + arcDelay * (arcs - 1);
+    for (const wave of this.shockwaves) {
+      if (!wave.active) continue;
+      wave.time += dt;
+      if (wave.time >= lifetime) wave.active = false;
+    }
   }
 
   updateRings(dt) {
