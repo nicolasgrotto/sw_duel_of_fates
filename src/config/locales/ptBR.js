@@ -72,6 +72,7 @@ export const ptBR = {
       music: 'Música: {value}',
       replay: 'Replay do golpe final: {value}',
       powers: 'Poderes: {value}',
+      bladeLockHold: 'Segurar para disputar: J1 {player1} · J2 {player2}',
       back: 'Voltar',
       full: 'Completos',
       reduced: 'Reduzidos',

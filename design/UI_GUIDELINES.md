@@ -52,6 +52,8 @@ Os textos ficam em uma tabela por idioma em `src/config/locales/` (`ptBR.js`, `e
 
 **Poderes** (Opções): ligados ou desligados. Vale para Duelar, 2 Jogadores e Treino; os outros modos não mudam.
 
+**Segurar para disputar** (2.5): uma linha na lista existente mostra os estados de J1 e J2. Confirmar percorre desligado/desligado, ligado/desligado, desligado/ligado e ligado/ligado. Cada preferência é salva separadamente e só produz repetições do ataque rápido durante a disputa, a 6 por segundo, abaixo do teto de 12. Mantém tipografia, espaçamento e cores do menu; com a nova linha, Voltar continua dentro do canvas.
+
 ### Configurar teclas
 
 - Aberta pelas Opções. Lista vertical (MenuList) com "Ação:  teclas" para as ações de luta, mais **Restaurar padrão** e **Voltar**.

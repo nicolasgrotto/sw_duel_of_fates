@@ -8,6 +8,24 @@ const defaults = { difficulty: 'normal', sound: true };
 const allowed = { difficulty: ['easy', 'normal', 'hard'] };
 const KEY = 'test.settings';
 
+it('validates and persists independent hold preferences without losing other save data', () => {
+  const initial = { sound: true, bladeLockHold: [false, false] };
+  const storage = createStorage();
+  const story = { encounter: 'mine', points: 3 };
+  saveSettings({ ...initial, sound: false, bladeLockHold: [true, false] }, storage, KEY, story);
+  assert.deepEqual(loadSettings(initial, storage, KEY), { sound: false, bladeLockHold: [true, false] });
+  assert.deepEqual(loadSave(storage, KEY).story, story);
+  const old = createStorage({ [KEY]: JSON.stringify({ sound: false }) });
+  const loaded = loadSettings(initial, old, KEY);
+  assert.deepEqual(loaded.bladeLockHold, [false, false]);
+  loaded.bladeLockHold[0] = true;
+  assert.deepEqual(initial.bladeLockHold, [false, false]);
+  for (const value of [true, null, [], [true], [true, 'yes'], [true, false, true], { 0: true, 1: false }]) {
+    const invalid = createStorage({ [KEY]: JSON.stringify({ sound: false, bladeLockHold: value }) });
+    assert.deepEqual(loadSettings(initial, invalid, KEY), { sound: false, bladeLockHold: [false, false] });
+  }
+});
+
 function createStorage(initial = {}) {
   const data = { ...initial };
   return {

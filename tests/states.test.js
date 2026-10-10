@@ -15,6 +15,26 @@ import { captureFighter } from '../src/simulation/ReplayBuffer.js';
 
 const STEP = 1 / 60;
 
+it('cycles the hold option per player, saves it and connects both local controllers', () => {
+  const game = createFakeGame();
+  game.changeState(StateId.OPTIONS);
+  const options = game.states.current;
+  for (const expected of [[true, false], [false, true], [true, true], [false, false]]) {
+    options.toggle('bladeLockHold');
+    assert.deepEqual(game.settings.bladeLockHold, expected);
+  }
+  assert.equal(game.saved, 4);
+  game.settings.bladeLockHold = [false, true];
+  options.refreshLabels();
+  assert.match(options.items.bladeLockHold.label, /J1 Desligado.*J2 Ligado/);
+  game.changeState(StateId.DUEL, { mode: DuelMode.LOCAL });
+  const [player1, player2] = game.states.current.participants;
+  assert.equal(player1.controller.fighter, player1.fighter);
+  assert.equal(player2.controller.fighter, player2.fighter);
+  assert.equal(player1.controller.settings.bladeLockHold[player1.controller.playerIndex], false);
+  assert.equal(player2.controller.settings.bladeLockHold[player2.controller.playerIndex], true);
+});
+
 it('freezes a blade lock on pause and clears it on round reset, restart and state exit', () => {
   const game = createFakeGame();
   game.changeState(StateId.DUEL, { mode: DuelMode.TRAINING });

@@ -330,14 +330,14 @@ export class DuelState extends GameState {
     const opponent = createFighter(opponentCharacter, { x: centerX + spawnDistance / 2, y: floorY, facing: -1 }, { saberColor: this.params.opponentSaberColor, skin: this.params.opponentSkin });
 
     return [
-      { fighter: player, controller: new PlayerController(this.game.input) },
+      { fighter: player, controller: new PlayerController(this.game.input, { fighter: player, settings: this.game.settings }) },
       { fighter: opponent, controller: this.createOpponentController(opponent, player, opponentCharacter) },
     ];
   }
 
   createOpponentController(opponent, player, characterId) {
     if (this.isLocal) {
-      return new PlayerController(this.game.secondInput);
+      return new PlayerController(this.game.secondInput, { fighter: opponent, settings: this.game.settings, playerIndex: 1 });
     }
     if (this.usesDummy) {
       const dummy = new DummyController(gameConfig.duel.dummy, this.random);

@@ -17,6 +17,7 @@ export const OptionId = Object.freeze({
   KEYBOARD: 'keyboard',
   REPLAY: 'replay',
   POWERS: 'powers',
+  BLADE_LOCK_HOLD: 'bladeLockHold',
   REMAP: 'remap',
   BACK: 'back',
 });
@@ -37,6 +38,7 @@ export class OptionsState extends GameState {
       [OptionId.KEYBOARD]: { id: OptionId.KEYBOARD, label: '' },
       [OptionId.REPLAY]: { id: OptionId.REPLAY, label: '' },
       [OptionId.POWERS]: { id: OptionId.POWERS, label: '' },
+      [OptionId.BLADE_LOCK_HOLD]: { id: OptionId.BLADE_LOCK_HOLD, label: '' },
       [OptionId.REMAP]: { id: OptionId.REMAP, label: '' },
       [OptionId.BACK]: { id: OptionId.BACK, label: '' },
     };
@@ -58,6 +60,10 @@ export class OptionsState extends GameState {
 
     this.items.difficulty.label = formatText(options.difficulty, { level: difficultyNames[settings.difficulty] });
     this.items.powers.label = formatText(options.powers, { value: settings.powers === false ? options.offPlural : options.onPlural });
+    this.items.bladeLockHold.label = formatText(options.bladeLockHold, {
+      player1: settings.bladeLockHold?.[0] ? options.on : options.off,
+      player2: settings.bladeLockHold?.[1] ? options.on : options.off,
+    });
     this.items.effects.label = formatText(options.effects, { value: settings.reducedEffects ? options.reduced : options.full });
     this.items.sound.label = formatText(options.sound, { value: settings.sound ? options.on : options.off });
     this.items.keyboard.label = formatText(options.keyboard, { preset: options.keyboardPresets[settings.keyboardPreset ?? keyboardPresetOrder[0]] });
@@ -94,6 +100,11 @@ export class OptionsState extends GameState {
       case OptionId.POWERS:
         settings.powers = settings.powers === false;
         break;
+      case OptionId.BLADE_LOCK_HOLD: {
+        const hold = settings.bladeLockHold ?? [false, false];
+        settings.bladeLockHold = hold[0] ? [false, !hold[1]] : [true, hold[1]];
+        break;
+      }
       case OptionId.EFFECTS:
         settings.reducedEffects = !settings.reducedEffects;
         break;

@@ -72,6 +72,7 @@ export const en = {
       music: 'Music: {value}',
       replay: 'Final blow replay: {value}',
       powers: 'Powers: {value}',
+      bladeLockHold: 'Hold to contest: P1 {player1} · P2 {player2}',
       back: 'Back',
       full: 'Full',
       reduced: 'Reduced',
