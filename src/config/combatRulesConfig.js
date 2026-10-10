@@ -10,12 +10,28 @@ export const combatRulesConfig = {
     exhaustion: ['versus', 'local', 'training', 'tutorial'],
     wounds: ['versus', 'local', 'training', 'tutorial'],
     focusEvade: ['versus', 'local', 'training'],
+    bladeLock: ['versus', 'local', 'training'],
   },
   wounds: {
     arm: { blockCostScale: 1.25 },
     leg: { dashCostScale: 1.2, maxJumps: 1 },
   },
   focus: { autoEvadeCost: 30 },
+  bladeLock: {
+    cooldown: 4,
+    distance: 70,
+    minPressInterval: 1 / 12,
+    winMargin: 4,
+    maxDuration: 2,
+    timeoutMargin: 2,
+    damage: 8,
+    staminaLoss: 35,
+    separation: 420,
+    loserStagger: 0.35,
+    winnerRecovery: 0.25,
+    lockReleaseGuard: 0.15,
+    holdRate: 6,
+  },
 };
 
 export function resolveCombatRules(rules = {}) {
@@ -24,5 +40,6 @@ export function resolveCombatRules(rules = {}) {
     exhaustion: rules.exhaustion === true,
     wounds: rules.wounds === true,
     focusEvade: rules.powers === true && rules.focusEvade === true,
+    bladeLock: rules.bladeLock === true,
   };
 }

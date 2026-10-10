@@ -1,5 +1,7 @@
 # GAME DESIGN — Star Wars: Duel of Fates
 
+Regras aprovadas da disputa v3 (2.5): [versions/v3.md](versions/v3.md), seção "Notas de implementação da 2.5". A capacidade `bladeLock` vale em Duelar, 2 Jogadores e Treino, com ou sem Poderes. Fortes elegíveis em contato ativo iniciam uma disputa de pressões limitada no tempo e na frequência; outros contatos mantêm o clash curto. A disputa suspende ações, movimento, regeneração, status e cooldowns dos participantes. Vitória causa dano e perda de Vigor uma única vez; empate só separa. Recuperação, separação e proteção de saída impedem converter pressões em ataque ou garantir um forte seguinte. A opção de segurar produz pressões pelo controlador, abaixo do teto, e o replay registra os intents resultantes.
+
 Regras aprovadas da simulação v3 (2.4): [versions/v3.md](versions/v3.md), seções "Notas de implementação da 2.4" e "Especificação aprovada → Combate". Capacidades `exhaustion`, `wounds` e `focusEvade` habilitam as consequências em Duelar, 2 Jogadores e Treino; demais modos preservam a v2 até suas etapas. Dano efetivo de qualquer categoria, inclusive periódico, interrompe a Cura; dano absorvido não interrompe. Apresentação e calibração entram depois da simulação.
 
 Este documento é a fonte de verdade sobre **o que** o jogo é. Para **como** o código é organizado, veja [ARCHITECTURE.md](ARCHITECTURE.md).

@@ -14,22 +14,24 @@ it('enables combat capabilities only in their approved modes', () => {
     assert.equal(rules.exhaustion, taught);
     assert.equal(rules.wounds, taught);
     assert.equal(rules.focusEvade, enabled);
+    assert.equal(rules.bladeLock, enabled);
   }
   assert.equal(storyConfig.rules.exhaustion, false);
   assert.equal(storyConfig.rules.wounds, false);
   assert.equal(storyConfig.rules.focusEvade, false);
+  assert.equal(storyConfig.rules.bladeLock, false);
 });
 
 it('requires powers only for automatic focus evasion', () => {
   assert.deepEqual(createDuelRules('versus', { powers: false }, powersConfig.modes), {
-    powers: false, exhaustion: true, wounds: true, focusEvade: false,
+    powers: false, exhaustion: true, wounds: true, focusEvade: false, bladeLock: true,
   });
   assert.deepEqual(resolveCombatRules(), {
-    powers: false, exhaustion: false, wounds: false, focusEvade: false,
+    powers: false, exhaustion: false, wounds: false, focusEvade: false, bladeLock: false,
   });
 });
 
 it('accepts the complete combat capability list in the simulator', () => {
-  const output = execFileSync(process.execPath, ['tools/simulate.js', '--duels', '1', '--maxSeconds', '0.1', '--rules', 'powers,exhaustion,wounds,focusEvade'], { encoding: 'utf8' });
-  assert.match(output, /rules: powers,exhaustion,wounds,focusEvade/);
+  const output = execFileSync(process.execPath, ['tools/simulate.js', '--duels', '1', '--maxSeconds', '0.1', '--rules', 'powers,exhaustion,wounds,focusEvade,bladeLock'], { encoding: 'utf8' });
+  assert.match(output, /rules: powers,exhaustion,wounds,focusEvade,bladeLock/);
 });

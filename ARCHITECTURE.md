@@ -1206,6 +1206,8 @@ Update e render dentro do alvo em todas as janelas. Sem mudanças de visual ou o
 
 ## v3: princípios e decisões
 
+**Configuração da 2.5.** `bladeLock` é independente de Poderes e vale em Duelar, 2 Jogadores e Treino. História declara a capacidade desligada; tutorial aguarda a apresentação da etapa. `combatRulesConfig.bladeLock` guarda os parâmetros iniciais da disputa e da opção de segurar. A resolução compartilhada torna a capacidade disponível em `--rules bladeLock` e os parâmetros em `--set combatRules.bladeLock.*`.
+
 Roteiro, etapas e especificação aprovada em [versions/v3.md](versions/v3.md). Esta seção registra os contratos que valem para todo o ciclo; o detalhe de cada sistema entra nas seções acima quando a etapa for implementada.
 
 **Princípios.** Os da v2 continuam. Toda mecânica nova roda na `DuelSimulation`, guarda estado em `fighter.combat` ou em campo coberto pelo teste de snapshot, e passa no replay a partir de snapshots intermediários. Render, áudio e VFX só leem eventos e estado.

@@ -9,7 +9,7 @@ export const storyConfig = {
   ratingCaps: { easy: 7, normal: 6, hard: 5 },
   budgets: { easy: 33, normal: 30, hard: 28 },
   difficulties: ['easy', 'normal', 'hard'],
-  rules: { powers: true, exhaustion: false, wounds: false, focusEvade: false },
+  rules: { powers: true, exhaustion: false, wounds: false, focusEvade: false, bladeLock: false },
   roundsToWin: 1,
   protagonist: {
     names: ['Kael', 'Iria', 'Tarin', 'Vessa', 'Oren', 'Lyse'],
