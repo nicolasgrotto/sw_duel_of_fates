@@ -28,6 +28,7 @@ import { tutorialConfig } from '../config/tutorialConfig.js';
 import { ParryChallenge } from '../modes/ParryChallenge.js';
 import { TutorialDirector } from '../modes/TutorialDirector.js';
 import { GalleryDirector } from '../modes/GalleryDirector.js';
+import { GalleryScene } from '../modes/GalleryScene.js';
 import { BannerKind, ModeBanner } from '../ui/ModeBanner.js';
 import { getArcadeStage } from '../modes/arcade.js';
 import { getSurvivalStage } from '../modes/survival.js';
@@ -148,6 +149,8 @@ export class DuelState extends GameState {
         this.game.settings.gallery = selection;
         this.game.saveSettings();
       });
+      this.galleryScene = new GalleryScene(this.gallery, this.simulation, () => this.resetGalleryPresentation());
+      this.syncGalleryParticipants();
     } else if (this.mode === DuelMode.TUTORIAL) {
       this.director = new TutorialDirector(tutorialConfig.steps);
       this.banner = new ModeBanner(BannerKind.TUTORIAL, this.director, bindings);
@@ -167,6 +170,25 @@ export class DuelState extends GameState {
     if (this.director) {
       this.opponentController.setBehavior(this.director.dummyBehavior);
     }
+  }
+
+  syncGalleryParticipants() {
+    for (let index = 0; index < this.participants.length; index += 1) {
+      this.participants[index].fighter = this.fighters[index];
+      this.participants[index].controller = this.galleryScene.controllers[index];
+    }
+    this.opponentController = this.participants[1].controller;
+    this.hud = this.createHud();
+  }
+
+  resetGalleryPresentation() {
+    this.camera = new Camera(effectsConfig, this.random);
+    this.timeControl = new TimeControl();
+    this.effects = new EffectsSystem(effectsConfig, this.camera, this.random, this.timeControl);
+    this.effects.setReduced(this.game.settings.reducedEffects);
+    this.view = new DuelRenderer(this.arenaDefinition);
+    this.replayBuffer.clear();
+    this.message.text = '';
   }
 
   updateBossEnrage() {
@@ -464,6 +486,7 @@ export class DuelState extends GameState {
   }
 
   stepSimulation(dt) {
+    this.galleryScene?.beforeStep();
     if (this.mode === DuelMode.GALLERY) this.keepFightersAlive();
     if (this.isPlaying()) {
       this.duelTime += dt;
@@ -475,6 +498,7 @@ export class DuelState extends GameState {
     }
     this.replayBuffer.record(this.fighters, dt, this.simulation.projectiles);
     this.simulation.step(dt);
+    this.galleryScene?.afterStep(dt);
     this.effects.handleEvents(this.simulation.events);
     this.duelAudio.handleEvents(this.simulation.events);
     for (const event of this.simulation.events) {
