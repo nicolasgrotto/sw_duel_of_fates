@@ -329,6 +329,17 @@ export const ptBR = {
       wrath: 'Ira',
       alignments: { light: 'Aurora', dark: 'Eclipse' },
     },
+    gallery: {
+      detail: 'Tier {tier} · nível {level} · Alvo: {target} · Repetição: {repeat}',
+      required: 'Exige nível {level}',
+      tiers: { faint: 'Tênue', steady: 'Firme', deep: 'Profundo', apex: 'Ápice' },
+      targets: { idle: 'parado', blocking: 'bloqueando', barrier: 'com Barreira', redirect: 'com Redirecionamento', airborne: 'no ar' },
+      repeat: { on: 'ligada', off: 'desligada' },
+      cast: 'Lançar',
+      repeatChip: 'Repetição: {repeat}',
+      footer: '{up}/{down} poder · {left}/{right} tier · {block} alvo · {light} lançar · {heavy} repetição · {special} lançador · {back} sair',
+      gamepad: { up: '↑', down: '↓', left: '←', right: '→', block: 'LB/LT', light: 'X', heavy: 'Y', special: 'RB', back: 'B', pause: 'Start' },
+    },
     pause: {
       title: 'PAUSADO',
       resume: 'Continuar',

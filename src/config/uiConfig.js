@@ -32,6 +32,14 @@ export const controlsScreenRows = [
 export const keyComboSeparator = '  +  ';
 
 export const layout = {
+  gallery: {
+    previousX: 330, nextX: 950, arrowWidth: 70,
+    tiersY: 190, firstTierX: 430, tierSpacing: 140, tierWidth: 130,
+    underlineY: 207, underlineWidth: 90, underlineThickness: 2,
+    footerY: 650, targetX: 280, castX: 640, repeatX: 1000, footerChipWidth: 320, tapHeight: 44,
+    footerMargin: 24,
+    meterY: 100,
+  },
   attributes: { firstRowY: 410, rowSpacing: 30, labelX: 620, barX: 745, valueX: 925, segmentWidth: 19, segmentHeight: 5, segmentGap: 4, previewX: 1080, previewScale: 1 },
   touch: { rotateY: 300, rotateHintY: 380 },
   menu: {

@@ -62,6 +62,7 @@ export const colors = {
 };
 
 export const textStyles = {
+  galleryDanger: { font: `20px ${FONT_FAMILY}`, color: colors.hudDanger, align: 'center', baseline: 'middle' },
   attributeLabel: { font: `18px ${FONT_FAMILY}`, color: colors.textMuted, align: 'left', baseline: 'middle' },
   attributeValue: { font: `18px ${FONT_FAMILY}`, color: colors.text, align: 'center', baseline: 'middle' },
   touchLabel: { font: `18px ${FONT_FAMILY}`, color: colors.textMuted, align: 'center', baseline: 'middle' },

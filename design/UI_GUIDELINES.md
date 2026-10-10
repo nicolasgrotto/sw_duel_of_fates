@@ -184,6 +184,8 @@ Modo do menu, logo depois de **Treino**, sempre disponível. Mostra a cena de du
 - **Alvos**: parado, bloqueando, com Barreira, com Redirecionamento, no ar.
 - Sem painel DOM, sem caixas cobrindo a área de luta, sem números de dano. O F3 continua sendo o lugar dos números (fase, potência, alcance, custo, eventos).
 
+Medidas de implementação: painel em y=120/152, tiers em y=190 (sublinhado em 207) e rodapé em y=650. O medidor conserva a largura da HUD e começa em y=103, abaixo do botão Voltar do toque. A dica de pausa usa P no teclado e Start no gamepad; Esc sai. O menu usa espaçamento de 36 px para acomodar a galeria. Rodapés muito largos são ajustados horizontalmente dentro das margens, mantendo o estilo hint.
+
 ### Ferramentas do Treino
 
 Inputs do jogador e do boneco aparecem em uma linha hint no rodapé (acima dos dados de frame), usando nomes de ações. F5 alterna gravação dos intents do jogador; F6 reproduz a gravação no boneco em loop, espelhando movimento pela direção de guarda. Estado e duração da gravação ficam na borda inferior esquerda. Hitboxes podem ser ligadas por F7 sem ligar todo o debug. As três teclas constam em Controles. Sem painel DOM ou elementos no centro da luta.

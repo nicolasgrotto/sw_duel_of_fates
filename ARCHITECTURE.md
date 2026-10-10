@@ -43,7 +43,7 @@ src/
   states/                   ✅ telas do jogo
     GameState.js            ✅ classe base
     stateIds.js             ✅ ids dos estados
-    duelModes.js            ✅ modos do duelo (versus, local, arcade, sobrevivência, tutorial, desafio, treino) e `createDuelRules`
+    duelModes.js            ✅ modos do duelo (versus, local, arcade, sobrevivência, tutorial, desafio, treino, galeria) e `createDuelRules`
     stateFactory.js         ✅ cria estados a partir do id
     IntroState.js           ✅ intro (lâmina, título), tela de título e segredo; primeira tela do jogo
     MenuState.js            ✅ título + opções (MenuList)
@@ -73,6 +73,9 @@ src/
     DuelResult.js           ✅ resultado independente dos Fighters
     duelOutcomes.js         ✅ resultado + escada -> tela e patch de progresso
     TutorialDirector.js     ✅ passos do tutorial: objetivo, progresso e comportamento do boneco
+    GalleryDirector.js      ✅ seleção da galeria, tiers e persistência via callback
+    galleryCatalog.js       ✅ catálogo gerado dos poderes e técnicas; valida settings.gallery
+    GalleryScene.js         ✅ ciclos roteirizados sobre a DuelSimulation e reset completo
     ParryChallenge.js       ✅ desafio de parry: tempo, pontos e resumo
     arcade.js               ✅ escada do Arcade: adversários, dificuldade e arena por luta, chefe no fim
     unlocks.js              ✅ cores de lâmina e skins liberadas por Arcade, desafios e finais
@@ -82,6 +85,8 @@ src/
     story/dialogue.js       ✅ resolve falante, variante de alinhamento e `{name}`
     SecretUnlockSystem.js   ✅ casa sequências de tokens por tipo (`key:`, `action:`, `tap:`), com tempo limite entre tokens
   controllers/              ✅ quem controla um lutador
+    GalleryController.js    ✅ solicita o item escolhido por intent normal
+    GalleryTargetController.js ✅ alvos da galeria: guarda, defesa reativa e salto
     PlayerController.js     ✅ Input → intent
     IntentRecorder.js       ✅ buffer Uint16 fixo: grava intents e reproduz movimento relativo
     DummyController.js      ✅ boneco (parado, bloqueando, rápidos, fortes em intervalos aleatórios, disputa); se aproxima ao atacar
@@ -138,6 +143,7 @@ src/
     attributeBars.js        ✅ seis linhas de sete segmentos (até dez com potencial); posição por parâmetro; somente leitura
     TouchControls.js        ✅ desenho de joystick e botões sem alterar input
     MenuList.js             ✅ lista de opções navegável
+    GalleryPanel.js         ✅ painel, chips, comandos da galeria e rodapé por idioma/input
     Hud.js                  ✅ nomes, barras de vida (com fantasma) e stamina
     CombatMessage.js        ✅ mensagens curtas (ROUND 1/2/FINAL, K.O.) com fade
     Letterbox.js            ✅ barras cinematográficas (alvo suave + pulso curto)
@@ -149,6 +155,7 @@ src/
     language.js             ✅ idioma atual; troca as tabelas de texto no lugar
   config/                   ✅ valores e ajustes
     combatRulesConfig.js    ✅ capacidades por modo, exaustão, custos de ferimento e Foco automático
+    galleryConfig.js        ✅ padrões da seleção, níveis por tier, alvos e intervalo dos ciclos
     gameConfig.js           ✅ canvas, loop, arena, física, duelo, replay, Arcade, Sobrevivência, boneco, debug
     themeConfig.js          ✅ cores, estilos de texto, animação de UI
     controlsConfig.js       ✅ ações e teclas
@@ -1277,6 +1284,19 @@ Consequências: dano do passo 4 ou 5 interrompe a Cura antes do passo 7, então 
 
 **Render.** Interpolação visual (2.1) usa o `alpha` do `GameLoop` e dados pré-alocados do passo anterior, fora do snapshot. Desligar ou ligar a interpolação não muda nenhum resultado.
 
+
+### Galeria de poderes (2.11)
+
+O modo gallery entra pelo menu depois de Treino, reutiliza DuelState e DuelSimulation, não tem rounds nem término por morte e repõe vida entre passos. createDuelRules força Poderes e focusEvade e desliga as outras capacidades, independentemente das preferências de combate. A lista do menu usa espaçamento de 36 px para acomodar a entrada dentro do rodapé.
+
+GalleryDirector guarda seleção e disponibilidade por nível; galleryCatalog gera os poderes por categoria e acrescenta bladeTechniques, sem lista duplicada de itens. galleryConfig define níveis representativos e padrões. settingsStorage valida cada campo de settings.gallery no carregamento; DuelState salva só a seleção quando ela muda.
+
+GalleryScene monta o lançador com characterFactory e loadout de dados, sem validação de alinhamento; resolvePowerStats recalcula potência e ganho ao trocar o tier. GalleryController solicita intents normais. A cena repõe Fluxo antes de cada passo e lê poderes, ataques, status dos dois lados e projéteis para esperar o fim mais 0,8 s. O reset usa resetForRound, limpa projéteis e disputa e pede ao DuelState a limpeza de efeitos, câmera, trilhas e replay. O alvo Sombra acompanha o nível escolhido para mostrar o efeito sem resistência pela diferença de Fluxo. Poderes direcionais e técnicas usam vão entre corpos de 60% do alcance; Tempestade usa distância entre centros, como sua detecção real. Trocar tier conserva posições e relógios; trocar item, alvo ou lançador reinicia a cena.
+
+GalleryTargetController solicita guarda contínua, saltos ou um único poder defensivo por ciclo. Barreira responde ao início do lançamento; Redirecionamento alinha sua preparação com a preparação do item recebido, mantendo a janela real. O loadout defensivo vem dos mesmos dados de powersConfig e o reset limpa a reação. O controlador não escreve dano, status ou estados do Fighter.
+
+GalleryPanel lê a seleção e desenha painel, chips e rodapé no Canvas, com layout em uiConfig e estilos/cores em themeConfig. Atualização lê ações dos presets e gamepad; toque usa taps no contexto gallery, sem joystick nem botões de combate. Game.popState restaura o touchContext fornecido pelo duelo ao voltar da pausa. Troca de lançador sincroniza participantes, HUD e hum; Esc/B volta ao menu, P/Start abre pausa. As tabelas PT-BR/EN contêm as notas da etapa. F3 lê fase real da ação e fase do ciclo, potência, alcance, custo e últimos eventos. Não existe renderer ou efeito alternativo para a galeria.
+
 ---
 
 ## Convenções de código
@@ -1302,13 +1322,3 @@ Santuário com reflexos e F3: referência Sombra/Raio contra Guardião/Barreira;
 | Tempestade + projéteis + estados | reduzidos | 8 | 0,67 / 0,97 ms | 6,95 / 9,79 ms | 59,88 |
 
 Todas as janelas dentro de update ≤ 2 ms e render ≤ 10 ms; sem erros JavaScript. Capturas desktop e mobile conferidas no QA. A medição emulada não substitui hardware: os testes em Chrome Android/Safari iOS e teclado nativo são os já concluídos pelo autor nas etapas anteriores, não foram refeitos nesta etapa. Arquivos temporários e perfil do Chrome são removidos ao concluir.
-
-### Galeria de poderes (2.11)
-
-O modo gallery entra pelo menu depois de Treino, reutiliza DuelState e DuelSimulation, não tem rounds nem término por morte e repõe vida entre passos. createDuelRules força Poderes e focusEvade e desliga as outras capacidades, independentemente das preferências de combate. A lista do menu usa espaçamento de 36 px para acomodar a entrada dentro do rodapé.
-
-GalleryDirector guarda seleção e disponibilidade por nível; galleryCatalog gera os poderes por categoria e acrescenta bladeTechniques, sem lista duplicada de itens. galleryConfig define níveis representativos e padrões. settingsStorage valida cada campo de settings.gallery no carregamento; DuelState salva só a seleção quando ela muda.
-
-GalleryScene monta o lançador com characterFactory e loadout de dados, sem validação de alinhamento; resolvePowerStats recalcula potência e ganho ao trocar o tier. GalleryController solicita intents normais. A cena repõe Fluxo antes de cada passo e lê poderes, ataques, status dos dois lados e projéteis para esperar o fim mais 0,8 s. O reset usa resetForRound, limpa projéteis e disputa e pede ao DuelState a limpeza de efeitos, câmera, trilhas e replay. O alvo Sombra acompanha o nível escolhido para mostrar o efeito sem resistência pela diferença de Fluxo. Poderes direcionais e técnicas usam vão entre corpos de 60% do alcance; Tempestade usa distância entre centros, como sua detecção real. Trocar tier conserva posições e relógios; trocar item, alvo ou lançador reinicia a cena.
-
-GalleryTargetController solicita guarda contínua, saltos ou um único poder defensivo por ciclo. Barreira responde ao início do lançamento; Redirecionamento alinha sua preparação com a preparação do item recebido, mantendo a janela real. O loadout defensivo vem dos mesmos dados de powersConfig e o reset limpa a reação. O controlador não escreve dano, status ou estados do Fighter.

@@ -8,7 +8,7 @@ import { createProtagonistCharacter } from '../characters/protagonist.js';
 import { storyConfig } from '../config/storyConfig.js';
 import { storyTexts } from '../config/storyTexts.js';
 import { getStoryStage } from '../modes/story/storyRun.js';
-import { getChainStep, isStrongAttack } from '../combat/attackPhases.js';
+import { getAttackPhase, getChainStep, isStrongAttack } from '../combat/attackPhases.js';
 import { getFrameAdvantage } from '../combat/frameData.js';
 import { CombatEvent } from '../combat/combatEvents.js';
 import { createBox, getAttackHitbox, isAttackActive, isInvulnerable } from '../combat/hitboxes.js';
@@ -29,6 +29,7 @@ import { ParryChallenge } from '../modes/ParryChallenge.js';
 import { TutorialDirector } from '../modes/TutorialDirector.js';
 import { GalleryDirector } from '../modes/GalleryDirector.js';
 import { GalleryScene } from '../modes/GalleryScene.js';
+import { GalleryPanel } from '../ui/GalleryPanel.js';
 import { BannerKind, ModeBanner } from '../ui/ModeBanner.js';
 import { getArcadeStage } from '../modes/arcade.js';
 import { getSurvivalStage } from '../modes/survival.js';
@@ -48,7 +49,7 @@ import { formatText } from '../ui/formatText.js';
 import { Hud } from '../ui/Hud.js';
 import { Letterbox } from '../ui/Letterbox.js';
 import { clamp } from '../utils/math.js';
-import { formatActionKeys } from '../ui/keyLabels.js';
+import { formatActionKeys, formatKeys } from '../ui/keyLabels.js';
 import { createRandom, createRandomSeed } from '../utils/random.js';
 import { GameState } from './GameState.js';
 import { DuelMode, createDuelRules, hasRoundLimit, usesDummy } from './duelModes.js';
@@ -151,6 +152,8 @@ export class DuelState extends GameState {
       });
       this.galleryScene = new GalleryScene(this.gallery, this.simulation, () => this.resetGalleryPresentation());
       this.syncGalleryParticipants();
+      this.galleryPanel = new GalleryPanel(this.galleryScene, this.game.input, () => this.syncGalleryParticipants());
+      this.game.touch?.setContext('gallery', true);
     } else if (this.mode === DuelMode.TUTORIAL) {
       this.director = new TutorialDirector(tutorialConfig.steps);
       this.banner = new ModeBanner(BannerKind.TUTORIAL, this.director, bindings);
@@ -173,6 +176,7 @@ export class DuelState extends GameState {
   }
 
   syncGalleryParticipants() {
+    if (this.participants[0].fighter !== this.fighters[0]) this.duelAudio.stop();
     for (let index = 0; index < this.participants.length; index += 1) {
       this.participants[index].fighter = this.fighters[index];
       this.participants[index].controller = this.galleryScene.controllers[index];
@@ -395,6 +399,13 @@ export class DuelState extends GameState {
   }
 
   update(dt) {
+    if (this.galleryPanel) {
+      if (this.game.input.wasPressed(Action.BACK)) {
+        this.game.changeState(StateId.MENU);
+        return;
+      }
+      this.galleryPanel.update();
+    }
     if (this.isPausePressed()) {
       this.duelAudio.stopGrind();
       this.game.pushState(StateId.PAUSE, { duelParams: this.params, rules: this.rules, character: this.playerCharacterData, quitState: this.storyStage ? StateId.STORY : StateId.MENU });
@@ -465,6 +476,10 @@ export class DuelState extends GameState {
     if (this.isLocal) {
       this.game.applySettings();
     }
+  }
+
+  get touchContext() {
+    return this.mode === DuelMode.GALLERY ? 'gallery' : 'duel';
   }
 
   get isLocal() {
@@ -721,7 +736,9 @@ export class DuelState extends GameState {
       this.renderDebug(renderer);
     }
     this.letterbox.render(renderer);
-    this.hud.render(renderer);
+    if (this.gallery) this.hud.renderPower(renderer, this.hud.sides[0], (renderer.viewLeft ?? 0) + layout.hud.margin, layout.gallery.meterY, true);
+    else this.hud.render(renderer);
+    this.galleryPanel?.render(renderer);
     this.banner?.render(renderer);
     this.message.render(renderer);
 
@@ -733,7 +750,11 @@ export class DuelState extends GameState {
       renderer.text(this.frameDataLine, renderer.width / 2, layout.hud.frameDataY, textStyles.hint);
     }
     if (!this.outcome && this.game.input.lastInputKind !== 'touch') {
-      renderer.text(this.pauseHint, renderer.width / 2, layout.hud.pauseHintY, textStyles.hint);
+      const bindings = this.game.input.bindings ?? keyBindings;
+      const pause = this.gallery ? formatText(texts.duel.pauseHint, {
+        pause: this.game.input.lastInputKind === 'gamepad' ? texts.gallery.gamepad.pause : formatKeys(bindings[Action.PAUSE].filter((key) => !bindings[Action.BACK].includes(key))),
+      }) : this.pauseHint;
+      renderer.text(pause, renderer.width / 2, layout.hud.pauseHintY, textStyles.hint);
     }
   }
 
@@ -753,6 +774,23 @@ export class DuelState extends GameState {
   }
 
   getDebugInfo() {
+    if (this.gallery) {
+      const item = this.gallery.item;
+      const { combat, stateTime } = this.player;
+      const phase = combat.attack ? getAttackPhase(combat.attack, stateTime) : combat.power
+        ? stateTime < combat.power.startup ? 'startup' : combat.power.channel
+          ? combat.powerEndTime > 0 ? 'recovery' : 'channel'
+          : stateTime < combat.power.startup + combat.power.active ? 'active' : 'recovery'
+        : this.gallery.phase;
+      const cost = item.kind === 'power' ? this.simulation.combat.powers.getCost(this.player, item.data) : this.player.moves[item.id].staminaCost;
+      return [
+        `gallery: ${item.id}  phase: ${phase}  cycle: ${this.gallery.phase}  caster: ${this.player.id}  target: ${this.gallery.selection.target}`,
+        `level: ${this.gallery.level}  potency: ${this.player.stats.power.potency.toFixed(2)}  range: ${this.galleryScene.range}  cost: ${cost}`,
+        `state: ${this.player.state} ${this.player.stateTime.toFixed(2)}s  projectiles: ${this.simulation.projectiles.activeCount}`,
+        `events: ${this.gallery.lastEvents || '-'}`,
+        ...this.fighters.map((fighter) => `${fighter.id}: ${fighter.state}  pos ${fighter.x.toFixed(0)},${fighter.y.toFixed(0)}  vel ${fighter.vx.toFixed(0)},${fighter.vy.toFixed(0)}`),
+      ];
+    }
     const lines = [
       `round: ${this.roundNumber}  wins: ${this.roundWins.join(" / ")}`,
       `input: ${this.game.input.lastInputKind ?? 'keyboard'}  touch pointers: ${this.game.touch?.pointers.size ?? 0}`,

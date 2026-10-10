@@ -329,6 +329,17 @@ export const en = {
       wrath: 'Wrath',
       alignments: { light: 'Aurora', dark: 'Eclipse' },
     },
+    gallery: {
+      detail: 'Tier {tier} · level {level} · Target: {target} · Repeat: {repeat}',
+      required: 'Needs level {level}',
+      tiers: { faint: 'Faint', steady: 'Steady', deep: 'Deep', apex: 'Apex' },
+      targets: { idle: 'idle', blocking: 'blocking', barrier: 'with Barrier', redirect: 'with Redirect', airborne: 'airborne' },
+      repeat: { on: 'on', off: 'off' },
+      cast: 'Cast',
+      repeatChip: 'Repeat: {repeat}',
+      footer: '{up}/{down} power · {left}/{right} tier · {block} target · {light} cast · {heavy} repeat · {special} caster · {back} exit',
+      gamepad: { up: '↑', down: '↓', left: '←', right: '→', block: 'LB/LT', light: 'X', heavy: 'Y', special: 'RB', back: 'B', pause: 'Start' },
+    },
     pause: {
       title: 'PAUSED',
       resume: 'Resume',

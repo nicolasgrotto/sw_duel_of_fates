@@ -114,7 +114,7 @@ export class Game {
   popState() {
     this.states.pop();
     const id = this.states.current?.id;
-    this.touch.setContext(id === StateId.DUEL ? 'duel' : 'menu', id !== StateId.MENU && id !== StateId.INTRO);
+    this.touch.setContext(this.states.current?.touchContext ?? (id === StateId.DUEL ? 'duel' : 'menu'), id !== StateId.MENU && id !== StateId.INTRO);
   }
 
   handleResize() {
