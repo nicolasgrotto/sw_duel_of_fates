@@ -14,6 +14,7 @@ import { colors, textStyles } from '../config/themeConfig.js';
 import { createState } from '../states/stateFactory.js';
 import { StateId } from '../states/stateIds.js';
 import { DebugOverlay } from '../utils/debug.js';
+import { defaultLanguage, languageIds, setLanguage } from '../ui/language.js';
 import { AudioManager } from './AudioManager.js';
 import { GameLoop } from './GameLoop.js';
 import { Input } from './Input.js';
@@ -34,10 +35,10 @@ export class Game {
     this.touchControls = new TouchControls(this.touch);
     this.states = new StateMachine();
     this.settings = loadSettings(
-      { keyboardPreset: 'classic', difficulty: aiConfig.defaultDifficulty, reducedEffects: coarsePointer, sound: true, music: true, parryChallengeBest: 0, arcadeCleared: [], finalReplay: true, customBindings: {}, unlocks: {}, survivalBest: 0, powers: true, unlockedCharacters: [] },
+      { language: defaultLanguage, keyboardPreset: 'classic', difficulty: aiConfig.defaultDifficulty, reducedEffects: coarsePointer, sound: true, music: true, parryChallengeBest: 0, arcadeCleared: [], finalReplay: true, customBindings: {}, unlocks: {}, survivalBest: 0, powers: true, unlockedCharacters: [] },
       globalThis.localStorage,
       gameConfig.settingsStorageKey,
-      { difficulty: aiConfig.difficultyOrder, keyboardPreset: keyboardPresetOrder },
+      { language: languageIds, difficulty: aiConfig.difficultyOrder, keyboardPreset: keyboardPresetOrder },
     );
     this.settings.customBindings = sanitizeCustomBindings(this.settings.customBindings, remappableActions);
     this.story = sanitizeStoryRun(loadStory(globalThis.localStorage, gameConfig.settingsStorageKey), storyConfig);
@@ -77,6 +78,7 @@ export class Game {
   }
 
   applySettings() {
+    document.documentElement.lang = setLanguage(this.settings.language);
     this.input.setBindings(this.getKeyboardBindings());
     this.audio.setSfxEnabled(this.settings.sound);
     this.audio.setMusicEnabled(this.settings.music);

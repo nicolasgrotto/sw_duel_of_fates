@@ -1,5 +1,6 @@
+import { texts } from '../config/uiConfig.js';
+
 const SPECIAL_LABELS = {
-  Space: 'Espaço',
   Escape: 'Esc',
   Enter: 'Enter',
   NumpadEnter: null,
@@ -13,6 +14,9 @@ const SPECIAL_LABELS = {
 };
 
 export function formatKey(code) {
+  if (code in texts.keys) {
+    return texts.keys[code];
+  }
   if (code in SPECIAL_LABELS) {
     return SPECIAL_LABELS[code];
   }

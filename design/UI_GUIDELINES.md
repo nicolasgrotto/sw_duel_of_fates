@@ -11,9 +11,9 @@ Segue [ART_DIRECTION.md](ART_DIRECTION.md) e [VISUAL_SYSTEM.md](VISUAL_SYSTEM.md
 
 ## Idioma
 
-Textos da interface em **português (pt-BR)**. Código e commits em inglês.
+Interface em **português (pt-BR)**, padrão, e **inglês (en)**, escolhidos em Opções e salvos no navegador. Código e commits em inglês.
 
-Todos os textos ficam em `src/config/uiConfig.js` (`texts`). Para trocar o nome do jogo ou traduzir, só esse arquivo muda.
+Os textos ficam em uma tabela por idioma em `src/config/locales/` (`ptBR.js`, `en.js`), com as mesmas chaves e os mesmos `{marcadores}`. A interface, a História e os nomes de personagens, visuais e cores vêm dessas tabelas por id; o código nunca escreve texto de tela. O português é direto e comum (Vigor, Contra-ataque, Golpe de resposta); o glossário fica em versions/v3.md, etapa 2.2. Frase nova entra nas duas tabelas no mesmo commit; o texto em inglês não pode cortar rodapés, listas ou linhas da HUD.
 
 ## Onde a UI é desenhada
 
@@ -38,7 +38,7 @@ Todos os textos ficam em `src/config/uiConfig.js` (`texts`). Para trocar o nome 
 
 ### Opções
 
-- Lista: **Dificuldade: <nível>**, **Efeitos: Completos/Reduzidos**, **Som: Ligado/Desligado**, **Música: Ligada/Desligada**, **Teclado: A/D + J/K/L/Shift ou Setas + Z/X/C/V**, **Voltar**.
+- Lista: **Idioma: Português/English** (cada idioma escrito no próprio idioma), **Dificuldade: <nível>**, **Efeitos: Completos/Reduzidos**, **Som: Ligado/Desligado**, **Música: Ligada/Desligada**, **Teclado: A/D + J/K/L/Shift ou Setas + Z/X/C/V**, **Voltar**.
 - `Enter` troca o valor da opção selecionada. `Esc` volta.
 - As escolhas ficam salvas no navegador (`localStorage`) e voltam na próxima vez.
 - Linha discreta no rodapé com a navegação (`↑ ↓  escolher · Enter  confirmar`).

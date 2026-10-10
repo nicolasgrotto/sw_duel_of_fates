@@ -1,30 +1,25 @@
+import { ptBR } from '../config/locales/ptBR.js';
 import { movesByCharacter } from '../config/movesConfig.js';
+import { applyCharacterTexts } from './characterTexts.js';
 
 export const characters = {
   guardian: {
     id: 'guardian',
     attributes: {"health": 5, "stamina": 4, "blade": 4, "defense": 6, "agility": 4, "flow": 5},
-    name: 'Guardião',
     archetype: 'guardian',
     alignment: 'light',
     loadout: { powers: { neutral: 'push', back: 'barrier', forward: 'heal' }, techniques: { forward: 'dashSlash', back: 'saberThrow' } },
     selectable: true,
     moves: movesByCharacter.guardian,
     aiProfile: 'guardian',
-    info: {
-      style: 'Técnico · fundamentos',
-      saberName: 'Ciano-gelo',
-      trait: 'Bloqueio custa menos stamina',
-      ability: 'Contraguarda: postura curta que responde com a riposta',
-    },
     skins: [
-      { id: 'base', name: 'Original', appearance: {}, unlock: null },
-      { id: 'skin-arcade', name: 'Viajante', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
-      { id: 'skin-story', name: 'Sentinela', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
+      { id: 'base', appearance: {}, unlock: null },
+      { id: 'skin-arcade', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
+      { id: 'skin-story', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
     ],
     altSaberColors: [
-      { id: 'arcade', name: 'Azul-profundo', color: '#5f8bff', challenge: null },
-      { id: 'challenge', name: 'Verde-água', color: '#3fffc8', challenge: { stat: 'perfectParries', target: 3, text: 'vença com 3 parries perfeitos' } },
+      { id: 'arcade', color: '#5f8bff', challenge: null },
+      { id: 'challenge', color: '#3fffc8', challenge: { stat: 'perfectParries', target: 3 } },
     ],
     sound: {
       humFrequency: 74,
@@ -51,27 +46,20 @@ export const characters = {
   shadow: {
     id: 'shadow',
     attributes: {"health": 4, "stamina": 4, "blade": 5, "defense": 3, "agility": 4, "flow": 5},
-    name: 'Sombra',
     archetype: 'shadow',
     alignment: 'dark',
     loadout: { powers: { neutral: 'lightning', forward: 'pull', back: 'choke' }, techniques: { forward: 'dashSlash', back: 'spin' } },
     selectable: true,
     moves: movesByCharacter.shadow,
     aiProfile: 'shadow',
-    info: {
-      style: 'Agressiva · pressão',
-      saberName: 'Magenta',
-      trait: 'Golpe que acerta devolve stamina',
-      ability: 'Ímpeto: avanço com armadura contra um golpe',
-    },
     skins: [
-      { id: 'base', name: 'Original', appearance: {}, unlock: null },
-      { id: 'skin-arcade', name: 'Viajante', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
-      { id: 'skin-story', name: 'Sentinela', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
+      { id: 'base', appearance: {}, unlock: null },
+      { id: 'skin-arcade', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
+      { id: 'skin-story', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
     ],
     altSaberColors: [
-      { id: 'arcade', name: 'Violeta-escuro', color: '#c23cff', challenge: null },
-      { id: 'challenge', name: 'Rubi', color: '#ff2a3a', challenge: { stat: 'damage', target: 200, text: 'vença causando 200 de dano' } },
+      { id: 'arcade', color: '#c23cff', challenge: null },
+      { id: 'challenge', color: '#ff2a3a', challenge: { stat: 'damage', target: 200 } },
     ],
     sound: {
       humFrequency: 62,
@@ -98,27 +86,20 @@ export const characters = {
   bastion: {
     id: 'bastion',
     attributes: {"health": 6, "stamina": 6, "blade": 6, "defense": 7, "agility": 2, "flow": 2},
-    name: 'Bastião',
     archetype: 'bastion',
     alignment: 'light',
     loadout: { powers: { neutral: 'push', back: 'barrier', forward: 'focus' }, techniques: { back: 'spin' } },
     selectable: true,
     moves: movesByCharacter.bastion,
     aiProfile: 'bastion',
-    info: {
-      style: 'Tanque · peso',
-      saberName: 'Verde-ácido',
-      trait: 'Anda bloqueando e não é empurrado',
-      ability: 'Marreta: golpe lento com armadura contra dois golpes',
-    },
     skins: [
-      { id: 'base', name: 'Original', appearance: {}, unlock: null },
-      { id: 'skin-arcade', name: 'Viajante', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
-      { id: 'skin-story', name: 'Sentinela', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
+      { id: 'base', appearance: {}, unlock: null },
+      { id: 'skin-arcade', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
+      { id: 'skin-story', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
     ],
     altSaberColors: [
-      { id: 'arcade', name: 'Ouro-pálido', color: '#ffe08a', challenge: null },
-      { id: 'challenge', name: 'Azul-céu', color: '#3fd0ff', challenge: { stat: 'blocks', target: 12, text: 'vença com 12 defesas' } },
+      { id: 'arcade', color: '#ffe08a', challenge: null },
+      { id: 'challenge', color: '#3fd0ff', challenge: { stat: 'blocks', target: 12 } },
     ],
     sound: {
       humFrequency: 52,
@@ -145,27 +126,20 @@ export const characters = {
   wasp: {
     id: 'wasp',
     attributes: {"health": 3, "stamina": 6, "blade": 2, "defense": 3, "agility": 7, "flow": 3},
-    name: 'Vespa',
     archetype: 'wasp',
     alignment: 'light',
     loadout: { powers: { neutral: 'push', back: 'barrier', forward: 'throw' }, techniques: { forward: 'dashSlash', back: 'saberThrow' } },
     selectable: true,
     moves: movesByCharacter.wasp,
     aiProfile: 'wasp',
-    info: {
-      style: 'Velocidade · sequências',
-      saberName: 'Amarelo-âmbar',
-      trait: 'Sequência de cinco golpes rápidos',
-      ability: 'Zumbido: avanço que atravessa o oponente',
-    },
     skins: [
-      { id: 'base', name: 'Original', appearance: {}, unlock: null },
-      { id: 'skin-arcade', name: 'Viajante', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
-      { id: 'skin-story', name: 'Sentinela', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
+      { id: 'base', appearance: {}, unlock: null },
+      { id: 'skin-arcade', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
+      { id: 'skin-story', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
     ],
     altSaberColors: [
-      { id: 'arcade', name: 'Lima', color: '#7cff6b', challenge: null },
-      { id: 'challenge', name: 'Rosa', color: '#ff6bd5', challenge: { stat: 'longestChain', target: 5, text: 'vença acertando a sequência completa de 5' } },
+      { id: 'arcade', color: '#7cff6b', challenge: null },
+      { id: 'challenge', color: '#ff6bd5', challenge: { stat: 'longestChain', target: 5 } },
     ],
     sound: {
       humFrequency: 96,
@@ -192,27 +166,20 @@ export const characters = {
   mirror: {
     id: 'mirror',
     attributes: {"health": 3, "stamina": 5, "blade": 4, "defense": 7, "agility": 3, "flow": 6},
-    name: 'Espelho',
     archetype: 'mirror',
     alignment: 'light',
     loadout: { powers: { neutral: 'push', back: 'barrier', forward: 'throw' }, techniques: { back: 'spin' } },
     selectable: true,
     moves: movesByCharacter.mirror,
     aiProfile: 'mirror',
-    info: {
-      style: 'Defensivo · parry',
-      saberName: 'Branco-prata',
-      trait: 'Janelas de parry maiores',
-      ability: 'Postura de Espera: apara e responde com a riposta',
-    },
     skins: [
-      { id: 'base', name: 'Original', appearance: {}, unlock: null },
-      { id: 'skin-arcade', name: 'Viajante', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
-      { id: 'skin-story', name: 'Sentinela', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
+      { id: 'base', appearance: {}, unlock: null },
+      { id: 'skin-arcade', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
+      { id: 'skin-story', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
     ],
     altSaberColors: [
-      { id: 'arcade', name: 'Prata-azulada', color: '#9fd8ff', challenge: null },
-      { id: 'challenge', name: 'Marfim', color: '#ffe2b0', challenge: { stat: 'perfectParries', target: 4, text: 'vença com 4 parries perfeitos' } },
+      { id: 'arcade', color: '#9fd8ff', challenge: null },
+      { id: 'challenge', color: '#ffe2b0', challenge: { stat: 'perfectParries', target: 4 } },
     ],
     sound: {
       humFrequency: 84,
@@ -239,27 +206,20 @@ export const characters = {
   haste: {
     id: 'haste',
     attributes: {"health": 7, "stamina": 4, "blade": 4, "defense": 4, "agility": 3, "flow": 4},
-    name: 'Haste',
     archetype: 'haste',
     alignment: 'dark',
     loadout: { powers: { neutral: 'lightning', forward: 'pull', back: 'throw' }, techniques: { back: 'spin' } },
     selectable: true,
     moves: movesByCharacter.haste,
     aiProfile: 'haste',
-    info: {
-      style: 'Alcance · controle de distância',
-      saberName: 'Violeta',
-      trait: 'A ponta da lâmina dá mais dano; de perto, menos',
-      ability: 'Varredura: golpe de alcance enorme e lento',
-    },
     skins: [
-      { id: 'base', name: 'Original', appearance: {}, unlock: null },
-      { id: 'skin-arcade', name: 'Viajante', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
-      { id: 'skin-story', name: 'Sentinela', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
+      { id: 'base', appearance: {}, unlock: null },
+      { id: 'skin-arcade', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
+      { id: 'skin-story', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
     ],
     altSaberColors: [
-      { id: 'arcade', name: 'Anil', color: '#6b7cff', challenge: null },
-      { id: 'challenge', name: 'Fúcsia', color: '#ff6bff', challenge: { stat: 'hits', target: 15, text: 'vença com 15 golpes acertados' } },
+      { id: 'arcade', color: '#6b7cff', challenge: null },
+      { id: 'challenge', color: '#ff6bff', challenge: { stat: 'hits', target: 15 } },
     ],
     sound: {
       humFrequency: 68,
@@ -286,27 +246,20 @@ export const characters = {
   ember: {
     id: 'ember',
     attributes: {"health": 3, "stamina": 5, "blade": 5, "defense": 4, "agility": 4, "flow": 5},
-    name: 'Brasa',
     archetype: 'ember',
     alignment: 'dark',
     loadout: { powers: { neutral: 'lightning', forward: 'pull', back: 'freeze' }, techniques: { forward: 'dashSlash', back: 'saberThrow' } },
     selectable: true,
     moves: movesByCharacter.ember,
     aiProfile: 'ember',
-    info: {
-      style: 'Contra-ataque · leitura',
-      saberName: 'Laranja-brasa',
-      trait: 'Mais dano em quem está aberto',
-      ability: 'Brasa Viva: postura que responde com um corte forte',
-    },
     skins: [
-      { id: 'base', name: 'Original', appearance: {}, unlock: null },
-      { id: 'skin-arcade', name: 'Viajante', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
-      { id: 'skin-story', name: 'Sentinela', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
+      { id: 'base', appearance: {}, unlock: null },
+      { id: 'skin-arcade', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
+      { id: 'skin-story', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
     ],
     altSaberColors: [
-      { id: 'arcade', name: 'Ouro', color: '#ffcf3f', challenge: null },
-      { id: 'challenge', name: 'Carmim', color: '#ff3f5a', challenge: { stat: 'counters', target: 3, text: 'vença com 3 contra-golpes da postura' } },
+      { id: 'arcade', color: '#ffcf3f', challenge: null },
+      { id: 'challenge', color: '#ff3f5a', challenge: { stat: 'counters', target: 3 } },
     ],
     sound: {
       humFrequency: 80,
@@ -333,27 +286,20 @@ export const characters = {
   forge: {
     id: 'forge',
     attributes: {"health": 6, "stamina": 3, "blade": 6, "defense": 5, "agility": 3, "flow": 2},
-    name: 'Forja',
     archetype: 'forge',
     alignment: 'dark',
     loadout: { powers: { neutral: 'lightning', forward: 'pull', back: 'throw' }, techniques: { forward: 'saberThrow', back: 'spin' } },
     selectable: true,
     moves: movesByCharacter.forge,
     aiProfile: 'forge',
-    info: {
-      style: 'Pesada · carga',
-      saberName: 'Vermelho-forja',
-      trait: 'Empurra mais longe a cada golpe',
-      ability: 'Forja: segure para carregar; o nível 3 quebra a guarda',
-    },
     skins: [
-      { id: 'base', name: 'Original', appearance: {}, unlock: null },
-      { id: 'skin-arcade', name: 'Viajante', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
-      { id: 'skin-story', name: 'Sentinela', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
+      { id: 'base', appearance: {}, unlock: null },
+      { id: 'skin-arcade', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
+      { id: 'skin-story', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
     ],
     altSaberColors: [
-      { id: 'arcade', name: 'Laranja-forno', color: '#ff9a3f', challenge: null },
-      { id: 'challenge', name: 'Verde-escória', color: '#b0ff3f', challenge: { stat: 'guardBreaks', target: 2, text: 'vença quebrando a guarda 2 vezes' } },
+      { id: 'arcade', color: '#ff9a3f', challenge: null },
+      { id: 'challenge', color: '#b0ff3f', challenge: { stat: 'guardBreaks', target: 2 } },
     ],
     sound: {
       humFrequency: 58,
@@ -380,27 +326,20 @@ export const characters = {
   heron: {
     id: 'heron',
     attributes: {"health": 5, "stamina": 6, "blade": 3, "defense": 3, "agility": 6, "flow": 5},
-    name: 'Garça',
     archetype: 'heron',
     alignment: 'light',
     loadout: { powers: { neutral: 'push', back: 'redirect', forward: 'throw' }, techniques: { back: 'spin' } },
     selectable: true,
     moves: movesByCharacter.heron,
     aiProfile: 'heron',
-    info: {
-      style: 'Acrobática · mobilidade',
-      saberName: 'Verde-menta',
-      trait: 'Pula na parede, esquiva atravessando e tem dois aéreos',
-      ability: 'Voo da Garça: salto que passa por cima do oponente',
-    },
     skins: [
-      { id: 'base', name: 'Original', appearance: {}, unlock: null },
-      { id: 'skin-arcade', name: 'Viajante', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
-      { id: 'skin-story', name: 'Sentinela', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
+      { id: 'base', appearance: {}, unlock: null },
+      { id: 'skin-arcade', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
+      { id: 'skin-story', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
     ],
     altSaberColors: [
-      { id: 'arcade', name: 'Azul-gelo', color: '#a6e8ff', challenge: null },
-      { id: 'challenge', name: 'Coral', color: '#ff8a6b', challenge: { stat: 'airHits', target: 4, text: 'vença acertando 4 ataques aéreos' } },
+      { id: 'arcade', color: '#a6e8ff', challenge: null },
+      { id: 'challenge', color: '#ff8a6b', challenge: { stat: 'airHits', target: 4 } },
     ],
     sound: {
       humFrequency: 90,
@@ -427,27 +366,20 @@ export const characters = {
   echo: {
     id: 'echo',
     attributes: {"health": 6, "stamina": 6, "blade": 5, "defense": 3, "agility": 6, "flow": 6},
-    name: 'Eco',
     archetype: 'echo',
     alignment: 'dark',
     loadout: { powers: { neutral: 'lightning', forward: 'pull', back: 'throw' }, techniques: {} },
     selectable: true,
     moves: movesByCharacter.echo,
     aiProfile: 'echo',
-    info: {
-      style: 'Trapaceira · fintas',
-      saberName: 'Rosa-pálido',
-      trait: 'Finta: tocar a guarda cancela o forte',
-      ability: 'Passo-reflexo: passo curto e invulnerável',
-    },
     skins: [
-      { id: 'base', name: 'Original', appearance: {}, unlock: null },
-      { id: 'skin-arcade', name: 'Viajante', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
-      { id: 'skin-story', name: 'Sentinela', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
+      { id: 'base', appearance: {}, unlock: null },
+      { id: 'skin-arcade', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', hoodUp: false, scarf: true }, unlock: 'arcade' },
+      { id: 'skin-story', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', pauldrons: true, scarf: false }, unlock: 'story' },
     ],
     altSaberColors: [
-      { id: 'arcade', name: 'Lilás', color: '#c9a6ff', challenge: null },
-      { id: 'challenge', name: 'Prata', color: '#d6dbe6', challenge: { stat: 'feints', target: 5, text: 'vença fintando 5 vezes' } },
+      { id: 'arcade', color: '#c9a6ff', challenge: null },
+      { id: 'challenge', color: '#d6dbe6', challenge: { stat: 'feints', target: 5 } },
     ],
     sound: {
       humFrequency: 88,
@@ -474,19 +406,12 @@ export const characters = {
   shadowAwakened: {
     id: 'shadowAwakened',
     attributes: {"health": 7, "stamina": 6, "blade": 6, "defense": 5, "agility": 4, "flow": 7},
-    name: 'Sombra Desperta',
     archetype: 'shadowAwakened',
     alignment: 'dark',
     loadout: { powers: { neutral: 'lightning', forward: 'pull', back: 'choke' }, techniques: { forward: 'dashSlash', back: 'spin' } },
     selectable: false,
     moves: movesByCharacter.shadow,
     aiProfile: 'shadow',
-    info: {
-      style: 'Chefe',
-      saberName: 'Magenta',
-      trait: 'Golpe que acerta devolve stamina',
-      ability: 'Ímpeto: avanço com armadura contra um golpe',
-    },
     altSaberColors: [],
     sound: {
       humFrequency: 55,
@@ -514,7 +439,6 @@ export const characters = {
     id: 'sovereign',
     attributes: { health: 7, stamina: 6, blade: 6, defense: 6, agility: 4, flow: 9 },
     potential: 2,
-    name: 'Soberano',
     archetype: 'haste',
     alignment: 'dark',
     loadout: { powers: { neutral: 'lightning', forward: 'storm', back: 'choke' }, techniques: { back: 'spin' } },
@@ -522,15 +446,9 @@ export const characters = {
     secret: true,
     moves: movesByCharacter.haste,
     aiProfile: 'sovereign',
-    info: {
-      style: 'Secreto · senhor do Fluxo',
-      saberName: 'Ouro-velho',
-      trait: 'A ponta da lâmina dá mais dano; de perto, menos',
-      ability: 'Varredura: golpe de alcance enorme e lento',
-    },
     skins: [
-      { id: 'base', name: 'Original', appearance: {}, unlock: null },
-      { id: 'skin-secret', name: 'Legado', appearance: { cloakColor: '#34394a', bodyColor: '#191e29', trimColor: '#8795b1', longCape: true, masked: true }, unlock: 'secret' },
+      { id: 'base', appearance: {}, unlock: null },
+      { id: 'skin-secret', appearance: { cloakColor: '#34394a', bodyColor: '#191e29', trimColor: '#8795b1', longCape: true, masked: true }, unlock: 'secret' },
     ],
     altSaberColors: [],
     sound: {
@@ -559,7 +477,6 @@ export const characters = {
     id: 'foretold',
     attributes: { health: 8, stamina: 8, blade: 9, defense: 7, agility: 9, flow: 10 },
     potential: 3,
-    name: 'Predestinado',
     archetype: 'echo',
     alignment: 'light',
     loadout: { powers: { neutral: 'push', back: 'barrier', forward: 'throw' }, techniques: {} },
@@ -567,15 +484,9 @@ export const characters = {
     secret: true,
     moves: movesByCharacter.echo,
     aiProfile: 'foretold',
-    info: {
-      style: 'Secreto · Fluxo 10',
-      saberName: 'Azul-aurora',
-      trait: 'Finta: tocar a guarda cancela o forte',
-      ability: 'Passo-reflexo: passo curto e invulnerável'
-    },
     skins: [
-      { id: 'base', name: 'Original', appearance: {}, unlock: null },
-      { id: 'skin-secret', name: 'Legado', appearance: { cloakColor: '#34394a', bodyColor: '#191e29', trimColor: '#8795b1', longCape: true, masked: true }, unlock: 'secret' },
+      { id: 'base', appearance: {}, unlock: null },
+      { id: 'skin-secret', appearance: { cloakColor: '#34394a', bodyColor: '#191e29', trimColor: '#8795b1', longCape: true, masked: true }, unlock: 'secret' },
     ],
     altSaberColors: [],
     sound: {
@@ -604,7 +515,6 @@ export const characters = {
     id: 'elder',
     attributes: { health: 6, stamina: 6, blade: 6, defense: 8, agility: 7, flow: 8 },
     potential: 1,
-    name: 'Ancião',
     archetype: 'heron',
     alignment: 'light',
     loadout: { powers: { neutral: 'push', back: 'barrier', forward: 'heal' }, techniques: { back: 'spin' } },
@@ -612,15 +522,9 @@ export const characters = {
     secret: true,
     moves: movesByCharacter.heron,
     aiProfile: 'elder',
-    info: {
-      style: 'Secreto · mestre da Aurora',
-      saberName: 'Verde-jade',
-      trait: 'Pulo na parede e mergulho aéreo',
-      ability: 'Salto: avança pelo ar e cai golpeando',
-    },
     skins: [
-      { id: 'base', name: 'Original', appearance: {}, unlock: null },
-      { id: 'skin-secret', name: 'Eremita', appearance: { cloakColor: '#5c5a48', bodyColor: '#2e2c22', trimColor: '#a8a07a', hoodUp: true, longCape: true }, unlock: 'secret' },
+      { id: 'base', appearance: {}, unlock: null },
+      { id: 'skin-secret', appearance: { cloakColor: '#5c5a48', bodyColor: '#2e2c22', trimColor: '#a8a07a', hoodUp: true, longCape: true }, unlock: 'secret' },
     ],
     altSaberColors: [],
     sound: {
@@ -646,3 +550,5 @@ export const characters = {
     },
   },
 };
+
+applyCharacterTexts(characters, ptBR.characters);

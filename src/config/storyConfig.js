@@ -1,3 +1,6 @@
+import { applyNames } from '../utils/textTables.js';
+import { ptBR } from './locales/ptBR.js';
+
 export const storyConfig = {
   start: 'trial',
   pointsPerVictory: 2,
@@ -12,9 +15,9 @@ export const storyConfig = {
     names: ['Kael', 'Iria', 'Tarin', 'Vessa', 'Oren', 'Lyse'],
     maxNameLength: 16,
     skins: [
-      { id: 'base', name: 'Errante', appearance: {}, unlock: null },
-      { id: 'watcher', name: 'Vigia', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', longCape: false, hoodUp: true, masked: true, scarf: false }, unlock: null },
-      { id: 'pilgrim', name: 'Peregrino', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', longCape: true, hoodUp: false, masked: false, pauldrons: true, scarf: false }, unlock: null },
+      { id: 'base', appearance: {}, unlock: null },
+      { id: 'watcher', appearance: { cloakColor: '#454d58', bodyColor: '#222730', trimColor: '#83909e', longCape: false, hoodUp: true, masked: true, scarf: false }, unlock: null },
+      { id: 'pilgrim', appearance: { cloakColor: '#51483c', bodyColor: '#28231e', trimColor: '#a0957e', longCape: true, hoodUp: false, masked: false, pauldrons: true, scarf: false }, unlock: null },
     ],
     alignments: ['light', 'dark'],
     loadouts: {
@@ -59,3 +62,5 @@ export const storyConfig = {
     secret: { unlocks: [], conditionalUnlocks: [{ condition: { type: 'alignmentIs', alignment: 'light' }, ids: ['elder'] }] },
   },
 };
+
+applyNames(storyConfig.protagonist.skins, ptBR.protagonistSkins);

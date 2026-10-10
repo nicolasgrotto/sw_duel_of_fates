@@ -116,7 +116,9 @@ describe('state flow', () => {
     game.step(Action.CONFIRM);
     assert.deepEqual(game.stateNames(), ['MenuState', 'OptionsState']);
     const options = game.states.current;
+    assert.equal(options.items.language.label, 'Idioma: Português');
 
+    game.step(Action.MENU_DOWN);
     game.step(Action.CONFIRM);
     game.step(Action.CONFIRM);
     assert.equal(game.settings.difficulty, 'easy');

@@ -3,11 +3,13 @@ import { Action, keyboardPresetOrder } from '../config/controlsConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
 import { difficultyNames, layout, texts } from '../config/uiConfig.js';
 import { formatText } from '../ui/formatText.js';
+import { getLanguageName, nextLanguage } from '../ui/language.js';
 import { MenuList } from '../ui/MenuList.js';
 import { GameState } from './GameState.js';
 import { StateId } from './stateIds.js';
 
 export const OptionId = Object.freeze({
+  LANGUAGE: 'language',
   DIFFICULTY: 'difficulty',
   EFFECTS: 'effects',
   SOUND: 'sound',
@@ -27,6 +29,7 @@ function nextDifficulty(current) {
 export class OptionsState extends GameState {
   enter() {
     this.items = {
+      [OptionId.LANGUAGE]: { id: OptionId.LANGUAGE, label: '' },
       [OptionId.DIFFICULTY]: { id: OptionId.DIFFICULTY, label: '' },
       [OptionId.EFFECTS]: { id: OptionId.EFFECTS, label: '' },
       [OptionId.SOUND]: { id: OptionId.SOUND, label: '' },
@@ -34,8 +37,8 @@ export class OptionsState extends GameState {
       [OptionId.KEYBOARD]: { id: OptionId.KEYBOARD, label: '' },
       [OptionId.REPLAY]: { id: OptionId.REPLAY, label: '' },
       [OptionId.POWERS]: { id: OptionId.POWERS, label: '' },
-      [OptionId.REMAP]: { id: OptionId.REMAP, label: texts.options.remap },
-      [OptionId.BACK]: { id: OptionId.BACK, label: texts.options.back },
+      [OptionId.REMAP]: { id: OptionId.REMAP, label: '' },
+      [OptionId.BACK]: { id: OptionId.BACK, label: '' },
     };
     this.menu = new MenuList(Object.values(this.items).filter((item) => !this.game.coarsePointer || ![OptionId.REMAP, OptionId.KEYBOARD].includes(item.id)), layout.options, this.game.audio);
     this.refreshLabels();
@@ -48,6 +51,10 @@ export class OptionsState extends GameState {
   refreshLabels() {
     const { settings } = this.game;
     const { options } = texts;
+
+    this.items.language.label = formatText(options.language, { value: getLanguageName(settings.language) });
+    this.items.remap.label = options.remap;
+    this.items.back.label = options.back;
 
     this.items.difficulty.label = formatText(options.difficulty, { level: difficultyNames[settings.difficulty] });
     this.items.powers.label = formatText(options.powers, { value: settings.powers === false ? options.offPlural : options.onPlural });
@@ -78,6 +85,9 @@ export class OptionsState extends GameState {
     const { settings } = this.game;
 
     switch (option) {
+      case OptionId.LANGUAGE:
+        settings.language = nextLanguage(settings.language);
+        break;
       case OptionId.DIFFICULTY:
         settings.difficulty = nextDifficulty(settings.difficulty);
         break;

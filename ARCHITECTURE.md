@@ -68,6 +68,7 @@ src/
     skins.js                ✅ resolve overrides cosméticos parciais sem mudar lâmina ou stats
     protagonist.js          ✅ perfil e skin da História sobre o arquétipo do estilo
     characterFactory.js     ✅ cria um Fighter a partir dos dados
+    characterTexts.js       ✅ aplica nome, info, visuais e cores do idioma aos dados por id
   modes/                    ✅ regras de modos de jogo, puras e testáveis (sem render)
     DuelResult.js           ✅ resultado independente dos Fighters
     duelOutcomes.js         ✅ resultado + escada -> tela e patch de progresso
@@ -132,6 +133,7 @@ src/
     effectsRenderer.js      ✅ partículas, luzes de impacto e flash
     PowerRenderer.js        ✅ brilho de carga, raio (polilinhas) e domo da Barreira, só lendo o estado
     ProjectileRenderer.js   ✅ fragmento do Arremesso e lâmina girando, só lendo o pool
+    RenderInterpolation.js  ✅ mistura do passo anterior e atual no replay, desfeita no mesmo frame
   ui/                       ✅ peças de interface desenhadas no canvas
     attributeBars.js        ✅ seis linhas de sete segmentos (até dez com potencial); posição por parâmetro; somente leitura
     TouchControls.js        ✅ desenho de joystick e botões sem alterar input
@@ -144,11 +146,13 @@ src/
     formatText.js           ✅ textos com {placeholders}
     moveList.js             ✅ monta a lista de golpes a partir dos dados do personagem e das teclas ativas
     trainingInputs.js       ✅ texto do intent gravado ou reproduzido no Treino
+    language.js             ✅ idioma atual; troca as tabelas de texto no lugar
   config/                   ✅ valores e ajustes
     gameConfig.js           ✅ canvas, loop, arena, física, duelo, replay, Arcade, Sobrevivência, boneco, debug
     themeConfig.js          ✅ cores, estilos de texto, animação de UI
     controlsConfig.js       ✅ ações e teclas
-    uiConfig.js             ✅ textos da interface e layout das telas
+    uiConfig.js             ✅ textos da interface (clonados do locale) e layout das telas
+    locales/                ✅ ptBR.js e en.js: todo texto de tela por idioma, mesmas chaves
     tutorialConfig.js       ✅ passos do tutorial (objetivo, contagem, boneco) e regras do desafio de parry
     aiConfig.js             ✅ perfis, dificuldades e percepção da IA
     audioConfig.js          ✅ volumes, receitas de som, zumbido e música
@@ -160,7 +164,7 @@ src/
     powersConfig.js         ✅ modos com poderes, medidor, tabelas de interação por habilidade e tiers visuais do Fluxo
     projectilesConfig.js    ✅ capacidade do pool, faixas de tamanho do Arremesso, voo da lâmina e estilo do render
     storyConfig.js          ✅ regras da História, opções do protagonista, encontros (rotas, recompensas, liberações) e finais
-    storyTexts.js           ✅ títulos e falas dos encontros e finais
+    storyTexts.js           ✅ títulos e falas dos encontros e finais (clonados do locale)
     introConfig.js          ✅ linha do tempo e desenho da intro
     secretsConfig.js        ✅ sequências secretas (teclas, ações, toques) e recompensas
     fightersConfig.js       ✅ estrutura por arquétipo (corpo, tempos, golpes, custos, traços e regras de mobilidade)
@@ -171,6 +175,7 @@ src/
     math.js                 ✅ clamp, lerp, approach, smoothTowards
     easing.js               ✅ curvas de easing para poses
     random.js               ✅ RNG com seed (testes determinísticos)
+    textTables.js           ✅ clonar, mesclar e substituir tabelas de texto no lugar
     legacyRatings.js        ✅ conversão das notas 1–9 para a escala 7/8/9/10 (elenco e migração do save)
 tools/
   server.js                 ✅ servidor estático para desenvolvimento
@@ -436,6 +441,8 @@ Menu → CharacterSelectState → DuelState: a seleção usa MenuList e previews
 `createDuelResult` copia o lado vencedor (0/1 ou null), modo, tempo, stats e dados escalares dos dois lutadores (vida, máximo e healthRatio). `resolveDuelOutcome` recebe resultado, params da escada, settings, personagem e config de cura; devolve `{ state, params, progress }` sem mutar os argumentos. Arcade, Sobrevivência, cores e título local ficam nesse resolvedor. DuelState aplica o patch de progresso, salva uma vez e abre a tela. Modos importam apenas ids de estados/modos e formatação pura de UI; nunca classes de estados.
 
 ## UI
+
+**Idiomas (v2.2).** Uma tabela por idioma em `src/config/locales/` (`ptBR.js`, `en.js`), com `ui`, `difficultyNames`, `story`, `protagonistSkins` e `characters` (nome, `info`, visuais, cores e desafios por id). Os módulos de dados nascem em PT-BR: `uiConfig` (`texts`, `difficultyNames`) e `storyTexts` clonam a tabela; `characterData` e `storyConfig` recebem os nomes por `applyCharacterTexts` / `applyNames`. `ui/language.js` troca o idioma reescrevendo o conteúdo desses objetos no lugar (`replaceTable`), com PT-BR como base de cada chave; quem guardou uma referência continua vendo o objeto certo. Estados recalculam textos no `enter`; a `OptionsState` reconstrói os rótulos ao trocar e a `MenuState.resume` refaz os itens. `Game.applySettings` aplica `settings.language` (validado contra `languageIds`, padrão `pt-BR`) e atualiza `document.documentElement.lang`. Lógica de gameplay não lê idioma: só nomes e textos mudam. `tests/language.test.js` exige as mesmas chaves e marcadores nos dois idiomas, cobertura de todo id de personagem, visual e cor, e a troca de ida e volta. O nome digitado do protagonista nunca é traduzido; o `manifest` continua com o título neutro e descrição em PT-BR.
 
 Arquivos: [src/ui/](src/ui/), [src/config/uiConfig.js](src/config/uiConfig.js). Regras em [design/UI_GUIDELINES.md](design/UI_GUIDELINES.md).
 

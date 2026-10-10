@@ -22,24 +22,35 @@ export const MenuOption = Object.freeze({
   CONTROLS: 'controls',
 });
 
+const MENU_ORDER = Object.freeze([
+  MenuOption.DUEL,
+  MenuOption.STORY,
+  MenuOption.ARCADE,
+  MenuOption.SURVIVAL,
+  MenuOption.LOCAL,
+  MenuOption.TUTORIAL,
+  MenuOption.CHALLENGE,
+  MenuOption.TRAINING,
+  MenuOption.OPTIONS,
+  MenuOption.CONTROLS,
+]);
+
 export class MenuState extends GameState {
   enter() {
     this.menu = new MenuList(
-      [
-        { id: MenuOption.DUEL, label: texts.menu.duel },
-        { id: MenuOption.STORY, label: texts.menu.story },
-        { id: MenuOption.ARCADE, label: texts.menu.arcade },
-        { id: MenuOption.SURVIVAL, label: texts.menu.survival },
-        { id: MenuOption.LOCAL, label: texts.menu.local },
-        { id: MenuOption.TUTORIAL, label: texts.menu.tutorial },
-        { id: MenuOption.CHALLENGE, label: texts.menu.challenge },
-        { id: MenuOption.TRAINING, label: texts.menu.training },
-        { id: MenuOption.OPTIONS, label: texts.menu.options },
-        { id: MenuOption.CONTROLS, label: texts.menu.controls },
-      ].filter((item) => !this.game.coarsePointer || item.id !== MenuOption.LOCAL),
+      MENU_ORDER
+        .filter((id) => !this.game.coarsePointer || id !== MenuOption.LOCAL)
+        .map((id) => ({ id, label: texts.menu[id] })),
       layout.menu,
       this.game.audio,
     );
+    this.refreshFooter();
+  }
+
+  resume() {
+    for (const item of this.menu.items) {
+      item.label = texts.menu[item.id];
+    }
     this.refreshFooter();
   }
 
