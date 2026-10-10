@@ -1,10 +1,10 @@
 export const combatRulesConfig = {
   exhaustion: {
-    enterRatio: 0.1,
-    exitRatio: 0.4,
+    enterRatio: 0.05,
+    exitRatio: 0.3,
     minDuration: 1,
-    guardBreakMinDuration: 1.6,
-    damageScale: 1.2,
+    guardBreakMinDuration: 1,
+    damageScale: 1.1,
   },
   modes: {
     exhaustion: ['versus', 'local', 'training', 'tutorial'],
@@ -12,10 +12,10 @@ export const combatRulesConfig = {
     focusEvade: ['versus', 'local', 'training'],
   },
   wounds: {
-    arm: { blockCostScale: 1.35 },
-    leg: { dashCostScale: 1.35, maxJumps: 1 },
+    arm: { blockCostScale: 1.25 },
+    leg: { dashCostScale: 1.2, maxJumps: 1 },
   },
-  focus: { autoEvadeCost: 12 },
+  focus: { autoEvadeCost: 30 },
 };
 
 export function resolveCombatRules(rules = {}) {

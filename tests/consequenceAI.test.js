@@ -6,6 +6,7 @@ import { powersConfig } from '../src/config/powersConfig.js';
 import { captureFighter } from '../src/simulation/ReplayBuffer.js';
 import { isNeutralForFocus } from '../src/combat/StatusSystem.js';
 import { FighterState } from '../src/entities/fighterStates.js';
+import './consequenceHelpers.js';
 import { STEP, createSimulation, spawnFighter } from './helpers.js';
 
 const RULES = { powers: true, exhaustion: true, wounds: true, focusEvade: true };
