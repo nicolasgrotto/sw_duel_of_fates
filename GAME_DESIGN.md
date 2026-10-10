@@ -658,7 +658,7 @@ Loadouts da v1.18: Garça troca Barreira por Redirecionamento (trás + Poder); S
 | --- | --- | --- | --- | --- | --- |
 | Guardião | Repulsão | Cura | Barreira | Avanço com corte | Arremesso da lâmina |
 | Sombra | Raio | Puxão | Estrangular | Avanço com corte | Giro |
-| Bastião | Repulsão | Foco | Barreira | — | Giro |
+| Bastião | Repulsão | Redirecionamento | Barreira | — | Giro |
 | Vespa | Repulsão | Arremesso | Barreira | Avanço com corte | Arremesso da lâmina |
 | Espelho | Repulsão | Arremesso | Barreira | — | Giro |
 | Haste | Raio | Puxão | Arremesso | — | Giro |

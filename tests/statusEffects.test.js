@@ -123,6 +123,7 @@ describe('freeze', () => {
 describe('focus', () => {
   it('halves the stamina cost of attacking, blocking and dodging while it lasts', () => {
     const setup = duel('bastion', 'shadow', 400);
+    setup.caster.stats.power.loadout = { ...setup.caster.stats.power.loadout, forward: focus };
     cast(setup, setup.caster, 'forward');
     step(setup, stepsFor(focus.startup + focus.active + focus.recovery));
     assert.ok(setup.caster.combat.focusTime > 0);

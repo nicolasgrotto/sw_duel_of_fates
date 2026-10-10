@@ -89,7 +89,7 @@ export const characters = {
     attributes: {"health": 6, "stamina": 6, "blade": 6, "defense": 7, "agility": 2, "flow": 2},
     archetype: 'bastion',
     alignment: 'light',
-    loadout: { powers: { neutral: 'push', back: 'barrier', forward: 'focus' }, techniques: { back: 'spin' } },
+    loadout: { powers: { neutral: 'push', back: 'barrier', forward: 'redirect' }, techniques: { back: 'spin' } },
     selectable: true,
     moves: movesByCharacter.bastion,
     aiProfile: 'bastion',
