@@ -1,10 +1,12 @@
 import { isStrongAttack } from '../combat/attackPhases.js';
 import { CombatEvent } from '../combat/combatEvents.js';
 import { getPowerTier } from '../combat/flowInteractions.js';
+import { combatRulesConfig } from '../config/combatRulesConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { colors } from '../config/themeConfig.js';
-import { degreesToRadians } from '../utils/math.js';
+import { clamp, degreesToRadians } from '../utils/math.js';
 import { pick, randomInt, randomRange } from '../utils/random.js';
+import { FighterState } from '../entities/fighterStates.js';
 import { ParticlePool } from './ParticlePool.js';
 
 export const EffectType = Object.freeze({
@@ -18,6 +20,11 @@ export const EffectType = Object.freeze({
   PARRY_SPARK: 'parrySpark',
   PERFECT_PARRY: 'perfectParry',
   SHOVE_IMPACT: 'shoveImpact',
+  BLADE_LOCK_START: 'bladeLockStart',
+  BLADE_LOCK_GRIND: 'bladeLockGrind',
+  BLADE_LOCK_PRESS: 'bladeLockPress',
+  BLADE_LOCK_WIN: 'bladeLockWin',
+  BLADE_LOCK_BREAK: 'bladeLockBreak',
   POWER_WAVE: 'powerWave',
   POWER_IMPACT: 'powerImpact',
   LIGHTNING_TICK: 'lightningTick',
@@ -85,6 +92,8 @@ export class EffectsSystem {
     this.rings = Array.from({ length: config.maxRings }, createRing);
     this.shockwaves = Array.from({ length: config.maxShockwaves }, createShockwave);
     this.saberFlares = new Map();
+    this.bladeLock = { active: false, first: null, second: null, advantage: 0, sparkTime: 0 };
+    this.lockWinners = new Set();
     this.desaturation = { amount: 0, peakAmount: 0, time: 0, duration: 0 };
     this.flash = {
       color: config.flashColor,
@@ -160,6 +169,15 @@ export class EffectsSystem {
       case CombatEvent.SHOVE:
         this.spawn(EffectType.SHOVE_IMPACT, params);
         break;
+      case CombatEvent.BLADE_LOCK_START:
+        this.startBladeLock(attacker, defender, params);
+        break;
+      case CombatEvent.BLADE_LOCK_PRESS:
+        this.pressBladeLock(event, params);
+        break;
+      case CombatEvent.BLADE_LOCK_END:
+        this.endBladeLock(event, params);
+        break;
       case CombatEvent.COUNTER:
         this.spawnParry(EffectType.PARRY_SPARK, defender, params);
         break;
@@ -200,6 +218,80 @@ export class EffectsSystem {
       default:
         break;
     }
+  }
+
+  startBladeLock(first, second, params) {
+    const lock = this.bladeLock;
+    lock.active = true;
+    lock.first = first;
+    lock.second = second;
+    lock.advantage = 0;
+    lock.sparkTime = this.config.bladeLock.sparkInterval;
+    this.placeAtLockContact(params);
+    params.secondaryColor = second.appearance.saberColor;
+    this.spawn(EffectType.BLADE_LOCK_START, params);
+  }
+
+  pressBladeLock(event, params) {
+    const lock = this.bladeLock;
+    if (!lock.active) return;
+    const presser = event.attacker;
+    lock.advantage = presser === lock.first ? event.advantage : -event.advantage;
+    this.placeAtLockContact(params);
+    this.spawn(EffectType.BLADE_LOCK_PRESS, params);
+    this.spawnLight(this.config.bladeLock.pressLight, params.x, params.y, presser.appearance.saberColor);
+  }
+
+  endBladeLock(event, params) {
+    const lock = this.bladeLock;
+    if (!lock.active) return;
+    this.placeAtLockContact(params);
+    lock.active = false;
+    if (event.winner) {
+      params.direction = event.winner.facing;
+      params.color = event.winner.appearance.saberColor;
+      if (this.flashScale > 0) {
+        this.hitFlashes.set(event.loser, this.config.hitFlashDuration);
+      }
+      this.lockWinners.add(event.winner);
+      this.spawn(EffectType.BLADE_LOCK_WIN, params);
+    } else if (event.draw) {
+      params.color = lock.first.appearance.saberColor;
+      params.secondaryColor = lock.second.appearance.saberColor;
+      this.spawn(EffectType.BLADE_LOCK_BREAK, params);
+    }
+  }
+
+  placeAtLockContact(params) {
+    const { first, second, advantage } = this.bladeLock;
+    const side = Math.sign(second.x - first.x) || first.facing;
+    const shift = clamp(advantage / combatRulesConfig.bladeLock.winMargin, -1, 1) * this.config.bladeLock.contactShift;
+    params.x = (first.x + second.x) / 2 + side * shift;
+    params.y = first.y - this.config.bladeLock.contactHeight;
+    return params;
+  }
+
+  isLockWinner(fighter) {
+    return this.lockWinners.has(fighter);
+  }
+
+  updateBladeLock(dt) {
+    for (const winner of this.lockWinners) {
+      if (winner.state !== FighterState.HIT) this.lockWinners.delete(winner);
+    }
+    const lock = this.bladeLock;
+    if (!lock.active) return;
+    if (lock.first.state !== FighterState.BLADE_LOCK || lock.second.state !== FighterState.BLADE_LOCK) {
+      lock.active = false;
+      return;
+    }
+    lock.sparkTime -= dt;
+    if (lock.sparkTime > 0) return;
+    lock.sparkTime += this.config.bladeLock.sparkInterval;
+    const params = this.placeAtLockContact(this.eventParams);
+    const recipe = this.config.recipes[EffectType.BLADE_LOCK_GRIND];
+    const direction = this.random() < 0.5 ? 1 : -1;
+    this.spawnSparks(recipe, params.x, params.y, direction, null, this.reduced ? this.config.bladeLock.reducedSparkScale : 1);
   }
 
   spawnParry(type, defender, params) {
@@ -469,6 +561,7 @@ export class EffectsSystem {
     this.updateTimers(this.evadeAfterimages, dt);
     this.updateTremors(dt);
     this.updateDesaturation(dt);
+    this.updateBladeLock(dt);
   }
 
   updateShockwaves(dt) {

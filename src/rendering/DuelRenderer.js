@@ -7,7 +7,7 @@ import { DodgeAfterimage } from './DodgeAfterimage.js';
 import { PowerRenderer } from './PowerRenderer.js';
 import { ProjectileRenderer } from './ProjectileRenderer.js';
 import { drawDesaturation, drawFlash, drawImpactLights, drawParticles, drawRings, drawShockwaves } from './effectsRenderer.js';
-import { computePose, createPose } from './fighterPose.js';
+import { computePose, createPose, getBladeLockAdvantage } from './fighterPose.js';
 import { drawFighterBody } from './fighterRenderer.js';
 import { SaberTrail } from './SaberTrail.js';
 import { drawSaber, drawSaberBodyLight, drawSaberFloorLight, getBladeWorldPoints } from './saberRenderer.js';
@@ -29,6 +29,7 @@ export class DuelRenderer {
     this.powerView = new PowerRenderer();
     this.projectileView = new ProjectileRenderer();
     this.bladePoints = { baseX: 0, baseY: 0, tipX: 0, tipY: 0 };
+    this.lockContext = { advantage: 0, victory: false };
   }
 
   getPose(fighter) {
@@ -128,7 +129,9 @@ export class DuelRenderer {
 
   preparePoses(fighters, bladeExtension, effects) {
     for (const fighter of fighters) {
-      const pose = computePose(fighter, this.getPose(fighter));
+      this.lockContext.advantage = getBladeLockAdvantage(fighter, fighters);
+      this.lockContext.victory = effects?.isLockWinner?.(fighter) ?? false;
+      const pose = computePose(fighter, this.getPose(fighter), false, this.lockContext);
       pose.bladeExtension = bladeExtension;
       this.getAfterimage(fighter).record(fighter, pose, effects?.hasEvadeAfterimage?.(fighter) ?? false);
 

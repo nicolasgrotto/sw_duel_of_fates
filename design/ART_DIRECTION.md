@@ -175,6 +175,23 @@ Cada personagem tem um **estilo de movimento** (`appearance.motion`, tabela `mot
 
 O protagonista do estilo Técnica herda o estilo do Guardião pela base de aparência.
 
+### Disputa de lâminas (v2.5)
+
+Pose `BLADE_LOCK`, com números por estilo em `motionStyles[motion].lock` e `lockVictory`:
+
+- Os dois se inclinam um contra o outro, base baixa, mãos recolhidas e um pouco erguidas; as lâminas sobem em diagonal e se cruzam acima das mãos, num X entre os rostos.
+- **Inclinação conforme a vantagem:** quem está ganhando avança o tronco e o ponto de contato; quem está perdendo recua o tronco e afunda a base. A leitura vem da silhueta, sem barra nem número na tela.
+- **Entrada:** 0,08 s com easing saindo da guarda; a pose do forte some sob o impacto da entrada.
+- **Vitória curta (0,25 s, a recuperação do vencedor):** a lâmina empurra através do cruzamento até um corte baixo à frente e volta à guarda. Cada estilo lê de um jeito:
+
+| Estilo | Disputa | Vitória |
+| --- | --- | --- |
+| `standard` | inclinação média, sem traço próprio | empurra até 35° e volta |
+| `guardian` | base mais baixa e firme, tremor menor | empurra curto e controlado (25°), tronco quase parado, volta direto à guarda |
+| `wasp` | tronco mais à frente, tremor maior | empurra largo (55°) com o tronco e fecha com um giro completo da lâmina |
+
+O perdedor usa a pose de desequilíbrio existente. Os demais estilos recebem disputa e vitória próprias na 2.6.
+
 ## Camadas de arena como dados
 
 Cada arena descreve camadas estáticas de geometria em tokens da paleta existente. O renderer pré-renderiza essas camadas em canvases internos e as reutiliza. Partículas ambientes são poucas, lentas e pouco opacas, atrás dos corpos; não geram eventos nem colisão. A plataforma provisória mantém o desenho atual até a implementação da Plataforma de Refino.

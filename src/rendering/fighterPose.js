@@ -1,4 +1,6 @@
 import { AttackPhase, getAttackPhase, getPhaseProgress } from '../combat/attackPhases.js';
+import { combatRulesConfig } from '../config/combatRulesConfig.js';
+import { effectsConfig } from '../config/effectsConfig.js';
 import { animation as animationStyle, combatPoses, motionStyles, proportions } from '../config/fighterVisualConfig.js';
 import { FighterState } from '../entities/fighterStates.js';
 import { easeInOutSine, easeInQuad, easeOutCubic, easeOutQuad } from '../utils/easing.js';
@@ -67,7 +69,72 @@ function resolveAttackPoses(style) {
 }
 
 function resolveMotionStyle(style) {
-  return { ...style, ...resolveAttackPoses(style), block: { ...combatPoses.block, ...style.block } };
+  return {
+    ...style,
+    ...resolveAttackPoses(style),
+    block: { ...combatPoses.block, ...style.block },
+    lock: { ...motionStyles.standard.lock, ...style.lock },
+    lockVictory: { ...motionStyles.standard.lockVictory, ...style.lockVictory },
+  };
+}
+
+export const noLockContext = Object.freeze({ advantage: 0, victory: false });
+
+export function getBladeLockAdvantage(fighter, fighters) {
+  const opponent = fighters[fighter.combat.lockOpponent];
+  if (fighter.state !== FighterState.BLADE_LOCK || !opponent) {
+    return 0;
+  }
+  return clamp((fighter.combat.lockPresses - opponent.combat.lockPresses) / combatRulesConfig.bladeLock.winMargin, -1, 1);
+}
+
+function getLockEntry(fighter) {
+  return easeOutCubic(clamp(fighter.combat.lockTime / combatPoses.bladeLock.entryDuration, 0, 1));
+}
+
+function getLockPressPush(fighter) {
+  const { lockTime, lockLastPress, lockPresses } = fighter.combat;
+  const elapsed = lockTime - lockLastPress;
+  if (lockPresses === 0 || elapsed >= combatPoses.bladeLock.pressPushDuration) {
+    return 0;
+  }
+  return 1 - elapsed / combatPoses.bladeLock.pressPushDuration;
+}
+
+function applyBladeLockPose(fighter, motion, advantage) {
+  const { lock } = motion;
+  const entry = getLockEntry(fighter);
+  combatPose.leanDegrees = (lock.lean + advantage * lock.advantageLean) * entry;
+  combatPose.crouch = (lock.crouch + Math.max(0, -advantage) * lock.advantageCrouch) * entry;
+  combatPose.reach = (lock.reach + getLockPressPush(fighter) * lock.pressPush) * entry;
+  combatPose.lift = lock.lift * entry;
+}
+
+function applyLockVictoryPose(fighter, guardDegrees, motion) {
+  const victory = motion.lockVictory;
+  const progress = clamp(fighter.stateTime / fighter.combat.stunDuration, 0, 1);
+  if (progress < victory.sweepShare) {
+    const amount = easeOutQuad(progress / victory.sweepShare);
+    combatPose.bladeDegrees = lerp(victory.fromDegrees, victory.sweepDegrees, amount);
+    combatPose.leanDegrees = victory.lean * amount;
+    return;
+  }
+  const amount = easeInOutSine((progress - victory.sweepShare) / (1 - victory.sweepShare));
+  combatPose.bladeDegrees = lerp(victory.sweepDegrees, guardDegrees, amount) + victory.twirl * amount;
+  combatPose.leanDegrees = victory.lean * (1 - amount);
+}
+
+function placeLockedBlade(pose, fighter, motion, advantage) {
+  const { bladeLock } = combatPoses;
+  const time = fighter.animation.time;
+  const growth = clamp(fighter.combat.lockTime / combatRulesConfig.bladeLock.maxDuration, 0, 1);
+  const amplitude = lerp(motion.lock.tremor[0], motion.lock.tremor[1], growth);
+  pose.handX += Math.sin(time * bladeLock.tremorRates[0] * TAU) * amplitude;
+  pose.handY += Math.sin(time * bladeLock.tremorRates[1] * TAU) * amplitude;
+  const contactX = combatRulesConfig.bladeLock.distance / 2 + advantage * effectsConfig.bladeLock.contactShift;
+  const contactY = -effectsConfig.bladeLock.contactHeight + Math.sin(time * bladeLock.tremorRates[1] * TAU) * bladeLock.contactJitter;
+  const contactAngle = Math.atan2(contactY - pose.handY, contactX - pose.handX);
+  pose.bladeAngle = lerp(pose.bladeAngle, contactAngle, getLockEntry(fighter));
 }
 
 const resolvedMotionStyles = Object.fromEntries(
@@ -158,7 +225,7 @@ export function getEvadeVariant(fighter, justSucceeded = false) {
   return variants[index % variants.length];
 }
 
-function resolveCombatPose(fighter, guardDegrees, motion, forceEvade = false) {
+function resolveCombatPose(fighter, guardDegrees, motion, forceEvade, lockContext) {
   resetCombatPose(guardDegrees);
 
   if (forceEvade || (fighter.state === FighterState.DODGING && fighter.combat.evading)) {
@@ -194,7 +261,14 @@ function resolveCombatPose(fighter, guardDegrees, motion, forceEvade = false) {
       combatPose.crouch = dodge.crouch;
       break;
     }
+    case FighterState.BLADE_LOCK:
+      applyBladeLockPose(fighter, motion, lockContext.advantage);
+      break;
     case FighterState.HIT: {
+      if (lockContext.victory) {
+        applyLockVictoryPose(fighter, guardDegrees, motion);
+        break;
+      }
       const { hit } = combatPoses;
       const recovery = 1 - easeOutQuad(clamp(fighter.stateTime / fighter.combat.stunDuration, 0, 1));
       combatPose.leanDegrees = hit.lean * recovery;
@@ -249,7 +323,7 @@ function placeKnees(pose, kneeBend) {
   pose.backKneeY = (pose.hipY + pose.backFootY) / 2;
 }
 
-export function computePose(fighter, pose, forceEvade = false) {
+export function computePose(fighter, pose, forceEvade = false, lockContext = noLockContext) {
   const { height, appearance, animation } = fighter;
   const { time, walkPhase, walkBlend, airBlend } = animation;
   const motion = getMotionStyle(fighter);
@@ -261,7 +335,7 @@ export function computePose(fighter, pose, forceEvade = false) {
   const walkBob = Math.abs(Math.sin(walkPhase)) * animationStyle.walkBob * stance.bobScale * walkBlend;
 
   const droop = exhausted ? animationStyle.exhaustedDroopDegrees : 0;
-  resolveCombatPose(fighter, appearance.guardAngleDegrees + stance.guardOffset + droop, motion, forceEvade);
+  resolveCombatPose(fighter, appearance.guardAngleDegrees + stance.guardOffset + droop, motion, forceEvade, lockContext);
 
   const lean = degreesToRadians(appearance.torsoLeanDegrees + stance.lean + combatPose.leanDegrees);
   const torsoLength = height * proportions.torsoLength;
@@ -282,6 +356,9 @@ export function computePose(fighter, pose, forceEvade = false) {
   pose.handX = pose.shoulderX + height * (proportions.handForward + combatPose.reach);
   pose.handY = pose.hipY - height * (proportions.handHeight + combatPose.lift) - breath / 2;
   pose.bladeAngle = degreesToRadians(combatPose.bladeDegrees + breathWave * animationStyle.saberSwayDegrees * stance.swayScale);
+  if (fighter.state === FighterState.BLADE_LOCK) {
+    placeLockedBlade(pose, fighter, motion, lockContext.advantage);
+  }
   pose.bladeVisible = combatPose.bladeVisible && !fighter.combat.saberThrown;
   pose.bodyRotation = degreesToRadians(combatPose.bodyRotationDegrees);
   pose.bodyLift = combatPose.bodyLift;

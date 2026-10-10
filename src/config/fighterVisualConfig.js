@@ -182,6 +182,12 @@ export const combatPoses = {
     swayDegrees: 6,
     swaySpeed: 3,
   },
+  bladeLock: {
+    entryDuration: 0.08,
+    pressPushDuration: 0.08,
+    tremorRates: [31, 47],
+    contactJitter: 0.6,
+  },
   dead: {
     fallDuration: 0.45,
     fallDegrees: 88,
@@ -199,6 +205,8 @@ export const motionStyles = {
       { lean: -12, crouch: 16, bladeOffset: 18 },
       { lean: -30, crouch: 4, bladeOffset: -12 },
     ],
+    lock: { lean: 9, crouch: 10, reach: -0.07, lift: 0.12, advantageLean: 9, advantageCrouch: 8, tremor: [1, 2.5], pressPush: 0.03 },
+    lockVictory: { fromDegrees: -55, sweepDegrees: 35, lean: 10, twirl: 0, sweepShare: 0.4 },
     attacks: {},
     attackTypes: {},
   },
@@ -211,6 +219,8 @@ export const motionStyles = {
       { lean: -10, crouch: 14, bladeOffset: 8 },
       { lean: -20, crouch: 8, bladeOffset: -6 },
     ],
+    lock: { lean: 7, crouch: 14, reach: -0.06, lift: 0.11, advantageLean: 7, advantageCrouch: 7, tremor: [0.7, 1.8], pressPush: 0.02 },
+    lockVictory: { fromDegrees: -55, sweepDegrees: 25, lean: 6, twirl: 0, sweepShare: 0.45 },
     attacks: {
       light: { windupDegrees: -95, strikeDegrees: 25, windupLean: -2, strikeLean: 5, windupLift: 0.06, strikeReach: 0.1 },
       heavy: { windupDegrees: -150, strikeDegrees: 48, windupLean: -5, strikeLean: 10, windupLift: 0.12, strikeReach: 0.13 },
@@ -227,6 +237,8 @@ export const motionStyles = {
       { lean: -8, crouch: 22, bladeOffset: -20 },
       { lean: -34, crouch: 6, bladeOffset: 24 },
     ],
+    lock: { lean: 13, crouch: 8, reach: -0.08, lift: 0.13, advantageLean: 11, advantageCrouch: 8, tremor: [1.3, 3], pressPush: 0.04 },
+    lockVictory: { fromDegrees: -55, sweepDegrees: 55, lean: 15, twirl: 360, sweepShare: 0.35 },
     attacks: {
       light: { windupDegrees: -100, strikeDegrees: 40, windupLean: -1, strikeLean: 11, windupLift: 0.07, strikeReach: 0.1 },
       lightReverse: { windupDegrees: 75, strikeDegrees: -85, windupLean: 6, strikeLean: 12, windupLift: 0.02, strikeReach: 0.11 },
