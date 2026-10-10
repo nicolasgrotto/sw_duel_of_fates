@@ -1242,6 +1242,8 @@ Consequências: dano do passo 4 ou 5 interrompe a Cura antes do passo 7, então 
 
 **Ira (2.4).** `wrath` é um poder Eclipse de duração em `powerEffects`, sem capacidade própria e sem loadout do elenco. Guarda duração, motivos e escalas em `combat.wrathTime`, `wrathEnd`, `wrathDamageDealtScale` e `wrathDamageTakenScale`. O pipeline aplica escalas de quem causa e recebe dano depois da exaustão e antes da armadura; poder chega com potência já resolvida. Periódico não recebe escalas novas. Reaplicar reinicia sem empilhar. Dano e interrupções de ações não dão imunidade nem encerram o buff; morte e término limpam as escalas. As notas fixam custo, startup, duração e escalas; fases ativa/recuperação reutilizam as já existentes do Foco (`SELF_BUFF_PHASES`), sem novos valores de calibração.
 
+**Foco automático (2.4).** `StatusSystem.tryAutoEvade` responde a contatos elegíveis de lâmina, depois da prioridade da esquiva manual em `resolveContact`. `isNeutralForFocus` exige chão, IDLE e todos os campos do intent sem movimento/ação. Projéteis não passam por esse caminho. Cada sucesso debita `focus.autoEvadeCost` uma vez e emite `EVADE_SUCCESS` com `auto: true`, sem alterar `evadeStreak` nem renovar duração. A lista de contatos já consome o ataque. Saldo insuficiente encerra imediatamente por `depleted`, inclusive após um sucesso deixar menos que o custo da próxima defesa; o passo de status também verifica consumo externo antes da regeneração de Fluxo. A redução de Vigor termina junto e não volta ao regenerar.
+
 **Render.** Interpolação visual (2.1) usa o `alpha` do `GameLoop` e dados pré-alocados do passo anterior, fora do snapshot. Desligar ou ligar a interpolação não muda nenhum resultado.
 
 ---

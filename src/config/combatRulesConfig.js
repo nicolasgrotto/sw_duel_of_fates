@@ -15,6 +15,7 @@ export const combatRulesConfig = {
     arm: { blockCostScale: 1.35 },
     leg: { dashCostScale: 1.35, maxJumps: 1 },
   },
+  focus: { autoEvadeCost: 12 },
 };
 
 export function resolveCombatRules(rules = {}) {

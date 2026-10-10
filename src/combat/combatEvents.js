@@ -41,8 +41,8 @@ export function isContactEvent(event) {
   return CONTACT_EVENTS.has(event.type);
 }
 
-export function createCombatEvent(type, { attacker, defender, attackType, x, y, armored = false, damage = 0 }) {
-  return {
+export function createCombatEvent(type, { attacker, defender, attackType, x, y, armored = false, damage = 0, auto }) {
+  const event = {
     type,
     attacker,
     defender,
@@ -52,4 +52,8 @@ export function createCombatEvent(type, { attacker, defender, attackType, x, y, 
     armored,
     damage,
   };
+  if (auto !== undefined) {
+    event.auto = auto;
+  }
+  return event;
 }

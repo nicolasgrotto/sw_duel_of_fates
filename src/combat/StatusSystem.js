@@ -1,3 +1,7 @@
+import { combatRulesConfig } from '../config/combatRulesConfig.js';
+import { FighterState } from '../entities/fighterStates.js';
+import { AttackType, isSaberAttack } from './attackPhases.js';
+
 function findOpponent(fighter, fighters) {
   for (const other of fighters) {
     if (other !== fighter) {
@@ -5,6 +9,18 @@ function findOpponent(fighter, fighters) {
     }
   }
   return null;
+}
+
+export function isNeutralForFocus(fighter) {
+  if (!fighter.grounded || fighter.state !== FighterState.IDLE) {
+    return false;
+  }
+  for (const action in fighter.intent) {
+    if (fighter.intent[action]) {
+      return false;
+    }
+  }
+  return true;
 }
 
 export function hasStatus(fighter) {
@@ -25,6 +41,7 @@ export class StatusSystem {
         continue;
       }
       this.advance(fighter, 'focus', dt);
+      this.checkFocusResource(fighter);
       this.advance(fighter, 'wrath', dt);
       combat.freezeTime = Math.max(0, combat.freezeTime - dt);
       if (combat.chokeTime > 0) {
@@ -34,6 +51,29 @@ export class StatusSystem {
         this.heal(fighter, dt);
       }
     }
+  }
+
+  checkFocusResource(fighter) {
+    if (this.combat.rules.focusEvade && fighter.combat.focusTime > 0 && fighter.flowMeter < combatRulesConfig.focus.autoEvadeCost) {
+      this.end(fighter, 'focus', 'depleted');
+    }
+  }
+
+  tryAutoEvade(contact) {
+    const { defender, attack, attackType } = contact;
+    if (!this.combat.rules.focusEvade || defender.combat.focusTime <= 0 || !isNeutralForFocus(defender)
+      || !isSaberAttack(attackType) || attackType === AttackType.SHOVE || attack.projectile) {
+      return false;
+    }
+    const cost = combatRulesConfig.focus.autoEvadeCost;
+    if (defender.flowMeter < cost) {
+      this.end(defender, 'focus', 'depleted');
+      return false;
+    }
+    defender.flowMeter -= cost;
+    contact.auto = true;
+    this.checkFocusResource(defender);
+    return true;
   }
 
   start(fighter, effect, duration) {

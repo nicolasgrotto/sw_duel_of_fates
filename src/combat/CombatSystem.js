@@ -543,6 +543,10 @@ export class CombatSystem {
       this.emit(CombatEvent.EVADE_SUCCESS, contact);
       return;
     }
+    if (this.statuses.tryAutoEvade(contact)) {
+      this.emit(CombatEvent.EVADE_SUCCESS, contact);
+      return;
+    }
     if (contact.attackType === AttackType.SHOVE) {
       this.applyShove(contact);
     } else if (isBarrierUp(contact.defender)) {
