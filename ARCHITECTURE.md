@@ -1206,6 +1206,8 @@ Update e render dentro do alvo em todas as janelas. Sem mudanças de visual ou o
 
 ## v3: princípios e decisões
 
+**Entrada na disputa (2.5).** A factory resolve `bladeLock` só nos fortes comuns e de avanço, permitindo declarações explícitas. `CombatSystem.tryClash` mantém a detecção de contato ativo da v2 e consulta `BladeLockSystem.tryStart` antes do clash curto. A `DuelSimulation` monta esse sistema e injeta a conexão no combate. O sistema verifica chão, cooldown, efeitos periódicos e projéteis pelos índices em `fighters`, posiciona a dupla dentro da arena e espelha o vínculo em `combat.lockOpponent`. Os demais campos escalares da disputa são cobertos pelo snapshot existente e pelo reset de round do Fighter.
+
 **Configuração da 2.5.** `bladeLock` é independente de Poderes e vale em Duelar, 2 Jogadores e Treino. História declara a capacidade desligada; tutorial aguarda a apresentação da etapa. `combatRulesConfig.bladeLock` guarda os parâmetros iniciais da disputa e da opção de segurar. A resolução compartilhada torna a capacidade disponível em `--rules bladeLock` e os parâmetros em `--set combatRules.bladeLock.*`.
 
 Roteiro, etapas e especificação aprovada em [versions/v3.md](versions/v3.md). Esta seção registra os contratos que valem para todo o ciclo; o detalhe de cada sistema entra nas seções acima quando a etapa for implementada.

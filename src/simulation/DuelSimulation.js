@@ -1,4 +1,5 @@
 import { CombatSystem } from '../combat/CombatSystem.js';
+import { BladeLockSystem } from '../combat/BladeLockSystem.js';
 import { AnimationSystem } from '../systems/AnimationSystem.js';
 import { CollisionSystem } from '../systems/CollisionSystem.js';
 import { MovementSystem } from '../systems/MovementSystem.js';
@@ -13,6 +14,8 @@ export class DuelSimulation {
     this.fighters = fighters;
     this.rules = resolveCombatRules(rules);
     this.combat = new CombatSystem(arena, combatConfig, { rules: this.rules, friction: physicsConfig.actionFriction });
+    this.bladeLocks = new BladeLockSystem(this.combat, fighters, arena);
+    this.combat.bladeLocks = this.bladeLocks;
     this.movement = new MovementSystem(physicsConfig, arena);
     this.physics = new PhysicsSystem(physicsConfig, arena);
     this.collision = new CollisionSystem(arena);

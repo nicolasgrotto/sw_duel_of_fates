@@ -8,6 +8,7 @@ export const FighterState = Object.freeze({
   DODGING: 'DODGING',
   CASTING: 'CASTING',
   CHANNELING: 'CHANNELING',
+  BLADE_LOCK: 'BLADE_LOCK',
   HIT: 'HIT',
   STAGGERED: 'STAGGERED',
   STUNNED: 'STUNNED',

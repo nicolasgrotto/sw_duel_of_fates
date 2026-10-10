@@ -475,6 +475,8 @@ export class CombatSystem {
       return;
     }
 
+    if (this.bladeLocks?.tryStart(a, b)) return;
+
     this.events.push(
       createCombatEvent(CombatEvent.CLASH, {
         attacker: a,
