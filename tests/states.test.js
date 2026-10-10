@@ -15,6 +15,18 @@ import { captureFighter } from '../src/simulation/ReplayBuffer.js';
 
 const STEP = 1 / 60;
 
+it('shows lock time, accepted pressures and advantage in the duel debug info', () => {
+  const game = createFakeGame();
+  game.changeState(StateId.DUEL, { mode: DuelMode.TRAINING });
+  const duel = game.states.current;
+  duel.fighters.forEach((fighter) => { fighter.combat.attack = fighter.moves.heavy; });
+  duel.simulation.bladeLocks.tryStart(...duel.fighters);
+  duel.fighters[0].intent.lightAttack = true;
+  duel.simulation.step(STEP);
+  assert.ok(duel.getDebugInfo().some((line) => /lock 1 [\d.]+s presses 1 advantage 1/.test(line)));
+  assert.ok(duel.getDebugInfo().some((line) => /lock 0 [\d.]+s presses 0 advantage -1/.test(line)));
+});
+
 it('cycles the hold option per player, saves it and connects both local controllers', () => {
   const game = createFakeGame();
   game.changeState(StateId.OPTIONS);

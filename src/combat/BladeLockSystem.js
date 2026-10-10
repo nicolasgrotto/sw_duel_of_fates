@@ -2,6 +2,7 @@ import { combatRulesConfig } from '../config/combatRulesConfig.js';
 import { FighterState } from '../entities/fighterStates.js';
 import { clamp } from '../utils/math.js';
 import { clearActionBuffer } from './actionBuffer.js';
+import { CombatEvent, createCombatEvent } from './combatEvents.js';
 
 function hasPeriodicOffense(fighter) {
   return fighter.combat.chokeTime > 0 || ['choke', 'storm', 'lightning'].includes(fighter.combat.power?.effect);
@@ -15,7 +16,7 @@ export class BladeLockSystem {
   }
 
   canStart(a, b) {
-    if (!this.combat.rules.bladeLock || !a.isAlive || !b.isAlive || !a.grounded || !b.grounded
+    if (a === b || !this.combat.rules.bladeLock || !a.isAlive || !b.isAlive || !a.grounded || !b.grounded
       || a.combat.attack?.bladeLock !== true || b.combat.attack?.bladeLock !== true
       || a.combat.lockOpponent >= 0 || b.combat.lockOpponent >= 0
       || a.combat.lockCooldown > 0 || b.combat.lockCooldown > 0
@@ -39,6 +40,7 @@ export class BladeLockSystem {
     right.facing = -1;
     this.enter(a, b);
     this.enter(b, a);
+    this.emit(CombatEvent.BLADE_LOCK_START, a, b, { advantage: 0 });
     return true;
   }
 
@@ -50,6 +52,7 @@ export class BladeLockSystem {
     combat.lockOpponent = this.fighters.indexOf(opponent);
     combat.lockPressHeld = fighter.intent.lightAttack;
     combat.lockReleaseGuard = 0;
+    combat.lockCount += 1;
     fighter.clearAttack();
     fighter.vx = 0;
     fighter.vy = 0;
@@ -73,8 +76,7 @@ export class BladeLockSystem {
       const opponent = this.fighters[opponentIndex];
       if (!opponent || !fighter.isAlive || !opponent.isAlive || fighter.state !== FighterState.BLADE_LOCK
         || opponent.state !== FighterState.BLADE_LOCK || opponent.combat.lockOpponent !== index) {
-        this.cancel(fighter);
-        if (opponent) this.cancel(opponent);
+        this.abort(fighter, opponent, !fighter.isAlive || opponent && !opponent.isAlive ? 'death' : 'reset');
         continue;
       }
       if (index > opponentIndex) continue;
@@ -88,13 +90,15 @@ export class BladeLockSystem {
     const tolerance = Number.EPSILON * Math.max(1, config.maxDuration / dt);
     if (config.maxDuration - a.combat.lockTime <= tolerance) a.combat.lockTime = config.maxDuration;
     b.combat.lockTime = a.combat.lockTime;
-    this.countPress(a);
-    this.countPress(b);
+    const aPressed = this.countPress(a);
+    const bPressed = this.countPress(b);
     const margin = a.combat.lockPresses - b.combat.lockPresses;
+    if (aPressed) this.emit(CombatEvent.BLADE_LOCK_PRESS, a, b, { side: this.fighters.indexOf(a), advantage: margin, presses: a.combat.lockPresses });
+    if (bPressed) this.emit(CombatEvent.BLADE_LOCK_PRESS, b, a, { side: this.fighters.indexOf(b), advantage: b.combat.lockPresses - a.combat.lockPresses, presses: b.combat.lockPresses });
     if (Math.abs(margin) >= config.winMargin) {
       this.finish(a, b, margin > 0 ? a : b);
     } else if (a.combat.lockTime >= config.maxDuration) {
-      this.finish(a, b, Math.abs(margin) >= config.timeoutMargin ? margin > 0 ? a : b : null);
+      this.finish(a, b, Math.abs(margin) >= config.timeoutMargin ? margin > 0 ? a : b : null, 'timeout');
     }
   }
 
@@ -102,14 +106,29 @@ export class BladeLockSystem {
     const { combat, intent } = fighter;
     const pressed = intent.lightAttack && !combat.lockPressHeld;
     combat.lockPressHeld = intent.lightAttack;
-    if (!pressed || combat.lockTime - combat.lockLastPress + Number.EPSILON * Math.max(1, combat.lockTime) < combatRulesConfig.bladeLock.minPressInterval) return;
+    if (!pressed || combat.lockTime - combat.lockLastPress + Number.EPSILON * Math.max(1, combat.lockTime) < combatRulesConfig.bladeLock.minPressInterval) return false;
     combat.lockPresses += 1;
     combat.lockLastPress = combat.lockTime;
+    return true;
   }
 
-  finish(a, b, winner) {
+  finish(a, b, winner, reason = winner ? 'margin' : 'timeout') {
+    if (a.combat.lockOpponent < 0 || a.combat.lockOpponent !== this.fighters.indexOf(b) || b.combat.lockOpponent !== this.fighters.indexOf(a)) return;
+    if (!a.isAlive || !b.isAlive) {
+      this.abort(a, b, 'death');
+      return;
+    }
     const config = combatRulesConfig.bladeLock;
     const loser = winner === a ? b : a;
+    const duration = a.combat.lockTime;
+    const data = { winner, loser: winner ? loser : null, draw: !winner, reason, duration,
+      winnerPresses: winner?.combat.lockPresses ?? null, loserPresses: winner ? loser.combat.lockPresses : null };
+    for (const fighter of [a, b]) {
+      fighter.combat.lockEndCount += 1;
+      fighter.combat.lockDurationTotal += duration;
+      if (!winner) fighter.combat.lockDrawCount += 1;
+    }
+    if (winner) winner.combat.lockWinCount += 1;
     this.release(a);
     this.release(b);
     a.combat.lockCooldown = config.cooldown;
@@ -117,6 +136,7 @@ export class BladeLockSystem {
     if (!winner) {
       this.combat.recoil(a, b);
       this.combat.recoil(b, a);
+      this.emit(CombatEvent.BLADE_LOCK_END, a, b, data);
       return;
     }
     const contact = { attacker: winner, defender: loser, attackType: 'bladeLock',
@@ -131,6 +151,22 @@ export class BladeLockSystem {
       loser.combat.stunDuration = config.loserStagger;
       loser.restartState(FighterState.STAGGERED);
     }
+    this.emit(CombatEvent.BLADE_LOCK_END, winner, loser, { ...data, damage: contact.damage });
+  }
+
+  emit(type, attacker, defender, data) {
+    this.combat.events.push(Object.assign(createCombatEvent(type, {
+      attacker, defender: defender ?? null, attackType: 'bladeLock',
+      x: defender ? (attacker.x + defender.x) / 2 : attacker.x,
+      y: attacker.y - attacker.height / 2,
+    }), data));
+  }
+
+  abort(fighter, opponent, reason) {
+    const duration = fighter.combat.lockTime;
+    this.emit(CombatEvent.BLADE_LOCK_END, fighter, opponent, { winner: null, loser: null, draw: false, reason, duration });
+    this.cancel(fighter);
+    if (opponent) this.cancel(opponent);
   }
 
   release(fighter) {
@@ -152,6 +188,11 @@ export class BladeLockSystem {
   }
 
   reset() {
-    for (const fighter of this.fighters) this.cancel(fighter);
+    for (const fighter of this.fighters) {
+      if (fighter.combat.lockOpponent >= 0) this.abort(fighter, this.fighters[fighter.combat.lockOpponent], 'reset');
+      this.cancel(fighter);
+      Object.assign(fighter.combat, { lockCount: 0, lockWinCount: 0, lockDrawCount: 0, lockEndCount: 0, lockDurationTotal: 0,
+        exhaustionBladeLockCount: 0 });
+    }
   }
 }

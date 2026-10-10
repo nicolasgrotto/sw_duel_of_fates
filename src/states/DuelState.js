@@ -735,6 +735,7 @@ export class DuelState extends GameState {
         `  wound ${fighter.combat.wound ?? '-'} quota ${fighter.combat.woundUsed ? 'used' : 'ready'}`,
         `  heal ${fighter.combat.healTime.toFixed(2)} ${fighter.combat.healEnd ?? '-'} focus ${fighter.combat.focusTime.toFixed(2)} ${fighter.combat.focusEnd ?? '-'}`,
         `  wrath ${fighter.combat.wrathTime.toFixed(2)} ${fighter.combat.wrathEnd ?? '-'} extra ${fighter.combat.wrathExtraDamage.toFixed(2)} auto evades ${fighter.combat.autoEvadeCount}`,
+        `  lock ${fighter.combat.lockOpponent} ${fighter.combat.lockTime.toFixed(2)}s presses ${fighter.combat.lockPresses} advantage ${fighter.combat.lockPresses - (this.fighters[fighter.combat.lockOpponent]?.combat.lockPresses ?? 0)} cooldown ${fighter.combat.lockCooldown.toFixed(2)} guard ${fighter.combat.lockReleaseGuard.toFixed(2)}`,
         `  jumps ${fighter.combat.jumpsUsed}/${getMaxJumps(fighter)}  air dash ${fighter.combat.airDashUsed ? 'used' : 'ready'}  evade ${fighter.combat.evading ? fighter.stateTime.toFixed(2) : '-'} streak ${fighter.combat.evadeStreak}`,
         `  pos ${fighter.x.toFixed(0)}, ${fighter.y.toFixed(0)}  vel ${fighter.vx.toFixed(0)}, ${fighter.vy.toFixed(0)}`,
         `  parry ${fighter.combat.parryArmed ? fighter.combat.parryTime.toFixed(2) : '-'}  lockout ${fighter.combat.parryLockout.toFixed(2)}  buffer ${fighter.combat.bufferedAction ?? '-'}`,

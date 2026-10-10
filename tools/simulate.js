@@ -188,9 +188,11 @@ function runDuel(leftSetup, rightSetup, random, rules, maxSeconds) {
   }
 
   const winner = left.isAlive && !right.isAlive ? left : right.isAlive && !left.isAlive ? right : null;
-  for (const name of ['exhaustionSpendCount', 'exhaustionBlockCount', 'exhaustionGuardBreakCount', 'exhaustionDrainCount', 'woundArmCount', 'woundLegCount', 'autoEvadeCount', 'wrathExtraDamage']) {
+  for (const name of ['exhaustionSpendCount', 'exhaustionBlockCount', 'exhaustionGuardBreakCount', 'exhaustionDrainCount', 'exhaustionBladeLockCount', 'woundArmCount', 'woundLegCount', 'autoEvadeCount', 'wrathExtraDamage', 'lockCount', 'lockWinCount', 'lockDrawCount', 'lockEndCount', 'lockDurationTotal']) {
     counts[name] = left.combat[name] + right.combat[name];
   }
+  counts.lockWinsA = leftSetup.side === 'A' ? left.combat.lockWinCount : right.combat.lockWinCount;
+  counts.lockWinsB = leftSetup.side === 'B' ? left.combat.lockWinCount : right.combat.lockWinCount;
   const winnerSetup = winner === left ? leftSetup : winner === right ? rightSetup : null;
   const woundedFirst = firstWound ? { winnerWounded: winner === firstWound.attacker, timeAfter: time - firstWound.time } : null;
   return { winnerSide: winnerSetup?.side ?? null, ending: describeEnding(left, right), time, counts, woundedFirst, hitsToKnockout: winner ? hitsReceived.get(winner === left ? right : left) : null };
@@ -249,9 +251,9 @@ function main() {
     console.log(`avg powers : ${counts('powers')}  hits: ${counts('powerHits')}  resisted: ${counts('powerResisted')}  absorbed: ${counts('powerAbsorbed')}`);
   }
   const wrathEquipped = sides.some(({ characterId }) => Object.values(resolveCharacter(characterId).loadout?.powers ?? {}).includes('wrath'));
-  if (rules.exhaustion || rules.wounds || rules.focusEvade || wrathEquipped) {
+  if (rules.exhaustion || rules.wounds || rules.focusEvade || rules.bladeLock || wrathEquipped) {
     const counts = (name) => average(results.map((result) => result.counts[name])).toFixed(2);
-    console.log(`avg exhaustion: spend ${counts('exhaustionSpendCount')}  block ${counts('exhaustionBlockCount')}  guardBreak ${counts('exhaustionGuardBreakCount')}  drain ${counts('exhaustionDrainCount')}`);
+    console.log(`avg exhaustion: spend ${counts('exhaustionSpendCount')}  block ${counts('exhaustionBlockCount')}  guardBreak ${counts('exhaustionGuardBreakCount')}  drain ${counts('exhaustionDrainCount')}${rules.bladeLock ? `  bladeLock ${counts('exhaustionBladeLockCount')}` : ''}`);
     console.log(`avg wounds: arm ${counts('woundArmCount')}  leg ${counts('woundLegCount')}`);
     const wounded = results.filter((result) => result.woundedFirst);
     const after = wounded.map((result) => result.woundedFirst.timeAfter).sort((a, b) => a - b);
@@ -259,6 +261,12 @@ function main() {
     console.log(`first wound: rounds ${wounded.length}  wins ${firstWins}  median after ${(after[Math.floor(after.length / 2)] ?? 0).toFixed(1)} s`);
     console.log(`avg auto evades: ${counts('autoEvadeCount')}`);
     console.log(`avg wrath extra damage: ${counts('wrathExtraDamage')}`);
+  }
+  if (rules.bladeLock) {
+    const counts = (name, divisor = 1) => (average(results.map((result) => result.counts[name])) / divisor).toFixed(2);
+    const duration = results.reduce((total, result) => total + result.counts.lockDurationTotal, 0);
+    const resolved = results.reduce((total, result) => total + result.counts.lockEndCount, 0);
+    console.log(`avg blade locks: ${counts('lockCount', 2)}  wins A ${counts('lockWinsA')} B ${counts('lockWinsB')}  draws ${counts('lockDrawCount', 2)}  duration ${(duration / Math.max(1, resolved)).toFixed(2)} s`);
   }
 }
 

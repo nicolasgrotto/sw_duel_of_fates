@@ -29,6 +29,7 @@ export function spendStamina(fighter, amount, cause = 'spend', rules = {}) {
         case 'block': combat.exhaustionBlockCount += 1; break;
         case 'guardBreak': combat.exhaustionGuardBreakCount += 1; break;
         case 'drain': combat.exhaustionDrainCount += 1; break;
+        case 'bladeLock': combat.exhaustionBladeLockCount += 1; break;
         default: break;
       }
     }
