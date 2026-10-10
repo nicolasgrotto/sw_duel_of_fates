@@ -31,15 +31,33 @@ export function drawParticles(renderer, particles, streakTime) {
   renderer.restore();
 }
 
-function drawShockwaveArc(renderer, wave, style, radius, progress) {
-  const opening = Math.min((style.openingDegrees * Math.PI) / 180, Math.asin(Math.min(1, style.halfHeight / radius)));
-  const center = wave.direction > 0 ? 0 : Math.PI;
+const chevronPoints = [0, 0, 0, 0, 0, 0];
+const bandPoints = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+function placeChevron(points, offset, wave, radius, armHeight, armBack, upward = 1) {
+  const tipX = wave.x + wave.direction * radius;
+  points[offset] = tipX - wave.direction * armBack;
+  points[offset + 1] = wave.y - armHeight * upward;
+  points[offset + 2] = tipX;
+  points[offset + 3] = wave.y;
+  points[offset + 4] = tipX - wave.direction * armBack;
+  points[offset + 5] = wave.y + armHeight * upward;
+}
+
+function drawShockwaveChevron(renderer, wave, style, radius, progress) {
+  const armHeight = Math.min(style.halfHeight, radius * style.armRatio);
+  const armBack = armHeight / Math.tan((style.chevronDegrees * Math.PI) / 180);
   const width = style.lineWidth[0] + (style.lineWidth[1] - style.lineWidth[0]) * progress;
   const fade = 1 - progress;
+  placeChevron(bandPoints, 0, wave, radius, armHeight, armBack);
+  placeChevron(bandPoints, 6, wave, Math.max(0, radius - style.bandDepth), armHeight, armBack, -1);
+  renderer.setAlpha(style.bandAlpha * fade);
+  renderer.fillPolygon(bandPoints, wave.color);
+  placeChevron(chevronPoints, 0, wave, radius, armHeight, armBack);
   renderer.setAlpha(style.alpha * fade);
-  renderer.strokeArc(wave.x, wave.y, radius, center - opening, center + opening, wave.color, width);
+  renderer.polyline(chevronPoints, wave.color, width, 'miter');
   renderer.setAlpha(style.coreAlpha * fade);
-  renderer.strokeArc(wave.x, wave.y, radius, center - opening, center + opening, colors.shockwaveCore, width * style.coreWidthScale);
+  renderer.polyline(chevronPoints, colors.shockwaveCore, width * style.coreWidthScale, 'miter');
 }
 
 export function drawShockwaves(renderer, waves, style) {
@@ -55,7 +73,7 @@ export function drawShockwaves(renderer, waves, style) {
         continue;
       }
       const radius = style.startRadius + (wave.range - style.startRadius) * (1 - (1 - progress) * (1 - progress));
-      drawShockwaveArc(renderer, wave, style, radius, progress);
+      drawShockwaveChevron(renderer, wave, style, radius, progress);
     }
   }
   renderer.restore();

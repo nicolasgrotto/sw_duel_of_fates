@@ -144,11 +144,11 @@ export class Renderer {
     this.context.stroke();
   }
 
-  polyline(points, color, lineWidth = 1) {
+  polyline(points, color, lineWidth = 1, lineJoin = 'round') {
     this.context.strokeStyle = color;
     this.context.lineWidth = lineWidth;
     this.context.lineCap = 'round';
-    this.context.lineJoin = 'round';
+    this.context.lineJoin = lineJoin;
     this.tracePath(points);
     this.context.stroke();
   }

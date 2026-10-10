@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { CombatEvent } from '../src/combat/combatEvents.js';
 import { effectsConfig } from '../src/config/effectsConfig.js';
 import { Camera } from '../src/core/Camera.js';
+import { drawShockwaves } from '../src/rendering/effectsRenderer.js';
 import { EffectType, EffectsSystem } from '../src/systems/EffectsSystem.js';
 import { ParticlePool } from '../src/systems/ParticlePool.js';
 import { TimeControl } from '../src/systems/TimeControl.js';
@@ -377,4 +378,25 @@ it('turns the push into a travelling shockwave with floor dust while the pull ke
   reduced.effects.setReduced(true);
   reduced.effects.handleEvents([createEvent(CombatEvent.POWER_ACTIVE, 'push')]);
   assert.equal(reduced.effects.particles.activeCount, effectsConfig.shockwave.dust.reducedCount);
+});
+
+it('draws the push wave as forward chevrons with a sharp tip', () => {
+  const { effects } = createEffects();
+  effects.handleEvents([createEvent(CombatEvent.POWER_ACTIVE, 'push')]);
+  effects.update(0.1);
+  const wave = effects.shockwaves.find((candidate) => candidate.active);
+  const strokes = [];
+  const renderer = new Proxy({}, {
+    get: (target, name) => (name === 'polyline' ? (points, color, width, join) => strokes.push({ points: [...points], join }) : () => {}),
+  });
+  drawShockwaves(renderer, effects.shockwaves, effectsConfig.shockwave);
+  assert.ok(strokes.length > 0);
+  for (const { points: [topX, topY, tipX, tipY, bottomX, bottomY], join } of strokes) {
+    assert.equal(join, 'miter');
+    assert.equal(tipY, wave.y);
+    assert.ok((tipX - topX) * wave.direction > 0);
+    assert.equal(topX, bottomX);
+    assert.ok(topY < wave.y && bottomY > wave.y);
+    assert.ok(wave.y - topY <= effectsConfig.shockwave.halfHeight);
+  }
 });
