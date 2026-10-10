@@ -59,6 +59,7 @@ function createCombat() {
     lockLastPress: 0,
     lockOpponent: -1,
     lockCooldown: 0,
+    lockPressHeld: false,
     bufferedAction: null,
     bufferTime: 0,
     parryArmed: false,

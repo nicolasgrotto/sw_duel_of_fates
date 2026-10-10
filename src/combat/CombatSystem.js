@@ -73,6 +73,7 @@ export class CombatSystem {
     this.projectiles.fighters = fighters;
 
     for (const fighter of fighters) {
+      if (fighter.state === FighterState.BLADE_LOCK) continue;
       this.updateTimers(fighter, dt);
       updateActionBuffer(fighter, dt, this.inputBuffer);
       this.startActions(fighter);

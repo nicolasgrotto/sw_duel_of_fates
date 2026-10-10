@@ -7,11 +7,13 @@ import { PhysicsSystem } from '../systems/PhysicsSystem.js';
 import { StaminaSystem } from '../systems/StaminaSystem.js';
 import { CombatEvent } from '../combat/combatEvents.js';
 import { resolveCombatRules } from '../config/combatRulesConfig.js';
+import { FighterState } from '../entities/fighterStates.js';
 
 export class DuelSimulation {
   constructor({ arena, fighters, physicsConfig, combatConfig, animationConfig, rules = {} }) {
     this.arena = arena;
     this.fighters = fighters;
+    this.normalFighters = [];
     this.rules = resolveCombatRules(rules);
     this.combat = new CombatSystem(arena, combatConfig, { rules: this.rules, friction: physicsConfig.actionFriction });
     this.bladeLocks = new BladeLockSystem(this.combat, fighters, arena);
@@ -35,19 +37,29 @@ export class DuelSimulation {
     const { fighters } = this;
 
     for (const fighter of fighters) {
-      fighter.advanceStateTime(dt);
+      if (fighter.state !== FighterState.BLADE_LOCK) fighter.advanceStateTime(dt);
     }
 
     this.combat.update(fighters, dt);
-    this.movement.applyIntents(fighters, dt);
-    this.physics.update(fighters, dt);
-    this.collision.update(fighters);
-    this.movement.updateStates(fighters);
+    this.collectNormalFighters();
+    this.movement.applyIntents(this.normalFighters, dt);
+    this.physics.update(this.normalFighters, dt);
+    this.collision.update(this.normalFighters);
+    this.movement.updateStates(this.normalFighters);
     this.combat.resolveHits(fighters);
     this.combat.projectiles.update(fighters, dt);
-    this.stamina.update(fighters, dt);
-    this.combat.statuses.update(fighters, dt);
-    this.combat.powers.update(fighters, dt);
+    this.collectNormalFighters();
+    this.stamina.update(this.normalFighters, dt);
+    this.combat.statuses.update(this.normalFighters, dt);
+    this.combat.powers.update(this.normalFighters, dt);
     this.animator.update(fighters, dt);
+    this.bladeLocks.update(dt);
+  }
+
+  collectNormalFighters() {
+    this.normalFighters.length = 0;
+    for (const fighter of this.fighters) {
+      if (fighter.state !== FighterState.BLADE_LOCK) this.normalFighters.push(fighter);
+    }
   }
 }

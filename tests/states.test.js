@@ -11,8 +11,41 @@ import { createState } from '../src/states/stateFactory.js';
 import { DuelMode } from '../src/states/duelModes.js';
 import { StateId } from '../src/states/stateIds.js';
 import { FighterState } from '../src/entities/fighterStates.js';
+import { captureFighter } from '../src/simulation/ReplayBuffer.js';
 
 const STEP = 1 / 60;
+
+it('freezes a blade lock on pause and clears it on round reset, restart and state exit', () => {
+  const game = createFakeGame();
+  game.changeState(StateId.DUEL, { mode: DuelMode.TRAINING });
+  skipIntro(game);
+  const duel = game.states.current;
+  const start = () => {
+    duel.fighters.forEach((fighter) => { fighter.combat.attack = fighter.moves.heavy; });
+    assert.equal(duel.simulation.bladeLocks.tryStart(...duel.fighters), true);
+  };
+  start();
+  game.step();
+  const snapshot = duel.fighters.map(captureFighter);
+  game.step(Action.PAUSE);
+  for (let step = 0; step < 30; step += 1) game.step();
+  assert.deepEqual(duel.fighters.map(captureFighter), snapshot);
+  game.step(Action.PAUSE);
+  game.step();
+  assert.ok(duel.fighters[0].combat.lockTime > snapshot[0].combat.lockTime);
+  duel.startNextRound();
+  assert.equal(duel.fighters[0].combat.lockOpponent, -1);
+  assert.equal(duel.fighters[1].combat.lockOpponent, -1);
+  start();
+  game.step(Action.PAUSE);
+  goToMenuItem(game, 'restart');
+  game.step(Action.CONFIRM);
+  assert.equal(duel.fighters[0].combat.lockOpponent, -1);
+  assert.equal(duel.fighters[1].combat.lockOpponent, -1);
+  assert.equal(game.states.current.fighters[0].combat.lockOpponent, -1);
+  game.changeState(StateId.MENU);
+  assert.equal(game.states.current.name, 'MenuState');
+});
 
 function createFakeGame() {
   const pressed = new Set();

@@ -427,6 +427,7 @@ export class DuelState extends GameState {
   }
 
   exit() {
+    this.simulation.bladeLocks.reset();
     this.duelAudio.stop();
     if (this.isLocal) {
       this.game.applySettings();
