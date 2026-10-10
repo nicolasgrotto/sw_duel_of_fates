@@ -1,5 +1,7 @@
 # GAME DESIGN — Star Wars: Duel of Fates
 
+Regras aprovadas da simulação v3 (2.4): [versions/v3.md](versions/v3.md), seções "Notas de implementação da 2.4" e "Especificação aprovada → Combate". Capacidades `exhaustion`, `wounds` e `focusEvade` habilitam as consequências em Duelar, 2 Jogadores e Treino; demais modos preservam a v2 até suas etapas. Dano efetivo de qualquer categoria, inclusive periódico, interrompe a Cura; dano absorvido não interrompe. Apresentação e calibração entram depois da simulação.
+
 Este documento é a fonte de verdade sobre **o que** o jogo é. Para **como** o código é organizado, veja [ARCHITECTURE.md](ARCHITECTURE.md).
 
 ---
@@ -721,3 +723,18 @@ O total máximo impede um protagonista com tudo no teto: ele termina forte, mas 
 O elenco tem Original, Viajante (vencer Arcade com o lutador) e Sentinela (concluir qualquer final da História). Secretos têm Original e Legado (final secreto). São cosméticas: paleta e peças existentes, sem alterar atributos, golpes ou lâmina. A cor da lâmina continua independente. Skins bloqueadas são puladas na seleção, que mostra o requisito pendente. As escolhas de ambos os lados permanecem ao reiniciar ou jogar revanche e nas escadas.
 
 O protagonista escolhe Errante, Vigia ou Peregrino desde o início, em um passo Visual. O nome pode vir da lista ou ser digitado com teclado nativo, até 16 caracteres. O visual e o nome acompanham o save da campanha.
+
+
+## 26. Consequ?ncias no duelo (v3, etapa 2.4)
+
+Especifica??o aprovada em versions/v3.md ? notas da 2.4; apresenta??o e calibra??o s?o a etapa seguinte. Capacidades independentes `exhaustion`, `wounds` e `focusEvade`, inicialmente em Duelar, 2 Jogadores e Treino. Foco autom?tico exige Poderes; Hist?ria aguarda a 2.8. Sem capacidades novas, vale a refer?ncia v2.
+
+Gastar Vigor at? 10% ou menos causa exaust?o; regenera??o n?o a inicia. Sai com pelo menos 40% de Vigor e 1 s de dura??o, ou 1,6 s ap?s quebra de guarda. Motivos: gasto, bloqueio, quebra de guarda e dreno externo. N?o h? stun extra nem redu??o de regenera??o. Golpes corpo a corpo eleg?veis recebem dano ? 1,2 contra exaustos.
+
+Forte comum pode ferir bra?o; forte de avan?o, perna. Exige dano efetivo n?o letal contra exausto e cota ainda dispon?vel: uma aplica??o por round, mesmo ap?s Cura. Bra?o multiplica custo derivado de bloqueio por 1,35. Perna multiplica dash e dash a?reo por 1,35 e impede segundo salto; preserva primeiro salto, pulo na parede e esquiva de precis?o gratuita. Golpes declaram elegibilidade por dados, sem regra pelo nome do personagem.
+
+Cura remove ferimento somente ao completar sua dura??o sem dano. Pode ser lan?ada com vida cheia; atingir o teto de vida n?o conclui o efeito. Dano efetivo, inclusive peri?dico, interrompe antes da conclus?o do mesmo passo. Efeitos registram t?rmino `completed`, `interrupted`, `death`, `reset`, `replaced` ou `depleted`.
+
+Ira (`wrath`, Eclipse) custa 35 de Fluxo, prepara por 0,3 s e dura 5 s ? pot?ncia. Dano causado ? 1,2 e recebido ? 0,85 em l?minas e poderes; dano peri?dico n?o muda. Reaplica??o substitui e reinicia, sem empilhar. N?o impede interrup??o, stun, parry, empurr?o nem quebra de guarda. Nenhum loadout do elenco a recebe na 2.4. Ordem da l?mina: dano ? puni??o ? carga ? ponto doce ? exaust?o ? Ira atacante ? Ira defensor ? armadura. Poderes usam dano ? pot?ncia ? Ira atacante ? Ira defensor.
+
+Foco mant?m redu??o de custos e evita v?rios contatos de l?mina corpo a corpo por 12 de Fluxo cada, at? sua dura??o terminar. Exige ch?o, IDLE e intent sem movimento nem a??o. Manual v?lido tem prioridade e n?o custa Fluxo. Autom?tico n?o altera sequ?ncia manual nem renova dura??o. Empurr?es, poderes e proj?teis n?o s?o eleg?veis. Saldo insuficiente para a pr?xima defesa encerra o Foco, incluindo redu??o de custos, sem reativa??o pela regenera??o.

@@ -1205,7 +1205,7 @@ Roteiro, etapas e especificação aprovada em [versions/v3.md](versions/v3.md). 
 
 **Princípios.** Os da v2 continuam. Toda mecânica nova roda na `DuelSimulation`, guarda estado em `fighter.combat` ou em campo coberto pelo teste de snapshot, e passa no replay a partir de snapshots intermediários. Render, áudio e VFX só leem eventos e estado.
 
-**Configura??o da 2.4.** `src/config/combatRulesConfig.js` lista os modos por capacidade. `resolveCombatRules` normaliza as capacidades e exige Poderes para `focusEvade`; `createDuelRules` e o simulador usam essa resolu??o. Hist?ria declara as tr?s capacidades desligadas at? a 2.8. O simulador exp?e a config em `--set combatRules.*`.
+**Configuração da 2.4.** `src/config/combatRulesConfig.js` lista os modos por capacidade. `resolveCombatRules` normaliza as capacidades e exige Poderes para `focusEvade`; `createDuelRules` e o simulador usam essa resolução. História declara as três capacidades desligadas até a 2.8. O simulador expõe a config em `--set combatRules.*`.
 
 **Regras como capacidades.** `rules` deixa de ser só `{ powers }`. Cada mecânica nova ganha uma capacidade booleana própria, criada na etapa que a implementa, sem campo antecipado: `exhaustion`, `wounds` e `focusEvade` (2.4), `bladeLock` (2.5), `finishers` (2.9). `focusEvade` e o quarto poder exigem `rules.powers`; a Ira é um poder comum e só existe para quem a equipa. `createDuelRules` monta o objeto a partir de uma lista de modos por capacidade em config, no mesmo padrão de `powersConfig.modes`; a História usa as regras do `storyConfig`. O simulador aceita `--rules` com nomes de capacidades; sem nenhuma capacidade nova ligada, o resultado é o preset `reference`, que precisa passar em `npm run reference -- --check tools/reference-v2.json`.
 
@@ -1230,7 +1230,9 @@ Roteiro, etapas e especificação aprovada em [versions/v3.md](versions/v3.md). 
 
 Consequências: dano do passo 4 ou 5 interrompe a Cura antes do passo 7, então dano no passo de conclusão impede a limpeza do ferimento sem regra extra. A disputa de lâminas é detectada no passo 4 e, enquanto ativa, os passos 2, 3, 6 e 7 a ignoram para os dois participantes.
 
-**Pontos únicos.** Custos de Vigor passam por `getStaminaCost` (multiplicadores de Foco e ferimento sobre o custo derivado, com o tipo do custo) e gastos por `spendStamina` (entrada na exaustão quando o Vigor chega a zero). Todo dano efetivo passa por um único caminho que chama a interrupção de efeitos, inclusive o dano periódico de `applyStatusDamage`. Nenhuma regra nova fica espalhada em estados, renderers ou IA.
+**Pipeline de dano (2.4).** `CombatSystem.applyDamage` recebe contato, dano, categoria e evento. Limita o dano reportado à vida restante, interrompe status só por dano efetivo, limpa a sequência manual e resolve o K.O. depois do impacto. `applyHit`, `dealPowerDamage` e `applyStatusDamage` delegam a ele; os projéteis usam esses adaptadores. Reações de lâmina e ganhos de Fluxo mantêm a ordem da v2. Dano periódico também interrompe Cura e Congelar.
+
+**Pontos únicos.** Custos de Vigor passam por `getStaminaCost` (multiplicadores de Foco e ferimento sobre o custo derivado, com o tipo do custo) e gastos por `spendStamina` (entrada na exaustão pelo limiar de gasto em config). Todo dano efetivo passa pelo pipeline, inclusive `applyStatusDamage`. Nenhuma regra nova fica espalhada em estados, renderers ou IA.
 
 **Término de efeitos.** Efeitos de duração registram o motivo de término: `completed`, `interrupted`, `death`, `reset` ou `replaced`. Só `completed` dispara consequências de conclusão (a Cura limpar o ferimento). O motivo fica em `fighter.combat` até o próximo início do efeito, para o F3 e os testes.
 

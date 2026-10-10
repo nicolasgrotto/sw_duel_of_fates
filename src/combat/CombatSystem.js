@@ -646,25 +646,8 @@ export class CombatSystem {
     const { attacker, defender, attack } = contact;
     const armored = hasArmor(defender);
     const damage = this.getHitDamage(attacker, defender, attack) * (armored ? defender.combat.attack.armor.damageScale : 1);
-
-    attacker.combat.attackConnected = true;
-    attacker.stamina = Math.min(attacker.stats.maxStamina, attacker.stamina + attacker.stats.staminaOnHit);
-    contact.damage = Math.min(defender.health, damage);
-    defender.health = Math.max(0, defender.health - damage);
-    if (damage > 0) {
-      defender.combat.evadeStreak = 0;
-      this.statuses.onDamaged(defender);
-    }
     contact.armored = armored;
-    this.powers.onHit(attacker, defender);
-    if (!armored) {
-      defender.vx = attacker.facing * attack.knockback * attacker.stats.knockbackScale;
-      defender.clearAttack();
-    }
-    this.emit(CombatEvent.HIT, contact);
-
-    if (defender.health === 0) {
-      this.knockOut(defender, contact);
+    if (!this.applyDamage(contact, damage, 'blade', CombatEvent.HIT)) {
       return;
     }
     if (armored) {
@@ -676,6 +659,40 @@ export class CombatSystem {
     defender.restartState(FighterState.HIT);
   }
 
+  applyDamage(contact, amount, source, eventType = null) {
+    const { attacker, defender } = contact;
+    contact.damage = Math.min(defender.health, amount);
+    defender.health = Math.max(0, defender.health - amount);
+    if (contact.damage > 0) {
+      defender.combat.evadeStreak = 0;
+      this.statuses.onDamaged(defender);
+    }
+    if (source === 'blade') {
+      this.onBladeDamage(contact);
+    } else if (source === 'power' && contact.damage > 0) {
+      this.powers.gain(defender, this.powers.config.meter.gain.hitTaken);
+    }
+    if (eventType !== null) {
+      this.emit(eventType, contact);
+    }
+    if (defender.health === 0) {
+      this.knockOut(defender, contact);
+      return false;
+    }
+    return true;
+  }
+
+  onBladeDamage(contact) {
+    const { attacker, defender, attack, armored } = contact;
+    attacker.combat.attackConnected = true;
+    attacker.stamina = Math.min(attacker.stats.maxStamina, attacker.stamina + attacker.stats.staminaOnHit);
+    this.powers.onHit(attacker, defender);
+    if (!armored) {
+      defender.vx = attacker.facing * attack.knockback * attacker.stats.knockbackScale;
+      defender.clearAttack();
+    }
+  }
+
   knockOut(defender, contact) {
     defender.clearAttack();
     defender.combat.fallDirection = chooseFallDirection(defender, this.arena, this.fallRoomMargin);
@@ -684,28 +701,13 @@ export class CombatSystem {
   }
 
   dealPowerDamage(caster, target, power, damage, type) {
-    const dealt = Math.min(target.health, damage);
-    target.health = Math.max(0, target.health - damage);
-    if (dealt > 0) {
-      target.combat.evadeStreak = 0;
-      this.statuses.onDamaged(target);
-      this.powers.gain(target, this.powers.config.meter.gain.hitTaken);
-    }
-    const contact = this.createPowerContact(caster, target, power, dealt);
-    this.emit(type, contact);
-    if (target.health === 0) {
-      this.knockOut(target, contact);
-      return false;
-    }
-    return true;
+    const contact = this.createPowerContact(caster, target, power, 0);
+    return this.applyDamage(contact, damage, 'power', type);
   }
 
   applyStatusDamage(fighter, source, amount) {
-    fighter.health = Math.max(0, fighter.health - amount);
-    fighter.combat.evadeStreak = 0;
-    if (fighter.health === 0) {
-      this.knockOut(fighter, { attacker: source, defender: fighter, attackType: 'choke', x: fighter.x, y: fighter.y - fighter.height * this.powers.config.impactHeight, damage: amount });
-    }
+    const contact = this.createPowerContact(source, fighter, this.powers.config.powers.choke, 0);
+    return this.applyDamage(contact, amount, 'periodic');
   }
 
   createPowerContact(caster, target, power, damage) {
