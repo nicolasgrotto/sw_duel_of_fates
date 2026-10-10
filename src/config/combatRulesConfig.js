@@ -20,10 +20,10 @@ export const combatRulesConfig = {
   bladeLock: {
     cooldown: 4,
     distance: 70,
-    minPressInterval: 1 / 12,
+    minPressInterval: 1 / 15,
     winMargin: 4,
     maxDuration: 2,
-    timeoutMargin: 2,
+    timeoutMargin: 1,
     damage: 8,
     staminaLoss: 35,
     separation: 420,
