@@ -160,3 +160,5 @@ Disputa de lâminas (v2.5): sem câmera lenta, dessaturação nem tela sobrepost
 - **Empate:** impacto `bladeLockBreak` (10–14 faíscas para os dois lados, luz nas duas cores, shake 3 px, hit stop 0,04 s); os dois recuam como no clash.
 - **Cancelamento** (morte ou reset): nenhum efeito próprio.
 - **Vibração do gamepad:** entrada como o clash, pulso fraco por pressão, desfecho como golpe forte.
+
+Sons: entrada reaproveita `clash`. Durante a disputa, um **atrito contínuo** (`bladeLockGrind`: ruído em banda estreita com crepitação e um zumbido grave desafinado) sobe de volume e brilho com o tempo da disputa e para no desfecho, na pausa e na saída do duelo. Cada pressão toca `bladeLockPress` (batida metálica curta com baque grave). Vitória toca `bladeLockWin` (lâmina empurrada que escapa, com baque grave); empate, `bladeLockBreak` (raspão mais curto e agudo).

@@ -105,6 +105,70 @@ export function createHum(context, output, hum, frequency) {
   };
 }
 
+export function createGrind(context, output, grind) {
+  const noise = context.createBufferSource();
+  noise.buffer = getNoiseBuffer(context);
+  noise.loop = true;
+  const noiseFilter = context.createBiquadFilter();
+  noiseFilter.type = 'bandpass';
+  noiseFilter.frequency.value = grind.noiseCutoff[0];
+  noiseFilter.Q.value = grind.noiseQ;
+  const noiseGain = context.createGain();
+  noiseGain.gain.value = grind.noiseGain;
+  noise.connect(noiseFilter);
+  noiseFilter.connect(noiseGain);
+
+  const tones = [createOscillator(context, grind.toneWave, grind.toneFrequency), createOscillator(context, grind.toneWave, grind.toneFrequency * grind.detune)];
+  const toneFilter = context.createBiquadFilter();
+  toneFilter.type = 'lowpass';
+  toneFilter.frequency.value = grind.toneCutoff;
+  const toneGain = context.createGain();
+  toneGain.gain.value = grind.toneGain;
+  for (const tone of tones) {
+    tone.connect(toneFilter);
+  }
+  toneFilter.connect(toneGain);
+
+  const flutter = context.createGain();
+  flutter.gain.value = 1 - grind.flutterDepth;
+  const flutterLfo = createOscillator(context, 'square', grind.flutterRate);
+  const flutterDepth = context.createGain();
+  flutterDepth.gain.value = grind.flutterDepth;
+  flutterLfo.connect(flutterDepth);
+  flutterDepth.connect(flutter.gain);
+  noiseGain.connect(flutter);
+  toneGain.connect(flutter);
+
+  const gain = context.createGain();
+  gain.gain.value = 0;
+  const panner = context.createStereoPanner();
+  flutter.connect(gain);
+  gain.connect(panner);
+  panner.connect(output);
+
+  const sources = [noise, flutterLfo, ...tones];
+  for (const source of sources) {
+    source.start();
+  }
+  const setTarget = (param, value) => param.setTargetAtTime(value, context.currentTime, grind.smoothing);
+
+  return {
+    setIntensity(amount) {
+      setTarget(gain.gain, amount > 0 ? grind.level[0] + (grind.level[1] - grind.level[0]) * amount : 0);
+      setTarget(noiseFilter.frequency, grind.noiseCutoff[0] + (grind.noiseCutoff[1] - grind.noiseCutoff[0]) * amount);
+    },
+    setPan(value) {
+      panner.pan.value = value;
+    },
+    stop() {
+      setTarget(gain.gain, 0);
+      for (const source of sources) {
+        source.stop(context.currentTime + grind.releaseTime);
+      }
+    },
+  };
+}
+
 export function createMusic(context, output, music) {
   const gain = context.createGain();
   const filter = context.createBiquadFilter();

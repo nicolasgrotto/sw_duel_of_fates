@@ -364,6 +364,7 @@ export class DuelState extends GameState {
 
   update(dt) {
     if (this.isPausePressed()) {
+      this.duelAudio.stopGrind();
       this.game.pushState(StateId.PAUSE, { duelParams: this.params, rules: this.rules, character: this.playerCharacterData, quitState: this.storyStage ? StateId.STORY : StateId.MENU });
       return;
     }

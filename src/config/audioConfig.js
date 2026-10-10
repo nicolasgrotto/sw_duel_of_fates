@@ -16,6 +16,21 @@ export const audioConfig = {
     smoothing: 0.04,
     releaseTime: 0.25,
   },
+  grind: {
+    noiseCutoff: [1500, 2800],
+    noiseQ: 4,
+    noiseGain: 0.9,
+    toneWave: 'sawtooth',
+    toneFrequency: 92,
+    detune: 1.035,
+    toneCutoff: 520,
+    toneGain: 0.5,
+    flutterRate: 14,
+    flutterDepth: 0.35,
+    level: [0.06, 0.16],
+    smoothing: 0.05,
+    releaseTime: 0.15,
+  },
   music: {
     notes: [
       { frequency: 55, wave: 'triangle', gain: 0.5 },
@@ -80,6 +95,20 @@ export const audioConfig = {
       { type: 'tone', wave: 'square', from: 1580, to: 1300, duration: 0.3, attack: 0.002, gain: 0.06, filter: { type: 'lowpass', from: 5000, to: 2000, q: 1 } },
       { type: 'noise', duration: 0.3, attack: 0.002, gain: 0.9, filter: { type: 'bandpass', from: 3000, to: 900, q: 0.9 } },
       { type: 'tone', wave: 'sawtooth', from: 520, to: 160, duration: 0.3, attack: 0.002, gain: 0.1, filter: { type: 'lowpass', from: 1800, to: 500, q: 1 } },
+    ],
+    bladeLockPress: [
+      { type: 'tone', wave: 'triangle', from: 940, to: 860, duration: 0.07, attack: 0.002, gain: 0.07, filter: null },
+      { type: 'noise', duration: 0.04, attack: 0.001, gain: 0.16, filter: { type: 'bandpass', from: 2600, to: 2600, q: 1.5 } },
+      { type: 'tone', wave: 'sine', from: 110, to: 60, duration: 0.08, attack: 0.002, gain: 0.14, filter: null },
+    ],
+    bladeLockWin: [
+      { type: 'noise', duration: 0.28, attack: 0.004, gain: 0.7, filter: { type: 'bandpass', from: 2800, to: 600, q: 0.9 } },
+      { type: 'tone', wave: 'triangle', from: 1050, to: 720, duration: 0.3, attack: 0.002, gain: 0.22, filter: null },
+      { type: 'tone', wave: 'sine', from: 85, to: 35, duration: 0.32, attack: 0.002, gain: 0.32, filter: null },
+    ],
+    bladeLockBreak: [
+      { type: 'noise', duration: 0.16, attack: 0.003, gain: 0.45, filter: { type: 'bandpass', from: 3400, to: 1400, q: 1.2 } },
+      { type: 'tone', wave: 'triangle', from: 1250, to: 1050, duration: 0.18, attack: 0.002, gain: 0.14, filter: null },
     ],
     death: [
       { type: 'tone', wave: 'sine', from: 70, to: 28, duration: 0.6, attack: 0.002, gain: 0.45, filter: null },

@@ -117,6 +117,7 @@ Todo o som é **sintetizado** com a Web Audio API (osciladores, ruído e filtros
 - Quebra de guarda: estalo forte e descendente.
 - Golpe final: baque grave e o sabre do derrotado "desligando" (tom caindo).
 - Esquiva: whoosh curto e agudo.
+- Disputa de lâminas: atrito elétrico contínuo que cresce com o tempo da disputa, batida metálica curta a cada pressão e, no desfecho, a lâmina que escapa (vitória) ou um raspão curto (empate).
 - Interface: tique curto ao navegar, tom curto ao confirmar.
 - Música: drone ambiente grave e tenso, com filtro respirando devagar. Abaixa no golpe final (silêncio curto) e volta depois.
 - **Música dinâmica**: quanto menor a vida do lutador mais ferido, mais o drone abre (filtro mais claro) e mais aparece uma camada de tensão (uma nota a mais, áspera). Volta ao normal ao sair do duelo.

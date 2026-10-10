@@ -1,7 +1,13 @@
-import { createHum, createMusic, playSound } from '../audio/synth.js';
+import { createGrind, createHum, createMusic, playSound } from '../audio/synth.js';
 
 const SILENT_HUM = Object.freeze({
   setMode() {},
+  setPan() {},
+  stop() {},
+});
+
+const SILENT_GRIND = Object.freeze({
+  setIntensity() {},
   setPan() {},
   stop() {},
 });
@@ -74,6 +80,13 @@ export class AudioManager {
       return SILENT_HUM;
     }
     return createHum(this.context, this.sfxBus, this.config.hum, frequency);
+  }
+
+  createGrind() {
+    if (!this.isReady || !this.sfxEnabled) {
+      return SILENT_GRIND;
+    }
+    return createGrind(this.context, this.sfxBus, this.config.grind);
   }
 
   duckMusic(duration) {

@@ -1,6 +1,8 @@
 import { AttackType, isHeavyAttack, isStrongAttack } from '../combat/attackPhases.js';
 import { CombatEvent } from '../combat/combatEvents.js';
 import { isSaberStrikeActive } from '../combat/hitboxes.js';
+import { combatRulesConfig } from '../config/combatRulesConfig.js';
+import { FighterState } from '../entities/fighterStates.js';
 import { clamp } from '../utils/math.js';
 import { SoundName } from './soundNames.js';
 
@@ -23,7 +25,13 @@ function getSoundForEvent(event) {
     case CombatEvent.GUARD_BREAK:
       return SoundName.GUARD_BREAK;
     case CombatEvent.CLASH:
+    case CombatEvent.BLADE_LOCK_START:
       return SoundName.CLASH;
+    case CombatEvent.BLADE_LOCK_PRESS:
+      return SoundName.BLADE_LOCK_PRESS;
+    case CombatEvent.BLADE_LOCK_END:
+      if (event.winner) return SoundName.BLADE_LOCK_WIN;
+      return event.draw ? SoundName.BLADE_LOCK_BREAK : null;
     case CombatEvent.DEATH:
       return SoundName.DEATH;
     case CombatEvent.EVADE_SUCCESS:
@@ -89,6 +97,7 @@ export class DuelAudio {
     this.secondBeatPending = false;
     this.playOptions = { pan: 0, intensity: 1 };
     this.hums = null;
+    this.grind = null;
   }
 
   updateMusic(fighters, heartbeatFighter, dt) {
@@ -135,6 +144,24 @@ export class DuelAudio {
     for (let i = 0; i < fighters.length; i += 1) {
       this.updateHum(this.hums[i], fighters[i]);
     }
+    this.updateGrind(fighters);
+  }
+
+  updateGrind(fighters) {
+    const locked = fighters.find((fighter) => fighter.state === FighterState.BLADE_LOCK);
+    if (!locked) {
+      this.stopGrind();
+      return;
+    }
+    this.grind ??= this.audio.createGrind();
+    const opponent = fighters[locked.combat.lockOpponent] ?? locked;
+    this.grind.setPan(this.getPan((locked.x + opponent.x) / 2));
+    this.grind.setIntensity(clamp(locked.combat.lockTime / combatRulesConfig.bladeLock.maxDuration, 0, 1));
+  }
+
+  stopGrind() {
+    this.grind?.stop();
+    this.grind = null;
   }
 
   updateHum(hum, fighter) {
@@ -162,6 +189,7 @@ export class DuelAudio {
   }
 
   stop() {
+    this.stopGrind();
     this.audio.setMusicTension(0);
     for (const hum of this.hums ?? []) {
       hum.handle.stop();
