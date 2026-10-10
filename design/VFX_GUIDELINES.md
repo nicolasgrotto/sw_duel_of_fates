@@ -131,6 +131,14 @@ A esquiva de precisao usa uma inclinacao breve para tras, joelhos baixos e recuo
 
 Sucesso em sequência (v2.1): cada esquiva bem-sucedida acende uma **luz curta** (`evade-glow`) no peito de quem esquivou, na cor da lâmina do próprio lutador, raio ~90 px, alpha 0,5 e 0,2 s, desenhada como as luzes de impacto (sprite em cache, modo aditivo). Sem anel, faíscas, flash, shake, hit stop, câmera lenta ou dessaturação: o anel e a dessaturação continuam assinatura do parry. Efeitos reduzidos mantêm a luz a 60%, porque ela não pisca a tela. A pose da esquiva alterna entre as variações do estilo de movimento do personagem (`motionStyles[motion].evade`), escolhida por `combat.evadeStreak`; a silhueta do sucesso mostra a variação que acabou de evitar o golpe. Som próprio `evadeSuccess` (sopro curto subindo e um toque agudo suave), diferente do metal do parry e do dash.
 
+Consequências da v2.4:
+
+- **Entrada na exaustão:** sem efeito de tela. O lutador exausto respira mais fundo (respiração 2× mais ampla e um pouco mais rápida, só no render) e a lâmina pende alguns graus. Som curto `exhausted`: sopro grave descendente, baixo volume.
+- **Ferimento:** no contato que fere, o `heavy-impact` normal mais 4–6 faíscas extras saindo baixas na direção do golpe, na cor das faíscas de impacto. Sem sangue. O membro ferido fica com a cor do corpo levemente mais escura (−15% de luminosidade) até a Cura terminar. Som `wound`: o impacto forte com uma camada grave curta.
+- **Cura que limpa ferimento:** no fim da Cura, um pulso suave na cor de status da Cura sobre o membro; o escurecimento some com fade de 0,3 s.
+- **Ira:** enquanto ativa, brilho fraco e irregular na cor do tier do Fluxo em volta do tronco (sprite de glow em cache, alpha 0,15–0,3) e lâmina com núcleo um pouco mais quente. Sem partículas contínuas. Som `wrath` na ativação: tom grave crescente.
+- **Esquiva automática do Foco:** reaproveita `evade-glow` e o som `evadeSuccess`, com a pose da variação 0. O medidor de Fluxo mostra o gasto.
+
 Dash aéreo (v1.13): reaproveita o estado e a pose da esquiva, as silhuetas `dodge-afterimage` e o som sintetizado de esquiva. Sem cor, rastro, anel ou shake novos; o lutador continua na cor da própria paleta e a lâmina não muda.
 
 Técnicas de lâmina (v1.15): usam o rastro, o som e o impacto dos golpes fortes, sem efeito novo. O **giro** tem pose própria (`combatPoses.attacks.spin`): a lâmina varre cerca de 350° ao redor do corpo, então o rastro desenha o círculo e mostra que o golpe acerta atrás. O **avanço com corte** (`dashSlash`) inclina o corpo para a frente no avanço e corta de baixo para cima no fim.

@@ -15,6 +15,13 @@ Interface em **português (pt-BR)**, padrão, e **inglês (en)**, escolhidos em 
 
 Os textos ficam em uma tabela por idioma em `src/config/locales/` (`ptBR.js`, `en.js`), com as mesmas chaves e os mesmos `{marcadores}`. A interface, a História e os nomes de personagens, visuais e cores vêm dessas tabelas por id; o código nunca escreve texto de tela. O português é direto e comum (Vigor, Contra-ataque, Golpe de resposta); o glossário fica em versions/v3.md, etapa 2.2. Frase nova entra nas duas tabelas no mesmo commit; o texto em inglês não pode cortar rodapés, listas ou linhas da HUD.
 
+## Exaustão e ferimento na HUD (v2.4)
+
+- **Exaustão:** a barra de Vigor do lutador exausto troca `hudStamina` pelo token novo `hudExhausted` (vermelho dessaturado, mais escuro que `hudDanger`) e pulsa devagar (período 0,8 s, alpha 0,55 ↔ 1). Ao sair, volta à cor normal com fade curto (0,2 s). Nada de texto nem ícone: a barra já fica perto de vazia.
+- **Ferimento:** marca curta ao lado do nome, no estilo do texto da HUD em tamanho menor (`hudWound`), na cor `hudDanger` com alpha 0,8: "Braço ferido" / "Perna ferida" (tabelas de idioma). Some quando a Cura termina ou o round acaba. Uma marca por lutador, porque só há um ferimento por round.
+- **Foco e Ira** usam os indicadores de status que já existem no corpo do lutador (PowerRenderer); o gasto do Foco automático aparece no medidor de Fluxo, que já desce. Nenhum número na tela.
+- Tokens novos ficam em `themeConfig` e na tabela do VISUAL_SYSTEM no mesmo commit.
+
 ## Onde a UI é desenhada
 
 - No canvas, pelos estados (`render`) e pelos módulos de `src/ui/`, usando `themeConfig.textStyles`.
