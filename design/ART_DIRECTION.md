@@ -158,6 +158,23 @@ Usar easing nas transições e um pequeno exagero (antecipação e follow-throug
 
 Curvas de tempo: startup com easing de saída (prepara devagar no fim), active quase linear e rápido, recovery com easing suave.
 
+### Estilos de movimento (v2.3)
+
+Cada personagem tem um **estilo de movimento** (`appearance.motion`, tabela `motionStyles` em `fighterVisualConfig`). O estilo muda a leitura do corpo, nunca o combate: startup, ativo, recuperação, alcance e hitboxes continuam vindo dos golpes. Sem sprites nem esqueleto novo; o estilo só ajusta os números das poses procedurais.
+
+- **Postura**: agachamento, inclinação e ângulo da guarda somados à pose parada e andando; escala da respiração, do balanço da lâmina e do sobe-e-desce da caminhada.
+- **Ataques**: o estilo pode trocar os ângulos, a inclinação, a elevação e o alcance de uma pose de golpe (por tipo de golpe ou por pose).
+- **Follow-through**: na recuperação a lâmina passa um pouco do ponto do corte e volta, proporcional ao arco do golpe. Some na metade da recuperação.
+- **Giro de recuperação**: volta completa da lâmina enquanto ela retorna à guarda. Só na recuperação, para nunca esconder a antecipação; o ataque continua legível no startup.
+- `standard` reproduz a v2 exatamente. Personagens sem estilo próprio usam `standard` até a cobertura do elenco (etapa 2.6).
+
+| Estilo | Personagem | Intenção | Como aparece |
+| --- | --- | --- | --- |
+| `guardian` | Guardião | Econômico, preciso, guarda firme | Base mais baixa, guarda parada (balanço e respiração menores), preparação curta e corte direto, quase sem follow-through, guarda de bloqueio mais firme |
+| `wasp` | Vespa | Alternância das duas lâminas, giros curtos, velocidade coordenada | Base leve e inquieta, cortes que avançam o tronco, arcos alternados (a lâmina de trás conduz o corte reverso), follow-through solto e giro curto da lâmina depois do quinto rápido e do forte |
+
+O protagonista do estilo Técnica herda o estilo do Guardião pela base de aparência.
+
 ## Camadas de arena como dados
 
 Cada arena descreve camadas estáticas de geometria em tokens da paleta existente. O renderer pré-renderiza essas camadas em canvases internos e as reutiliza. Partículas ambientes são poucas, lentas e pouco opacas, atrás dos corpos; não geram eventos nem colisão. A plataforma provisória mantém o desenho atual até a implementação da Plataforma de Refino.
