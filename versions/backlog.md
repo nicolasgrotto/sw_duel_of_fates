@@ -8,16 +8,12 @@ O ciclo aprovado v2.1 → v3.0 está em [v3.md](v3.md). As sugestões abaixo fic
 - Fúria (agora o poder Ira), expansão da História por alinhamento, offline e quatro poderes exclusivos do Predestinado foram incorporados ao plano v3.
 - As duas rotas aprovadas não incluem novas ramificações por escolhas de diálogo.
 - Ocaso é uma skin específica do ciclo, não aprovação de um sistema geral de equipamentos ou animações exclusivas para cada skin.
+- No ponto de checagem da 2.5, os itens de custo baixo e médio (acessibilidade competitiva e disputa por timing como protótipos, treinos guiados, desafios locais e galeria de finais) entraram na etapa 2.15, como flexíveis. A tabela abaixo mantém só o que continua fora do ciclo.
 
 ## Possibilidades futuras
 
 | Ideia | Valor possível | Custo e condição |
 | --- | --- | --- |
-| Acessibilidade competitiva na disputa | Alternativa aos apertos que empate com quem aperta | Médio: a opção "segurar" da v3 (2.5) fica abaixo do teto de apertos de propósito; equivalência exige outro desenho |
-| Treinos guiados das novas mecânicas | Ensinar timing e respostas | Baixo–médio após estabilizar regras; não substitui a atualização do tutorial já exigida |
-| Desafios locais com regras e seed fixas | Reutilizar arenas e elenco | Médio: ampliar o modo existente, sem backend ou farm na História |
-| Galeria de finais e diálogos | Valorizar conteúdo narrativo | Baixo–médio: tradução, persistência e proteção contra spoilers |
-| Disputa baseada em timing | Alternativa aos apertos repetidos | Médio: protótipo separado; não altera a decisão atual por repetição |
 | Árvore extensa de habilidades | Mais especialização | Alto: UI, IA, save e muitas combinações; avaliar após a progressão por pontos |
 | Equipamentos com atributos | Mais builds | Alto: risco de prejudicar leitura e equilíbrio; distinto de skins cosméticas |
 | Criador detalhado | Expressão visual | Alto em arte e cobertura de animações; preservar silhuetas legíveis |
