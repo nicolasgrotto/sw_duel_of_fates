@@ -4,6 +4,7 @@ import { resolvePowerStats } from '../characters/powers.js';
 import { galleryConfig } from '../config/galleryConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { GalleryController } from '../controllers/GalleryController.js';
+import { GalleryTargetController } from '../controllers/GalleryTargetController.js';
 
 export class GalleryScene {
   constructor(director, simulation, onReset = () => {}) {
@@ -11,7 +12,7 @@ export class GalleryScene {
     this.simulation = simulation;
     this.fighters = simulation.fighters;
     this.onReset = onReset;
-    this.controllers = [new GalleryController(this, 0), new GalleryController(this, 1)];
+    this.controllers = [new GalleryController(this, 0), new GalleryTargetController(this)];
     this.launchPending = false;
     this.delay = 0;
     this.configure();
@@ -26,7 +27,12 @@ export class GalleryScene {
       x: this.fighters[0].x, y: this.simulation.arena.floorY, facing: 1,
     });
     this.applyLevel(this.fighters[0], level, loadout.powers);
-    this.applyLevel(this.fighters[1], level, {});
+    this.configureTarget(level);
+  }
+
+  configureTarget(level) {
+    const target = this.director.selection.target;
+    this.applyLevel(this.fighters[1], level, target === 'barrier' || target === 'redirect' ? { neutral: target } : {});
   }
 
   applyLevel(fighter, level, loadout) {
@@ -44,7 +50,7 @@ export class GalleryScene {
     if (field === 'repeat') return;
     if (field === 'tier') {
       this.applyLevel(this.fighters[0], this.director.level, this.director.item.kind === 'power' ? { neutral: this.director.item.id } : {});
-      this.applyLevel(this.fighters[1], this.director.level, {});
+      this.configureTarget(this.director.level);
       return;
     }
     this.configure();
@@ -62,6 +68,7 @@ export class GalleryScene {
     this.fighters[0].resetForRound(center - gap / 2, 1);
     this.fighters[1].resetForRound(center + gap / 2, -1);
     this.launchPending = false;
+    this.controllers[1].reset();
     this.delay = 0;
     this.director.phase = 'ready';
     this.director.lastEvents = '';
