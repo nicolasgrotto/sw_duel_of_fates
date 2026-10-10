@@ -34,6 +34,7 @@ export const AiDecision = Object.freeze({
   BACK_OFF: 'backOff',
   WAIT: 'wait',
   FOCUS_WAIT: 'focusWait',
+  BLADE_LOCK: 'bladeLock',
 });
 
 const STUN_STATES = new Set([FighterState.HIT, FighterState.STAGGERED]);
@@ -112,6 +113,10 @@ export class EnemyAI {
   }
 
   updateIntent(intent, dt) {
+    if (this.self.state === FighterState.BLADE_LOCK) {
+      this.requestBladeLockPress(intent, dt);
+      return;
+    }
     this.attackCooldown = Math.max(0, this.attackCooldown - dt);
     this.plan.blockTime = Math.max(0, this.plan.blockTime - dt);
     this.plan.chargeHoldTime = Math.max(0, this.plan.chargeHoldTime - dt);
@@ -131,6 +136,29 @@ export class EnemyAI {
     this.updateFeint(dt);
     this.tryChain();
     this.writeIntent(intent);
+  }
+
+  requestBladeLockPress(intent, dt) {
+    const { plan, self, difficulty } = this;
+    this.resetPlan();
+    plan.blockTime = 0;
+    plan.parryDelay = -1;
+    plan.evadeDelay = -1;
+    plan.evadeAttack = null;
+    plan.punishAfterBlock = false;
+    plan.chargeHoldTime = 0;
+    plan.powerHoldTime = 0;
+    plan.feintDelay = -1;
+    plan.delayedAction = PendingAction.NONE;
+    plan.actionDelay = 0;
+    this.thinkTimer = 0;
+    this.decision = AiDecision.BLADE_LOCK;
+    this.writeIntent(intent);
+    const interval = Math.max(combatRulesConfig.bladeLock.minPressInterval,
+      (1 + this.perception.reactionJitter * this.random()) / difficulty.bladeLockRate);
+    const { combat } = self;
+    if (!combat.lockPressHeld && combat.lockTime + dt - combat.lockLastPress + Number.EPSILON * Math.max(1, combat.lockTime) >= interval
+      && this.random() >= difficulty.mistakeChance) intent.lightAttack = true;
   }
 
   updateBlockPunish() {

@@ -16,6 +16,7 @@ export const aiConfig = {
   bossDifficulty: 'boss',
   difficulties: {
     [Difficulty.EASY]: {
+      bladeLockRate: 5,
       reactionTime: 0.45,
       evadeChance: 0.005,
       powerMultiplier: 0.5,
@@ -41,6 +42,7 @@ export const aiConfig = {
       recoveryGuardChance: 0.1,
     },
     [Difficulty.NORMAL]: {
+      bladeLockRate: 7,
       reactionTime: 0.28,
       evadeChance: 0.015,
       powerMultiplier: 1,
@@ -66,6 +68,7 @@ export const aiConfig = {
       recoveryGuardChance: 0.5,
     },
     [Difficulty.HARD]: {
+      bladeLockRate: 9,
       reactionTime: 0.15,
       evadeChance: 0.04,
       powerMultiplier: 1.2,
@@ -91,6 +94,7 @@ export const aiConfig = {
       recoveryGuardChance: 0.75,
     },
     boss: {
+      bladeLockRate: 9,
       reactionTime: 0.15,
       evadeChance: 0.04,
       powerMultiplier: 1.2,
