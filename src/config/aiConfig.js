@@ -394,6 +394,13 @@ export const aiConfig = {
     },
   },
   perception: {
+    consequences: {
+      exhaustionHeavyWeight: 1,
+      woundedHealWeight: 1,
+      wrathDefenseWeight: 1,
+      focusNeutralWeight: 1,
+      focusShoveWeight: 1,
+    },
     reactionJitter: 0.4,
     evadeWeight: 1,
     airJumpFallSpeed: 0,
@@ -427,6 +434,7 @@ export const aiConfig = {
     selfPowerUse: {
       heal: { stat: 'health', max: 'maxHealth', below: 0.6, minGap: 180, active: 'healTime' },
       focus: { stat: 'stamina', max: 'maxStamina', below: 0.55, minGap: 140, active: 'focusTime' },
+      wrath: { minGap: 140, active: 'wrathTime' },
     },
     feintAt: 0.45,
     habits: {

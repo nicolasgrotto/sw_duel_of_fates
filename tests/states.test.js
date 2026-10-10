@@ -10,6 +10,7 @@ import { StateMachine } from '../src/core/StateMachine.js';
 import { createState } from '../src/states/stateFactory.js';
 import { DuelMode } from '../src/states/duelModes.js';
 import { StateId } from '../src/states/stateIds.js';
+import { FighterState } from '../src/entities/fighterStates.js';
 
 const STEP = 1 / 60;
 
@@ -389,6 +390,8 @@ describe('duel rounds', () => {
     const [player, opponent] = duel.fighters;
     player.clearIntent();
     opponent.clearIntent();
+    opponent.clearAttack();
+    opponent.restartState(FighterState.IDLE);
     opponent.x = player.x + 110;
     opponent.health = 1;
     game.step(Action.LIGHT_ATTACK);

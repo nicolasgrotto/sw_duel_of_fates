@@ -4,8 +4,11 @@ import { getFlowDifference, resolveInteraction, resolveLevelBand } from '../comb
 import { projectilesConfig } from '../config/projectilesConfig.js';
 import { evadeConfig } from '../config/evadeConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
+import { combatRulesConfig, resolveCombatRules } from '../config/combatRulesConfig.js';
+import { isNeutralForFocus } from '../combat/StatusSystem.js';
 import { FighterState } from '../entities/fighterStates.js';
-import { canAfford } from '../systems/StaminaSystem.js';
+import { canAfford, getStaminaCost } from '../systems/StaminaSystem.js';
+import { getMaxJumps } from '../systems/MovementSystem.js';
 import { HabitMemory } from './HabitMemory.js';
 import { canReach, findIncomingProjectile, getDirectionTo, getGap, getVulnerableTime, getTimeUntilAttackActive, isPunishable, isThreatening } from './perception.js';
 
@@ -30,6 +33,7 @@ export const AiDecision = Object.freeze({
   APPROACH: 'approach',
   BACK_OFF: 'backOff',
   WAIT: 'wait',
+  FOCUS_WAIT: 'focusWait',
 });
 
 const STUN_STATES = new Set([FighterState.HIT, FighterState.STAGGERED]);
@@ -85,6 +89,7 @@ export class EnemyAI {
     this.perception = perception;
     this.random = random;
     this.powersEnabled = rules.powers === true;
+    this.rules = resolveCombatRules(rules);
     this.thinkTimer = 0;
     this.attackCooldown = 0;
     this.decision = AiDecision.WAIT;
@@ -148,7 +153,8 @@ export class EnemyAI {
       return;
     }
     plan.actionDelay -= dt;
-    plan.moveX = 0;
+    plan.moveX = this.wantsWound() && plan.delayedAction === PendingAction.HEAVY_ATTACK && this.canUseForwardHeavy()
+      ? getDirectionTo(this.self, this.opponent) : 0;
     if (plan.actionDelay <= 0) {
       plan.pendingAction = plan.delayedAction;
       plan.delayedAction = PendingAction.NONE;
@@ -163,6 +169,7 @@ export class EnemyAI {
     plan.feintDelay -= dt;
     if (plan.feintDelay <= 0) {
       plan.feintDelay = -1;
+      if (this.rules.exhaustion && !this.canSpend(this.self.stats.feint.staminaCost)) return;
       plan.pendingAction = PendingAction.PARRY;
     }
   }
@@ -176,6 +183,9 @@ export class EnemyAI {
       return;
     }
     this.chainRolledFor = attack;
+    if (this.rules.exhaustion && !this.canSpend(this.self.moves[attack.cancelsInto[0]].staminaCost, this.self.moves[attack.cancelsInto[0]])) {
+      return;
+    }
     if (this.random() < this.difficulty.chainChance) {
       this.plan.pendingAction = PendingAction.LIGHT_ATTACK;
     }
@@ -235,6 +245,7 @@ export class EnemyAI {
       && self.combat.power.effect === 'lightning' && opponent.combat.redirectTime > 0) {
       this.plan.powerHoldTime = 0;
     }
+    if (this.tryFocusNeutral()) return AiDecision.FOCUS_WAIT;
     if (this.plan.evadeDelay >= 0) return AiDecision.EVADE;
     if (this.plan.parryDelay >= 0) {
       return AiDecision.PARRY;
@@ -251,6 +262,8 @@ export class EnemyAI {
     if (this.random() < this.difficulty.mistakeChance) {
       return AiDecision.HESITATE;
     }
+    const wrathAnswer = this.answerWrath();
+    if (wrathAnswer) return wrathAnswer;
 
     for (const step of this.profile.priorities) {
       const decision = this.runStep(step);
@@ -259,6 +272,71 @@ export class EnemyAI {
       }
     }
     return AiDecision.WAIT;
+  }
+
+  wantsWound() {
+    return this.rules.wounds && this.opponent.combat.exhausted && !this.opponent.combat.woundUsed
+      && Boolean(this.self.moves.heavy.wound);
+  }
+
+  canUseForwardHeavy() {
+    const move = this.self.moves.forwardHeavy;
+    return Boolean(move?.wound) && this.canReachWith(AttackType.FORWARD_HEAVY) && this.canSpend(move.staminaCost, move);
+  }
+
+  canSpend(cost, move = null, type = 'action') {
+    if (!this.rules.exhaustion && !this.rules.wounds && !this.rules.focusEvade) {
+      return canAfford(this.self, cost);
+    }
+    const derived = getStaminaCost(this.self, cost, type);
+    if (!canAfford(this.self, derived)) return false;
+    if (!this.rules.exhaustion || this.self.stamina - derived > this.self.stats.maxStamina * combatRulesConfig.exhaustion.enterRatio) return true;
+    return move !== null && this.expectedDamage(move) >= this.opponent.health;
+  }
+
+  allowsNewSpend(cost, type) {
+    return !this.rules.exhaustion && !this.rules.wounds && !this.rules.focusEvade || this.canSpend(cost, null, type);
+  }
+
+  expectedDamage(move) {
+    let damage = move.damage;
+    if (this.rules.exhaustion && this.opponent.combat.exhausted && move.exhaustionBonus) damage *= combatRulesConfig.exhaustion.damageScale;
+    if (this.self.combat.wrathTime > 0) damage *= this.self.combat.wrathDamageDealtScale;
+    if (this.opponent.combat.wrathTime > 0) damage *= this.opponent.combat.wrathDamageTakenScale;
+    return damage;
+  }
+
+  tryFocusNeutral() {
+    const { self, opponent, plan } = this;
+    if (!this.rules.focusEvade || self.combat.focusTime <= 0 || !self.grounded
+      || !(self.canAct || self.state === FighterState.BLOCKING && self.combat.blockstun === 0)
+      || self.flowMeter < combatRulesConfig.focus.autoEvadeCost || !opponent.combat.attack
+      || opponent.combat.attack.projectile || opponent.combat.attackType === AttackType.SHOVE
+      || !isThreatening(opponent, self, this.perception.threatMargin)
+      || this.random() >= this.perception.consequences.focusNeutralWeight * this.difficulty.defenseMultiplier) return false;
+    plan.moveX = 0;
+    plan.blockTime = 0;
+    plan.parryDelay = -1;
+    plan.evadeDelay = -1;
+    plan.feintDelay = -1;
+    plan.powerHoldTime = 0;
+    plan.chargeHoldTime = 0;
+    plan.pendingAction = PendingAction.NONE;
+    plan.delayedAction = PendingAction.NONE;
+    return true;
+  }
+
+  answerWrath() {
+    if (!this.powersEnabled || this.opponent.combat.wrathTime <= 0
+      || this.random() >= this.perception.consequences.wrathDefenseWeight * this.difficulty.defenseMultiplier) return null;
+    if (isThreatening(this.opponent, this.self, this.perception.threatMargin) && !this.self.combat.saberThrown
+      && this.canSpend(this.opponent.combat.attack.blockStaminaCost * this.self.stats.blockStaminaScale, null, 'block')) {
+      this.plan.blockTime = this.perception.blockHoldTime;
+      return AiDecision.GUARD;
+    }
+    this.plan.moveX = -getDirectionTo(this.self, this.opponent);
+    this.plan.blockTime = 0;
+    return AiDecision.BACK_OFF;
   }
 
   runStep(step) {
@@ -292,7 +370,7 @@ export class EnemyAI {
     for (const [slot, id] of Object.entries(self.stats.techniques ?? {})) {
       const move = self.moves[id];
       const reach = move.hitbox.reach + (move.lunge ?? 0) * move.active;
-      if (!canAfford(self, move.staminaCost) || getGap(self, opponent) >= reach - this.perception.reachMargin) {
+      if (!this.canSpend(move.staminaCost, move) || getGap(self, opponent) >= reach - this.perception.reachMargin) {
         continue;
       }
       if (this.random() >= (this.profile.techniqueChance ?? this.perception.techniqueChance) * this.difficulty.specialMultiplier) {
@@ -314,7 +392,7 @@ export class EnemyAI {
       return technique;
     }
     const special = this.self.moves.special;
-    if (!special || this.attackCooldown > 0 || this.self.combat.attack || !canAfford(this.self, special.staminaCost)) {
+    if (!special || this.attackCooldown > 0 || this.self.combat.attack || !this.canSpend(special.staminaCost, special, special.dash ? 'dash' : 'action')) {
       return null;
     }
     const kind = getSpecialKind(special);
@@ -386,12 +464,12 @@ export class EnemyAI {
     const blockChance = this.profile.blockChance * this.difficulty.defenseMultiplier;
     const dodgeChance = this.profile.dodgeChance * this.difficulty.defenseMultiplier;
 
-    if (roll < blockChance) {
+    if (roll < blockChance && this.allowsNewSpend(this.opponent.combat.attack.blockStaminaCost * this.self.stats.blockStaminaScale, 'block')) {
       this.plan.blockTime = this.perception.blockHoldTime;
       this.plan.punishAfterBlock = !isHeavyAttack(this.opponent.combat.attackType) && this.random() < this.difficulty.blockPunishChance;
       return AiDecision.BLOCK;
     }
-    if (roll < blockChance + dodgeChance && canAfford(this.self, this.self.stats.dodge.staminaCost)) {
+    if (roll < blockChance + dodgeChance && this.canSpend(this.self.stats.dodge.staminaCost, null, 'dash')) {
       this.plan.pendingAction = PendingAction.DODGE;
       return AiDecision.DODGE;
     }
@@ -434,8 +512,11 @@ export class EnemyAI {
     }
     const use = this.perception.selfPowerUse[power.effect];
     const { self } = this;
+    if (power.effect === 'wrath') {
+      return self.combat.wrathTime === 0 && getGap(self, this.opponent) >= use.minGap;
+    }
     return Boolean(use) && self.combat[use.active] === 0 && getGap(self, this.opponent) >= use.minGap
-      && self[use.stat] / self.stats[use.max] < use.below;
+      && (self[use.stat] / self.stats[use.max] < use.below || power.effect === 'heal' && this.rules.wounds && self.combat.wound !== null);
   }
 
   wantsPower(power) {
@@ -451,7 +532,8 @@ export class EnemyAI {
     if (!this.powersEnabled || !loadout || this.attackCooldown > 0 || !self.canAct) {
       return null;
     }
-    const chance = (this.profile.powerChance ?? this.perception.powerChance) * this.difficulty.powerMultiplier;
+    const healWeight = this.rules.wounds && self.combat.wound !== null ? this.perception.consequences.woundedHealWeight : 1;
+    const chance = (this.profile.powerChance ?? this.perception.powerChance) * this.difficulty.powerMultiplier * healWeight;
     if (this.random() >= chance) {
       return null;
     }
@@ -505,7 +587,7 @@ export class EnemyAI {
   }
 
   dodgePower() {
-    if (!canAfford(this.self, this.self.stats.dodge.staminaCost)) return null;
+    if (!this.canSpend(this.self.stats.dodge.staminaCost, null, 'dash')) return null;
     this.plan.blockTime = 0;
     this.plan.moveX = -getDirectionTo(this.self, this.opponent);
     this.plan.pendingAction = PendingAction.DODGE;
@@ -610,7 +692,7 @@ export class EnemyAI {
 
   trySpecialAnswer() {
     const special = this.self.moves.special;
-    if (!special || !canAfford(this.self, special.staminaCost)) {
+    if (!special || !this.canSpend(special.staminaCost, special, special.dash ? 'dash' : 'action')) {
       return false;
     }
     const { attack, attackType } = this.opponent.combat;
@@ -649,13 +731,15 @@ export class EnemyAI {
 
   tryShove() {
     const barrier = this.powersEnabled && isBarrierUp(this.opponent);
-    if ((!barrier && this.opponent.state !== FighterState.BLOCKING) || this.attackCooldown > 0 || !this.canReachWith(AttackType.SHOVE)) {
+    const focus = this.rules.focusEvade && this.opponent.combat.focusTime > 0 && isNeutralForFocus(this.opponent);
+    if ((!barrier && !focus && this.opponent.state !== FighterState.BLOCKING) || this.attackCooldown > 0 || !this.canReachWith(AttackType.SHOVE)) {
       return null;
     }
-    if (!canAfford(this.self, this.self.stats.attacks.shove.staminaCost)) {
+    if (!this.canSpend(this.self.stats.attacks.shove.staminaCost)) {
       return null;
     }
-    const shoveChance = this.profile.shoveChance * this.difficulty.shoveMultiplier + this.getHabitBonus(this.habits.blockRatio, 'block');
+    const focusWeight = focus ? this.perception.consequences.focusShoveWeight : 1;
+    const shoveChance = (this.profile.shoveChance * this.difficulty.shoveMultiplier + this.getHabitBonus(this.habits.blockRatio, 'block')) * focusWeight;
     if (this.random() >= shoveChance) {
       return null;
     }
@@ -684,6 +768,7 @@ export class EnemyAI {
   }
 
   wantsHeavyPunish() {
+    if (this.wantsWound()) return true;
     if (this.opponent.state === FighterState.STUNNED) {
       return true;
     }
@@ -716,7 +801,8 @@ export class EnemyAI {
       return null;
     }
 
-    const wantsHeavy = this.random() < this.profile.heavyChance;
+    const heavyChance = this.wantsWound() ? Math.max(this.profile.heavyChance, this.perception.consequences.exhaustionHeavyWeight) : this.profile.heavyChance;
+    const wantsHeavy = this.random() < heavyChance;
     return this.startAttack(wantsHeavy) ? AiDecision.ATTACK : null;
   }
 
@@ -725,6 +811,7 @@ export class EnemyAI {
     if (!canReach(this.opponent, this.self, opponentReach, -this.perception.threatMargin)) {
       return null;
     }
+    if (!this.allowsNewSpend(opponentReach.blockStaminaCost * this.self.stats.blockStaminaScale, 'block')) return null;
     const guardChance = this.profile.guardChance * this.difficulty.defenseMultiplier + this.getHabitBonus(this.habits.lightRatio, 'light');
     if (this.random() >= guardChance) {
       return null;
@@ -784,7 +871,7 @@ export class EnemyAI {
   tryAirDash() {
     const { self, opponent } = this;
     const chance = (this.difficulty.airDashChance ?? 0) * this.getAerialWeight();
-    if (!(chance > 0) || self.combat.airDashUsed || !canAfford(self, self.stats.airDash.staminaCost)) return false;
+    if (!(chance > 0) || self.combat.airDashUsed || !this.canSpend(self.stats.airDash.staminaCost, null, 'dash')) return false;
     const above = opponent.y - self.y >= opponent.height * this.perception.airDashClearance;
     const crossing = above && getGap(self, opponent) <= this.perception.airDashCrossGap;
     if (!crossing && !this.isCornered()) return false;
@@ -797,7 +884,7 @@ export class EnemyAI {
 
   tryAirJump() {
     const { self, opponent } = this;
-    if (self.stats.movement.maxJumps < 2 || Math.max(1, self.combat.jumpsUsed) >= self.stats.movement.maxJumps || self.vy < this.perception.airJumpFallSpeed) return false;
+    if (getMaxJumps(self) < 2 || Math.max(1, self.combat.jumpsUsed) >= getMaxJumps(self) || self.vy < this.perception.airJumpFallSpeed) return false;
     if (this.random() >= (this.difficulty.airJumpChance ?? 0)) return false;
     const retreat = self.stamina / self.stats.maxStamina < this.profile.retreatStaminaRatio;
     this.plan.moveX = getDirectionTo(self, opponent) * (retreat ? -1 : 1);
@@ -813,13 +900,16 @@ export class EnemyAI {
 
   startAttack(wantsHeavy, isPunish = false) {
     const { attacks } = this.self.stats;
-    const useHeavy = wantsHeavy && canAfford(this.self, attacks.heavy.staminaCost) && this.canReachWith(AttackType.HEAVY);
+    const useHeavy = wantsHeavy && this.canSpend(attacks.heavy.staminaCost, attacks.heavy) && this.canReachWith(AttackType.HEAVY);
 
-    if (!useHeavy && !canAfford(this.self, attacks.light.staminaCost)) {
+    if (!useHeavy && !this.canSpend(attacks.light.staminaCost, attacks.light)) {
       return false;
     }
 
     const action = useHeavy ? PendingAction.HEAVY_ATTACK : PendingAction.LIGHT_ATTACK;
+    if (useHeavy && this.wantsWound() && this.canUseForwardHeavy()) {
+      this.plan.moveX = getDirectionTo(this.self, this.opponent);
+    }
     this.plan.blockTime = 0;
     this.attackCooldown = this.difficulty.attackCooldown;
     if (useHeavy && !isPunish && this.self.stats.feint && this.random() < this.profile.feintChance) {
