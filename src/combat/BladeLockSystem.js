@@ -1,6 +1,7 @@
 import { combatRulesConfig } from '../config/combatRulesConfig.js';
 import { FighterState } from '../entities/fighterStates.js';
 import { clamp } from '../utils/math.js';
+import { clearActionBuffer } from './actionBuffer.js';
 
 function hasPeriodicOffense(fighter) {
   return fighter.combat.chokeTime > 0 || ['choke', 'storm', 'lightning'].includes(fighter.combat.power?.effect);
@@ -48,6 +49,7 @@ export class BladeLockSystem {
     combat.lockLastPress = -combatRulesConfig.bladeLock.minPressInterval;
     combat.lockOpponent = this.fighters.indexOf(opponent);
     combat.lockPressHeld = fighter.intent.lightAttack;
+    combat.lockReleaseGuard = 0;
     fighter.clearAttack();
     fighter.vx = 0;
     fighter.vy = 0;
@@ -57,6 +59,8 @@ export class BladeLockSystem {
   update(dt) {
     const tolerance = Number.EPSILON * Math.max(1, combatRulesConfig.bladeLock.cooldown / dt);
     for (const fighter of this.fighters) {
+      const guard = fighter.combat.lockReleaseGuard - dt;
+      fighter.combat.lockReleaseGuard = guard <= tolerance ? 0 : guard;
       if (fighter.combat.lockOpponent < 0) {
         const remaining = fighter.combat.lockCooldown - dt;
         fighter.combat.lockCooldown = remaining <= tolerance ? 0 : remaining;
@@ -136,11 +140,14 @@ export class BladeLockSystem {
     combat.lockLastPress = 0;
     combat.lockOpponent = -1;
     combat.lockPressHeld = false;
+    combat.lockReleaseGuard = combatRulesConfig.bladeLock.lockReleaseGuard;
+    clearActionBuffer(fighter);
   }
 
   cancel(fighter) {
     this.release(fighter);
     fighter.combat.lockCooldown = 0;
+    fighter.combat.lockReleaseGuard = 0;
     if (fighter.state === FighterState.BLADE_LOCK) fighter.restartState(FighterState.IDLE);
   }
 

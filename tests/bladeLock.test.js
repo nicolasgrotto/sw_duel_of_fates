@@ -8,6 +8,8 @@ import { createSimulation, spawnFighter, arena } from './helpers.js';
 import { STEP } from './helpers.js';
 import { combatRulesConfig } from '../src/config/combatRulesConfig.js';
 import { assertSnapshotContinuation } from './consequenceHelpers.js';
+import { PlayerController } from '../src/controllers/PlayerController.js';
+import { Action } from '../src/config/controlsConfig.js';
 
 const lockTestNumbers = Object.freeze({ cooldown: 4, distance: 70, minPressInterval: 1 / 12,
   winMargin: 4, maxDuration: 2, timeoutMargin: 2, damage: 8, staminaLoss: 35,
@@ -337,4 +339,58 @@ it('prevents a guaranteed heavy follow-up for every archetype, orientation and a
       }
     }
   }
+});
+
+it('clears both buffers and discards attacking edges during the release guard', () => {
+  const { fighters, simulation } = startLock();
+  fighters.forEach((fighter) => {
+    fighter.combat.bufferedAction = 'heavyAttack';
+    fighter.combat.bufferTime = 0.15;
+  });
+  pressSteps(simulation, 19);
+  for (const fighter of fighters) {
+    assert.equal(fighter.combat.bufferedAction, null);
+    assert.equal(fighter.combat.bufferTime, 0);
+    assert.equal(fighter.combat.lockReleaseGuard, 0.15);
+  }
+  for (let step = 0; step < 9; step += 1) {
+    fighters.forEach((fighter) => Object.assign(fighter.intent, { lightAttack: true, heavyAttack: true, special: true }));
+    simulation.step(STEP);
+    fighters.forEach((fighter) => assert.equal(fighter.combat.bufferedAction, null));
+  }
+  fighters.forEach((fighter) => {
+    assert.equal(fighter.combat.lockReleaseGuard, 0);
+    fighter.clearIntent();
+  });
+  pressSteps(simulation, 30, []);
+  fighters.forEach((fighter) => assert.equal(fighter.combat.attack, null));
+  fighters[0].intent.lightAttack = true;
+  simulation.step(STEP);
+  assert.equal(fighters[0].state, FighterState.ATTACKING);
+});
+
+it('does not turn a held human attack into an automatic strike after release', () => {
+  const { fighters: [a, b], simulation } = startLock();
+  let pressed = true;
+  const controller = new PlayerController({ isDown: (action) => action === Action.LIGHT_ATTACK,
+    wasPressed: (action) => pressed && action === Action.LIGHT_ATTACK });
+  for (let step = 0; step < 150; step += 1) {
+    controller.updateIntent(a.intent, STEP);
+    b.clearIntent();
+    simulation.step(STEP);
+    pressed = false;
+  }
+  assert.equal(a.combat.attack, null);
+  assert.equal(a.combat.bufferedAction, null);
+  assert.equal(a.health, a.stats.maxHealth);
+});
+
+it('also protects a draw and replays the release guard from a snapshot', () => {
+  const { fighters, simulation } = startLock();
+  pressSteps(simulation, 120, []);
+  fighters.forEach((fighter) => assert.equal(fighter.combat.lockReleaseGuard, 0.15));
+  assertSnapshotContinuation(simulation, 60, (current, step) => {
+    current.forEach((fighter) => { fighter.intent.heavyAttack = step < 9; });
+  });
+  fighters.forEach((fighter) => assert.equal(fighter.combat.attack, null));
 });

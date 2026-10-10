@@ -9,24 +9,24 @@ export const CombatAction = Object.freeze({
   PARRY: 'parry',
 });
 
-export function readPressedAction(intent) {
+export function readPressedAction(intent, ignoreAttacks = false) {
   if (intent.dodge) {
     return CombatAction.DODGE;
   }
   if (intent.evade) return CombatAction.EVADE;
-  if (intent.lightAttack && intent.block) {
+  if (!ignoreAttacks && intent.lightAttack && intent.block) {
     return CombatAction.SHOVE;
   }
   if (intent.power) {
     return CombatAction.POWER;
   }
-  if (intent.special) {
+  if (!ignoreAttacks && intent.special) {
     return CombatAction.SPECIAL;
   }
-  if (intent.heavyAttack) {
+  if (!ignoreAttacks && intent.heavyAttack) {
     return CombatAction.HEAVY_ATTACK;
   }
-  if (intent.lightAttack) {
+  if (!ignoreAttacks && intent.lightAttack) {
     return CombatAction.LIGHT_ATTACK;
   }
   if (intent.blockPressed) {
@@ -37,7 +37,7 @@ export function readPressedAction(intent) {
 
 export function updateActionBuffer(fighter, dt, bufferTime) {
   const { combat } = fighter;
-  const pressed = readPressedAction(fighter.intent);
+  const pressed = readPressedAction(fighter.intent, combat.lockReleaseGuard > 0);
 
   if (pressed) {
     combat.bufferedAction = pressed;
