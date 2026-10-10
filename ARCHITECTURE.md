@@ -1205,6 +1205,8 @@ Roteiro, etapas e especificação aprovada em [versions/v3.md](versions/v3.md). 
 
 **Princípios.** Os da v2 continuam. Toda mecânica nova roda na `DuelSimulation`, guarda estado em `fighter.combat` ou em campo coberto pelo teste de snapshot, e passa no replay a partir de snapshots intermediários. Render, áudio e VFX só leem eventos e estado.
 
+**Configura??o da 2.4.** `src/config/combatRulesConfig.js` lista os modos por capacidade. `resolveCombatRules` normaliza as capacidades e exige Poderes para `focusEvade`; `createDuelRules` e o simulador usam essa resolu??o. Hist?ria declara as tr?s capacidades desligadas at? a 2.8. O simulador exp?e a config em `--set combatRules.*`.
+
 **Regras como capacidades.** `rules` deixa de ser só `{ powers }`. Cada mecânica nova ganha uma capacidade booleana própria, criada na etapa que a implementa, sem campo antecipado: `exhaustion`, `wounds` e `focusEvade` (2.4), `bladeLock` (2.5), `finishers` (2.9). `focusEvade` e o quarto poder exigem `rules.powers`; a Ira é um poder comum e só existe para quem a equipa. `createDuelRules` monta o objeto a partir de uma lista de modos por capacidade em config, no mesmo padrão de `powersConfig.modes`; a História usa as regras do `storyConfig`. O simulador aceita `--rules` com nomes de capacidades; sem nenhuma capacidade nova ligada, o resultado é o preset `reference`, que precisa passar em `npm run reference -- --check tools/reference-v2.json`.
 
 | Modo | Capacidades novas |

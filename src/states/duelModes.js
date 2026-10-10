@@ -1,3 +1,5 @@
+import { combatRulesConfig, resolveCombatRules } from '../config/combatRulesConfig.js';
+
 export const DuelMode = Object.freeze({
   VERSUS: 'versus',
   ARCADE: 'arcade',
@@ -12,7 +14,11 @@ export const DuelMode = Object.freeze({
 const DUMMY_MODES = new Set([DuelMode.TRAINING, DuelMode.TUTORIAL, DuelMode.CHALLENGE]);
 
 export function createDuelRules(mode, settings, powerModes) {
-  return { powers: powerModes.includes(mode) && settings.powers !== false };
+  const rules = { powers: powerModes.includes(mode) && settings.powers !== false };
+  for (const [capability, modes] of Object.entries(combatRulesConfig.modes)) {
+    rules[capability] = modes.includes(mode);
+  }
+  return resolveCombatRules(rules);
 }
 
 export function usesDummy(mode) {

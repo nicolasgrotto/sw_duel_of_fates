@@ -7,6 +7,7 @@ import { storyConfig } from '../src/config/storyConfig.js';
 import { CombatEvent } from '../src/combat/combatEvents.js';
 import { evadeConfig } from '../src/config/evadeConfig.js';
 import { aiConfig } from '../src/config/aiConfig.js';
+import { combatRulesConfig, resolveCombatRules } from '../src/config/combatRulesConfig.js';
 import { powersConfig } from '../src/config/powersConfig.js';
 import { projectilesConfig } from '../src/config/projectilesConfig.js';
 import { bladeTechniques } from '../src/config/movesConfig.js';
@@ -43,6 +44,7 @@ function resolveCharacter(id) {
 }
 const CONFIG_ROOTS = {
   fighters: fighterArchetypes,
+  combatRules: combatRulesConfig,
   attributes: Object.fromEntries(Object.entries(characters).map(([id, character]) => [id, character.attributes])),
   loadouts: Object.fromEntries(Object.entries(characters).map(([id, character]) => [id, character.loadout])),
   attributeBases: attributesConfig.bases,
@@ -114,7 +116,7 @@ function createController(self, opponent, { characterId, difficulty, profile }, 
 
 function readRules(names) {
   const enabled = new Set(names.split(',').filter(Boolean));
-  return { powers: enabled.has('powers') };
+  return resolveCombatRules(Object.fromEntries([...enabled].map((name) => [name, true])));
 }
 
 function describeEnding(left, right) {
