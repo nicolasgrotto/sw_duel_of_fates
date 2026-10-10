@@ -31,6 +31,8 @@ export const animation = {
   airBlendRate: 14,
   airLegTuck: 0.12,
   airFootPull: 0.4,
+  exhaustedBreathScale: 2,
+  exhaustedDroopDegrees: 6,
 };
 
 export const combatPoses = {

@@ -2,8 +2,8 @@ import { CombatEvent } from '../combat/combatEvents.js';
 import { getPowerTier } from '../combat/flowInteractions.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
-import { layout } from '../config/uiConfig.js';
-import { approach } from '../utils/math.js';
+import { layout, texts } from '../config/uiConfig.js';
+import { TAU, approach } from '../utils/math.js';
 
 const Side = Object.freeze({
   LEFT: 'left',
@@ -19,6 +19,7 @@ function createSideState(fighter, side) {
     lastHealth: fighter.health,
     rejectTime: 0,
     powerRejectTime: 0,
+    exhaustion: 0,
   };
 }
 
@@ -26,6 +27,7 @@ export class Hud {
   constructor(leftFighter, rightFighter, rounds = null, names = null, showPower = false) {
     this.showPower = showPower;
     this.names = names ?? [leftFighter.name, rightFighter.name];
+    this.nameWidths = [null, null];
     this.sides = [createSideState(leftFighter, Side.LEFT), createSideState(rightFighter, Side.RIGHT)];
     this.time = 0;
     this.rounds = rounds;
@@ -37,6 +39,7 @@ export class Hud {
       this.updateGhost(state, dt);
       state.rejectTime = Math.max(0, state.rejectTime - dt);
       state.powerRejectTime = Math.max(0, state.powerRejectTime - dt);
+      state.exhaustion = approach(state.exhaustion, state.fighter.combat.exhausted ? 1 : 0, layout.hud.exhaustFadeRate * dt);
     }
   }
 
@@ -119,11 +122,39 @@ export class Hud {
 
     renderer.fillRect(barX, staminaY, healthWidth, staminaHeight, colors.hudTrack);
     this.fillBar(renderer, barX, staminaY, healthWidth, staminaHeight, fighter.stamina / maxStamina, isLeft, this.getStaminaColor(state));
+    this.renderExhaustion(renderer, state, barX, staminaY, fighter.stamina / maxStamina, isLeft);
+    this.renderWound(renderer, fighter, isLeft, viewLeft, viewRight);
     this.renderPower(renderer, state, barX, staminaY + staminaHeight, isLeft);
     this.renderRounds(renderer, isLeft, viewLeft, viewRight);
     if (state.rejectTime > 0) {
       renderer.strokeRect(barX, staminaY, healthWidth, staminaHeight, this.getStaminaColor(state));
     }
+  }
+
+  renderExhaustion(renderer, state, barX, staminaY, ratio, isLeft) {
+    if (state.exhaustion <= 0) {
+      return;
+    }
+    const { healthWidth, staminaHeight, exhaustPulsePeriod, exhaustMinAlpha } = layout.hud;
+    const pulse = (Math.cos((this.time / exhaustPulsePeriod) * TAU) + 1) / 2;
+    renderer.save();
+    renderer.setAlpha(state.exhaustion * (exhaustMinAlpha + (1 - exhaustMinAlpha) * pulse));
+    renderer.strokeRect(barX, staminaY, healthWidth, staminaHeight, colors.hudExhausted);
+    this.fillBar(renderer, barX, staminaY, healthWidth, staminaHeight, ratio, isLeft, colors.hudExhausted);
+    renderer.restore();
+  }
+
+  renderWound(renderer, fighter, isLeft, viewLeft, viewRight) {
+    const { wound } = fighter.combat;
+    if (!wound) {
+      return;
+    }
+    const { margin, nameY, woundGap } = layout.hud;
+    const index = isLeft ? 0 : 1;
+    this.nameWidths[index] ??= renderer.measureText(this.names[index], isLeft ? textStyles.hudNameLeft : textStyles.hudNameRight);
+    const nameWidth = this.nameWidths[index];
+    const x = isLeft ? viewLeft + margin + nameWidth + woundGap : viewRight - margin - nameWidth - woundGap;
+    renderer.text(texts.hud.wounds[wound], x, nameY, isLeft ? textStyles.hudWoundLeft : textStyles.hudWoundRight);
   }
 
   renderPower(renderer, state, barX, y, isLeft) {

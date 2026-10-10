@@ -255,10 +255,13 @@ export function computePose(fighter, pose, forceEvade = false) {
   const motion = getMotionStyle(fighter);
   const { stance } = motion;
   const breathWave = Math.sin((time * TAU) / animationStyle.breathPeriod);
-  const breath = breathWave * animationStyle.breathAmplitude * stance.breathScale * (1 - walkBlend * animationStyle.walkBreathDamping);
+  const exhausted = fighter.combat.exhausted === true;
+  const breathScale = stance.breathScale * (exhausted ? animationStyle.exhaustedBreathScale : 1);
+  const breath = breathWave * animationStyle.breathAmplitude * breathScale * (1 - walkBlend * animationStyle.walkBreathDamping);
   const walkBob = Math.abs(Math.sin(walkPhase)) * animationStyle.walkBob * stance.bobScale * walkBlend;
 
-  resolveCombatPose(fighter, appearance.guardAngleDegrees + stance.guardOffset, motion, forceEvade);
+  const droop = exhausted ? animationStyle.exhaustedDroopDegrees : 0;
+  resolveCombatPose(fighter, appearance.guardAngleDegrees + stance.guardOffset + droop, motion, forceEvade);
 
   const lean = degreesToRadians(appearance.torsoLeanDegrees + stance.lean + combatPose.leanDegrees);
   const torsoLength = height * proportions.torsoLength;

@@ -168,6 +168,9 @@ Cores compartilhadas (em `themeConfig`):
 | `hudDanger` | `#e5484d` | barra de vida abaixo de 25% |
 | `hudGhost` | `rgba(232, 236, 245, 0.3)` | parte da vida perdida há pouco (barra fantasma) |
 | `hudStamina` | `#8a94ab` | barra de Vigor |
+| `hudExhausted` | `#8c3b3e` | barra e contorno do Vigor de quem está exausto |
+| `hudWound` | `rgba(229, 72, 77, 0.8)` | marca "Braço/Perna ferida" ao lado do nome |
+| `woundShade` | `rgba(0, 0, 0, 0.32)` | sombra sobre o membro ferido |
 | `shockwaveCore` | `#eef2fb` | núcleo claro dos arcos da onda de choque da Repulsão |
 | `shockwaveDust` | `#8b8272` | poeira levantada do chão pela onda de choque |
 | `hudTrack` | `rgba(255, 255, 255, 0.08)` | fundo das barras |

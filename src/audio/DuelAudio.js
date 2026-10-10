@@ -28,6 +28,10 @@ function getSoundForEvent(event) {
       return SoundName.DEATH;
     case CombatEvent.EVADE_SUCCESS:
       return SoundName.EVADE_SUCCESS;
+    case CombatEvent.EXHAUSTION:
+      return SoundName.EXHAUSTED;
+    case CombatEvent.WOUND:
+      return SoundName.WOUND;
     case CombatEvent.DODGE:
       return SoundName.DODGE;
     case CombatEvent.ACTION_REJECTED:
@@ -42,6 +46,7 @@ function getSoundForEvent(event) {
     case CombatEvent.POWER_START:
       return event.attackType === 'barrier' ? SoundName.BARRIER : SoundName.POWER_CHARGE;
     case CombatEvent.POWER_ACTIVE:
+      if (event.attackType === 'wrath') return SoundName.WRATH;
       return event.attackType === 'pull' ? SoundName.POWER_PULL : SoundName.POWER_WAVE;
     case CombatEvent.POWER_HIT:
       return event.attackType === 'lightning' ? SoundName.LIGHTNING : SoundName.POWER_IMPACT;

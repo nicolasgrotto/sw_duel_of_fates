@@ -111,6 +111,7 @@ export const ptBR = {
         trainingHitboxes: 'Treino: hitboxes',
       },
     },
+    hud: { wounds: { arm: 'Braço ferido', leg: 'Perna ferida' } },
     duel: {
       intro: 'ROUND {number}',
       finalRound: 'ROUND FINAL',

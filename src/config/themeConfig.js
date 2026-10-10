@@ -23,6 +23,9 @@ export const colors = {
   hudDanger: '#e5484d',
   hudGhost: 'rgba(232, 236, 245, 0.3)',
   hudStamina: '#8a94ab',
+  hudExhausted: '#8c3b3e',
+  hudWound: 'rgba(229, 72, 77, 0.8)',
+  woundShade: 'rgba(0, 0, 0, 0.32)',
   shockwaveCore: '#eef2fb',
   shockwaveDust: '#8b8272',
   hudTrack: 'rgba(255, 255, 255, 0.08)',
@@ -123,6 +126,18 @@ export const textStyles = {
   hudNameRight: {
     font: `bold 18px ${FONT_FAMILY}`,
     color: colors.text,
+    align: 'right',
+    baseline: 'middle',
+  },
+  hudWoundLeft: {
+    font: `14px ${FONT_FAMILY}`,
+    color: colors.hudWound,
+    align: 'left',
+    baseline: 'middle',
+  },
+  hudWoundRight: {
+    font: `14px ${FONT_FAMILY}`,
+    color: colors.hudWound,
     align: 'right',
     baseline: 'middle',
   },

@@ -209,6 +209,10 @@ export const powersConfig = {
       healRadius: 0.6,
       healAlpha: 0.3,
       healRiseSpeed: 1.5,
+      wrathHeight: 0.55,
+      wrathRadius: 1.2,
+      wrathAlpha: [0.15, 0.3],
+      wrathFlicker: [7.3, 11.1],
     },
   },
   tiers: [

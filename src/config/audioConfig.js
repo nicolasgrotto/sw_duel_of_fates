@@ -92,6 +92,16 @@ export const audioConfig = {
       { type: 'noise', duration: 0.14, attack: 0.008, gain: 0.2, filter: { type: 'bandpass', from: 800, to: 3200, q: 2 } },
       { type: 'tone', wave: 'sine', from: 1320, to: 1560, duration: 0.16, attack: 0.004, gain: 0.05, filter: null },
     ],
+    exhausted: [
+      { type: 'noise', duration: 0.35, attack: 0.03, gain: 0.12, filter: { type: 'lowpass', from: 900, to: 260, q: 0.8 } },
+    ],
+    wound: [
+      { type: 'tone', wave: 'sawtooth', from: 120, to: 70, duration: 0.18, attack: 0.002, gain: 0.08, filter: { type: 'lowpass', from: 700, to: 300, q: 1 } },
+    ],
+    wrath: [
+      { type: 'tone', wave: 'sawtooth', from: 70, to: 140, duration: 0.5, attack: 0.05, gain: 0.07, filter: { type: 'lowpass', from: 400, to: 1200, q: 2 } },
+      { type: 'noise', duration: 0.4, attack: 0.08, gain: 0.08, filter: { type: 'bandpass', from: 300, to: 900, q: 1.5 } },
+    ],
     denied: [
       { type: 'tone', wave: 'square', from: 150, to: 110, duration: 0.08, attack: 0.002, gain: 0.07, filter: { type: 'lowpass', from: 900, to: 600, q: 1 } },
     ],

@@ -3,6 +3,7 @@ export const effectsConfig = {
   maxLights: 8,
   maxRings: 4,
   maxShockwaves: 2,
+  woundHealedLight: { radius: 60, alpha: 0.45, duration: 0.3 },
   shockwave: {
     duration: 0.3,
     arcs: 3,
@@ -52,6 +53,19 @@ export const effectsConfig = {
     streakTime: 0.02,
   },
   recipes: {
+    woundSpark: {
+      count: [4, 6],
+      speed: [120, 300],
+      life: [0.15, 0.3],
+      size: [1.5, 2.5],
+      spreadDegrees: 30,
+      upwardDegrees: -10,
+      light: null,
+      shake: null,
+      flash: null,
+      hitStop: 0,
+      slowMotion: null,
+    },
     hitSpark: {
       count: [6, 10],
       speed: [160, 380],

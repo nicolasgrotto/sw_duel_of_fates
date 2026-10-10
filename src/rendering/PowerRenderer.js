@@ -69,6 +69,11 @@ export class PowerRenderer {
       const pulse = (Math.sin(time * status.focusPulseSpeed) + 1) / 2;
       renderer.drawGlow(x, y - height * status.focusHeight, tier.glowRadius * status.focusRadius, tier.color, lerp(status.focusAlpha[0], status.focusAlpha[1], pulse));
     }
+    if (combat.wrathTime > 0) {
+      const [fast, slow] = status.wrathFlicker;
+      const flicker = (Math.sin(time * fast) + Math.sin(time * slow) + 2) / 4;
+      renderer.drawGlow(x, y - height * status.wrathHeight, tier.glowRadius * status.wrathRadius, tier.color, lerp(status.wrathAlpha[0], status.wrathAlpha[1], flicker));
+    }
     if (combat.healTime > 0) {
       const rise = (time * status.healRiseSpeed) % 1;
       renderer.drawGlow(x, y - height * lerp(status.healFrom, status.healTo, rise), tier.glowRadius * status.healRadius, tier.color, status.healAlpha * (1 - rise));

@@ -111,6 +111,7 @@ export const en = {
         trainingHitboxes: 'Training: hitboxes',
       },
     },
+    hud: { wounds: { arm: 'Wounded arm', leg: 'Wounded leg' } },
     duel: {
       intro: 'ROUND {number}',
       finalRound: 'FINAL ROUND',

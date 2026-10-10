@@ -10,6 +10,7 @@ import { ParticlePool } from './ParticlePool.js';
 export const EffectType = Object.freeze({
   HIT_SPARK: 'hitSpark',
   HEAVY_IMPACT: 'heavyImpact',
+  WOUND_SPARK: 'woundSpark',
   BLOCK_SPARK: 'blockSpark',
   GUARD_BREAK: 'guardBreak',
   SABER_CLASH: 'saberClash',
@@ -126,6 +127,12 @@ export class EffectsSystem {
     params.particleScale = 1;
 
     switch (event.type) {
+      case CombatEvent.WOUND:
+        this.spawn(EffectType.WOUND_SPARK, params);
+        break;
+      case CombatEvent.WOUND_HEALED:
+        this.spawnLight(this.config.woundHealedLight, attacker.x, attacker.y - attacker.height / 2, getTierColor(attacker));
+        break;
       case CombatEvent.EVADE_SUCCESS:
         this.evadeAfterimages.set(defender, this.config.evadeAfterimageDuration);
         this.spawnEvadeGlow(defender);

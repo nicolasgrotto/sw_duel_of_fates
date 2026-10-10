@@ -542,6 +542,8 @@ Pulo duplo: MovementSystem incrementa combat.jumpsUsed (snapshot automático) no
 
 ## Effects e Camera
 
+**Apresentação das consequências (v2.4).** `Hud` lê `combat.exhausted` (fade por `exhaustFadeRate`, pulso, contorno `hudExhausted`) e `combat.wound` (marca ao lado do nome, largura do nome em cache). `fighterPose` aprofunda a respiração e baixa a guarda do exausto; `fighterRenderer` sombreia o membro ferido. `EffectsSystem` reage a `wound` (faíscas `woundSpark`) e a `woundHealed`, que o `StatusSystem` emite quando a Cura concluída limpa o ferimento; `PowerRenderer` desenha a aura da Ira. `DuelAudio` toca `exhausted`, `wound` e `wrath`. Nada disso muda a simulação.
+
 **Onda de choque da Repulsão (v2.4).** `powerActive` da Repulsão chama `EffectsSystem.spawnShockwave` em vez do anel: um pool de `maxShockwaves` (2) guarda origem, direção, alcance (`powers.push.range`, o mesmo do gameplay) e tempo; `drawShockwaves` desenha `shockwave.arcs` arcos defasados que crescem até o alcance com abertura limitada por `halfHeight`. A poeira usa o pool de partículas. O Puxão continua com o anel.
 
 Arquivos: [src/systems/EffectsSystem.js](src/systems/EffectsSystem.js), [src/systems/ParticlePool.js](src/systems/ParticlePool.js), [src/core/Camera.js](src/core/Camera.js), [src/config/effectsConfig.js](src/config/effectsConfig.js). Catálogo e limites em [design/VFX_GUIDELINES.md](design/VFX_GUIDELINES.md).

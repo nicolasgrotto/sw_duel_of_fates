@@ -136,10 +136,10 @@ Repulsão como onda de choque (v2.4, pedido do autor): a Repulsão deixa de pare
 
 Consequências da v2.4:
 
-- **Entrada na exaustão:** sem efeito de tela. O lutador exausto respira mais fundo (respiração 2× mais ampla e um pouco mais rápida, só no render) e a lâmina pende alguns graus. Som curto `exhausted`: sopro grave descendente, baixo volume.
-- **Ferimento:** no contato que fere, o `heavy-impact` normal mais 4–6 faíscas extras saindo baixas na direção do golpe, na cor das faíscas de impacto. Sem sangue. O membro ferido fica com a cor do corpo levemente mais escura (−15% de luminosidade) até a Cura terminar. Som `wound`: o impacto forte com uma camada grave curta.
-- **Cura que limpa ferimento:** no fim da Cura, um pulso suave na cor de status da Cura sobre o membro; o escurecimento some com fade de 0,3 s.
-- **Ira:** enquanto ativa, brilho fraco e irregular na cor do tier do Fluxo em volta do tronco (sprite de glow em cache, alpha 0,15–0,3) e lâmina com núcleo um pouco mais quente. Sem partículas contínuas. Som `wrath` na ativação: tom grave crescente.
+- **Entrada na exaustão:** sem efeito de tela. O lutador exausto respira mais fundo (respiração 2× mais ampla, só no render) e a guarda pende 6°. Som curto `exhausted`: sopro grave descendente, baixo volume.
+- **Ferimento:** no contato que fere, o `heavy-impact` normal mais 4–6 faíscas extras saindo baixas na direção do golpe, na cor das faíscas de impacto. Sem sangue. O membro ferido (perna da frente ou braço da frente) recebe uma sombra `woundShade` por cima até a Cura terminar ou o round acabar. Som `wound`: o impacto forte com uma camada grave curta.
+- **Cura que limpa ferimento:** no fim da Cura, uma luz suave (0,3 s) na cor do tier do Fluxo sobre o corpo, e a sombra do membro some.
+- **Ira:** enquanto ativa, brilho fraco e irregular na cor do tier do Fluxo em volta do tronco (sprite de glow em cache, alpha 0,15–0,3) que oscila com duas frequências. Sem partículas contínuas. Som `wrath` na ativação: tom grave crescente.
 - **Esquiva automática do Foco:** reaproveita `evade-glow` e o som `evadeSuccess`, com a pose da variação 0. O medidor de Fluxo mostra o gasto.
 
 Dash aéreo (v1.13): reaproveita o estado e a pose da esquiva, as silhuetas `dodge-afterimage` e o som sintetizado de esquiva. Sem cor, rastro, anel ou shake novos; o lutador continua na cor da própria paleta e a lâmina não muda.

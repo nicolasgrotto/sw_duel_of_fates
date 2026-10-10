@@ -1,6 +1,7 @@
 import { combatRulesConfig } from '../config/combatRulesConfig.js';
 import { FighterState } from '../entities/fighterStates.js';
 import { AttackType, isSaberAttack } from './attackPhases.js';
+import { CombatEvent } from './combatEvents.js';
 
 function findOpponent(fighter, fighters) {
   for (const other of fighters) {
@@ -101,7 +102,8 @@ export class StatusSystem {
       combat.wrathDamageTakenScale = 1;
     } else if (effect === 'heal') {
       combat.healRate = 0;
-      if (reason === 'completed' && this.combat.rules.wounds) {
+      if (reason === 'completed' && this.combat.rules.wounds && combat.wound) {
+        this.combat.emitAction(CombatEvent.WOUND_HEALED, fighter, combat.wound);
         combat.wound = null;
       }
     }

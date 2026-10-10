@@ -148,6 +148,10 @@ export function drawFighterBody(renderer, fighter, pose, floorY, withShadow = tr
   }
   drawLeg(renderer, pose, pose.backKneeX, pose.backKneeY, pose.backFootX, pose.backFootY, bodyColor, legWidth);
   drawLeg(renderer, pose, pose.frontKneeX, pose.frontKneeY, pose.frontFootX, pose.frontFootY, bodyColor, legWidth);
+  const wound = overrideColor ? null : fighter.combat?.wound;
+  if (wound === 'leg') {
+    drawLeg(renderer, pose, pose.frontKneeX, pose.frontKneeY, pose.frontFootX, pose.frontFootY, colors.woundShade, legWidth);
+  }
   if (appearance.scarf) {
     drawScarf(renderer, pose, trimColor, height);
   }
@@ -157,6 +161,9 @@ export function drawFighterBody(renderer, fighter, pose, floorY, withShadow = tr
   }
   drawHead(renderer, fighter, pose, cloakColor, bodyColor, trimColor);
   drawArms(renderer, fighter, pose, cloakColor, bodyColor);
+  if (wound === 'arm') {
+    renderer.line(pose.shoulderX + 3, pose.shoulderY + 3, pose.handX, pose.handY, colors.woundShade, height * proportions.armWidth);
+  }
 
   renderer.restore();
 }
