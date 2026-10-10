@@ -24,3 +24,8 @@ it('counts duels that reach the time limit apart from double knockouts', () => {
   assert.match(output, /timeouts[ ]*: +4 /);
   assert.match(output, /double KOs: +0 /);
 });
+
+it('reports who wounded first and how long the round lasted afterwards', () => {
+  const output = execFileSync(process.execPath, ['tools/simulate.js', '--duels', '6', '--rules', 'exhaustion,wounds'], { encoding: 'utf8' });
+  assert.match(output, /first wound: rounds \d+ {2}wins \d+ {2}median after [\d.]+ s/);
+});

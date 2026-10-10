@@ -149,6 +149,7 @@ function runDuel(leftSetup, rightSetup, random, rules, maxSeconds) {
   const counts = { hits: 0, blocks: 0, clashes: 0, guardBreaks: 0, parries: 0, perfectParries: 0, shoves: 0, evades: 0, evadeAttempts: 0, jumps: 0, airJumps: 0, airDashes: 0, powers: 0, powerHits: 0, powerResisted: 0, powerAbsorbed: 0 };
 
   const hitsReceived = new Map([[left, 0], [right, 0]]);
+  let firstWound = null;
   let time = 0;
   while (time < maxSeconds && left.isAlive && right.isAlive) {
     for (let i = 0; i < fighters.length; i += 1) {
@@ -166,6 +167,7 @@ function runDuel(leftSetup, rightSetup, random, rules, maxSeconds) {
       if (fighters[i].combat.airDashUsed && !dashesBefore[i]) counts.airDashes += 1;
     }
     for (const event of simulation.events) {
+      if (event.type === CombatEvent.WOUND && !firstWound) firstWound = { attacker: event.attacker, time };
       if (event.type === CombatEvent.HIT) {
         counts.hits += 1;
         hitsReceived.set(event.defender, hitsReceived.get(event.defender) + 1);
@@ -190,7 +192,8 @@ function runDuel(leftSetup, rightSetup, random, rules, maxSeconds) {
     counts[name] = left.combat[name] + right.combat[name];
   }
   const winnerSetup = winner === left ? leftSetup : winner === right ? rightSetup : null;
-  return { winnerSide: winnerSetup?.side ?? null, ending: describeEnding(left, right), time, counts, hitsToKnockout: winner ? hitsReceived.get(winner === left ? right : left) : null };
+  const woundedFirst = firstWound ? { winnerWounded: winner === firstWound.attacker, timeAfter: time - firstWound.time } : null;
+  return { winnerSide: winnerSetup?.side ?? null, ending: describeEnding(left, right), time, counts, woundedFirst, hitsToKnockout: winner ? hitsReceived.get(winner === left ? right : left) : null };
 }
 
 function average(values) {
@@ -250,6 +253,10 @@ function main() {
     const counts = (name) => average(results.map((result) => result.counts[name])).toFixed(2);
     console.log(`avg exhaustion: spend ${counts('exhaustionSpendCount')}  block ${counts('exhaustionBlockCount')}  guardBreak ${counts('exhaustionGuardBreakCount')}  drain ${counts('exhaustionDrainCount')}`);
     console.log(`avg wounds: arm ${counts('woundArmCount')}  leg ${counts('woundLegCount')}`);
+    const wounded = results.filter((result) => result.woundedFirst);
+    const after = wounded.map((result) => result.woundedFirst.timeAfter).sort((a, b) => a - b);
+    const firstWins = wounded.filter((result) => result.woundedFirst.winnerWounded).length;
+    console.log(`first wound: rounds ${wounded.length}  wins ${firstWins}  median after ${(after[Math.floor(after.length / 2)] ?? 0).toFixed(1)} s`);
     console.log(`avg auto evades: ${counts('autoEvadeCount')}`);
     console.log(`avg wrath extra damage: ${counts('wrathExtraDamage')}`);
   }
