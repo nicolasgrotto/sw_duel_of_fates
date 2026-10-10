@@ -6,7 +6,7 @@ import { computePose, createPose, getEvadeVariant } from '../src/rendering/fight
 import { arena, combatConfig, spawnFighter } from './helpers.js';
 
 it('alternates the evade pose with the streak and shows the evading variant on success', () => {
-  const fighter = spawnFighter(500);
+  const fighter = spawnFighter(500, 1, 'shadow');
   const combat = new CombatSystem(arena, combatConfig);
   const variants = motionStyles.standard.evade;
   combat.tryEvade(fighter);

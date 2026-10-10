@@ -274,6 +274,8 @@ Processam entidades. Exemplo: `PhysicsSystem` aplica gravidade, `CombatSystem` r
 
 Desenha o estado atual seguindo as camadas de [design/VISUAL_SYSTEM.md](design/VISUAL_SYSTEM.md). Só lê dados.
 
+**Estilos de movimento (v2.3).** `fighterVisualConfig.motionStyles` define, por estilo, postura (agachamento, inclinação e deslocamento da guarda, somados em todos os estados para não haver salto nas transições), escalas de respiração, balanço e caminhada, ajustes de pose por pose de golpe (`attacks`) ou por tipo de golpe (`attackTypes`, com `from`), `followThrough`, `recoveryTwirl`, bloqueio e variações de esquiva. `fighterPose` resolve cada estilo uma vez na carga (sem objeto por frame) e escolhe pelo `appearance.motion`; sem estilo, `standard`, que reproduz a v2. O follow-through soma `(strike − windup) × followThrough × sin(π·min(2p, 1))` na recuperação e o giro soma `recoveryTwirl × ease(p)`: ambos começam em zero, então a lâmina não salta ao sair do ativo. Hitboxes e frame data não leem a pose.
+
 ### Config
 
 Todos os números de balanceamento, cores, textos e ajustes.

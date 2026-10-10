@@ -4,7 +4,7 @@ import { getAttackDuration } from '../src/combat/attackPhases.js';
 import { animation as animationStyle, combatPoses } from '../src/config/fighterVisualConfig.js';
 import { FighterState } from '../src/entities/fighterStates.js';
 import { degreesToRadians } from '../src/utils/math.js';
-import { computePose, createPose } from '../src/rendering/fighterPose.js';
+import { computePose, createPose, getMotionStyle } from '../src/rendering/fighterPose.js';
 import { AnimationSystem } from '../src/systems/AnimationSystem.js';
 import { STEP, repeat, spawnFighter } from './helpers.js';
 
@@ -128,7 +128,7 @@ describe('fighterPose in combat', () => {
   it('raises the blade back in the startup and strikes forward in the active phase', () => {
     const fighter = spawnFighter(400);
     const attack = startAttack(fighter, 'light');
-    const style = combatPoses.attacks.light;
+    const style = getMotionStyle(fighter).attacks.light;
 
     const windup = poseAt(fighter, FighterState.ATTACKING, attack.startup - 0.001);
     const strike = poseAt(fighter, FighterState.ATTACKING, attack.startup + attack.active - 0.001);
@@ -143,7 +143,7 @@ describe('fighterPose in combat', () => {
 
     const end = poseAt(fighter, FighterState.HEAVY_ATTACK, getAttackDuration(attack) - 0.0001);
 
-    assert.ok(Math.abs(end.bladeAngle - degreesToRadians(fighter.appearance.guardAngleDegrees)) < 0.1);
+    assert.ok(Math.abs(end.bladeAngle - degreesToRadians(fighter.appearance.guardAngleDegrees + getMotionStyle(fighter).stance.guardOffset)) < 0.1);
   });
 
   it('holds the blade up in front of the body while blocking', () => {

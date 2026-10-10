@@ -25,6 +25,7 @@ export const characters = {
       humFrequency: 74,
     },
     appearance: {
+      motion: 'guardian',
       cloakColor: '#6b5a48',
       bodyColor: '#2e2925',
       trimColor: '#8c7860',
@@ -145,6 +146,7 @@ export const characters = {
       humFrequency: 96,
     },
     appearance: {
+      motion: 'wasp',
       cloakColor: '#5c4a33',
       bodyColor: '#2a2219',
       trimColor: '#7a6446',

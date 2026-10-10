@@ -189,11 +189,50 @@ export const combatPoses = {
 
 export const motionStyles = {
   standard: {
+    stance: { crouch: 0, lean: 0, guardOffset: 0, breathScale: 1, swayScale: 1, bobScale: 1 },
+    followThrough: 0,
+    block: {},
     evade: [
       { lean: -22, crouch: 8, bladeOffset: 0 },
       { lean: -12, crouch: 16, bladeOffset: 18 },
       { lean: -30, crouch: 4, bladeOffset: -12 },
     ],
+    attacks: {},
+    attackTypes: {},
+  },
+  guardian: {
+    stance: { crouch: 4, lean: -1, guardOffset: -4, breathScale: 0.7, swayScale: 0.4, bobScale: 0.8 },
+    followThrough: 0.03,
+    block: { bladeDegrees: -92, reach: 0.06, crouch: 9 },
+    evade: [
+      { lean: -16, crouch: 10, bladeOffset: 0 },
+      { lean: -10, crouch: 14, bladeOffset: 8 },
+      { lean: -20, crouch: 8, bladeOffset: -6 },
+    ],
+    attacks: {
+      light: { windupDegrees: -95, strikeDegrees: 25, windupLean: -2, strikeLean: 5, windupLift: 0.06, strikeReach: 0.1 },
+      heavy: { windupDegrees: -150, strikeDegrees: 48, windupLean: -5, strikeLean: 10, windupLift: 0.12, strikeReach: 0.13 },
+      riposte: { windupDegrees: -55, strikeDegrees: 30, windupLean: -1, strikeLean: 12, windupLift: 0.03, strikeReach: 0.17 },
+    },
+    attackTypes: {},
+  },
+  wasp: {
+    stance: { crouch: 2, lean: 2, guardOffset: 6, breathScale: 1.25, swayScale: 1.6, bobScale: 1.3 },
+    followThrough: 0.12,
+    block: {},
+    evade: [
+      { lean: -26, crouch: 10, bladeOffset: 10 },
+      { lean: -8, crouch: 22, bladeOffset: -20 },
+      { lean: -34, crouch: 6, bladeOffset: 24 },
+    ],
+    attacks: {
+      light: { windupDegrees: -100, strikeDegrees: 40, windupLean: -1, strikeLean: 11, windupLift: 0.07, strikeReach: 0.1 },
+      lightReverse: { windupDegrees: 75, strikeDegrees: -85, windupLean: 6, strikeLean: 12, windupLift: 0.02, strikeReach: 0.11 },
+      heavy: { windupDegrees: -155, strikeDegrees: 60, windupLean: -4, strikeLean: 15, windupLift: 0.12, strikeReach: 0.14, recoveryTwirl: 360 },
+    },
+    attackTypes: {
+      light5: { from: 'light', strikeLean: 14, strikeReach: 0.13, recoveryTwirl: -360 },
+    },
   },
 };
 

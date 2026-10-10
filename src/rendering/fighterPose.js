@@ -54,9 +54,37 @@ function resetCombatPose(guardDegrees) {
   combatPose.bodyLift = 0;
 }
 
-function applyAttackPose(fighter, guardDegrees) {
+function resolveAttackPoses(style) {
+  const attacks = {};
+  for (const [key, pose] of Object.entries(combatPoses.attacks)) {
+    attacks[key] = { ...pose, followThrough: style.followThrough, recoveryTwirl: 0, ...style.attacks[key] };
+  }
+  const attackTypes = {};
+  for (const [key, { from, ...override }] of Object.entries(style.attackTypes)) {
+    attackTypes[key] = { ...attacks[from], ...override };
+  }
+  return { attacks, attackTypes };
+}
+
+function resolveMotionStyle(style) {
+  return { ...style, ...resolveAttackPoses(style), block: { ...combatPoses.block, ...style.block } };
+}
+
+const resolvedMotionStyles = Object.fromEntries(
+  Object.entries(motionStyles).map(([id, style]) => [id, resolveMotionStyle(style)]),
+);
+
+function getAttackStyle(motion, attack, attackType) {
+  return motion.attackTypes[attackType] ?? motion.attacks[attack.pose ?? attackType];
+}
+
+function getFollowThrough(style, progress) {
+  return (style.strikeDegrees - style.windupDegrees) * style.followThrough * Math.sin(Math.PI * clamp(progress * 2, 0, 1));
+}
+
+function applyAttackPose(fighter, guardDegrees, motion) {
   const { attack, attackType } = fighter.combat;
-  const style = combatPoses.attacks[attack.pose ?? attackType];
+  const style = getAttackStyle(motion, attack, attackType);
   const progress = getPhaseProgress(attack, fighter.stateTime);
 
   switch (getAttackPhase(attack, fighter.stateTime)) {
@@ -77,7 +105,7 @@ function applyAttackPose(fighter, guardDegrees) {
     }
     default: {
       const amount = easeInOutSine(progress);
-      combatPose.bladeDegrees = lerp(style.strikeDegrees, guardDegrees, amount);
+      combatPose.bladeDegrees = lerp(style.strikeDegrees, guardDegrees, amount) + getFollowThrough(style, progress) + style.recoveryTwirl * amount;
       combatPose.leanDegrees = lerp(style.strikeLean, 0, amount);
       combatPose.reach = lerp(style.strikeReach, 0, amount);
       break;
@@ -121,7 +149,7 @@ function applyStunnedPose(fighter) {
 }
 
 export function getMotionStyle(fighter) {
-  return motionStyles[fighter.appearance.motion] ?? motionStyles.standard;
+  return resolvedMotionStyles[fighter.appearance.motion] ?? resolvedMotionStyles.standard;
 }
 
 export function getEvadeVariant(fighter, justSucceeded = false) {
@@ -130,7 +158,7 @@ export function getEvadeVariant(fighter, justSucceeded = false) {
   return variants[index % variants.length];
 }
 
-function resolveCombatPose(fighter, guardDegrees, forceEvade = false) {
+function resolveCombatPose(fighter, guardDegrees, motion, forceEvade = false) {
   resetCombatPose(guardDegrees);
 
   if (forceEvade || (fighter.state === FighterState.DODGING && fighter.combat.evading)) {
@@ -146,14 +174,14 @@ function resolveCombatPose(fighter, guardDegrees, forceEvade = false) {
   switch (fighter.state) {
     case FighterState.ATTACKING:
     case FighterState.HEAVY_ATTACK:
-      applyAttackPose(fighter, guardDegrees);
+      applyAttackPose(fighter, guardDegrees, motion);
       break;
     case FighterState.CASTING:
     case FighterState.CHANNELING:
       applyPowerPose(fighter, guardDegrees);
       break;
     case FighterState.BLOCKING: {
-      const { block } = combatPoses;
+      const { block } = motion;
       combatPose.bladeDegrees = block.bladeDegrees;
       combatPose.reach = block.reach;
       combatPose.lift = block.lift;
@@ -224,17 +252,19 @@ function placeKnees(pose, kneeBend) {
 export function computePose(fighter, pose, forceEvade = false) {
   const { height, appearance, animation } = fighter;
   const { time, walkPhase, walkBlend, airBlend } = animation;
+  const motion = getMotionStyle(fighter);
+  const { stance } = motion;
   const breathWave = Math.sin((time * TAU) / animationStyle.breathPeriod);
-  const breath = breathWave * animationStyle.breathAmplitude * (1 - walkBlend * animationStyle.walkBreathDamping);
-  const walkBob = Math.abs(Math.sin(walkPhase)) * animationStyle.walkBob * walkBlend;
+  const breath = breathWave * animationStyle.breathAmplitude * stance.breathScale * (1 - walkBlend * animationStyle.walkBreathDamping);
+  const walkBob = Math.abs(Math.sin(walkPhase)) * animationStyle.walkBob * stance.bobScale * walkBlend;
 
-  resolveCombatPose(fighter, appearance.guardAngleDegrees, forceEvade);
+  resolveCombatPose(fighter, appearance.guardAngleDegrees + stance.guardOffset, motion, forceEvade);
 
-  const lean = degreesToRadians(appearance.torsoLeanDegrees + combatPose.leanDegrees);
+  const lean = degreesToRadians(appearance.torsoLeanDegrees + stance.lean + combatPose.leanDegrees);
   const torsoLength = height * proportions.torsoLength;
 
   pose.hipX = 0;
-  pose.hipY = -height * proportions.legLength + walkBob + combatPose.crouch;
+  pose.hipY = -height * proportions.legLength + walkBob + stance.crouch + combatPose.crouch;
   pose.shoulderX = pose.hipX + Math.sin(lean) * torsoLength;
   pose.shoulderY = pose.hipY - Math.cos(lean) * torsoLength - breath;
 
@@ -248,7 +278,7 @@ export function computePose(fighter, pose, forceEvade = false) {
 
   pose.handX = pose.shoulderX + height * (proportions.handForward + combatPose.reach);
   pose.handY = pose.hipY - height * (proportions.handHeight + combatPose.lift) - breath / 2;
-  pose.bladeAngle = degreesToRadians(combatPose.bladeDegrees + breathWave * animationStyle.saberSwayDegrees);
+  pose.bladeAngle = degreesToRadians(combatPose.bladeDegrees + breathWave * animationStyle.saberSwayDegrees * stance.swayScale);
   pose.bladeVisible = combatPose.bladeVisible && !fighter.combat.saberThrown;
   pose.bodyRotation = degreesToRadians(combatPose.bodyRotationDegrees);
   pose.bodyLift = combatPose.bodyLift;
