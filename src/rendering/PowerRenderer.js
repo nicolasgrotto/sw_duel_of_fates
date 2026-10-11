@@ -29,7 +29,7 @@ function createChannelView() {
   return {
     bolts: Array.from({ length: style.maxBolts }, () => createBolt(style.boltSegments)),
     arcs: Array.from({ length: Math.max(style.maxBolts, style.storm.shieldArcs) }, () => createBolt(style.storm.arcSegments)),
-    call: createBolt(style.storm.callSegments),
+    calls: style.storm.callSpread.map(() => createBolt(style.storm.callSegments)),
   };
 }
 
@@ -302,19 +302,24 @@ export class PowerRenderer {
 
   drawStormCall(renderer, fighter, pose, tier, phases) {
     const storm = style.storm;
-    const { call } = this.getChannelView(fighter);
+    const { calls } = this.getChannelView(fighter);
     const scaleX = fighter.facing * (pose.turnScale ?? 1);
     const handX = fighter.x + scaleX * pose.freeHandX;
     const handY = fighter.y + pose.freeHandY - pose.bodyLift;
     const rise = easeOutCubic(clamp(fighter.stateTime / phases.invocation, 0, 1));
-    this.refreshBolt(call, fighter.animation.time, storm.callJitter, 0);
-    this.tracePoints(call.points, call.offsets, handX, handY, handX, lerp(handY, storm.skyY, rise));
-    renderer.setAlpha(style.boltGlowAlpha);
-    renderer.polyline(call.points, tier.color, tier.boltWidth * style.boltGlowScale);
-    renderer.setAlpha(1);
-    renderer.polyline(call.points, tier.color, tier.boltWidth);
-    renderer.polyline(call.points, colors.saberCore, tier.boltWidth * style.coreWidthScale);
-    renderer.drawGlow(handX, handY, tier.glowRadius * rise, tier.color, tier.glowAlpha);
+    const width = tier.boltWidth * storm.callWidthScale;
+    const count = Math.min(tier.callBolts, calls.length);
+    for (let index = 0; index < count; index += 1) {
+      const call = calls[index];
+      this.refreshBolt(call, fighter.animation.time, storm.callJitter, 0);
+      this.tracePoints(call.points, call.offsets, handX, handY, handX + storm.callSpread[index] * rise, lerp(handY, storm.skyY, rise));
+      renderer.setAlpha(style.boltGlowAlpha);
+      renderer.polyline(call.points, tier.color, width * style.boltGlowScale);
+      renderer.setAlpha(1);
+      renderer.polyline(call.points, tier.color, width);
+      renderer.polyline(call.points, colors.saberCore, width * style.coreWidthScale);
+    }
+    renderer.drawGlow(handX, handY, tier.glowRadius * storm.callGlowScale * rise, tier.color, tier.glowAlpha);
   }
 
   drawStormShield(renderer, fighter, tier) {

@@ -243,3 +243,23 @@ describe('storm presentation', () => {
     ]), [SoundName.STORM_INVOKE, SoundName.STORM_CALL, SoundName.STORM_MARK, SoundName.STORM_STRIKE]);
   });
 });
+
+describe('storm invocation bolts', () => {
+  it('calls one bolt in the base tier, two in the deep tier and three at the apex, fanning to the sky', () => {
+    const counts = [];
+    for (const [level, tierIndex] of [[6, 1], [9, 2], [10, 3]]) {
+      const fighter = spawnFighter(400, 1, 'sovereign');
+      fighter.stats.flowLevel = level;
+      channel(fighter, 'storm', powersConfig.powers.storm.stormPhases.invocation * 0.95);
+      const pose = computePose(fighter, createPose());
+      const renderer = recordingRenderer();
+      new PowerRenderer().draw(renderer, [fighter], new Map([[fighter, pose]]), fighter.y);
+      const calls = renderer.calls.filter((entry) => entry.name === 'polyline' && entry.args[0].length === (powersConfig.render.storm.callSegments + 1) * 2);
+      const ends = new Set(calls.map((entry) => Math.round(entry.args[0].at(-2))));
+      counts.push(ends.size);
+      const tier = powersConfig.tiers[tierIndex];
+      assert.ok(calls.some((entry) => entry.args[2] === tier.boltWidth * powersConfig.render.storm.callWidthScale));
+    }
+    assert.deepEqual(counts, [1, 2, 3]);
+  });
+});

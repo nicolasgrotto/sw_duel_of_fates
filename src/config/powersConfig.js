@@ -198,7 +198,7 @@ export const powersConfig = {
     drain: { motes: 10, cyclesPerSecond: 1.6, wobble: 6, moteRadius: 9, moteAlpha: 0.65, lineAlpha: 0.22, lineWidth: 1.5, thinFrom: 0.7, thinAlpha: 0.35 },
     storm: {
       arcSegments: 5, arcJitter: 5, arcAlpha: 0.85, arcWidthScale: 0.55, arcGlowAlpha: 0.3, arcGlowScale: 3,
-      skyY: -60, callSegments: 12, callJitter: 18,
+      skyY: -60, callSegments: 12, callJitter: 18, callWidthScale: 2.2, callSpread: [0, -110, 110], callGlowScale: 1.4,
       shieldArcs: 6, shieldRadiusX: 0.34, shieldRadiusY: 0.56, shieldSpan: 1.1, shieldSpin: 1.3, shieldGlowScale: 0.6, shieldGlowAlpha: 0.18,
       markRadiusY: 7, markWidthScale: [1.1, 0.5], markAlpha: [0.3, 0.85], markFillAlpha: 0.2, markLineWidth: 2, columnHeight: 260, columnAlpha: 0.14,
       darkAlpha: 0.4,
@@ -265,9 +265,9 @@ export const powersConfig = {
     },
   },
   tiers: [
-    { id: 'faint', particleScale: 2 / 3, color: colors.powerTierFaint, minLevel: 1, glowRadius: 34, glowAlpha: 0.45, boltWidth: 2, particles: [4, 6], bolts: 1, branch: false, stormArcs: 2, barrierScale: 0.85, waveScale: 0.85 },
-    { id: 'steady', particleScale: 1, color: colors.powerTierSteady, minLevel: 3, glowRadius: 42, glowAlpha: 0.55, boltWidth: 2.5, particles: [6, 8], bolts: 1, branch: true, stormArcs: 2, barrierScale: 1, waveScale: 1 },
-    { id: 'deep', particleScale: 4 / 3, color: colors.powerTierDeep, minLevel: 8, glowRadius: 52, glowAlpha: 0.65, boltWidth: 3, particles: [8, 10], bolts: 2, branch: true, stormArcs: 3, barrierScale: 1.15, waveScale: 1.15 },
-    { id: 'apex', particleScale: 5 / 3, color: colors.powerTierApex, minLevel: 10, glowRadius: 64, glowAlpha: 0.75, boltWidth: 3.5, particles: [10, 12], bolts: 3, branch: true, stormArcs: 3, barrierScale: 1.3, waveScale: 1.3 },
+    { id: 'faint', particleScale: 2 / 3, color: colors.powerTierFaint, minLevel: 1, glowRadius: 34, glowAlpha: 0.45, boltWidth: 2, particles: [4, 6], bolts: 1, branch: false, stormArcs: 2, callBolts: 1, barrierScale: 0.85, waveScale: 0.85 },
+    { id: 'steady', particleScale: 1, color: colors.powerTierSteady, minLevel: 3, glowRadius: 42, glowAlpha: 0.55, boltWidth: 2.5, particles: [6, 8], bolts: 1, branch: true, stormArcs: 2, callBolts: 1, barrierScale: 1, waveScale: 1 },
+    { id: 'deep', particleScale: 4 / 3, color: colors.powerTierDeep, minLevel: 8, glowRadius: 52, glowAlpha: 0.65, boltWidth: 3, particles: [8, 10], bolts: 2, branch: true, stormArcs: 3, callBolts: 2, barrierScale: 1.15, waveScale: 1.15 },
+    { id: 'apex', particleScale: 5 / 3, color: colors.powerTierApex, minLevel: 10, glowRadius: 64, glowAlpha: 0.75, boltWidth: 3.5, particles: [10, 12], bolts: 3, branch: true, stormArcs: 3, callBolts: 3, barrierScale: 1.3, waveScale: 1.3 },
   ],
 };
