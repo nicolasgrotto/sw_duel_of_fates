@@ -1291,6 +1291,8 @@ Consequências: dano do passo 4 ou 5 interrompe a Cura antes do passo 7, então 
 
 **Alcance da lâmina arremessada (2.16/R1).** `attributesConfig.saberThrow` define base 380 px na Lâmina 4, passo de 20 px e limites 320–460 px. `applyAttributes` grava `attacks.saberThrow.throwRange` sem mutar o golpe-base; a factory do elenco e do protagonista usa a mesma derivação. `ProjectileSystem.steerSaber`, `EnemyAI.tryTechnique` e `GalleryScene.range` consomem esse campo. Saem `projectilesConfig.saber.range` e `hitbox.reach` da técnica; tempo máximo, velocidade e retorno permanecem iguais. A referência será conferida e regravada na task de testes.
 
+**Alcance dos poderes (2.16/R2).** `getPowerRange(fighter, power)` em `PowerSystem` resolve `rangeByLevel` por `resolveLevelBand`, ou devolve `power.range` sem tabela. `isInPowerRange` (também usado pela IA), `aim` e `GalleryScene.range` compartilham essa função. Puxão usa 330/380/430/480 px nos níveis mínimos 1/3/8/10; força, `endGap` e `maxSpeed` permanecem iguais. Não há capacidade extra: a regra aprovada vale em todo modo com Poderes, incluindo História e preset reference; a conferência completa e a regravação ficam para a task 3.
+
 ### Galeria de poderes (2.11)
 
 O modo gallery entra pelo menu depois de Treino, reutiliza DuelState e DuelSimulation, não tem rounds nem término por morte e repõe vida entre passos. createDuelRules força Poderes e focusEvade e desliga as outras capacidades, independentemente das preferências de combate. A lista do menu usa espaçamento de 36 px para acomodar a entrada dentro do rodapé.

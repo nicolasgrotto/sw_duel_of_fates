@@ -39,14 +39,19 @@ export function selectTechnique(fighter) {
   return fighter.stats.techniques?.[getIntentSlot(fighter)] ?? null;
 }
 
+export function getPowerRange(fighter, power) {
+  return power.rangeByLevel ? resolveLevelBand(fighter.flowLevel, power.rangeByLevel).range : power.range;
+}
+
 export function isInPowerRange(caster, target, power, airReach = powersConfig.airReach) {
+  const range = getPowerRange(caster, power);
   if (power.around) {
-    return Math.hypot(target.x - caster.x, (target.y - target.height / 2) - (caster.y - caster.height / 2)) <= power.range;
+    return Math.hypot(target.x - caster.x, (target.y - target.height / 2) - (caster.y - caster.height / 2)) <= range;
   }
   const side = Math.sign(target.x - caster.x) || caster.facing;
   const gap = Math.abs(target.x - caster.x) - (caster.width + target.width) / 2;
   const verticalReach = caster.grounded && target.grounded ? caster.height : Math.max(caster.height, airReach);
-  return side === caster.facing && gap <= power.range && Math.abs(target.y - caster.y) <= verticalReach;
+  return side === caster.facing && gap <= range && Math.abs(target.y - caster.y) <= verticalReach;
 }
 
 export class PowerSystem {
@@ -295,7 +300,7 @@ export class PowerSystem {
       combat.powerTargetY = target.y - target.height * this.config.impactHeight;
       return;
     }
-    combat.powerTargetX = caster.x + caster.facing * (caster.width / 2 + (power.range ?? 0));
+    combat.powerTargetX = caster.x + caster.facing * (caster.width / 2 + (getPowerRange(caster, power) ?? 0));
     combat.powerTargetY = caster.y - caster.height * this.config.castHeight;
   }
 

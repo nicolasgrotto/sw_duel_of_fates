@@ -45,6 +45,7 @@ export const powersConfig = {
     pull: {
       id: 'pull', effect: 'pull', channel: false, pose: 'cast', interaction: 'pull',
       cost: 40, startup: 0.24, active: 0.08, recovery: 0.3, range: 380,
+      rangeByLevel: [{ minLevel: 1, range: 330 }, { minLevel: 3, range: 380 }, { minLevel: 8, range: 430 }, { minLevel: 10, range: 480 }],
       damage: 3, endGap: 30, maxSpeed: 1100, stagger: 0.42,
       guard: { staminaCost: 12 },
     },

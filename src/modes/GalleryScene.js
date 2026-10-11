@@ -3,6 +3,7 @@ import { characters } from '../characters/characterData.js';
 import { resolvePowerStats } from '../characters/powers.js';
 import { galleryConfig } from '../config/galleryConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
+import { getPowerRange } from '../combat/PowerSystem.js';
 import { GalleryController } from '../controllers/GalleryController.js';
 import { GalleryTargetController } from '../controllers/GalleryTargetController.js';
 
@@ -53,7 +54,7 @@ export class GalleryScene {
   get range() {
     const { item } = this.director;
     const move = this.fighters[0].moves[item.id];
-    return item.kind === 'power' ? item.data.range ?? 0 : move.throwRange ?? move.hitbox.reach;
+    return item.kind === 'power' ? getPowerRange(this.fighters[0], item.data) ?? 0 : move.throwRange ?? move.hitbox.reach;
   }
 
   get gap() {
