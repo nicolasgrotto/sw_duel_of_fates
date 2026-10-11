@@ -777,18 +777,18 @@ export class DuelState extends GameState {
     if (this.gallery) {
       const item = this.gallery.item;
       const { combat, stateTime } = this.player;
-      const phase = combat.attack ? getAttackPhase(combat.attack, stateTime) : combat.power
+      const phase = combat.stormPhase ?? (combat.attack ? getAttackPhase(combat.attack, stateTime) : combat.power
         ? stateTime < combat.power.startup ? 'startup' : combat.power.channel
           ? combat.powerEndTime > 0 ? 'recovery' : 'channel'
           : stateTime < combat.power.startup + combat.power.active ? 'active' : 'recovery'
-        : this.gallery.phase;
+        : this.gallery.phase);
       const cost = item.kind === 'power' ? this.simulation.combat.powers.getCost(this.player, item.data) : this.player.moves[item.id].staminaCost;
       return [
         `gallery: ${item.id}  phase: ${phase}  cycle: ${this.gallery.phase}  caster: ${this.player.id}  target: ${this.gallery.selection.target}`,
         `level: ${this.gallery.level}  potency: ${this.player.stats.power.potency.toFixed(2)}  range: ${this.galleryScene.range}  cost: ${cost}`,
         `state: ${this.player.state} ${this.player.stateTime.toFixed(2)}s  projectiles: ${this.simulation.projectiles.activeCount}`,
         `events: ${this.gallery.lastEvents || '-'}`,
-        ...this.fighters.map((fighter) => `${fighter.id}: ${fighter.state}  pos ${fighter.x.toFixed(0)},${fighter.y.toFixed(0)}  vel ${fighter.vx.toFixed(0)},${fighter.vy.toFixed(0)}`),
+        ...this.fighters.map((fighter) => `${fighter.id}: ${fighter.state}  pos ${fighter.x.toFixed(0)},${fighter.y.toFixed(0)}  vel ${fighter.vx.toFixed(0)},${fighter.vy.toFixed(0)}  absorb ${fighter.combat.absorbTime.toFixed(2)}  confuse ${fighter.combat.confuseTime.toFixed(2)}  storm ${fighter.combat.stormPhase ?? '-'}  marks ${fighter.combat.stormMarks.filter(mark => mark.active).length}`),
       ];
     }
     const lines = [
@@ -806,6 +806,7 @@ export class DuelState extends GameState {
         `${fighter.id}: ${fighter.state}  hp ${fighter.health.toFixed(0)}  st ${fighter.stamina.toFixed(0)}  flow ${this.rules.powers ? fighter.flowMeter.toFixed(0) : 'off'}`,
         `  ratings ${Object.values(fighter.stats.attributes).join("/")}  flow ${fighter.flowLevel}`,
         `  power ${fighter.combat.power?.id ?? '-'}  absorb ${fighter.combat.absorbTime.toFixed(2)}`,
+        `  confuse ${fighter.combat.confuseTime.toFixed(2)}  storm ${fighter.combat.stormPhase ?? '-'}  marks ${fighter.combat.stormMarks.filter(mark => mark.active).length}`,
         `  exhaustion ${fighter.combat.exhausted} ${fighter.combat.exhaustionTime.toFixed(2)}s cause ${fighter.combat.exhaustionCause ?? '-'}`,
         `  wound ${fighter.combat.wound ?? '-'} quota ${fighter.combat.woundUsed ? 'used' : 'ready'}`,
         `  heal ${fighter.combat.healTime.toFixed(2)} ${fighter.combat.healEnd ?? '-'} focus ${fighter.combat.focusTime.toFixed(2)} ${fighter.combat.focusEnd ?? '-'}`,
