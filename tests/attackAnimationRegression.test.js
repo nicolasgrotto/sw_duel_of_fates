@@ -170,8 +170,7 @@ describe('keyframe blade geometry and chain continuity', () => {
       const destinations = [...from.cancelsInto, 'heavy', 'forwardHeavy'];
       for (const toId of destinations) {
         for (const facing of [-1, 1]) {
-          const knownDefect = id === 'wasp' && fromId === 'light5' && !from.cancelsInto.includes(toId);
-          it(`${id}/${fromId} → ${toId}/${facing}: changes at most 60 degrees per 60 Hz transition frame`, { todo: knownDefect ? '2.12: pending Claude correction of the light5 to buffered heavy angle discontinuity' : false }, () => {
+          it(`${id}/${fromId} → ${toId}/${facing}: changes at most 60 degrees per 60 Hz transition frame`, () => {
             const fighter = spawnFighter(500, facing, id);
             const cancel = from.cancelsInto.includes(toId);
             if (!cancel) {

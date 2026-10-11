@@ -397,6 +397,10 @@ function isAttacking(fighter) {
   return (fighter.state === FighterState.ATTACKING || fighter.state === FighterState.HEAVY_ATTACK) && fighter.combat.attack !== null;
 }
 
+function nearestDegrees(origin, target) {
+  return target + ((((origin - target) % 360) + 540) % 360) - 180;
+}
+
 function blendChainedAttack(pose, fighter, motion) {
   const { chain } = pose;
   const attack = isAttacking(fighter) ? fighter.combat.attack : null;
@@ -416,7 +420,8 @@ function blendChainedAttack(pose, fighter, motion) {
       const eased = easeOutQuad(clamp(amount, 0, 1));
       for (let index = 0; index < TRACK_CHANNELS.length; index += 1) {
         const channel = TRACK_CHANNELS[index];
-        combatPose[channel] = lerp(chain.origin[index], combatPose[channel], eased);
+        const origin = channel === 'bladeDegrees' ? nearestDegrees(chain.origin[index], combatPose[channel]) : chain.origin[index];
+        combatPose[channel] = lerp(origin, combatPose[channel], eased);
       }
     }
   }
