@@ -446,6 +446,7 @@ export const aiConfig = {
     selfPowerUse: {
       heal: { stat: 'health', max: 'maxHealth', below: 0.6, minGap: 180, active: 'healTime' },
       focus: { stat: 'stamina', max: 'maxStamina', below: 0.55, minGap: 140, active: 'focusTime' },
+      sanctuary: { stat: 'health', max: 'maxHealth', below: 1, minGap: 140, active: 'sanctuaryTime' },
       wrath: { minGap: 140, active: 'wrathTime' },
     },
     feintAt: 0.45,

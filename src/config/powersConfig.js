@@ -22,13 +22,18 @@ export const powersConfig = {
   airReach: 320,
   categories: {
     flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull', 'throw', 'mindTwist', 'supremePush'] },
-    aurora: { alignments: ['light'], abilities: ['barrier', 'heal', 'focus', 'absorb'] },
+    aurora: { alignments: ['light'], abilities: ['barrier', 'heal', 'focus', 'absorb', 'sanctuary'] },
     eclipse: { alignments: ['dark'], abilities: ['lightning', 'choke', 'freeze', 'storm', 'wrath', 'drain'] },
     blade: { alignments: ['light', 'dark'], abilities: ['spin', 'dashSlash', 'saberThrow'] },
   },
   powers: {
+    sanctuary: {
+      id: 'sanctuary', effect: 'sanctuary', channel: false, pose: 'barrier', self: true,
+      cost: 65, startup: 0.3, active: 0.08, recovery: 0.3, duration: 6, shield: 30, controlCost: 10,
+      hudMark: 'powerCostSanctuary',
+    },
     mindTwist: {
-      id: 'mindTwist', effect: 'mindTwist', channel: false, pose: 'cast', interaction: 'mindTwist',
+      id: 'mindTwist', effect: 'mindTwist', control: true, channel: false, pose: 'cast', interaction: 'mindTwist',
       cost: 30, startup: 0.3, active: 0.08, recovery: 0.35, range: 320, duration: 0.8,
     },
     drain: {
@@ -79,13 +84,13 @@ export const powersConfig = {
       guard: { staminaCost: 10 },
     },
     choke: {
-      id: 'choke', effect: 'choke', channel: true, requiresHold: true, boundChannel: true, pose: 'cast', interaction: 'choke',
+      id: 'choke', effect: 'choke', control: true, channel: true, requiresHold: true, boundChannel: true, pose: 'cast', interaction: 'choke',
       cost: 45, drainPerSecond: 20, startup: 0.3, maxChannel: 1.8, recovery: 0.25, range: 240,
       damage: 2, damagePerSecond: 2,
       guard: { staminaCost: 14 },
     },
     freeze: {
-      id: 'freeze', effect: 'freeze', channel: false, pose: 'cast', interaction: 'freeze',
+      id: 'freeze', effect: 'freeze', control: true, channel: false, pose: 'cast', interaction: 'freeze',
       cost: 40, startup: 0.28, active: 0.08, recovery: 0.36, range: 340,
       damage: 0, duration: 1.1,
       guard: { staminaCost: 12 },

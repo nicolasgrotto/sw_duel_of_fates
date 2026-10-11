@@ -268,6 +268,7 @@ export class PowerSystem {
       this.combat.emit(CombatEvent.POWER_RESISTED, this.combat.createPowerContact(caster, target, power, 0));
       return;
     }
+    if (this.combat.statuses.blockShieldControl(caster, target, power)) return;
     const { context } = this;
     context.caster = caster;
     context.target = target;

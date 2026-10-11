@@ -32,8 +32,8 @@ function push(context) {
     applyGuarded(context);
     return;
   }
-  target.vx = knockback;
   if (combat.dealPowerDamage(caster, target, power, power.damage * scale, CombatEvent.POWER_HIT)) {
+    target.vx = knockback;
     interrupt(target, FighterState.STAGGERED, getStagger(context));
   }
 }
@@ -47,8 +47,8 @@ function pull(context) {
     applyGuarded(context);
     return;
   }
-  target.vx = -caster.facing * speed;
   if (combat.dealPowerDamage(caster, target, power, power.damage * scale, CombatEvent.POWER_HIT)) {
+    target.vx = -caster.facing * speed;
     interrupt(target, FighterState.STAGGERED, getStagger(context));
   }
 }
@@ -60,8 +60,8 @@ function lightning(context) {
     applyGuarded(context);
     return;
   }
-  target.vx = caster.facing * power.knockback * scale * interaction.knockback;
   if (combat.dealPowerDamage(caster, target, power, power.damage * scale, CombatEvent.POWER_HIT)) {
+    target.vx = caster.facing * power.knockback * scale * interaction.knockback;
     interrupt(target, FighterState.HIT, power.stun * interaction.duration * air.duration * context.remainder);
   }
 }
@@ -74,8 +74,8 @@ function throwImpact(context) {
     applyGuarded(context, projectile.damage);
     return;
   }
-  target.vx = knockback;
   if (combat.dealPowerDamage(caster, target, power, projectile.damage * scale, CombatEvent.POWER_HIT)) {
+    target.vx = knockback;
     interrupt(target, FighterState.STAGGERED, projectile.stagger * Math.min(1, scale / context.remainder) * interaction.stagger * air.stagger * context.remainder);
   }
 }
@@ -176,5 +176,10 @@ export const powerEffects = Object.freeze({
   freeze: { active: freeze },
   heal: { self: heal },
   focus: { self: focus },
+  sanctuary: { self: ({ combat, caster, power, scale }) => {
+    combat.statuses.start(caster, 'sanctuary', power.duration);
+    caster.combat.sanctuaryShield = power.shield * scale;
+    caster.combat.statusLevel = caster.flowLevel;
+  } },
   wrath: { self: wrath },
 });

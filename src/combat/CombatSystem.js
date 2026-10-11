@@ -695,6 +695,7 @@ export class CombatSystem {
   applyDamage(contact, amount, source, eventType = null) {
     const { attacker, defender } = contact;
     amount = this.getDamageAmount(contact, amount, source);
+    amount = this.statuses.absorbShieldDamage(contact, amount);
     contact.damage = Math.min(defender.health, amount);
     if ((source === 'blade' || source === 'power') && attacker?.combat.wrathTime > 0) {
       const withoutWrath = Math.min(defender.health, amount / attacker.combat.wrathDamageDealtScale);
@@ -717,7 +718,7 @@ export class CombatSystem {
       this.knockOut(defender, contact);
       return false;
     }
-    return true;
+    return !contact.sanctuaryProtected;
   }
 
   getDamageAmount(contact, amount, source) {
@@ -747,7 +748,7 @@ export class CombatSystem {
     attacker.stamina = Math.min(attacker.stats.maxStamina, attacker.stamina + attacker.stats.staminaOnHit);
     this.powers.onHit(attacker, defender);
     this.applyWound(contact);
-    if (!armored && !contact.wrathArmored) {
+    if (!armored && !contact.wrathArmored && !contact.sanctuaryProtected) {
       defender.vx = attacker.facing * attack.knockback * attacker.stats.knockbackScale;
       defender.clearAttack();
     }

@@ -314,6 +314,7 @@ export const ptBR = {
     powers: {
       absorb: 'Absorção',
       drain: 'Dreno',
+      sanctuary: 'Santuário',
       supremePush: 'Repulsão Suprema',
       mindTwist: 'Truque Mental',
       storm: 'Tempestade',

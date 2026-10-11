@@ -26,7 +26,7 @@ export function isNeutralForFocus(fighter) {
 
 export function hasStatus(fighter) {
   const { combat } = fighter;
-  return combat.chokeTime > 0 || combat.freezeTime > 0 || combat.focusTime > 0 || combat.healTime > 0 || combat.wrathTime > 0 || combat.confuseTime > 0;
+  return combat.chokeTime > 0 || combat.freezeTime > 0 || combat.focusTime > 0 || combat.healTime > 0 || combat.wrathTime > 0 || combat.confuseTime > 0 || combat.sanctuaryTime > 0;
 }
 
 export class StatusSystem {
@@ -44,6 +44,7 @@ export class StatusSystem {
       this.advance(fighter, 'focus', dt);
       this.checkFocusResource(fighter);
       this.advance(fighter, 'wrath', dt);
+      this.advance(fighter, 'sanctuary', dt);
       combat.freezeTime = Math.max(0, combat.freezeTime - dt);
       if (combat.confuseTime > 0) {
         combat.confuseElapsed += Math.min(dt, combat.confuseTime);
@@ -100,7 +101,10 @@ export class StatusSystem {
     }
     combat[`${effect}Time`] = 0;
     combat[`${effect}End`] = reason;
-    if (effect === 'focus') {
+    if (effect === 'sanctuary') {
+      combat.sanctuaryShield = 0;
+      if (reason === 'completed') this.combat.emitAction(CombatEvent.SANCTUARY_END, fighter, effect);
+    } else if (effect === 'focus') {
       combat.focusScale = 1;
     } else if (effect === 'wrath') {
       combat.wrathArmorHits = 0;
@@ -154,6 +158,29 @@ export class StatusSystem {
     }
   }
 
+  absorbShieldDamage(contact, amount) {
+    const { defender } = contact;
+    const { combat } = defender;
+    contact.sanctuaryProtected = false;
+    if (combat.sanctuaryShield <= 0) return amount;
+    const absorbed = Math.min(amount, combat.sanctuaryShield);
+    combat.sanctuaryShield -= absorbed;
+    contact.sanctuaryProtected = combat.sanctuaryShield > 0;
+    if (combat.sanctuaryShield === 0) {
+      this.end(defender, 'sanctuary', 'broken');
+      this.combat.emit(CombatEvent.SANCTUARY_BREAK, contact);
+    }
+    return amount - absorbed;
+  }
+
+  blockShieldControl(caster, target, power) {
+    if (!power.control || target.combat.sanctuaryShield <= 0) return false;
+    const contact = this.combat.createPowerContact(caster, target, power, 0);
+    this.absorbShieldDamage(contact, this.combat.powers.config.powers.sanctuary.controlCost);
+    this.combat.emit(CombatEvent.POWER_ABSORBED, contact);
+    return true;
+  }
+
   hasWrathArmor(contact) {
     const { defender, attack, attackType, armored } = contact;
     return !armored && !attack.projectile && isSaberAttack(attackType)
@@ -189,5 +216,6 @@ export class StatusSystem {
     this.end(fighter, 'heal', 'death');
     this.end(fighter, 'focus', 'death');
     this.end(fighter, 'wrath', 'death');
+    this.end(fighter, 'sanctuary', 'death');
   }
 }
