@@ -1,5 +1,6 @@
 import { AttackPhase, AttackType, getAttackDuration, getAttackPhase, isHeavyAttack } from '../combat/attackPhases.js';
 import { isBarrierUp, isChannelOpen, isInPowerRange, isUsingPower } from '../combat/PowerSystem.js';
+import { isStormShieldUp } from '../combat/StormSystem.js';
 import { getFlowDifference, resolveInteraction, resolveLevelBand } from '../combat/flowInteractions.js';
 import { projectilesConfig } from '../config/projectilesConfig.js';
 import { evadeConfig } from '../config/evadeConfig.js';
@@ -10,7 +11,7 @@ import { FighterState } from '../entities/fighterStates.js';
 import { canAfford, getStaminaCost } from '../systems/StaminaSystem.js';
 import { getMaxJumps } from '../systems/MovementSystem.js';
 import { HabitMemory } from './HabitMemory.js';
-import { canReach, findIncomingProjectile, getAttackReach, getDirectionTo, getGap, getVulnerableTime, getTimeUntilAttackActive, isPunishable, isThreatening } from './perception.js';
+import { canReach, findIncomingProjectile, findStormThreat, getAttackReach, getDirectionTo, getGap, getVulnerableTime, getTimeUntilAttackActive, isPunishable, isThreatening } from './perception.js';
 
 export const AiDecision = Object.freeze({
   BUSY: 'busy',
@@ -271,6 +272,8 @@ export class EnemyAI {
       this.plan.parryDelay = -1;
       return AiDecision.WAIT;
     }
+    const stormAnswer = this.tryEscapeStorm();
+    if (stormAnswer) return stormAnswer;
     if (this.powersEnabled && this.difficulty.powerAware && isChannelOpen(self)
       && self.combat.power.effect === 'lightning' && opponent.combat.absorbTime > 0) {
       this.plan.powerHoldTime = 0;
@@ -515,6 +518,8 @@ export class EnemyAI {
   }
 
   isPowerBlocked(power) {
+    if (this.difficulty.powerAware && isStormShieldUp(this.opponent)) return true;
+    if (power.stormPhases) return false;
     if (this.difficulty.powerAware && isBarrierUp(this.opponent)) return true;
     if (power.effect === 'lightning' && this.difficulty.powerAware && this.opponent.combat.absorbTime > 0) return true;
     if (this.opponent.state !== FighterState.BLOCKING) {
@@ -529,7 +534,7 @@ export class EnemyAI {
 
   canUsePower(power) {
     const { self } = this;
-    const reserve = power.channel ? power.drainPerSecond * this.perception.powerChannelReserve : 0;
+    const reserve = power.channel ? (power.drainPerSecond ?? 0) * this.perception.powerChannelReserve : 0;
     return self.flowLevel >= (power.minFlowLevel ?? 0) && self.combat.powerCooldown === 0 && self.flowMeter >= this.getPowerCost(power) + reserve;
   }
 
@@ -556,6 +561,7 @@ export class EnemyAI {
     const gap = getGap(this.self, this.opponent);
     return Boolean(use) && gap >= use.minGap && gap <= use.maxGap && !this.isPowerBlocked(power)
       && (use.targetMeterAbove === undefined || this.opponent.flowMeter > use.targetMeterAbove)
+      && (!use.avoidPressure || !isThreatening(this.opponent, this.self, this.perception.threatMargin))
       && isInPowerRange(this.self, this.opponent, power) && this.getPowerScale(power) > 0;
   }
 
@@ -574,7 +580,7 @@ export class EnemyAI {
       const power = loadout[slot];
       if (power && power.effect !== 'barrier' && this.canUsePower(power) && (power.self ? this.wantsSelfPower(power) : this.wantsPower(power))) {
         const [minHold, maxHold] = this.perception.lightningHold;
-        return this.startPower(slot, power.channel ? minHold + (maxHold - minHold) * this.random() : 0);
+        return this.startPower(slot, power.channel && !power.automatic ? minHold + (maxHold - minHold) * this.random() : 0);
       }
     }
     return null;
@@ -632,6 +638,7 @@ export class EnemyAI {
     if (!this.powersEnabled || !isUsingPower(opponent)) {
       return null;
     }
+    if (opponent.combat.power.stormPhases) return this.tryEscapeStorm();
     for (const slot of POWER_SLOTS) {
       const reaction = self.stats.power.loadout?.[slot];
       if (reaction?.effect === 'absorb' && this.canUsePower(reaction) && this.wantsSelfPower(reaction)
@@ -657,6 +664,26 @@ export class EnemyAI {
     this.plan.blockTime = remaining + this.perception.blockHoldTime;
     this.plan.punishAfterBlock = false;
     return AiDecision.BLOCK;
+  }
+
+  tryEscapeStorm() {
+    if (!this.powersEnabled || !this.self.canMove && this.self.state !== FighterState.BLOCKING) return null;
+    const margin = this.perception.stormEscapeMargin;
+    const mark = findStormThreat(this.self, this.opponent, this.difficulty.reactionTime, margin);
+    if (!mark) return null;
+    let direction = Math.sign(this.self.x - mark.x) || -getDirectionTo(this.self, this.opponent);
+    const clearance = this.opponent.combat.power.strikeWidth / 2 + this.self.width / 2 + margin;
+    if (this.arena && (direction < 0 && mark.x - clearance < this.arena.left + this.self.width / 2
+      || direction > 0 && mark.x + clearance > this.arena.right - this.self.width / 2)) direction = -direction;
+    const distance = clearance - Math.abs(this.self.x - mark.x);
+    const time = mark.impactTime - this.opponent.stateTime;
+    this.plan.blockTime = 0;
+    this.plan.moveX = direction;
+    if (distance > this.self.stats.movement.walkSpeed * time && this.canSpend(this.self.stats.dodge.staminaCost, null, 'dash')) {
+      this.plan.pendingAction = PendingAction.DODGE;
+      return AiDecision.DODGE;
+    }
+    return AiDecision.BACK_OFF;
   }
 
   getProjectileTravelTime(power) {

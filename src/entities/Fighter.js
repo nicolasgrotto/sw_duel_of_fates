@@ -84,6 +84,10 @@ function createCombat() {
     statusLevel: 0,
     confuseTime: 0,
     confuseElapsed: 0,
+    stormPhase: null,
+    stormMarks: [],
+    stormNextStrike: 0,
+    stormTarget: -1,
     chokeTime: 0,
     chokeDamageRate: 0,
     freezeTime: 0,
@@ -218,6 +222,10 @@ export class Fighter {
 
   clearPower() {
     this.combat.absorbTime = 0;
+    this.combat.stormPhase = null;
+    this.combat.stormMarks.length = 0;
+    this.combat.stormNextStrike = 0;
+    this.combat.stormTarget = -1;
     this.combat.power = null;
     this.combat.powerEndTime = 0;
     this.combat.powerTick = 0;

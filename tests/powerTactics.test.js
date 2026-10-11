@@ -64,12 +64,12 @@ describe('AI ability coverage', () => {
     });
   }
 
-  for (const id of ['push', 'pull', 'lightning', 'throw', 'choke', 'freeze', 'storm']) {
+  for (const id of ['push', 'pull', 'lightning', 'throw', 'choke', 'freeze']) {
     it(`guards against incoming ${id} and avoids an unblockable band`, () => {
       const { self, opponent, ai } = setup(60);
       casting(opponent, powersConfig.powers[id]);
       assert.equal(ai.tryDefendPower(), AiDecision.BLOCK);
-      if (['push', 'choke', 'freeze', 'storm'].includes(id)) {
+      if (['push', 'choke', 'freeze'].includes(id)) {
         opponent.stats.flowLevel = 10;
         ai.plan.blockTime = 0;
         assert.equal(ai.tryDefendPower(), AiDecision.DODGE);

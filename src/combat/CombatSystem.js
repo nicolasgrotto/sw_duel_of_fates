@@ -13,6 +13,7 @@ import { PowerSystem, isBarrierUp, selectTechnique } from './PowerSystem.js';
 import { ProjectileSystem } from './ProjectileSystem.js';
 import { StatusSystem } from './StatusSystem.js';
 import { projectilesConfig } from '../config/projectilesConfig.js';
+import { isStormShieldUp } from './StormSystem.js';
 
 const PUNISHED_STATES = new Set([FighterState.STAGGERED, FighterState.STUNNED]);
 
@@ -544,6 +545,10 @@ export class CombatSystem {
       defender.vx = 0;
       defender.setState(FighterState.IDLE);
       this.emit(CombatEvent.EVADE_SUCCESS, contact);
+      return;
+    }
+    if (isStormShieldUp(contact.defender)) {
+      this.emit(CombatEvent.POWER_ABSORBED, contact);
       return;
     }
     if (this.statuses.tryAutoEvade(contact)) {

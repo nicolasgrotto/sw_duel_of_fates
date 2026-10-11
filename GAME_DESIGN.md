@@ -762,7 +762,7 @@ Especificação aprovada pelo autor. Números marcados como **inicial** são pon
 - **Tempestade** (Eclipse, reformulada, custo alto, continua exigindo Fluxo 6):
   1. **Invocação** (~0,5 s): o braço sobe e um raio vai ao céu; a arena escurece. É a **única janela de interrupção**.
   2. **Escudo de raios**: logo depois da invocação, arcos envolvem quem lança, que fica parado canalizando e não sofre lâmina nem poder até o encerramento.
-  3. **Tempestade** (~4 s): raios caem perto da posição do oponente, cada um marcado no chão cerca de 0,5 s antes (8, 10 e 12 raios por tier, inicial). Sem fogo amigo. **A guarda não bloqueia e a Absorção não absorve.** A esquiva com invulnerabilidade passa. A **Barreira** segura, mas cada raio absorvido drena muito medidor (30, inicial), e ela cai quando o medidor acaba.
+  3. **Tempestade** (~5 s, decisão do autor na implementação da 2.17): impactos igualmente de 0,5 até 5 s, com marcas 0,5 s antes; raios caem perto da posição do oponente, cada um marcado no chão cerca de 0,5 s antes (8, 10 e 12 raios por tier, inicial). Sem fogo amigo. **A guarda não bloqueia e a Absorção não absorve.** A esquiva com invulnerabilidade passa. A **Barreira** segura, mas cada raio absorvido drena muito medidor (30, inicial), e ela cai quando o medidor acaba.
   4. **Encerramento** (~0,8 s): o escudo some, o céu volta ao normal e quem lançou fica vulnerável (janela de punição).
   Dano por raio moderado: quem se move bem sofre pouco; quem fica parado perde cerca de 35–40% da vida (alvo de calibração). A IA lê as marcas para fugir.
 

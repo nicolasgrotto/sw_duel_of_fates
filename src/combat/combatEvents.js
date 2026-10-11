@@ -27,6 +27,8 @@ export const CombatEvent = Object.freeze({
   POWER_BLOCKED: 'powerBlocked',
   POWER_RESISTED: 'powerResisted',
   POWER_ABSORBED: 'powerAbsorbed',
+  STORM_MARK: 'stormMark',
+  STORM_STRIKE: 'stormStrike',
 });
 
 const CONTACT_EVENTS = new Set([
@@ -45,7 +47,7 @@ export function isContactEvent(event) {
   return CONTACT_EVENTS.has(event.type);
 }
 
-export function createCombatEvent(type, { attacker, defender, attackType, x, y, armored = false, damage = 0, auto }) {
+export function createCombatEvent(type, { attacker, defender, attackType, x, y, armored = false, damage = 0, auto, impactTime, hit }) {
   const event = {
     type,
     attacker,
@@ -59,5 +61,7 @@ export function createCombatEvent(type, { attacker, defender, attackType, x, y, 
   if (auto !== undefined) {
     event.auto = auto;
   }
+  if (impactTime !== undefined) event.impactTime = impactTime;
+  if (hit !== undefined) event.hit = hit;
   return event;
 }

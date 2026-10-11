@@ -6,6 +6,7 @@ import { powerEffects } from './powerEffects.js';
 import { getFlowDifference, resolveInteraction, resolveLevelBand } from './flowInteractions.js';
 import { projectilesConfig } from '../config/projectilesConfig.js';
 import { getMoveX } from '../entities/fighterIntent.js';
+import { isStormShieldUp, StormSystem } from './StormSystem.js';
 
 const POWER_STATES = new Set([FighterState.CASTING, FighterState.CHANNELING]);
 const GROUNDED = Object.freeze({ scale: 1, duration: 1, stagger: 1 });
@@ -61,6 +62,7 @@ export class PowerSystem {
     this.config = config;
     this.enabled = enabled;
     this.friction = friction;
+    this.storms = new StormSystem(this);
     this.context = { system: this, combat, caster: null, target: null, power: null, interaction: null, air: GROUNDED, scale: 1, remainder: 1, guarded: false, projectile: null };
   }
 
@@ -119,6 +121,7 @@ export class PowerSystem {
     fighter.clearAttack();
     fighter.combat.power = power;
     fighter.restartState(power.channel ? FighterState.CHANNELING : FighterState.CASTING);
+    if (power.stormPhases) this.storms.start(fighter);
     this.aim(fighter, null, power);
     this.combat.emitAction(CombatEvent.POWER_START, fighter, power.id);
     return true;
@@ -138,7 +141,9 @@ export class PowerSystem {
         continue;
       }
       const target = this.findOpponent(caster, fighters);
-      if (caster.combat.power.channel) {
+      if (caster.combat.power.stormPhases) {
+        this.storms.update(caster, target, fighters);
+      } else if (caster.combat.power.channel) {
         this.updateChannel(caster, target, dt);
       } else {
         this.updateInstant(caster, target);
@@ -228,7 +233,15 @@ export class PowerSystem {
     if (isInvulnerable(target)) {
       return;
     }
+    if (isStormShieldUp(target)) {
+      this.combat.emit(CombatEvent.POWER_ABSORBED, this.combat.createPowerContact(caster, target, power, 0));
+      return;
+    }
     if (isBarrierUp(target)) {
+      if (power.stormPhases) {
+        target.flowMeter = Math.max(0, target.flowMeter - power.barrierDrainPerStrike);
+        if (target.flowMeter === 0) target.combat.powerEndTime = target.stateTime;
+      }
       this.barrierBlock(caster, target, power);
       return;
     }
@@ -248,7 +261,7 @@ export class PowerSystem {
     context.air = target.grounded ? GROUNDED : table.air;
     context.remainder = remainder;
     context.scale = interaction.scale * caster.stats.power.potency * context.air.scale * remainder;
-    context.guarded = interaction.blockable && isGuardingAgainst(target, caster);
+    context.guarded = !power.stormPhases && interaction.blockable && isGuardingAgainst(target, caster);
     context.projectile = projectile;
     powerEffects[power.effect][phase](context);
   }

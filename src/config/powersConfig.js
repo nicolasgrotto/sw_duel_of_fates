@@ -12,6 +12,7 @@ const RESISTED_BAND = { atLeast: -Infinity, outcome: PowerOutcome.RESISTED, scal
 const STRIKE_GUARD = { guardDamage: 0, guardSlide: 0.5 };
 const CHANNEL_GUARD = { guardDamage: 0.25, guardSlide: 0.5 };
 const SELF_BUFF_PHASES = { active: 0.08, recovery: 0.3 };
+const STORM_PHASES = { invocation: 0.5, storm: 5, recovery: 0.8 };
 
 export const powersConfig = {
   modes: ['versus', 'local', 'training'],
@@ -41,9 +42,11 @@ export const powersConfig = {
       absorbGain: 0.5,
     },
     storm: {
-      id: 'storm', effect: 'storm', channel: true, pose: 'channel', interaction: 'storm', around: true,
-      minFlowLevel: 6, cost: 20, drainPerSecond: 25, startup: 0.35, maxChannel: 1.2, recovery: 0.4,
-      range: 240, tickInterval: 0.2, damage: 8, intensity: 1, guard: { staminaCost: 6 },
+      id: 'storm', effect: 'storm', channel: true, automatic: true, pose: 'channel', interaction: 'storm', around: true,
+      minFlowLevel: 6, cost: 70, startup: STORM_PHASES.invocation, maxChannel: STORM_PHASES.storm, recovery: STORM_PHASES.recovery,
+      stormPhases: STORM_PHASES, range: 600, damage: 6, stun: 0.12, strikeWarning: 0.5, strikeWidth: 60, barrierDrainPerStrike: 30,
+      strikesByTier: [{ minLevel: 3, strikes: 8 }, { minLevel: 8, strikes: 10 }, { minLevel: 10, strikes: 12 }],
+      strikeOffsets: [0, -24, 18, -12, 30, -30, 12, -18, 24, 0, -6, 6], hudMark: 'powerCostStorm',
     },
     push: {
       id: 'push', effect: 'push', channel: false, pose: 'cast', interaction: 'push',

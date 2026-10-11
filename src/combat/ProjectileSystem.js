@@ -4,6 +4,7 @@ import { CombatEvent } from './combatEvents.js';
 import { resolveLevelBand } from './flowInteractions.js';
 import { boxesOverlap, createBox, getHurtbox, isInvulnerable } from './hitboxes.js';
 import { isBarrierUp } from './PowerSystem.js';
+import { isStormShieldUp } from './StormSystem.js';
 
 function createProjectile() {
   return {
@@ -210,7 +211,7 @@ export class ProjectileSystem {
     contact.y = projectile.y;
     contact.damage = 0;
     contact.armored = false;
-    if (isBarrierUp(target)) {
+    if (isBarrierUp(target) || isStormShieldUp(target)) {
       combat.emit(CombatEvent.POWER_ABSORBED, contact);
     } else if (target.state === FighterState.BLOCKING && Math.sign(projectile.vx) === -target.facing) {
       combat.resolveBlock(contact);

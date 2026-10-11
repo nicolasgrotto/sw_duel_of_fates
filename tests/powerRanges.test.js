@@ -130,7 +130,7 @@ for (const [level, range] of [[1, 330], [2, 330], [3, 380], [4, 380], [5, 380], 
 
 it('preserves constant power ranges, radial detection and powers without a range', () => {
   const caster = spawnFighter(200);
-  const target = spawnFighter(440, -1, 'shadow');
+  const target = spawnFighter(caster.x + powersConfig.powers.storm.range, -1, 'shadow');
   target.y += (target.height - caster.height) / 2;
   for (const power of Object.values(powersConfig.powers)) {
     if (power.id !== 'pull') assert.equal(getPowerRange(caster, power), power.range);

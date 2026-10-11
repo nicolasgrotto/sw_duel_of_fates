@@ -429,11 +429,12 @@ export const aiConfig = {
     lightningHold: [0.4, 1],
     barrierPreference: 0.6,
     barrierVsSaberChance: 0.15,
+    stormEscapeMargin: 8,
     powerUse: {
       mindTwist: { minGap: 120, maxGap: 320 },
       drain: { minGap: 120, maxGap: 300, targetMeterAbove: 25 },
       absorb: { minDifference: -1 },
-      storm: { minGap: 0, maxGap: 130 },
+      storm: { minGap: 0, maxGap: 600, avoidPressure: true },
       push: { minGap: 0, maxGap: 100 },
       pull: { minGap: 250, maxGap: Infinity },
       lightning: { minGap: 110, maxGap: Infinity },

@@ -18,7 +18,7 @@ export function captureFighter(fighter) {
     flowMeter: fighter.flowMeter,
     state: fighter.state,
     stateTime: fighter.stateTime,
-    combat: { ...fighter.combat },
+    combat: { ...fighter.combat, stormMarks: fighter.combat.stormMarks.map(mark => ({ ...mark })) },
     animation: { ...fighter.animation },
   };
 }
@@ -27,6 +27,7 @@ export function restoreFighter(fighter, snapshot) {
   const { combat, animation, ...scalars } = snapshot;
   Object.assign(fighter, scalars);
   Object.assign(fighter.combat, combat);
+  fighter.combat.stormMarks = combat.stormMarks.map(mark => ({ ...mark }));
   Object.assign(fighter.animation, animation);
   fighter.clearIntent();
 }

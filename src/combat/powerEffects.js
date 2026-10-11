@@ -162,13 +162,10 @@ export const powerEffects = Object.freeze({
   } },
   drain: { tick: drain },
   absorb: { self: ({ caster, power }) => { caster.combat.absorbTime = power.window; } },
-  storm: { tick: (context) => {
-    const { combat, caster, target, power, scale, guarded } = context;
-    const damage = power.damage * power.intensity;
-    if (guarded) {
-      applyGuarded(context, damage);
-    } else {
-      combat.dealPowerDamage(caster, target, power, damage * scale, CombatEvent.POWER_HIT);
+  storm: { strike: (context) => {
+    const { combat, caster, target, power, scale, interaction } = context;
+    if (combat.dealPowerDamage(caster, target, power, power.damage * scale, CombatEvent.POWER_HIT)) {
+      interrupt(target, FighterState.HIT, power.stun * interaction.duration);
     }
   } },
   push: { active: push },
