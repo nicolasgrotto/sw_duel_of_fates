@@ -105,6 +105,7 @@ function createCombat() {
     healRate: 0,
     healCap: 0,
     wrathTime: 0,
+    wrathArmorHits: 0,
     wrathEnd: 'reset',
     wrathDamageDealtScale: 1,
     wrathDamageTakenScale: 1,

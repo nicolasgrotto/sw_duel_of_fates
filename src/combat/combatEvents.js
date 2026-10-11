@@ -20,6 +20,7 @@ export const CombatEvent = Object.freeze({
   SHOVE: 'shove',
   COUNTER: 'counter',
   FEINT: 'feint',
+  WRATH_ARMOR: 'wrathArmor',
   POWER_START: 'powerStart',
   POWER_ACTIVE: 'powerActive',
   POWER_PULSE: 'powerPulse',

@@ -670,11 +670,16 @@ export class CombatSystem {
     const armored = hasArmor(defender);
     const damage = this.getHitDamage(attacker, defender, attack);
     contact.armored = armored;
+    contact.wrathArmored = this.statuses.hasWrathArmor(contact);
     if (!this.applyDamage(contact, damage, 'blade', CombatEvent.HIT)) {
       return;
     }
     if (armored) {
       defender.combat.armorHits -= 1;
+      return;
+    }
+    if (contact.wrathArmored) {
+      this.statuses.consumeWrathArmor(contact);
       return;
     }
 
@@ -737,7 +742,7 @@ export class CombatSystem {
     attacker.stamina = Math.min(attacker.stats.maxStamina, attacker.stamina + attacker.stats.staminaOnHit);
     this.powers.onHit(attacker, defender);
     this.applyWound(contact);
-    if (!armored) {
+    if (!armored && !contact.wrathArmored) {
       defender.vx = attacker.facing * attack.knockback * attacker.stats.knockbackScale;
       defender.clearAttack();
     }

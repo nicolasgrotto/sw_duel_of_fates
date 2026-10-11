@@ -78,13 +78,15 @@ it('replaces rather than stacks and clears scales on completion', () => {
   assert.equal(attacker.combat.wrathDamageTakenScale, 1);
 });
 
-it('provides no armor or immunity to damage, shove, parry or guard break', () => {
+it('uses armor against blade interruption but not shove, parry or guard break', () => {
   const { attacker, defender, combat } = setup();
   combat.powers.applySelf(defender, wrath);
   const contact = { attacker, defender, attack: attacker.moves.light, attackType: 'light' };
   combat.applyHit(contact);
-  assert.equal(defender.state, FighterState.HIT);
+  assert.equal(defender.state, FighterState.IDLE);
   assert.equal(contact.armored, false);
+  assert.equal(defender.combat.wrathArmorHits, wrath.armorHits - 1);
+  assert.ok(combat.events.some(event => event.type === CombatEvent.WRATH_ARMOR));
   assert.ok(defender.combat.wrathTime > 0);
   combat.applyShove({ ...contact, attack: attacker.moves.shove, attackType: 'shove' });
   assert.equal(defender.state, FighterState.STAGGERED);
@@ -94,6 +96,83 @@ it('provides no armor or immunity to damage, shove, parry or guard break', () =>
   combat.resolveParry(contact);
   assert.equal(attacker.state, FighterState.STAGGERED);
   assert.ok(attacker.combat.wrathTime > 0);
+});
+
+for (const state of [FighterState.IDLE, FighterState.WALKING, FighterState.ATTACKING, FighterState.CASTING, FighterState.CHANNELING]) {
+  it('keeps the current state and action through two wrath blade armor hits in ' + state, () => {
+    const { attacker, defender, combat } = setup();
+    combat.powers.applySelf(defender, wrath);
+    defender.restartState(state);
+    defender.stateTime = 0.2;
+    const action = state === FighterState.ATTACKING ? defender.moves.light : null;
+    defender.combat.attack = action;
+    const power = state === FighterState.CASTING || state === FighterState.CHANNELING ? powersConfig.powers.choke : null;
+    defender.combat.power = power;
+    for (let hit = 0; hit < wrath.armorHits; hit++) {
+      const before = defender.health;
+      const contact = { attacker, defender, attack: attacker.moves.light, attackType: 'light' };
+      combat.applyHit(contact);
+      assert.ok(defender.health < before);
+      assert.equal(defender.state, state);
+      assert.equal(defender.stateTime, 0.2);
+      assert.equal(defender.combat.attack, action);
+      assert.equal(defender.combat.power, power);
+      assert.equal(defender.combat.wrathArmorHits, wrath.armorHits - hit - 1);
+      assert.equal(contact.armored, false);
+    }
+    assert.equal(combat.events.filter(event => event.type === CombatEvent.WRATH_ARMOR).length, wrath.armorHits);
+    combat.applyHit({ attacker, defender, attack: attacker.moves.light, attackType: 'light' });
+    assert.equal(defender.state, FighterState.HIT);
+    assert.equal(defender.combat.attack, null);
+    assert.equal(defender.combat.power, null);
+  });
+}
+
+it('does not consume wrath armor on guard, parry or an existing action armor hit', () => {
+  const { attacker, defender, combat } = setup();
+  combat.powers.applySelf(defender, wrath);
+  const contact = { attacker, defender, attack: attacker.moves.light, attackType: 'light' };
+  defender.restartState(FighterState.BLOCKING);
+  combat.resolveContact(contact);
+  assert.equal(defender.combat.wrathArmorHits, wrath.armorHits);
+  defender.combat.parryArmed = true;
+  combat.resolveContact(contact);
+  assert.equal(defender.combat.wrathArmorHits, wrath.armorHits);
+  defender.combat.attack = { ...defender.moves.light, armor: { damageScale: 0.6 } };
+  defender.combat.armorHits = 1;
+  defender.restartState(FighterState.ATTACKING);
+  combat.applyHit({ ...contact });
+  assert.equal(defender.combat.armorHits, 0);
+  assert.equal(defender.combat.wrathArmorHits, wrath.armorHits);
+  assert.equal(defender.state, FighterState.ATTACKING);
+});
+
+it('leaves projectile hits and power control free to interrupt without armor consumption', () => {
+  const { attacker, defender, combat } = setup();
+  combat.powers.applySelf(defender, wrath);
+  combat.applyHit({ attacker, defender, attack: { ...attacker.moves.light, projectile: true }, attackType: 'saberThrow' });
+  assert.equal(defender.state, FighterState.HIT);
+  assert.equal(defender.combat.wrathArmorHits, wrath.armorHits);
+  combat.powers.strike(attacker, defender, powersConfig.powers.freeze, 'active', null);
+  assert.equal(defender.state, FighterState.STUNNED);
+  assert.equal(defender.combat.wrathArmorHits, wrath.armorHits);
+});
+
+it('refills wrath charges on reapplication and clears them on expiry, death and reset', () => {
+  const { attacker, defender, combat } = setup();
+  combat.powers.applySelf(defender, wrath);
+  combat.applyHit({ attacker, defender, attack: attacker.moves.light, attackType: 'light' });
+  combat.powers.applySelf(defender, wrath);
+  assert.equal(defender.combat.wrathArmorHits, wrath.armorHits);
+  combat.statuses.advance(defender, 'wrath', defender.combat.wrathTime);
+  assert.equal(defender.combat.wrathArmorHits, 0);
+  combat.powers.applySelf(defender, wrath);
+  defender.health = 1;
+  combat.applyHit({ attacker, defender, attack: attacker.moves.light, attackType: 'light' });
+  assert.equal(defender.state, FighterState.DEAD);
+  assert.equal(defender.combat.wrathArmorHits, 0);
+  defender.resetForRound(defender.x, defender.facing);
+  assert.equal(defender.combat.wrathArmorHits, 0);
 });
 
 it('replays snapshots before, during and after wrath', () => {

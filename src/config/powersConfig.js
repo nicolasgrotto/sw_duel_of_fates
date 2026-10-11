@@ -96,7 +96,8 @@ export const powersConfig = {
     },
     wrath: {
       id: 'wrath', effect: 'wrath', channel: false, pose: 'cast', self: true,
-      cost: 35, startup: 0.3, ...SELF_BUFF_PHASES,
+      cost: 60, startup: 0.3, ...SELF_BUFF_PHASES,
+      armorHits: 2, hudMark: 'powerCostWrath',
       duration: 5, damageDealtScale: 1.2, damageTakenScale: 0.85,
     },
     barrier: {

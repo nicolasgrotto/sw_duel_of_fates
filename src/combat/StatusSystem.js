@@ -103,6 +103,7 @@ export class StatusSystem {
     if (effect === 'focus') {
       combat.focusScale = 1;
     } else if (effect === 'wrath') {
+      combat.wrathArmorHits = 0;
       combat.wrathDamageDealtScale = 1;
       combat.wrathDamageTakenScale = 1;
     } else if (effect === 'heal') {
@@ -151,6 +152,17 @@ export class StatusSystem {
       }
       this.combat.applyStatusDamage(fighter, source ?? opponent, combat.chokeDamageRate * step);
     }
+  }
+
+  hasWrathArmor(contact) {
+    const { defender, attack, attackType, armored } = contact;
+    return !armored && !attack.projectile && isSaberAttack(attackType)
+      && defender.combat.wrathTime > 0 && defender.combat.wrathArmorHits > 0;
+  }
+
+  consumeWrathArmor(contact) {
+    contact.defender.combat.wrathArmorHits -= 1;
+    this.combat.emit(CombatEvent.WRATH_ARMOR, contact);
   }
 
   releaseChoke(fighter) {

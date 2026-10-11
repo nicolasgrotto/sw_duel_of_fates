@@ -134,6 +134,7 @@ function focus(context) {
 function wrath(context) {
   const { combat, caster, power, scale } = context;
   combat.statuses.start(caster, 'wrath', power.duration * scale);
+  caster.combat.wrathArmorHits = power.armorHits;
   caster.combat.wrathDamageDealtScale = power.damageDealtScale;
   caster.combat.wrathDamageTakenScale = power.damageTakenScale;
   caster.combat.statusLevel = caster.flowLevel;
