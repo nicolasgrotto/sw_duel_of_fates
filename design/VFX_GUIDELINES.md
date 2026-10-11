@@ -173,3 +173,12 @@ Poderes por tier (v2.16): o tier do Fluxo de quem lança passa a mudar a forma, 
 - **Repulsão:** chevrons e poeira crescem por tier (`waveScale` 0,85/1/1,15/1,3 na altura, na espessura e na faixa; poeira pelo `particleScale`). O alcance desenhado continua o de gameplay.
 - **Puxão:** o anel que fecha cresce por tier e começa no alcance real do Puxão de quem lança (que agora muda por tier).
 - **Arremesso:** deixa de parecer uma esfera. Na preparação, as pedras sobem do chão perto de quem lança, com poeira; no lançamento, seguem o projétil girando. Uma pedra nas faixas pequenas, duas nas médias e três nas maiores, todas dentro do raio da hitbox; brilho reduzido a um contorno na cor do tier; no impacto, 4–6 fragmentos escuros caem com gravidade. Uma colisão só. Efeitos reduzidos cortam a poeira pela metade.
+
+Decisões da implementação (v2.16):
+
+- **Ramo do Raio:** sai só do primeiro feixe, do Firme para cima (Tênue sem ramo). Feixes extras miram 26 px acima (ombro) e 28 px abaixo (quadril) do ponto atingido.
+- **Tempestade:** 2 arcos no Firme e 3 no Profundo e no Ápice (ombro→mão, quadril→ombro, mão→quadril), com 5 segmentos e jitter de 5 px. Espasmo de ±1,5 px alternando a cada 0,03 s; contorno claro (cor do hit flash) desenhado quatro vezes deslocado 2 px atrás do corpo, alpha 0,5 caindo a zero em 0,12 s. Com efeitos reduzidos, o espasmo segue a escala do shake e o contorno some.
+- **Congelar:** 3 silhuetas deslocadas 3, 2 e 4 px (metade disso na vertical), alternando o lado a cada 0,05 s.
+- **Puxão:** o anel nasce na mão com raio = alcance do Puxão menos a distância até a mão, então a borda da frente toca o alcance real. Espessura × `waveScale`.
+- **Arremesso:** com duas pedras, raios 0,62 e 0,55 do raio da hitbox; com três, 0,5/0,45/0,48, sempre dentro dela. Na preparação o grupo sobe do chão até a altura do projétil. Fragmentos do impacto na cor da pedra (`floorEdge`), desenhados sem modo aditivo (cor escura some no `lighter`), num pool próprio de 24.
+- **Contraguarda:** 8–12 faíscas abertas 40° para cima (75°), luz na cor da lâmina e o brilho curto da lâmina do parry.

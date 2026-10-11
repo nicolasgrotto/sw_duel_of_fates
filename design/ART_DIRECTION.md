@@ -195,6 +195,7 @@ As técnicas de lâmina ganham trilhas de poses-chave (sistema da 2.12) válidas
 - **Avanço com corte:** duas variantes por estilo de movimento (`motionStyles[].dashSlash`). `rising` (padrão e Vespa): joelhos dobram, avanço baixo e arco diagonal de baixo para cima. `falling` (Guardião): lâmina acima do ombro, avanço e corte de cima para baixo. Tronco, passo e quadril acompanham.
 - **Arremesso da lâmina:** a lâmina recua atrás do corpo, o pé de trás desliza, e a soltura vem com passo e braço estendido; a mão vazia acompanha a volta.
 - **Contraguarda do Guardião:** no contato, a lâmina desvia para cima com faíscas e brilho, o corpo recua meio passo e a resposta é uma estocada curta (`counterRiposte`). Só o Guardião: marcado nos dados da habilidade (`counter.flourish`).
+- **Leitura do giro:** a escala horizontal segue o cosseno das voltas do corpo, com módulo mínimo de 0,08 (o corpo nunca vira uma linha). O giro inteiro cabe no ativo: meia volta na primeira metade (a lâmina passa atrás) e a outra meia volta na segunda; a recuperação desce a lâmina pela frente até a guarda.
 - **Congelado e estrangulado** deixam de usar a pose do atordoado: o congelado fica parado na pose do instante, o estrangulado é erguido com as mãos no pescoço (VFX_GUIDELINES → "Poderes por tier").
 
 ### Disputa de lâminas (v2.5)
