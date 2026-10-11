@@ -1,6 +1,6 @@
 import { groundShadow, proportions } from '../config/fighterVisualConfig.js';
 import { colors } from '../config/themeConfig.js';
-import { clamp } from '../utils/math.js';
+import { clamp, lerp } from '../utils/math.js';
 
 const legPoints = [0, 0, 0, 0, 0, 0];
 const torsoPoints = [0, 0, 0, 0, 0, 0, 0, 0];
@@ -119,7 +119,12 @@ function drawArms(renderer, fighter, pose, cloakColor, bodyColor) {
   const { height } = fighter;
   const armWidth = height * proportions.armWidth;
 
-  renderer.line(pose.shoulderX - 3, pose.shoulderY + 4, pose.handX - 2, pose.handY, bodyColor, armWidth);
+  const backHandX = lerp(pose.handX - 2, pose.freeHandX, pose.offHand);
+  const backHandY = lerp(pose.handY, pose.freeHandY, pose.offHand);
+  renderer.line(pose.shoulderX - 3, pose.shoulderY + 4, backHandX, backHandY, bodyColor, armWidth);
+  if (pose.offHand > 0) {
+    renderer.fillCircle(backHandX, backHandY, height * proportions.handRadius, bodyColor);
+  }
   renderer.line(pose.shoulderX + 3, pose.shoulderY + 3, pose.handX, pose.handY, cloakColor, armWidth);
   renderer.fillCircle(pose.handX, pose.handY, height * proportions.handRadius, bodyColor);
 }

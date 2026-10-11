@@ -14,6 +14,7 @@ export const proportions = {
   tunicLength: 0.2,
   tunicFlare: 0.1,
   hiltLength: 0.09,
+  freeArmLength: 0.28,
 };
 
 export const animation = {
@@ -182,6 +183,18 @@ export const combatPoses = {
     swayDegrees: 6,
     swaySpeed: 3,
   },
+  keyframeDefaults: {
+    leanDegrees: 0,
+    crouch: 0,
+    reach: 0,
+    lift: 0,
+    step: 0,
+    slide: 0,
+    hip: 0,
+    offHand: 0,
+    offHandDegrees: 70,
+    chainBlend: 0.06,
+  },
   bladeLock: {
     entryDuration: 0.08,
     pressPushDuration: 0.08,
@@ -193,6 +206,79 @@ export const combatPoses = {
     fallDegrees: 88,
     lift: 0.2,
   },
+};
+
+const STARTUP = 'startup';
+const ACTIVE = 'active';
+const RECOVERY = 'recovery';
+
+const guardianKeyframes = {
+  light: [
+    { phase: STARTUP, at: 1, ease: 'out', blade: -95, lean: -2, lift: 0.06, slide: 0.01 },
+    { phase: ACTIVE, at: 0.5, ease: 'in', blade: -35, lean: 2, reach: 0.06, lift: 0.03, step: 0.02 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 25, lean: 5, reach: 0.1, step: 0.03, hip: 0.015 },
+    { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: 28, lean: 5, reach: 0.09, step: 0.03, hip: 0.015 },
+  ],
+  heavy: [
+    { phase: STARTUP, at: 0.6, ease: 'out', blade: -120, lean: -4, crouch: 6, lift: 0.1, slide: 0.02, hip: -0.01 },
+    { phase: STARTUP, at: 1, ease: 'inOut', blade: -150, lean: -6, crouch: 8, lift: 0.13, slide: 0.03, hip: -0.02 },
+    { phase: ACTIVE, at: 0.5, ease: 'in', blade: -40, lean: 4, crouch: 8, reach: 0.08, lift: 0.06, step: 0.04, hip: 0.01 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 48, lean: 10, crouch: 10, reach: 0.13, step: 0.07, slide: -0.01, hip: 0.03 },
+    { phase: RECOVERY, at: 0.25, ease: 'outQuad', blade: 55, lean: 11, crouch: 10, reach: 0.12, step: 0.07, slide: -0.01, hip: 0.03 },
+  ],
+  riposte: [
+    { phase: STARTUP, at: 1, ease: 'out', blade: -55, lean: -1, lift: 0.03, slide: 0.01 },
+    { phase: ACTIVE, at: 0.5, ease: 'in', blade: -10, lean: 7, reach: 0.1, step: 0.04, hip: 0.015 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 30, lean: 12, reach: 0.17, step: 0.06, hip: 0.03 },
+    { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: 34, lean: 12, reach: 0.15, step: 0.06, hip: 0.03 },
+  ],
+  shove: [
+    { phase: STARTUP, at: 1, ease: 'out', blade: -40, lean: -6, lift: 0.02, slide: 0.02, hip: -0.01, offHand: 0.6, offHandDegrees: 40 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: -75, lean: 16, reach: 0.12, step: 0.06, hip: 0.03, offHand: 1, offHandDegrees: 5 },
+    { phase: RECOVERY, at: 0.4, ease: 'inOut', blade: -70, lean: 12, reach: 0.08, step: 0.05, hip: 0.02, offHand: 0.7, offHandDegrees: 20 },
+  ],
+};
+
+const waspLight = [
+  { phase: STARTUP, at: 1, ease: 'out', blade: -100, lean: -1, lift: 0.07, slide: 0.015, hip: -0.01 },
+  { phase: ACTIVE, at: 0.5, ease: 'in', blade: -30, lean: 6, reach: 0.06, lift: 0.03, step: 0.03, hip: 0.01 },
+  { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 40, lean: 11, reach: 0.1, step: 0.05, hip: 0.025 },
+  { phase: RECOVERY, at: 0.35, ease: 'outQuad', blade: 52, lean: 12, reach: 0.09, step: 0.05, hip: 0.025 },
+];
+
+const waspKeyframes = {
+  light: waspLight,
+  lightReverse: [
+    { phase: STARTUP, at: 1, ease: 'out', blade: 75, lean: 6, lift: 0.02, slide: 0.015, hip: -0.005 },
+    { phase: ACTIVE, at: 0.5, ease: 'in', blade: -5, lean: 9, reach: 0.07, lift: 0.04, step: 0.03, hip: 0.01 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: -85, lean: 12, reach: 0.11, lift: 0.04, step: 0.05, hip: 0.025 },
+    { phase: RECOVERY, at: 0.35, ease: 'outQuad', blade: -97, lean: 12, reach: 0.1, lift: 0.04, step: 0.05, hip: 0.025 },
+  ],
+  light5: [
+    ...waspLight.slice(0, 2),
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 40, lean: 14, reach: 0.13, step: 0.07, hip: 0.035 },
+    { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: 55, lean: 14, reach: 0.12, step: 0.07, hip: 0.035 },
+    { phase: RECOVERY, at: 1, ease: 'inOut', twirl: -360 },
+  ],
+  heavy: [
+    { phase: STARTUP, at: 0.5, ease: 'out', blade: -120, lean: -2, crouch: 4, lift: 0.08, slide: 0.03, hip: -0.02 },
+    { phase: STARTUP, at: 1, ease: 'inOut', blade: -158, lean: -5, crouch: 6, lift: 0.13, slide: 0.04, hip: -0.025 },
+    { phase: ACTIVE, at: 0.5, ease: 'in', blade: -50, lean: 8, crouch: 6, reach: 0.09, lift: 0.06, step: 0.06, hip: 0.015 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 62, lean: 16, crouch: 8, reach: 0.15, step: 0.1, slide: -0.02, hip: 0.04 },
+    { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: 80, lean: 17, crouch: 8, reach: 0.14, step: 0.1, slide: -0.02, hip: 0.04 },
+    { phase: RECOVERY, at: 1, ease: 'inOut', twirl: 360 },
+  ],
+  riposte: [
+    { phase: STARTUP, at: 1, ease: 'out', blade: -60, lean: 0, lift: 0.04, slide: 0.015 },
+    { phase: ACTIVE, at: 0.5, ease: 'in', blade: -10, lean: 9, reach: 0.1, step: 0.05, hip: 0.02 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 42, lean: 15, reach: 0.17, step: 0.08, hip: 0.035 },
+    { phase: RECOVERY, at: 0.35, ease: 'outQuad', blade: 55, lean: 15, reach: 0.15, step: 0.08, hip: 0.035 },
+  ],
+  shove: [
+    { phase: STARTUP, at: 1, ease: 'out', blade: -40, lean: -6, lift: 0.02, slide: 0.03, hip: -0.015 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: -75, lean: 18, reach: 0.12, step: 0.08, hip: 0.04 },
+    { phase: RECOVERY, at: 0.4, ease: 'inOut', blade: -70, lean: 13, reach: 0.08, step: 0.06, hip: 0.025 },
+  ],
 };
 
 export const motionStyles = {
@@ -221,6 +307,7 @@ export const motionStyles = {
     ],
     lock: { lean: 7, crouch: 14, reach: -0.06, lift: 0.11, advantageLean: 7, advantageCrouch: 7, tremor: [0.7, 1.8], pressPush: 0.02 },
     lockVictory: { fromDegrees: -55, sweepDegrees: 25, lean: 6, twirl: 0, sweepShare: 0.45 },
+    keyframes: guardianKeyframes,
     attacks: {
       light: { windupDegrees: -95, strikeDegrees: 25, windupLean: -2, strikeLean: 5, windupLift: 0.06, strikeReach: 0.1 },
       heavy: { windupDegrees: -150, strikeDegrees: 48, windupLean: -5, strikeLean: 10, windupLift: 0.12, strikeReach: 0.13 },
@@ -239,6 +326,7 @@ export const motionStyles = {
     ],
     lock: { lean: 13, crouch: 8, reach: -0.08, lift: 0.13, advantageLean: 11, advantageCrouch: 8, tremor: [1.3, 3], pressPush: 0.04 },
     lockVictory: { fromDegrees: -55, sweepDegrees: 55, lean: 15, twirl: 360, sweepShare: 0.35 },
+    keyframes: waspKeyframes,
     attacks: {
       light: { windupDegrees: -100, strikeDegrees: 40, windupLean: -1, strikeLean: 11, windupLift: 0.07, strikeReach: 0.1 },
       lightReverse: { windupDegrees: 75, strikeDegrees: -85, windupLean: 6, strikeLean: 12, windupLift: 0.02, strikeReach: 0.11 },

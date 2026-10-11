@@ -31,6 +31,33 @@ export function createPose() {
     bodyRotation: 0,
     bodyLift: 0,
     clothSway: 0,
+    offHand: 0,
+    freeHandX: 0,
+    freeHandY: 0,
+    chain: createChainMemory(),
+  };
+}
+
+const TRACK_CHANNELS = ['bladeDegrees', 'leanDegrees', 'crouch', 'reach', 'lift', 'step', 'slide', 'hip', 'offHand', 'offHandDegrees'];
+const KEY_CHANNELS = { blade: 'bladeDegrees', lean: 'leanDegrees', crouch: 'crouch', reach: 'reach', lift: 'lift', step: 'step', slide: 'slide', hip: 'hip', offHand: 'offHand', offHandDegrees: 'offHandDegrees', twirl: 'twirl' };
+const PHASE_OFFSET = { [AttackPhase.STARTUP]: 0, [AttackPhase.ACTIVE]: 1, [AttackPhase.RECOVERY]: 2 };
+const TRACK_END = 3;
+const EASINGS = {
+  linear: (t) => t,
+  in: easeInQuad,
+  out: easeOutCubic,
+  outQuad: easeOutQuad,
+  inOut: easeInOutSine,
+};
+
+function createChainMemory() {
+  return {
+    attack: null,
+    stateTime: 0,
+    wasAttack: false,
+    blending: false,
+    origin: new Float64Array(TRACK_CHANNELS.length),
+    last: new Float64Array(TRACK_CHANNELS.length),
   };
 }
 
@@ -43,9 +70,19 @@ const combatPose = {
   bladeVisible: true,
   bodyRotationDegrees: 0,
   bodyLift: 0,
+  step: 0,
+  slide: 0,
+  hip: 0,
+  offHand: 0,
+  offHandDegrees: 0,
 };
 
 function resetCombatPose(guardDegrees) {
+  combatPose.step = 0;
+  combatPose.slide = 0;
+  combatPose.hip = 0;
+  combatPose.offHand = 0;
+  combatPose.offHandDegrees = combatPoses.keyframeDefaults.offHandDegrees;
   combatPose.leanDegrees = 0;
   combatPose.crouch = 0;
   combatPose.reach = 0;
@@ -68,10 +105,35 @@ function resolveAttackPoses(style) {
   return { attacks, attackTypes };
 }
 
+function resolveTrackKey(key, defaults) {
+  const values = { ...defaults };
+  for (const [name, channel] of Object.entries(KEY_CHANNELS)) {
+    if (key[name] !== undefined) values[channel] = key[name];
+  }
+  return { time: PHASE_OFFSET[key.phase] + key.at, ease: EASINGS[key.ease ?? 'inOut'], values };
+}
+
+function resolveTrack(keys) {
+  const defaults = { bladeDegrees: null, twirl: 0 };
+  for (const channel of TRACK_CHANNELS) {
+    if (channel !== 'bladeDegrees') defaults[channel] = combatPoses.keyframeDefaults[channel];
+  }
+  const track = [resolveTrackKey({ phase: AttackPhase.STARTUP, at: 0 }, defaults)];
+  for (const key of keys) track.push(resolveTrackKey(key, defaults));
+  if (track.at(-1).time < TRACK_END) track.push(resolveTrackKey({ phase: AttackPhase.RECOVERY, at: 1 }, defaults));
+  return track;
+}
+
+function resolveKeyframes(style) {
+  if (!style.keyframes) return null;
+  return Object.fromEntries(Object.entries(style.keyframes).map(([id, keys]) => [id, resolveTrack(keys)]));
+}
+
 function resolveMotionStyle(style) {
   return {
     ...style,
     ...resolveAttackPoses(style),
+    tracks: resolveKeyframes(style),
     block: { ...combatPoses.block, ...style.block },
     lock: { ...motionStyles.standard.lock, ...style.lock },
     lockVictory: { ...motionStyles.standard.lockVictory, ...style.lockVictory },
@@ -149,8 +211,38 @@ function getFollowThrough(style, progress) {
   return (style.strikeDegrees - style.windupDegrees) * style.followThrough * Math.sin(Math.PI * clamp(progress * 2, 0, 1));
 }
 
+function getTrackChannel(key, channel, guardDegrees) {
+  if (channel !== 'bladeDegrees') return key.values[channel];
+  return (key.values.bladeDegrees ?? guardDegrees) + key.values.twirl;
+}
+
+function applyTrackPose(track, fighter, guardDegrees) {
+  const { attack } = fighter.combat;
+  const phase = PHASE_OFFSET[getAttackPhase(attack, fighter.stateTime)];
+  const time = phase === undefined ? TRACK_END : phase + clamp(getPhaseProgress(attack, fighter.stateTime), 0, 1);
+  let index = 1;
+  while (index < track.length - 1 && track[index].time < time) index += 1;
+  const from = track[index - 1];
+  const to = track[index];
+  const span = to.time - from.time;
+  const amount = span > 0 ? to.ease(clamp((time - from.time) / span, 0, 1)) : 1;
+  for (const channel of TRACK_CHANNELS) {
+    combatPose[channel] = lerp(getTrackChannel(from, channel, guardDegrees), getTrackChannel(to, channel, guardDegrees), amount);
+  }
+}
+
+function getAttackTrack(motion, attack, attackType) {
+  if (!motion.tracks) return null;
+  return motion.tracks[attackType] ?? motion.tracks[attack.pose ?? attackType] ?? null;
+}
+
 function applyAttackPose(fighter, guardDegrees, motion) {
   const { attack, attackType } = fighter.combat;
+  const track = getAttackTrack(motion, attack, attackType);
+  if (track) {
+    applyTrackPose(track, fighter, guardDegrees);
+    return;
+  }
   const style = getAttackStyle(motion, attack, attackType);
   const progress = getPhaseProgress(attack, fighter.stateTime);
 
@@ -301,6 +393,40 @@ function resolveCombatPose(fighter, guardDegrees, motion, forceEvade, lockContex
   }
 }
 
+function isAttacking(fighter) {
+  return (fighter.state === FighterState.ATTACKING || fighter.state === FighterState.HEAVY_ATTACK) && fighter.combat.attack !== null;
+}
+
+function blendChainedAttack(pose, fighter, motion) {
+  const { chain } = pose;
+  const attack = isAttacking(fighter) ? fighter.combat.attack : null;
+  if (!motion.tracks) {
+    chain.wasAttack = false;
+    return;
+  }
+  if (attack && chain.wasAttack && (attack !== chain.attack || fighter.stateTime < chain.stateTime)) {
+    chain.origin.set(chain.last);
+    chain.blending = true;
+  }
+  if (attack && chain.blending) {
+    const amount = fighter.stateTime / combatPoses.keyframeDefaults.chainBlend;
+    if (amount >= 1) {
+      chain.blending = false;
+    } else {
+      const eased = easeOutQuad(clamp(amount, 0, 1));
+      for (let index = 0; index < TRACK_CHANNELS.length; index += 1) {
+        const channel = TRACK_CHANNELS[index];
+        combatPose[channel] = lerp(chain.origin[index], combatPose[channel], eased);
+      }
+    }
+  }
+  if (!attack) chain.blending = false;
+  for (let index = 0; index < TRACK_CHANNELS.length; index += 1) chain.last[index] = combatPose[TRACK_CHANNELS[index]];
+  chain.attack = attack;
+  chain.stateTime = fighter.stateTime;
+  chain.wasAttack = attack !== null;
+}
+
 function placeFeet(pose, fighter) {
   const { height, animation } = fighter;
   const { walkPhase, walkBlend, airBlend } = animation;
@@ -312,7 +438,8 @@ function placeFeet(pose, fighter) {
 
   pose.frontFootX = lerp(stanceWidth + stepOffset, tuckedStance, airBlend);
   pose.frontFootY = -Math.max(0, Math.cos(walkPhase)) * stepLift - tuck;
-  pose.backFootX = lerp(-stanceWidth - stepOffset, -tuckedStance, airBlend);
+  pose.frontFootX += combatPose.step * height;
+  pose.backFootX = lerp(-stanceWidth - stepOffset, -tuckedStance, airBlend) - combatPose.slide * height;
   pose.backFootY = -Math.max(0, -Math.cos(walkPhase)) * stepLift - tuck;
 }
 
@@ -336,11 +463,12 @@ export function computePose(fighter, pose, forceEvade = false, lockContext = noL
 
   const droop = exhausted ? animationStyle.exhaustedDroopDegrees : 0;
   resolveCombatPose(fighter, appearance.guardAngleDegrees + stance.guardOffset + droop, motion, forceEvade, lockContext);
+  if (!forceEvade) blendChainedAttack(pose, fighter, motion);
 
   const lean = degreesToRadians(appearance.torsoLeanDegrees + stance.lean + combatPose.leanDegrees);
   const torsoLength = height * proportions.torsoLength;
 
-  pose.hipX = 0;
+  pose.hipX = combatPose.hip * height;
   pose.hipY = -height * proportions.legLength + walkBob + stance.crouch + combatPose.crouch;
   pose.shoulderX = pose.hipX + Math.sin(lean) * torsoLength;
   pose.shoulderY = pose.hipY - Math.cos(lean) * torsoLength - breath;
@@ -355,6 +483,10 @@ export function computePose(fighter, pose, forceEvade = false, lockContext = noL
 
   pose.handX = pose.shoulderX + height * (proportions.handForward + combatPose.reach);
   pose.handY = pose.hipY - height * (proportions.handHeight + combatPose.lift) - breath / 2;
+  const freeArm = degreesToRadians(combatPose.offHandDegrees);
+  pose.offHand = combatPose.offHand;
+  pose.freeHandX = pose.shoulderX + Math.cos(freeArm) * height * proportions.freeArmLength;
+  pose.freeHandY = pose.shoulderY + Math.sin(freeArm) * height * proportions.freeArmLength;
   pose.bladeAngle = degreesToRadians(combatPose.bladeDegrees + breathWave * animationStyle.saberSwayDegrees * stance.swayScale);
   if (fighter.state === FighterState.BLADE_LOCK) {
     placeLockedBlade(pose, fighter, motion, lockContext.advantage);
