@@ -732,19 +732,21 @@ O elenco tem Original, Viajante (vencer Arcade com o lutador) e Sentinela (concl
 O protagonista escolhe Errante, Vigia ou Peregrino desde o início, em um passo Visual. O nome pode vir da lista ou ser digitado com teclado nativo, até 16 caracteres. O visual e o nome acompanham o save da campanha.
 
 
-## 26. Consequ?ncias no duelo (v3, etapa 2.4)
+## 26. Consequências no duelo (v3, etapa 2.4)
 
-Especifica??o aprovada em versions/v3.md ? notas da 2.4; apresenta??o e calibra??o s?o a etapa seguinte. Capacidades independentes `exhaustion`, `wounds` e `focusEvade`, inicialmente em Duelar, 2 Jogadores e Treino. Foco autom?tico exige Poderes; Hist?ria aguarda a 2.8. Sem capacidades novas, vale a refer?ncia v2.
+Especificação aprovada em versions/v3.md → notas da 2.4; apresentação e calibração são a etapa seguinte. Capacidades independentes `exhaustion`, `wounds` e `focusEvade`, inicialmente em Duelar, 2 Jogadores e Treino. Foco automático exige Poderes; História aguarda a 2.8. Sem capacidades novas, vale a referência v2.
 
-Gastar Vigor at? 10% ou menos causa exaust?o; regenera??o n?o a inicia. Sai com pelo menos 40% de Vigor e 1 s de dura??o, ou 1,6 s ap?s quebra de guarda. Motivos: gasto, bloqueio, quebra de guarda e dreno externo. N?o h? stun extra nem redu??o de regenera??o. Golpes corpo a corpo eleg?veis recebem dano ? 1,2 contra exaustos.
+Gastar Vigor até 10% ou menos causa exaustão; regeneração não a inicia. Sai com pelo menos 40% de Vigor e 1 s de duração, ou 1,6 s após quebra de guarda. Motivos: gasto, bloqueio, quebra de guarda e dreno externo. Não há stun extra nem redução de regeneração. Golpes corpo a corpo elegíveis recebem dano × 1,2 contra exaustos.
 
-Forte comum pode ferir bra?o; forte de avan?o, perna. Exige dano efetivo n?o letal contra exausto e cota ainda dispon?vel: uma aplica??o por round, mesmo ap?s Cura. Bra?o multiplica custo derivado de bloqueio por 1,35. Perna multiplica dash e dash a?reo por 1,35 e impede segundo salto; preserva primeiro salto, pulo na parede e esquiva de precis?o gratuita. Golpes declaram elegibilidade por dados, sem regra pelo nome do personagem.
+Forte comum pode ferir braço; forte de avanço, perna. Exige dano efetivo não letal contra exausto e cota ainda disponível: uma aplicação por round, mesmo após Cura. Braço multiplica custo derivado de bloqueio por 1,35. Perna multiplica dash e dash aéreo por 1,35 e impede segundo salto; preserva primeiro salto, pulo na parede e esquiva de precisão gratuita. Golpes declaram elegibilidade por dados, sem regra pelo nome do personagem.
 
-Cura remove ferimento somente ao completar sua dura??o sem dano. Pode ser lan?ada com vida cheia; atingir o teto de vida n?o conclui o efeito. Dano efetivo, inclusive peri?dico, interrompe antes da conclus?o do mesmo passo. Efeitos registram t?rmino `completed`, `interrupted`, `death`, `reset`, `replaced` ou `depleted`.
+Cura remove ferimento somente ao completar sua duração sem dano. Pode ser lançada com vida cheia; atingir o teto de vida não conclui o efeito. Dano efetivo, inclusive periódico, interrompe antes da conclusão do mesmo passo. Efeitos registram término `completed`, `interrupted`, `death`, `reset`, `replaced` ou `depleted`.
 
-Ira (`wrath`, Eclipse) custa 35 de Fluxo, prepara por 0,3 s e dura 5 s ? pot?ncia. Dano causado ? 1,2 e recebido ? 0,85 em l?minas e poderes; dano peri?dico n?o muda. Reaplica??o substitui e reinicia, sem empilhar. N?o impede interrup??o, stun, parry, empurr?o nem quebra de guarda. Nenhum loadout do elenco a recebe na 2.4. Ordem da l?mina: dano ? puni??o ? carga ? ponto doce ? exaust?o ? Ira atacante ? Ira defensor ? armadura. Poderes usam dano ? pot?ncia ? Ira atacante ? Ira defensor.
+Ira (`wrath`, Eclipse) custa 35 de Fluxo, prepara por 0,3 s e dura 5 s × potência. Dano causado × 1,2 e recebido × 0,85 em lâminas e poderes; dano periódico não muda. Reaplicação substitui e reinicia, sem empilhar. Não impede interrupção, stun, parry, empurrão nem quebra de guarda. Nenhum loadout do elenco a recebe na 2.4. Ordem da lâmina: dano → punição → carga → ponto doce → exaustão → Ira atacante → Ira defensor → armadura. Poderes usam dano → potência → Ira atacante → Ira defensor.
 
-Foco mant?m redu??o de custos e evita v?rios contatos de l?mina corpo a corpo por 12 de Fluxo cada, at? sua dura??o terminar. Exige ch?o, IDLE e intent sem movimento nem a??o. Manual v?lido tem prioridade e n?o custa Fluxo. Autom?tico n?o altera sequ?ncia manual nem renova dura??o. Empurr?es, poderes e proj?teis n?o s?o eleg?veis. Saldo insuficiente para a pr?xima defesa encerra o Foco, incluindo redu??o de custos, sem reativa??o pela regenera??o.
+Foco mantém redução de custos e evita vários contatos de lâmina corpo a corpo por 12 de Fluxo cada, até sua duração terminar. Exige chão, IDLE e intent sem movimento nem ação. Manual válido tem prioridade e não custa Fluxo. Automático não altera sequência manual nem renova duração. Empurrões, poderes e projéteis não são elegíveis. Saldo insuficiente para a próxima defesa encerra o Foco, incluindo redução de custos, sem reativação pela regeneração.
+
+**Números adotados no fechamento da 2.4** (`combatRulesConfig`; os acima são os da especificação, mantidos nos testes de regra): entrada na exaustão a 5% do Vigor, saída a 30%, mínimo de 1 s após quebra de guarda, dano × 1,1 contra o exausto, braço ferido × 1,25 no custo de bloqueio, perna ferida × 1,2 no dash e esquiva automática do Foco a 30 de Fluxo. Exaustão e ferimento valem também no Tutorial. Calibração completa em versions/v3.md → "Validação da 2.4".
 
 ## 27. Poderes novos e poderes de custo alto (v3, etapas 2.17 e 2.18)
 
