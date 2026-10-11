@@ -10,7 +10,7 @@ import { easeOutCubic } from '../utils/easing.js';
 import { TAU, clamp, lerp } from '../utils/math.js';
 import { createRandom } from '../utils/random.js';
 import { drawFighterBody } from './fighterRenderer.js';
-import { drawRockCluster, getRockCount } from './rockCluster.js';
+import { drawRockCluster, getRockCount, getRockScale } from './rockCluster.js';
 
 const style = powersConfig.render;
 
@@ -264,7 +264,7 @@ export class PowerRenderer {
     const y = lerp(fighter.y - size.radius * rocks.riseStart, fighter.y - fighter.height * projectilesConfig.height, rise);
     renderer.save();
     renderer.setBlendMode('source-over');
-    drawRockCluster(renderer, x, y, size.radius, fighter.stateTime * rocks.riseSpin * fighter.facing, getRockCount(size.id), tier.color);
+    drawRockCluster(renderer, x, y, size.radius * getRockScale(size.id), fighter.stateTime * rocks.riseSpin * fighter.facing, getRockCount(size.id), tier.color);
     renderer.restore();
   }
 

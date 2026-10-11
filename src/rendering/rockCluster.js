@@ -8,6 +8,10 @@ export function getRockCount(sizeId) {
   return style.rocks.bySize[sizeId] ?? 1;
 }
 
+export function getRockScale(sizeId) {
+  return style.rocks.drawScale[sizeId] ?? 1;
+}
+
 function drawRock(renderer, x, y, radius, angle, edgeColor) {
   const cos = Math.cos(angle);
   const sin = Math.sin(angle);

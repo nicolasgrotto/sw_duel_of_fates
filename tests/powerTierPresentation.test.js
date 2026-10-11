@@ -291,3 +291,14 @@ describe('stone cluster', () => {
     }
   });
 });
+
+describe('stone size', () => {
+  it('draws the smaller sizes larger than their hitbox so the stones read at every tier', () => {
+    const { sizes } = projectilesConfig.throw;
+    const { drawScale } = projectilesConfig.render.rocks;
+    const drawn = sizes.map((size) => size.radius * drawScale[size.id]);
+    for (let index = 1; index < drawn.length; index += 1) assert.ok(drawn[index] > drawn[index - 1]);
+    assert.ok(sizes.slice(0, -1).every((size) => drawScale[size.id] > 1));
+    assert.equal(drawScale.max, 1);
+  });
+});
