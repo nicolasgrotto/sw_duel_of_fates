@@ -1145,9 +1145,11 @@ Testes rodam em Node (`npm test`), sem navegador. Por isso:
 
 - Módulos de lógica (`states/`, `modes/`, `characters/`, `controllers/`, `entities/`, `combat/`, `simulation/`, `systems/`, `ai/`, `config/`, `utils/`) **não** acessam `window`, `document` ou canvas. Estados e `rendering/` desenham só pela API do `Renderer` recebido.
 - Quando um módulo do core precisa do navegador (`Input`, `TouchInput`, `GameLoop`, `textPrompt`), a dependência é injetada.
-- `computePose` é uma função pura e também é testada.
+- `computePose` só lê o lutador e atualiza a pose recebida, incluindo sua memória de encadeamento; também é testada em Node, sem canvas.
 
 Testes atuais: 580 testes em `tests/`, um arquivo por área (loop, input e toque, estados e modos, combate, especiais, EVADE, atributos, Fluxo e poderes, IA, simulação, replay, áudio, efeitos, UI, desbloqueios e skins, Arcade, Sobrevivência, História, segredos, remapeamento, save). `tests/states.test.js` cobre o fluxo de telas; `goToMenuItem(game, id)` navega no menu pelo id, sem depender da posição dos itens. Utilitários compartilhados ficam em `tests/helpers.js` (`createSimulation`, `spawnFighter`...).
+
+**Regressão de poses (2.12).** `tests/attackAnimationRegression.test.js` compara os canais antigos dos personagens sem trilhas e dos protagonistas Fúria/Voo com o fixture histórico `tests/fixtures/attackPoses-v2.json`, capturado executando o commit `198525b`, e os seis valores de frame data/hitbox de todos os golpes de Guardião e Vespa. Geometria usa `getBladeWorldPoints` e `getAttackHitbox`; continuidade mantém a mesma `createPose` entre frames de 1/60 s, amostra cada entrada de recuperação nas cadeias e solicita fortes pelo buffer da simulação. Limite e pendências estão em `versions/v3.md` → "Validação da 2.12". Os quatro casos conhecidos de light5→forte da Vespa são asserções executadas como `todo`, não testes pulados; precisam deixar de ser `todo` após a correção.
 
 ---
 
