@@ -30,6 +30,26 @@ export function spawnFighter(x, facing = 1, characterId = 'guardian') {
   return createFighter(characterId, { x, y: arena.floorY, facing });
 }
 
+export function segmentEntersBox(blade, box) {
+  let near = 0;
+  let far = 1;
+  for (const [start, delta, minimum, maximum] of [
+    [blade.baseX, blade.tipX - blade.baseX, box.left, box.right],
+    [blade.baseY, blade.tipY - blade.baseY, box.top, box.bottom],
+  ]) {
+    if (delta === 0) {
+      if (start <= minimum || start >= maximum) return false;
+      continue;
+    }
+    const a = (minimum - start) / delta;
+    const b = (maximum - start) / delta;
+    near = Math.max(near, Math.min(a, b));
+    far = Math.min(far, Math.max(a, b));
+    if (near >= far) return false;
+  }
+  return near < far;
+}
+
 export function repeat(times, callback) {
   for (let i = 0; i < times; i += 1) {
     callback(i);

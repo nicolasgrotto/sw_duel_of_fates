@@ -8,7 +8,7 @@ import { storyConfig } from '../src/config/storyConfig.js';
 import { createBox, getAttackHitbox } from '../src/combat/hitboxes.js';
 import { getMotionStyle, computePose, createPose } from '../src/rendering/fighterPose.js';
 import { getBladeWorldPoints } from '../src/rendering/saberRenderer.js';
-import { STEP, createSimulation, spawnFighter } from './helpers.js';
+import { STEP, createSimulation, segmentEntersBox, spawnFighter } from './helpers.js';
 
 const baseline = JSON.parse(readFileSync(new URL('./fixtures/attackPoses-v2.json', import.meta.url)));
 const MAX_CHAIN_ANGLE = Math.PI / 3;
@@ -22,26 +22,6 @@ function attackAt(fighter, moveId, time) {
   fighter.stateTime = time;
   fighter.animation.time = time;
   return move;
-}
-
-function segmentEntersBox(blade, box) {
-  let near = 0;
-  let far = 1;
-  for (const [start, delta, minimum, maximum] of [
-    [blade.baseX, blade.tipX - blade.baseX, box.left, box.right],
-    [blade.baseY, blade.tipY - blade.baseY, box.top, box.bottom],
-  ]) {
-    if (delta === 0) {
-      if (start <= minimum || start >= maximum) return false;
-      continue;
-    }
-    const a = (minimum - start) / delta;
-    const b = (maximum - start) / delta;
-    near = Math.max(near, Math.min(a, b));
-    far = Math.min(far, Math.max(a, b));
-    if (near >= far) return false;
-  }
-  return near < far;
 }
 
 function angularDistance(a, b) {

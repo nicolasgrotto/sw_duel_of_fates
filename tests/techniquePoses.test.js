@@ -1,15 +1,24 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
 import { CombatEvent } from '../src/combat/combatEvents.js';
-import { createBox, getAttackHitbox } from '../src/combat/hitboxes.js';
+import { createBox, getAttackHitbox, hasActiveHitbox } from '../src/combat/hitboxes.js';
+import { characters } from '../src/characters/characterData.js';
+import { createFighterFromCharacter } from '../src/characters/characterFactory.js';
+import { createProtagonistCharacter } from '../src/characters/protagonist.js';
 import { effectsConfig } from '../src/config/effectsConfig.js';
+import { storyConfig } from '../src/config/storyConfig.js';
 import { Camera } from '../src/core/Camera.js';
 import { computePose, createPose } from '../src/rendering/fighterPose.js';
 import { getBladeWorldPoints } from '../src/rendering/saberRenderer.js';
 import { EffectsSystem } from '../src/systems/EffectsSystem.js';
 import { TimeControl } from '../src/systems/TimeControl.js';
 import { createRandom } from '../src/utils/random.js';
-import { spawnFighter } from './helpers.js';
+import { segmentEntersBox, spawnFighter } from './helpers.js';
+
+const techniqueCasters = Object.keys(characters).map((id) => ({ id, create: (facing) => spawnFighter(500, facing, id) }));
+techniqueCasters.push({ id: 'protagonist/technique', create: (facing) => createFighterFromCharacter(createProtagonistCharacter({
+  name: 'Pilot', style: 'technique', alignment: 'light', attributes: storyConfig.startAttributes,
+}, storyConfig), { x: 500, y: 600, facing }) });
 
 function attackAt(fighter, moveId, time) {
   const move = fighter.moves[moveId];
@@ -26,29 +35,28 @@ function poseAt(fighter, moveId, time) {
   return computePose(fighter, createPose());
 }
 
-function bladeTouchesBox(blade, box) {
-  for (let step = 0; step <= 20; step += 1) {
-    const x = blade.baseX + (blade.tipX - blade.baseX) * step / 20;
-    const y = blade.baseY + (blade.tipY - blade.baseY) * step / 20;
-    if (x >= box.left && x <= box.right && y >= box.top && y <= box.bottom) return true;
-  }
-  return false;
-}
-
-function assertBladeReachesHitbox(id, moveId, facing) {
-  const fighter = spawnFighter(500, facing, id);
+function assertBladeReachesHitbox(fighter, moveId, context) {
   const move = fighter.moves[moveId];
   const box = getAttackHitbox(fighter, move, createBox());
   const blade = {};
+  const pose = createPose();
   let touches = false;
-  for (let sample = 0; sample <= 60; sample += 1) {
-    const pose = poseAt(fighter, moveId, move.startup + move.active * sample / 60);
-    if (bladeTouchesBox(getBladeWorldPoints(fighter, pose, blade), box)) touches = true;
+  for (let sample = 0; sample < 120; sample += 1) {
+    attackAt(fighter, moveId, move.startup + move.active * sample / 120);
+    computePose(fighter, pose, false, context);
+    if (segmentEntersBox(getBladeWorldPoints(fighter, pose, blade), box)) touches = true;
   }
-  assert.ok(touches, `${id}/${moveId}/${facing}`);
+  assert.ok(touches, `${fighter.id}/${moveId}/${fighter.facing}: no blade segment enters the active hitbox interior`);
 }
 
 describe('technique keyframe tracks', () => {
+  it('requires a segment through the box interior instead of an edge or corner touch', () => {
+    const box = { left: 0, right: 10, top: 0, bottom: 10 };
+    assert.equal(segmentEntersBox({ baseX: 0, baseY: -5, tipX: 0, tipY: 15 }, box), false);
+    assert.equal(segmentEntersBox({ baseX: -5, baseY: -5, tipX: 0, tipY: 0 }, box), false);
+    assert.equal(segmentEntersBox({ baseX: -5, baseY: 5, tipX: 15, tipY: 5 }, box), true);
+  });
+
   it('turns the body during the spin and faces front again in the recovery', () => {
     const fighter = spawnFighter(500, 1, 'shadow');
     const move = fighter.moves.spin;
@@ -101,10 +109,30 @@ describe('technique keyframe tracks', () => {
     }
   });
 
-  for (const [id, moveId] of [['shadow', 'spin'], ['forge', 'spin'], ['shadow', 'dashSlash'], ['guardian', 'dashSlash'], ['wasp', 'dashSlash'], ['ember', 'dashSlash']]) {
+  for (const { id, create } of techniqueCasters) {
+    const equipped = new Set(Object.values(create(1).stats.techniques));
+    for (const moveId of ['spin', 'dashSlash'].filter((move) => equipped.has(move))) {
+      for (const facing of [-1, 1]) {
+        it(`${id}/${moveId}/${facing}: the blade enters the real hitbox interior during active`, () => {
+          assertBladeReachesHitbox(create(facing), moveId);
+        });
+      }
+    }
+    if (!equipped.has('saberThrow')) continue;
     for (const facing of [-1, 1]) {
-      it(`${id}/${moveId}/${facing}: the blade reaches the real hitbox during active`, () => {
-        assertBladeReachesHitbox(id, moveId, facing);
+      it(`${id}/saberThrow/${facing}: excludes projectile geometry and hides the owner's blade in flight`, () => {
+        const fighter = create(facing);
+        const move = fighter.moves.saberThrow;
+        assert.equal(move.projectile, true);
+        const pose = createPose();
+        fighter.combat.saberThrown = true;
+        for (let sample = 0; sample < 120; sample += 1) {
+          attackAt(fighter, 'saberThrow', move.startup + move.active * sample / 120);
+          assert.equal(hasActiveHitbox(fighter), false);
+          assert.equal(computePose(fighter, pose).bladeVisible, false);
+        }
+        fighter.combat.saberThrown = false;
+        assert.equal(computePose(fighter, pose).bladeVisible, true);
       });
     }
   }
@@ -172,17 +200,8 @@ describe('guardian counter flourish', () => {
 
   for (const facing of [-1, 1]) {
     it(`guardian/counterRiposte/${facing}: the thrust reaches the real riposte hitbox`, () => {
-      const fighter = spawnFighter(500, facing, 'guardian');
-      const move = fighter.moves.riposte;
-      const box = getAttackHitbox(fighter, move, createBox());
       const flourish = { advantage: 0, victory: false, flourish: true };
-      const blade = {};
-      let touches = false;
-      for (let sample = 0; sample <= 60; sample += 1) {
-        attackAt(fighter, 'riposte', move.startup + move.active * sample / 60);
-        if (bladeTouchesBox(getBladeWorldPoints(fighter, computePose(fighter, createPose(), false, flourish), blade), box)) touches = true;
-      }
-      assert.ok(touches);
+      assertBladeReachesHitbox(spawnFighter(500, facing, 'guardian'), 'riposte', flourish);
     });
   }
 });
