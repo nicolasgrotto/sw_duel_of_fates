@@ -314,6 +314,10 @@ function applyPowerPose(fighter, guardDegrees) {
   combatPose.crouch = style.crouch * amount;
   combatPose.reach = style.reach * amount;
   combatPose.lift = style.lift * amount;
+  if (style.offHand) {
+    combatPose.offHand = style.offHand * amount;
+    combatPose.offHandDegrees = lerp(combatPoses.keyframeDefaults.offHandDegrees, style.offHandDegrees, amount);
+  }
 }
 
 function isChoked(fighter) {

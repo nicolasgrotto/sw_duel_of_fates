@@ -194,6 +194,22 @@ export const audioConfig = {
       { type: 'tone', wave: 'sine', from: 547, to: 322, duration: 0.45, attack: 0.03, gain: 0.07, filter: null },
       { type: 'tone', wave: 'triangle', from: 130, to: 120, duration: 0.4, attack: 0.05, gain: 0.06, filter: null },
     ],
+    stormInvoke: [
+      { type: 'noise', duration: 0.5, attack: 0.3, gain: 0.28, filter: { type: 'bandpass', from: 400, to: 3000, q: 1 } },
+      { type: 'tone', wave: 'sawtooth', from: 60, to: 180, duration: 0.5, attack: 0.25, gain: 0.06, filter: { type: 'lowpass', from: 400, to: 1400, q: 1 } },
+    ],
+    stormCall: [
+      { type: 'noise', duration: 1.2, attack: 0.02, gain: 0.42, filter: { type: 'lowpass', from: 900, to: 150, q: 0.8 } },
+      { type: 'tone', wave: 'sine', from: 50, to: 35, duration: 1, attack: 0.02, gain: 0.2, filter: null },
+    ],
+    stormMark: [
+      { type: 'noise', duration: 0.08, attack: 0.002, gain: 0.1, filter: { type: 'highpass', from: 3000, to: 3000, q: 0.7 } },
+    ],
+    stormStrike: [
+      { type: 'noise', duration: 0.15, attack: 0.001, gain: 0.42, filter: { type: 'highpass', from: 1800, to: 1800, q: 0.7 } },
+      { type: 'noise', duration: 0.6, attack: 0.005, gain: 0.32, filter: { type: 'lowpass', from: 600, to: 120, q: 0.8 } },
+      { type: 'tone', wave: 'sine', from: 80, to: 40, duration: 0.4, attack: 0.002, gain: 0.22, filter: null },
+    ],
     secret: [
       { type: 'tone', wave: 'sine', from: 440, to: 440, duration: 0.5, attack: 0.01, gain: 0.08, filter: null },
       { type: 'tone', wave: 'sine', from: 660, to: 660, duration: 0.7, attack: 0.12, gain: 0.07, filter: null },

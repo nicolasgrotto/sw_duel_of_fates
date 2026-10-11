@@ -27,6 +27,8 @@ export const EffectType = Object.freeze({
   BLADE_LOCK_WIN: 'bladeLockWin',
   BLADE_LOCK_BREAK: 'bladeLockBreak',
   COUNTER_FLOURISH: 'counterFlourish',
+  STORM_STRIKE: 'stormStrike',
+  STORM_CALL: 'stormCall',
   POWER_WAVE: 'powerWave',
   POWER_IMPACT: 'powerImpact',
   LIGHTNING_TICK: 'lightningTick',
@@ -41,6 +43,10 @@ function getTierColor(fighter) {
 
 function createShockwave() {
   return { active: false, x: 0, y: 0, direction: 1, range: 0, scale: 1, color: '', time: 0 };
+}
+
+function createStormStrike(segments) {
+  return { active: false, x: 0, floorY: 0, time: 0, color: '', width: 0, points: new Float32Array((segments + 1) * 2) };
 }
 
 function createLight() {
@@ -94,6 +100,7 @@ export class EffectsSystem {
     this.spasms = new Map();
     this.particles = new ParticlePool(config.maxParticles);
     this.debris = new ParticlePool(config.maxDebris);
+    this.stormStrikes = Array.from({ length: config.maxStormStrikes }, () => createStormStrike(config.stormStrike.segments));
     this.ringParams = { radius: 0, lineWidth: 0, alpha: 0, duration: 0 };
     this.lights = Array.from({ length: config.maxLights }, createLight);
     this.rings = Array.from({ length: config.maxRings }, createRing);
@@ -131,10 +138,6 @@ export class EffectsSystem {
 
   handleEvent(event) {
     const { attacker, defender, x, y } = event;
-    if (event.type === CombatEvent.POWER_PULSE) {
-      this.spawnStorm(attacker);
-      return;
-    }
     if (event.attackType === 'throw' && THROW_IMPACTS.has(event.type)) {
       this.spawnDebris(x, y, attacker.facing);
     }
@@ -206,8 +209,13 @@ export class EffectsSystem {
         this.startTremor(attacker);
         this.spawnParry(EffectType.PERFECT_PARRY, defender, params);
         break;
+      case CombatEvent.STORM_STRIKE:
+        this.spawnStormStrike(attacker, x, y, params);
+        break;
       case CombatEvent.POWER_ACTIVE:
-        if (event.attackType === 'push') {
+        if (event.attackType === 'storm') {
+          this.spawnStormCall(attacker, params);
+        } else if (event.attackType === 'push') {
           this.spawnShockwave(attacker);
         } else {
           this.spawnPowerWave(attacker, event.attackType === 'pull', params);
@@ -228,8 +236,9 @@ export class EffectsSystem {
         }
         if (event.attackType === 'storm') {
           this.spasms.set(defender, this.config.stormSpasm.duration);
+          break;
         }
-        this.spawn(event.attackType === 'lightning' || event.attackType === 'storm' ? EffectType.LIGHTNING_TICK : EffectType.POWER_IMPACT, params);
+        this.spawn(event.attackType === 'lightning' ? EffectType.LIGHTNING_TICK : EffectType.POWER_IMPACT, params);
         break;
       case CombatEvent.POWER_BLOCKED:
         params.color = getTierColor(attacker);
@@ -356,27 +365,6 @@ export class EffectsSystem {
     }
   }
 
-  spawnStorm(caster) {
-    const style = powersConfig.render.storm;
-    const power = powersConfig.powers.storm;
-    const tier = getPowerTier(caster.flowLevel, powersConfig.tiers);
-    const count = Math.round((this.reduced ? style.reducedParticles : style.particles) * tier.particleScale);
-    for (let i = 0; i < count; i += 1) {
-      const particle = this.particles.acquire();
-      if (!particle) return;
-      const angle = this.random() * Math.PI * 2;
-      const radius = Math.sqrt(this.random()) * power.range;
-      particle.x = caster.x + Math.cos(angle) * radius;
-      particle.y = caster.y - caster.height / 2 + Math.sin(angle) * radius;
-      particle.vx = -Math.sin(angle) * style.speed;
-      particle.vy = Math.cos(angle) * style.speed;
-      particle.life = style.life;
-      particle.maxLife = style.life;
-      particle.size = style.size;
-      particle.color = tier.color;
-    }
-  }
-
   spawnShockwave(caster) {
     const style = this.config.shockwave;
     let wave = this.shockwaves[0];
@@ -437,6 +425,54 @@ export class EffectsSystem {
     ring.alpha = recipe.ring.alpha;
     ring.duration = recipe.ring.duration;
     this.spawnRing(ring, params.x, params.y, params.color, true);
+  }
+
+  spawnStormCall(caster, params) {
+    params.color = getTierColor(caster);
+    params.x = caster.x;
+    params.y = this.config.stormStrike.skyY;
+    this.spawn(EffectType.STORM_CALL, params);
+  }
+
+  spawnStormStrike(caster, x, floorY, params) {
+    const style = this.config.stormStrike;
+    const tier = getPowerTier(caster.flowLevel, powersConfig.tiers);
+    let strike = this.stormStrikes[0];
+    for (const candidate of this.stormStrikes) {
+      if (!candidate.active) {
+        strike = candidate;
+        break;
+      }
+      if (candidate.time > strike.time) strike = candidate;
+    }
+    strike.active = true;
+    strike.x = x;
+    strike.floorY = floorY;
+    strike.time = 0;
+    strike.color = tier.color;
+    strike.width = tier.boltWidth * style.widthScale;
+    const last = style.segments;
+    for (let index = 0; index <= last; index += 1) {
+      const t = index / last;
+      const envelope = Math.sin(t * Math.PI);
+      strike.points[index * 2] = x + (this.random() * 2 - 1) * style.jitter * envelope;
+      strike.points[index * 2 + 1] = style.skyY + (floorY - style.skyY) * t;
+    }
+    params.x = x;
+    params.y = floorY;
+    params.direction = this.random() < 0.5 ? 1 : -1;
+    params.color = tier.color;
+    params.particleScale = tier.particleScale;
+    this.spawn(EffectType.STORM_STRIKE, params);
+  }
+
+  updateStormStrikes(dt) {
+    const { duration } = this.config.stormStrike;
+    for (const strike of this.stormStrikes) {
+      if (!strike.active) continue;
+      strike.time += dt;
+      if (strike.time >= duration) strike.active = false;
+    }
   }
 
   spawnMindTwist(caster, target) {
@@ -712,6 +748,7 @@ export class EffectsSystem {
     this.updateFlash(dt);
     this.updateRings(dt);
     this.updateShockwaves(dt);
+    this.updateStormStrikes(dt);
     this.updateTimers(this.saberFlares, dt);
     this.updateTimers(this.hitFlashes, dt);
     this.updateTimers(this.evadeAfterimages, dt);

@@ -29,23 +29,6 @@ function activeLights(effects) {
   return effects.lights.filter((light) => light.active);
 }
 
-it('scales storm emission by tier, respects reduced effects and never exceeds the pool', () => {
-  for (const [level, expected] of [[1, 8], [6, 12], [8, 16], [10, 20]]) {
-    const { effects } = createEffects();
-    const attacker = spawnFighter(500);
-    attacker.stats = { ...attacker.stats, flowLevel: level };
-    const event = { type: CombatEvent.POWER_PULSE, attacker };
-    effects.handleEvent(event);
-    assert.equal(effects.particles.activeCount, expected);
-    effects.particles.update(1, { gravity: 0, drag: 0 });
-    effects.setReduced(true);
-    effects.handleEvent(event);
-    assert.ok(effects.particles.activeCount < expected);
-    assert.ok(effects.particles.activeCount >= powersConfig.render.storm.reducedParticles * 0.5);
-    repeat(100, () => effects.handleEvent(event));
-    assert.equal(effects.particles.activeCount, effectsConfig.maxParticles);
-  }
-});
 
 describe('random', () => {
   it('repeats the same sequence for the same seed', () => {

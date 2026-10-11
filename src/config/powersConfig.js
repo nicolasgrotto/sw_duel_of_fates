@@ -42,7 +42,7 @@ export const powersConfig = {
       absorbGain: 0.5,
     },
     storm: {
-      id: 'storm', effect: 'storm', channel: true, automatic: true, pose: 'channel', interaction: 'storm', around: true,
+      id: 'storm', effect: 'storm', channel: true, automatic: true, pose: 'invoke', interaction: 'storm', around: true,
       minFlowLevel: 6, cost: 70, startup: STORM_PHASES.invocation, maxChannel: STORM_PHASES.storm, recovery: STORM_PHASES.recovery,
       stormPhases: STORM_PHASES, range: 600, damage: 6, stun: 0.12, strikeWarning: 0.5, strikeWidth: 60, barrierDrainPerStrike: 30,
       strikesByTier: [{ minLevel: 3, strikes: 8 }, { minLevel: 8, strikes: 10 }, { minLevel: 10, strikes: 12 }],
@@ -197,8 +197,11 @@ export const powersConfig = {
     absorb: { ringRadius: 70, particles: 8, reducedParticles: 4, radius: 70, life: 0.22, size: 2 },
     drain: { motes: 10, cyclesPerSecond: 1.6, wobble: 6, moteRadius: 9, moteAlpha: 0.65, lineAlpha: 0.22, lineWidth: 1.5, thinFrom: 0.7, thinAlpha: 0.35 },
     storm: {
-      alpha: 0.25, lineWidth: 1.5, particles: 12, reducedParticles: 5, life: 0.3, speed: 65, size: 2,
       arcSegments: 5, arcJitter: 5, arcAlpha: 0.85, arcWidthScale: 0.55, arcGlowAlpha: 0.3, arcGlowScale: 3,
+      skyY: -60, callSegments: 12, callJitter: 18,
+      shieldArcs: 6, shieldRadiusX: 0.34, shieldRadiusY: 0.56, shieldSpan: 1.1, shieldSpin: 1.3, shieldGlowScale: 0.6, shieldGlowAlpha: 0.18,
+      markRadiusY: 7, markWidthScale: [1.1, 0.5], markAlpha: [0.3, 0.85], markFillAlpha: 0.2, markLineWidth: 2, columnHeight: 260, columnAlpha: 0.14,
+      darkAlpha: 0.4,
     },
     seed: 7,
     handOffset: 8,

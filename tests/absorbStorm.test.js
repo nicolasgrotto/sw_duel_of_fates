@@ -195,19 +195,4 @@ describe('new power integration', () => {
     }
   });
 
-  it('keeps storm particles in the existing pool and reduces emission', () => {
-    const s = setup('storm');
-    const effects = new EffectsSystem(effectsConfig, null, createRandom(1), null);
-    const particles = effects.particles.particles.slice();
-    const event = { type: CombatEvent.POWER_PULSE, attacker: s.caster, attackType: 'storm' };
-    effects.handleEvent(event);
-    assert.equal(effects.particles.activeCount, powersConfig.render.storm.particles);
-    for (let i = 0; i < 100; i++) effects.handleEvent(event);
-    assert.equal(effects.particles.activeCount, effectsConfig.maxParticles);
-    assert.ok(particles.every((p, i) => p === effects.particles.particles[i]));
-    effects.particles.update(1, { gravity: 0, drag: 0 });
-    effects.setReduced(true);
-    effects.handleEvent(event);
-    assert.equal(effects.particles.activeCount, powersConfig.render.storm.reducedParticles);
-  });
 });

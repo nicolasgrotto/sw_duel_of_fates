@@ -53,18 +53,25 @@ function getSoundForEvent(event) {
       return SoundName.PERFECT_PARRY;
     case CombatEvent.POWER_START:
       if (event.attackType === 'drain') return SoundName.DRAIN;
+      if (event.attackType === 'storm') return SoundName.STORM_INVOKE;
       return event.attackType === 'barrier' ? SoundName.BARRIER : SoundName.POWER_CHARGE;
     case CombatEvent.POWER_ACTIVE:
       if (event.attackType === 'wrath') return SoundName.WRATH;
+      if (event.attackType === 'storm') return SoundName.STORM_CALL;
       return event.attackType === 'pull' ? SoundName.POWER_PULL : SoundName.POWER_WAVE;
     case CombatEvent.POWER_HIT:
       if (event.attackType === 'drain') return null;
       if (event.attackType === 'mindTwist') return SoundName.MIND_TWIST;
+      if (event.attackType === 'storm') return null;
       return event.attackType === 'lightning' ? SoundName.LIGHTNING : SoundName.POWER_IMPACT;
     case CombatEvent.POWER_BLOCKED:
       return SoundName.BLOCK;
     case CombatEvent.POWER_RESISTED:
       return SoundName.POWER_RESISTED;
+    case CombatEvent.STORM_MARK:
+      return SoundName.STORM_MARK;
+    case CombatEvent.STORM_STRIKE:
+      return SoundName.STORM_STRIKE;
     case CombatEvent.POWER_ABSORBED:
       if (event.defender?.combat.absorbTime > 0 && event.attackType !== 'storm') return SoundName.ABSORB;
       return SoundName.POWER_ABSORBED;

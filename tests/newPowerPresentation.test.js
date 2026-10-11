@@ -7,7 +7,8 @@ import { effectsConfig } from '../src/config/effectsConfig.js';
 import { powersConfig } from '../src/config/powersConfig.js';
 import { Camera } from '../src/core/Camera.js';
 import { FighterState } from '../src/entities/fighterStates.js';
-import { PowerRenderer } from '../src/rendering/PowerRenderer.js';
+import { computePose, createPose } from '../src/rendering/fighterPose.js';
+import { PowerRenderer, getStormDarkness } from '../src/rendering/PowerRenderer.js';
 import { EffectsSystem } from '../src/systems/EffectsSystem.js';
 import { TimeControl } from '../src/systems/TimeControl.js';
 import { createRandom } from '../src/utils/random.js';
@@ -147,5 +148,98 @@ describe('mind twist presentation', () => {
     assert.equal(ring.x, target.x);
     assert.equal(effects.hasHitFlash(target), false);
     assert.deepEqual(playedSounds([event(CombatEvent.POWER_HIT, caster, target, 'mindTwist')]), [SoundName.MIND_TWIST]);
+  });
+});
+
+describe('storm presentation', () => {
+  const storm = powersConfig.powers.storm;
+  const phases = storm.stormPhases;
+
+  function caster(stateTime, level = 8) {
+    const fighter = spawnFighter(400, 1, 'sovereign');
+    fighter.stats.flowLevel = level;
+    channel(fighter, 'storm', stateTime);
+    return fighter;
+  }
+
+  it('darkens the arena during the invocation, holds it in the storm and fades in the recovery', () => {
+    const dark = powersConfig.render.storm.darkAlpha;
+    assert.equal(getStormDarkness([caster(0)]), 0);
+    assert.ok(Math.abs(getStormDarkness([caster(phases.invocation / 2)]) - dark / 2) < 1e-9);
+    assert.equal(getStormDarkness([caster(phases.invocation + 1)]), dark);
+    const ending = caster(phases.invocation + phases.storm + phases.recovery / 2);
+    ending.combat.powerEndTime = phases.invocation + phases.storm;
+    assert.ok(Math.abs(getStormDarkness([ending]) - dark / 2) < 1e-9);
+    assert.equal(getStormDarkness([spawnFighter(400)]), 0);
+  });
+
+  it('raises the free hand and calls a bolt to the sky during the invocation', () => {
+    const fighter = caster(phases.invocation * 0.9);
+    const pose = computePose(fighter, createPose());
+    assert.equal(pose.offHand > 0.9, true);
+    assert.ok(pose.freeHandY < pose.headY);
+    const renderer = recordingRenderer();
+    new PowerRenderer().draw(renderer, [fighter], new Map([[fighter, pose]]), fighter.y);
+    const call = renderer.calls.find((entry) => entry.name === 'polyline' && entry.args[0].length === (powersConfig.render.storm.callSegments + 1) * 2);
+    const points = call.args[0];
+    assert.ok(points[1] > points.at(-1));
+    assert.ok(points.at(-1) < powersConfig.render.storm.skyY / 2);
+  });
+
+  it('wraps the caster in shield arcs during the storm and draws the pending marks on the floor', () => {
+    const fighter = caster(phases.invocation + 1);
+    fighter.combat.stormMarks = [
+      { active: true, marked: true, x: 700, markTime: phases.invocation + 0.8, impactTime: phases.invocation + 1.3 },
+      { active: false, marked: false, x: 0, markTime: phases.invocation + 2, impactTime: phases.invocation + 2.5 },
+    ];
+    const renderer = recordingRenderer();
+    new PowerRenderer().draw(renderer, [fighter], null, 600);
+    const arcs = renderer.calls.filter((entry) => entry.name === 'polyline' && entry.args[0].length === (powersConfig.render.storm.arcSegments + 1) * 2);
+    assert.equal(arcs.length, powersConfig.render.storm.shieldArcs * 2);
+    const marks = renderer.calls.filter((entry) => entry.name === 'strokeEllipse');
+    assert.equal(marks.length, 1);
+    assert.equal(marks[0].args[0], 700);
+    assert.equal(marks[0].args[1], 600);
+    assert.ok(marks[0].args[2] < storm.strikeWidth * powersConfig.render.storm.markWidthScale[0]);
+  });
+
+  it('flashes the call and drops each strike from the sky to the floor', () => {
+    const effects = createEffects();
+    const fighter = caster(phases.invocation);
+    const target = spawnFighter(700, -1, 'guardian');
+    effects.handleEvents([{ type: CombatEvent.POWER_ACTIVE, attacker: fighter, defender: null, attackType: 'storm', x: 400, y: 500 }]);
+    assert.ok(effects.flash.alpha > 0);
+    assert.equal(effects.rings.some((ring) => ring.active), false);
+    effects.handleEvents([{ type: CombatEvent.STORM_STRIKE, attacker: fighter, defender: target, attackType: 'storm', x: 700, y: 600, hit: true }]);
+    const strike = effects.stormStrikes.find((candidate) => candidate.active);
+    assert.equal(strike.points[1], effectsConfig.stormStrike.skyY);
+    assert.equal(strike.points.at(-1), 600);
+    assert.ok(effects.particles.particles.some((particle) => particle.active));
+    effects.update(effectsConfig.stormStrike.duration + 0.01);
+    assert.equal(strike.active, false);
+    const reduced = createEffects(true);
+    reduced.handleEvents([{ type: CombatEvent.STORM_STRIKE, attacker: fighter, defender: target, attackType: 'storm', x: 700, y: 600, hit: false }]);
+    assert.equal(reduced.flash.alpha, 0);
+  });
+
+  it('leaves the strike visuals to the strike event and only shakes the hit target', () => {
+    const effects = createEffects();
+    const fighter = caster(phases.invocation + 1);
+    const target = spawnFighter(700, -1, 'guardian');
+    effects.handleEvents([event(CombatEvent.POWER_HIT, fighter, target, 'storm')]);
+    assert.equal(effects.particles.particles.filter((particle) => particle.active).length, 0);
+    assert.ok(effects.getTremor(target) !== 0);
+  });
+
+  it('plays invocation, call, mark and strike sounds', () => {
+    const fighter = caster(0);
+    const target = spawnFighter(700, -1, 'guardian');
+    assert.deepEqual(playedSounds([
+      event(CombatEvent.POWER_START, fighter, null, 'storm'),
+      event(CombatEvent.POWER_ACTIVE, fighter, null, 'storm'),
+      event(CombatEvent.STORM_MARK, fighter, target, 'storm'),
+      event(CombatEvent.STORM_STRIKE, fighter, target, 'storm'),
+      event(CombatEvent.POWER_HIT, fighter, target, 'storm'),
+    ]), [SoundName.STORM_INVOKE, SoundName.STORM_CALL, SoundName.STORM_MARK, SoundName.STORM_STRIKE]);
   });
 });

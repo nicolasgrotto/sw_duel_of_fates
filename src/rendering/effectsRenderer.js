@@ -80,6 +80,34 @@ export function drawShockwaves(renderer, waves, style) {
   renderer.restore();
 }
 
+export function drawStormStrikes(renderer, strikes, style) {
+  renderer.save();
+  renderer.setBlendMode('lighter');
+  for (const strike of strikes) {
+    if (!strike.active) {
+      continue;
+    }
+    const fade = 1 - strike.time / style.duration;
+    renderer.setAlpha(style.glowAlpha * fade);
+    renderer.polyline(strike.points, strike.color, strike.width * style.glowScale);
+    renderer.setAlpha(fade);
+    renderer.polyline(strike.points, strike.color, strike.width);
+    renderer.polyline(strike.points, colors.saberCore, strike.width * 0.4);
+    renderer.drawGlow(strike.x, strike.floorY, style.floorGlowRadius, strike.color, 0.6 * fade);
+  }
+  renderer.restore();
+}
+
+export function drawStormDarkness(renderer, amount, padding) {
+  if (amount <= 0) {
+    return;
+  }
+  renderer.save();
+  renderer.setAlpha(amount);
+  renderer.fillRect(-padding, -padding, renderer.width + padding * 2, renderer.height + padding * 2, colors.stormDarken);
+  renderer.restore();
+}
+
 export function drawDebris(renderer, debris) {
   renderer.save();
   for (const piece of debris) {

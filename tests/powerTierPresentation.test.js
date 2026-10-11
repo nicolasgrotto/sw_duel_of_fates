@@ -73,12 +73,12 @@ describe('lightning and storm by tier', () => {
     });
   }
 
-  it('runs short arcs over the body of the storm caster, more at the higher tiers', () => {
+  it('runs short arcs over the body of the storm caster during the invocation, more at the higher tiers', () => {
     const counts = [];
     for (const level of [6, 8]) {
       const caster = spawnFighter(400, 1, 'shadow');
       caster.stats.flowLevel = level;
-      startPower(caster, 'storm', 0.6);
+      startPower(caster, 'storm', 0.3);
       const pose = computePose(caster, createPose());
       const renderer = recordingRenderer();
       new PowerRenderer().draw(renderer, [caster], new Map([[caster, pose]]));
@@ -95,7 +95,7 @@ describe('lightning and storm by tier', () => {
   it('skips the body arcs when no pose is given', () => {
     const caster = spawnFighter(400, 1, 'shadow');
     caster.stats.flowLevel = 8;
-    startPower(caster, 'storm', 0.6);
+    startPower(caster, 'storm', 0.3);
     const renderer = recordingRenderer();
     new PowerRenderer().draw(renderer, [caster]);
     assert.equal(renderer.calls.filter((call) => call.name === 'polyline').length, 0);

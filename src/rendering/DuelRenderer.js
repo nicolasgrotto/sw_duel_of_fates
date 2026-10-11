@@ -4,9 +4,9 @@ import { colors } from '../config/themeConfig.js';
 import { effectsConfig } from '../config/effectsConfig.js';
 import { ArenaRenderer } from './arenaRenderer.js';
 import { DodgeAfterimage } from './DodgeAfterimage.js';
-import { PowerRenderer } from './PowerRenderer.js';
+import { PowerRenderer, getStormDarkness } from './PowerRenderer.js';
 import { ProjectileRenderer } from './ProjectileRenderer.js';
-import { drawDebris, drawDesaturation, drawFlash, drawImpactLights, drawParticles, drawRings, drawShockwaves } from './effectsRenderer.js';
+import { drawDebris, drawDesaturation, drawFlash, drawStormDarkness, drawStormStrikes, drawImpactLights, drawParticles, drawRings, drawShockwaves } from './effectsRenderer.js';
 import { computePose, createPose, getBladeLockAdvantage } from './fighterPose.js';
 import { drawFighterBody } from './fighterRenderer.js';
 import { SaberTrail } from './SaberTrail.js';
@@ -93,6 +93,7 @@ export class DuelRenderer {
       renderer.restore();
     }
     drawDesaturation(renderer, effects.desaturation, effectsConfig.desaturationDim, arena.overscan);
+    drawStormDarkness(renderer, getStormDarkness(fighters), arena.overscan);
     for (const fighter of fighters) {
       this.getTrail(fighter).draw(renderer, fighter.animation.time, fighter.appearance.saberColor);
     }
@@ -104,7 +105,8 @@ export class DuelRenderer {
     }
 
     this.projectileView.draw(renderer, projectiles, fighters);
-    this.powerView.draw(renderer, fighters, this.poses);
+    this.powerView.draw(renderer, fighters, this.poses, arena.floorY);
+    if (effects.stormStrikes) drawStormStrikes(renderer, effects.stormStrikes, effectsConfig.stormStrike);
     drawImpactLights(renderer, effects.lights);
     drawRings(renderer, effects.rings);
     drawShockwaves(renderer, effects.shockwaves, effectsConfig.shockwave);

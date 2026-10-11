@@ -1,5 +1,6 @@
 import { getPowerTier, resolveLevelBand } from '../combat/flowInteractions.js';
 import { getPowerRange, isBarrierUp, isChannelOpen, isUsingPower } from '../combat/PowerSystem.js';
+import { isStormShieldUp } from '../combat/StormSystem.js';
 import { hasStatus } from '../combat/StatusSystem.js';
 import { effectsConfig } from '../config/effectsConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
@@ -27,8 +28,23 @@ function createBolt(segments) {
 function createChannelView() {
   return {
     bolts: Array.from({ length: style.maxBolts }, () => createBolt(style.boltSegments)),
-    arcs: Array.from({ length: style.maxBolts }, () => createBolt(style.storm.arcSegments)),
+    arcs: Array.from({ length: Math.max(style.maxBolts, style.storm.shieldArcs) }, () => createBolt(style.storm.arcSegments)),
+    call: createBolt(style.storm.callSegments),
   };
+}
+
+export function getStormDarkness(fighters) {
+  let darkness = 0;
+  for (const fighter of fighters) {
+    const { power, powerEndTime } = fighter.combat;
+    if (!isUsingPower(fighter) || !power.stormPhases) continue;
+    const phases = power.stormPhases;
+    const amount = fighter.stateTime < phases.invocation
+      ? fighter.stateTime / phases.invocation
+      : powerEndTime > 0 ? 1 - (fighter.stateTime - powerEndTime) / phases.recovery : 1;
+    darkness = Math.max(darkness, clamp(amount, 0, 1));
+  }
+  return darkness * style.storm.darkAlpha;
 }
 
 const arcEnds = new Float32Array(4);
@@ -62,11 +78,13 @@ export class PowerRenderer {
     return view;
   }
 
-  draw(renderer, fighters, poses = null) {
+  draw(renderer, fighters, poses = null, floorY = null) {
     renderer.save();
     renderer.setBlendMode('lighter');
     for (const fighter of fighters) {
-      if (isUsingPower(fighter)) {
+      if (isUsingPower(fighter) && fighter.combat.power.stormPhases) {
+        this.drawStorm(renderer, fighter, poses?.get(fighter) ?? null, floorY ?? fighter.y);
+      } else if (isUsingPower(fighter)) {
         this.drawFighter(renderer, fighter, poses?.get(fighter) ?? null);
       }
       if (hasStatus(fighter)) {
@@ -169,13 +187,6 @@ export class PowerRenderer {
       this.drawLightning(renderer, fighter, tier, originX, originY);
     } else if (isChannelOpen(fighter) && power.effect === 'drain') {
       this.drawDrain(renderer, fighter, tier, originX, originY);
-    } else if (isChannelOpen(fighter) && power.effect === 'storm') {
-      renderer.setAlpha(style.storm.alpha);
-      renderer.strokeEllipse(fighter.x, fighter.y - fighter.height / 2, power.range, power.range, tier.color, style.storm.lineWidth);
-      renderer.setAlpha(1);
-      if (pose) {
-        this.drawStormArcs(renderer, fighter, pose, tier);
-      }
     } else if (fighter.combat.absorbTime > 0) {
       renderer.drawGlow(originX, originY, tier.glowRadius * style.absorbGlowScale, tier.color, tier.glowAlpha);
     }
@@ -273,6 +284,83 @@ export class PowerRenderer {
       renderer.drawGlow(x, y, drain.moteRadius * lerp(1, 0.5, t), tier.color, drain.moteAlpha * thin);
     }
     renderer.drawGlow(originX, originY, tier.glowRadius * style.absorbGlowScale, tier.color, tier.glowAlpha * thin);
+  }
+
+  drawStorm(renderer, fighter, pose, floorY) {
+    const tier = getPowerTier(fighter.flowLevel, powersConfig.tiers);
+    const phases = fighter.combat.power.stormPhases;
+    if (fighter.stateTime < phases.invocation) {
+      if (pose) {
+        this.drawStormArcs(renderer, fighter, pose, tier);
+        this.drawStormCall(renderer, fighter, pose, tier, phases);
+      }
+    } else if (isStormShieldUp(fighter)) {
+      this.drawStormShield(renderer, fighter, tier);
+    }
+    this.drawStormMarks(renderer, fighter, tier, floorY);
+  }
+
+  drawStormCall(renderer, fighter, pose, tier, phases) {
+    const storm = style.storm;
+    const { call } = this.getChannelView(fighter);
+    const scaleX = fighter.facing * (pose.turnScale ?? 1);
+    const handX = fighter.x + scaleX * pose.freeHandX;
+    const handY = fighter.y + pose.freeHandY - pose.bodyLift;
+    const rise = easeOutCubic(clamp(fighter.stateTime / phases.invocation, 0, 1));
+    this.refreshBolt(call, fighter.animation.time, storm.callJitter, 0);
+    this.tracePoints(call.points, call.offsets, handX, handY, handX, lerp(handY, storm.skyY, rise));
+    renderer.setAlpha(style.boltGlowAlpha);
+    renderer.polyline(call.points, tier.color, tier.boltWidth * style.boltGlowScale);
+    renderer.setAlpha(1);
+    renderer.polyline(call.points, tier.color, tier.boltWidth);
+    renderer.polyline(call.points, colors.saberCore, tier.boltWidth * style.coreWidthScale);
+    renderer.drawGlow(handX, handY, tier.glowRadius * rise, tier.color, tier.glowAlpha);
+  }
+
+  drawStormShield(renderer, fighter, tier) {
+    const storm = style.storm;
+    const { arcs } = this.getChannelView(fighter);
+    const time = fighter.animation.time;
+    const centerX = fighter.x;
+    const centerY = fighter.y - fighter.height / 2;
+    const radiusX = fighter.height * storm.shieldRadiusX;
+    const radiusY = fighter.height * storm.shieldRadiusY;
+    renderer.drawGlow(centerX, centerY, radiusY * storm.shieldGlowScale * 2, tier.color, storm.shieldGlowAlpha);
+    for (let index = 0; index < storm.shieldArcs; index += 1) {
+      const arc = arcs[index];
+      const from = (index / storm.shieldArcs) * TAU + time * storm.shieldSpin;
+      const to = from + storm.shieldSpan;
+      this.refreshBolt(arc, time, storm.arcJitter, 0);
+      this.tracePoints(
+        arc.points, arc.offsets,
+        centerX + Math.cos(from) * radiusX, centerY + Math.sin(from) * radiusY,
+        centerX + Math.cos(to) * radiusX, centerY + Math.sin(to) * radiusY,
+      );
+      renderer.setAlpha(storm.arcGlowAlpha);
+      renderer.polyline(arc.points, tier.color, tier.boltWidth * storm.arcGlowScale);
+      renderer.setAlpha(storm.arcAlpha);
+      renderer.polyline(arc.points, tier.color, tier.boltWidth * storm.arcWidthScale);
+    }
+    renderer.setAlpha(1);
+  }
+
+  drawStormMarks(renderer, fighter, tier, floorY) {
+    const storm = style.storm;
+    const { stormMarks, power } = fighter.combat;
+    if (!stormMarks) return;
+    for (const mark of stormMarks) {
+      if (!mark.active) continue;
+      const progress = easeOutCubic(clamp((fighter.stateTime - mark.markTime) / (mark.impactTime - mark.markTime), 0, 1));
+      const radiusX = power.strikeWidth * lerp(storm.markWidthScale[0], storm.markWidthScale[1], progress);
+      const alpha = lerp(storm.markAlpha[0], storm.markAlpha[1], progress);
+      renderer.setAlpha(alpha * storm.markFillAlpha);
+      renderer.fillEllipse(mark.x, floorY, radiusX, storm.markRadiusY, tier.color);
+      renderer.setAlpha(alpha);
+      renderer.strokeEllipse(mark.x, floorY, radiusX, storm.markRadiusY, tier.color, storm.markLineWidth);
+      renderer.setAlpha(storm.columnAlpha * progress);
+      renderer.line(mark.x, floorY, mark.x, floorY - storm.columnHeight, tier.color, power.strikeWidth * 0.5);
+    }
+    renderer.setAlpha(1);
   }
 
   drawStormArcs(renderer, fighter, pose, tier) {

@@ -162,6 +162,7 @@ export const combatPoses = {
     cast: { bladeDegrees: 115, lean: 12, crouch: 4, reach: 0.06, lift: 0, tremble: 0, trembleSpeed: 0 },
     channel: { bladeDegrees: 125, lean: 8, crouch: 8, reach: 0.04, lift: 0, tremble: 2.5, trembleSpeed: 9 },
     barrier: { bladeDegrees: -100, lean: -2, crouch: 12, reach: 0, lift: 0.04, tremble: 0, trembleSpeed: 0 },
+    invoke: { bladeDegrees: 100, lean: -8, crouch: 6, reach: -0.02, lift: 0, tremble: 1.5, trembleSpeed: 9, offHand: 1, offHandDegrees: -100 },
   },
   dodge: {
     lean: 14,
