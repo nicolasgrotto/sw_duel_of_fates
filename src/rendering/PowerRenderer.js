@@ -6,6 +6,7 @@ import { powersConfig } from '../config/powersConfig.js';
 import { colors } from '../config/themeConfig.js';
 import { TAU, clamp, lerp } from '../utils/math.js';
 import { createRandom } from '../utils/random.js';
+import { drawFighterBody } from './fighterRenderer.js';
 
 const style = powersConfig.render;
 
@@ -68,6 +69,27 @@ export class PowerRenderer {
       if (hasStatus(fighter)) {
         this.drawStatus(renderer, fighter);
       }
+    }
+    renderer.restore();
+  }
+
+  drawFrozenEchoes(renderer, fighter, pose, floorY) {
+    if (!(fighter.combat.freezeTime > 0)) {
+      return;
+    }
+    const status = style.status;
+    const color = getPowerTier(fighter.combat.statusLevel, powersConfig.tiers).color;
+    const beat = Math.floor(fighter.animation.time / status.freezeEchoInterval);
+    renderer.save();
+    renderer.setAlpha(status.freezeEchoAlpha);
+    for (let index = 0; index < status.freezeEchoOffsets.length; index += 1) {
+      const offset = status.freezeEchoOffsets[index];
+      const direction = (beat + index) % 2 === 0 ? 1 : -1;
+      const offsetX = offset * direction;
+      const offsetY = (offset / 2) * (index % 2 === 0 ? -direction : direction);
+      renderer.translate(offsetX, offsetY);
+      drawFighterBody(renderer, fighter, pose, floorY, false, color);
+      renderer.translate(-offsetX, -offsetY);
     }
     renderer.restore();
   }

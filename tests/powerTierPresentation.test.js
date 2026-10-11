@@ -124,3 +124,65 @@ describe('lightning and storm by tier', () => {
     assert.equal(effects.getPulseOutline(target), 0);
   });
 });
+
+describe('frozen and choked targets', () => {
+  it('holds the pose of the instant while frozen and releases it after', () => {
+    const fighter = spawnFighter(400, 1, 'guardian');
+    const pose = createPose();
+    const before = { ...computePose(fighter, pose) };
+    fighter.restartState(FighterState.STUNNED);
+    fighter.combat.freezeTime = 1;
+    for (const time of [0.1, 0.4, 0.9]) {
+      fighter.stateTime = time;
+      fighter.animation.time += 0.3;
+      computePose(fighter, pose);
+      assert.equal(pose.bladeAngle, before.bladeAngle);
+      assert.equal(pose.shoulderY, before.shoulderY);
+    }
+    fighter.combat.freezeTime = 0;
+    computePose(fighter, pose);
+    assert.notEqual(pose.bladeAngle, before.bladeAngle);
+  });
+
+  it('draws trembling silhouettes in the tier color of the caster around the frozen body', () => {
+    const fighter = spawnFighter(400, 1, 'guardian');
+    fighter.combat.freezeTime = 0.5;
+    fighter.combat.statusLevel = 10;
+    const renderer = recordingRenderer();
+    const pose = computePose(fighter, createPose());
+    const view = new PowerRenderer();
+    view.drawFrozenEchoes(renderer, fighter, pose, fighter.y);
+    const echoes = powersConfig.render.status.freezeEchoOffsets.length;
+    const torsos = renderer.calls.filter((call) => call.name === 'fillPolygon');
+    assert.equal(torsos.length, echoes);
+    assert.ok(torsos.every((call) => call.args[1] === powersConfig.tiers[3].color));
+    assert.ok(renderer.calls.some((call) => call.name === 'setAlpha' && call.args[0] === powersConfig.render.status.freezeEchoAlpha));
+    const firstShift = renderer.calls.find((call) => call.name === 'translate').args[0];
+    fighter.animation.time += powersConfig.render.status.freezeEchoInterval;
+    const next = recordingRenderer();
+    view.drawFrozenEchoes(next, fighter, pose, fighter.y);
+    assert.equal(next.calls.find((call) => call.name === 'translate').args[0], -firstShift);
+    fighter.combat.freezeTime = 0;
+    const idle = recordingRenderer();
+    view.drawFrozenEchoes(idle, fighter, pose, fighter.y);
+    assert.equal(idle.calls.length, 0);
+  });
+
+  it('lifts the choked victim with the hands at the neck, feet together and the blade hanging', () => {
+    const fighter = spawnFighter(400, 1, 'guardian');
+    fighter.restartState(FighterState.STUNNED);
+    fighter.combat.chokeTime = 0.5;
+    fighter.stateTime = 0.3;
+    const pose = computePose(fighter, createPose());
+    assert.ok(Math.abs(pose.bodyLift - fighter.height * 0.1) < 1e-9);
+    assert.equal(pose.offHand, 1);
+    assert.ok(Math.abs(pose.handY - pose.headY) < pose.headRadius * 2);
+    assert.ok(Math.abs(pose.freeHandY - pose.headY) < pose.headRadius * 2);
+    assert.ok(Math.abs(pose.frontFootX - pose.backFootX) < fighter.height * 0.06);
+    assert.ok(pose.bladeAngle > Math.PI / 3);
+    fighter.combat.chokeTime = 0;
+    const stunned = computePose(fighter, createPose());
+    assert.equal(stunned.bodyLift, 0);
+    assert.equal(stunned.offHand, 0);
+  });
+});

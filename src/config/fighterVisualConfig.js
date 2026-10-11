@@ -176,6 +176,16 @@ export const combatPoses = {
     crouch: 4,
     bladeDegrees: -150,
   },
+  choked: {
+    lift: 0.1,
+    riseTime: 0.18,
+    lean: -5,
+    bladeDegrees: 100,
+    footSpread: 0.025,
+    neckDrop: 1.4,
+    neckForward: 0.5,
+    freeNeckForward: -0.2,
+  },
   stunned: {
     lean: 18,
     crouch: 10,

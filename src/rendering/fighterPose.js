@@ -34,6 +34,7 @@ export function createPose() {
     offHand: 0,
     freeHandX: 0,
     freeHandY: 0,
+    computed: false,
     chain: createChainMemory(),
   };
 }
@@ -298,6 +299,39 @@ function applyPowerPose(fighter, guardDegrees) {
   combatPose.lift = style.lift * amount;
 }
 
+function isChoked(fighter) {
+  return fighter.state === FighterState.STUNNED && fighter.combat.chokeTime > 0;
+}
+
+function getChokeRise(fighter) {
+  return easeOutCubic(clamp(fighter.stateTime / combatPoses.choked.riseTime, 0, 1));
+}
+
+function applyChokedPose(fighter) {
+  const style = combatPoses.choked;
+  combatPose.leanDegrees = style.lean;
+  combatPose.bladeDegrees = style.bladeDegrees;
+  combatPose.bodyLift = getChokeRise(fighter) * style.lift * fighter.height;
+}
+
+function hangFeet(pose, fighter, rise) {
+  const spread = fighter.height * combatPoses.choked.footSpread;
+  pose.frontFootX = lerp(pose.frontFootX, spread, rise);
+  pose.backFootX = lerp(pose.backFootX, -spread, rise);
+  pose.frontFootY = lerp(pose.frontFootY, 0, rise);
+  pose.backFootY = lerp(pose.backFootY, 0, rise);
+}
+
+function graspNeck(pose, rise) {
+  const style = combatPoses.choked;
+  const neckY = pose.headY + pose.headRadius * style.neckDrop;
+  pose.handX = lerp(pose.handX, pose.headX + pose.headRadius * style.neckForward, rise);
+  pose.handY = lerp(pose.handY, neckY, rise);
+  pose.offHand = rise;
+  pose.freeHandX = lerp(pose.freeHandX, pose.headX + pose.headRadius * style.freeNeckForward, rise);
+  pose.freeHandY = lerp(pose.freeHandY, neckY, rise);
+}
+
 function applyStunnedPose(fighter) {
   const style = combatPoses.stunned;
   const sway = Math.sin(fighter.stateTime * style.swaySpeed * TAU) * style.swayDegrees;
@@ -376,7 +410,8 @@ function resolveCombatPose(fighter, guardDegrees, motion, forceEvade, lockContex
       break;
     }
     case FighterState.STUNNED:
-      applyStunnedPose(fighter);
+      if (isChoked(fighter)) applyChokedPose(fighter);
+      else applyStunnedPose(fighter);
       break;
     case FighterState.DEAD: {
       const { dead } = combatPoses;
@@ -456,6 +491,9 @@ function placeKnees(pose, kneeBend) {
 }
 
 export function computePose(fighter, pose, forceEvade = false, lockContext = noLockContext) {
+  if (!forceEvade && pose.computed && fighter.combat.freezeTime > 0) {
+    return pose;
+  }
   const { height, appearance, animation } = fighter;
   const { time, walkPhase, walkBlend, airBlend } = animation;
   const motion = getMotionStyle(fighter);
@@ -483,7 +521,9 @@ export function computePose(fighter, pose, forceEvade = false, lockContext = noL
   pose.headX = pose.shoulderX + Math.sin(lean) * neckLength;
   pose.headY = pose.shoulderY - Math.cos(lean) * neckLength;
 
+  const chokeRise = isChoked(fighter) ? getChokeRise(fighter) : 0;
   placeFeet(pose, fighter);
+  if (chokeRise > 0) hangFeet(pose, fighter, chokeRise);
   placeKnees(pose, height * proportions.kneeBend * (1 + airBlend));
 
   pose.handX = pose.shoulderX + height * (proportions.handForward + combatPose.reach);
@@ -492,6 +532,7 @@ export function computePose(fighter, pose, forceEvade = false, lockContext = noL
   pose.offHand = combatPose.offHand;
   pose.freeHandX = pose.shoulderX + Math.cos(freeArm) * height * proportions.freeArmLength;
   pose.freeHandY = pose.shoulderY + Math.sin(freeArm) * height * proportions.freeArmLength;
+  if (chokeRise > 0) graspNeck(pose, chokeRise);
   pose.bladeAngle = degreesToRadians(combatPose.bladeDegrees + breathWave * animationStyle.saberSwayDegrees * stance.swayScale);
   if (fighter.state === FighterState.BLADE_LOCK) {
     placeLockedBlade(pose, fighter, motion, lockContext.advantage);
@@ -502,6 +543,7 @@ export function computePose(fighter, pose, forceEvade = false, lockContext = noL
 
   const forwardSpeed = fighter.vx * fighter.facing;
   pose.clothSway = clamp(forwardSpeed * animationStyle.clothDrag, -animationStyle.maxClothSway, animationStyle.maxClothSway);
+  pose.computed = true;
 
   return pose;
 }
