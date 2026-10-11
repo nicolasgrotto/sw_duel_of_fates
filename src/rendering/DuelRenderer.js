@@ -29,7 +29,7 @@ export class DuelRenderer {
     this.powerView = new PowerRenderer();
     this.projectileView = new ProjectileRenderer();
     this.bladePoints = { baseX: 0, baseY: 0, tipX: 0, tipY: 0 };
-    this.lockContext = { advantage: 0, victory: false };
+    this.lockContext = { advantage: 0, victory: false, flourish: false };
   }
 
   getPose(fighter) {
@@ -152,6 +152,7 @@ export class DuelRenderer {
     for (const fighter of fighters) {
       this.lockContext.advantage = getBladeLockAdvantage(fighter, fighters);
       this.lockContext.victory = effects?.isLockWinner?.(fighter) ?? false;
+      this.lockContext.flourish = effects?.isCounterFlourish?.(fighter) ?? false;
       const pose = computePose(fighter, this.getPose(fighter), false, this.lockContext);
       pose.bladeExtension = bladeExtension;
       this.getAfterimage(fighter).record(fighter, pose, effects?.hasEvadeAfterimage?.(fighter) ?? false);

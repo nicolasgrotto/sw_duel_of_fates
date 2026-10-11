@@ -144,7 +144,7 @@ function resolveMotionStyle(style) {
   };
 }
 
-export const noLockContext = Object.freeze({ advantage: 0, victory: false });
+export const noLockContext = Object.freeze({ advantage: 0, victory: false, flourish: false });
 
 export function getBladeLockAdvantage(fighter, fighters) {
   const opponent = fighters[fighter.combat.lockOpponent];
@@ -206,6 +206,7 @@ function placeLockedBlade(pose, fighter, motion, advantage) {
 const techniqueTracks = {
   spin: resolveTrack(techniqueKeyframes.spin),
   saberThrow: resolveTrack(techniqueKeyframes.saberThrow),
+  counterRiposte: resolveTrack(techniqueKeyframes.counterRiposte),
   dashSlash: Object.fromEntries(Object.entries(techniqueKeyframes.dashSlash).map(([variant, keys]) => [variant, resolveTrack(keys)])),
 };
 
@@ -247,14 +248,15 @@ function getTechniqueTrack(motion, key) {
   return techniqueTracks[key] ?? null;
 }
 
-function getAttackTrack(motion, attack, attackType) {
+function getAttackTrack(motion, attack, attackType, flourish) {
+  if (flourish && attackType === 'riposte') return techniqueTracks.counterRiposte;
   const key = attack.pose ?? attackType;
   return motion.tracks?.[attackType] ?? motion.tracks?.[key] ?? getTechniqueTrack(motion, key);
 }
 
-function applyAttackPose(fighter, guardDegrees, motion) {
+function applyAttackPose(fighter, guardDegrees, motion, flourish) {
   const { attack, attackType } = fighter.combat;
-  const track = getAttackTrack(motion, attack, attackType);
+  const track = getAttackTrack(motion, attack, attackType, flourish);
   if (track) {
     applyTrackPose(track, fighter, guardDegrees);
     return;
@@ -382,7 +384,7 @@ function resolveCombatPose(fighter, guardDegrees, motion, forceEvade, lockContex
   switch (fighter.state) {
     case FighterState.ATTACKING:
     case FighterState.HEAVY_ATTACK:
-      applyAttackPose(fighter, guardDegrees, motion);
+      applyAttackPose(fighter, guardDegrees, motion, lockContext.flourish);
       break;
     case FighterState.CASTING:
     case FighterState.CHANNELING:

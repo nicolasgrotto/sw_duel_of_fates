@@ -18,7 +18,7 @@ export const movesByCharacter = {
       attack: 'heavy', type: 'stance', pose: 'stance', cancelsInto: [],
       staminaCost: 15, startup: 0.35, active: 0, recovery: 0.35, lunge: 0,
       hitbox: { reach: 0, top: 0.9, bottom: 0.3 },
-      counter: { move: 'riposte', stagger: 0.45, event: 'counter' },
+      counter: { move: 'riposte', stagger: 0.45, event: 'counter', flourish: true },
     },
   },
   shadow: {

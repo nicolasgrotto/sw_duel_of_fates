@@ -26,6 +26,7 @@ export const EffectType = Object.freeze({
   BLADE_LOCK_PRESS: 'bladeLockPress',
   BLADE_LOCK_WIN: 'bladeLockWin',
   BLADE_LOCK_BREAK: 'bladeLockBreak',
+  COUNTER_FLOURISH: 'counterFlourish',
   POWER_WAVE: 'powerWave',
   POWER_IMPACT: 'powerImpact',
   LIGHTNING_TICK: 'lightningTick',
@@ -100,6 +101,7 @@ export class EffectsSystem {
     this.saberFlares = new Map();
     this.bladeLock = { active: false, first: null, second: null, advantage: 0, sparkTime: 0 };
     this.lockWinners = new Set();
+    this.counterFlourishes = new Set();
     this.desaturation = { amount: 0, peakAmount: 0, time: 0, duration: 0 };
     this.flash = {
       color: config.flashColor,
@@ -192,6 +194,9 @@ export class EffectsSystem {
         break;
       case CombatEvent.COUNTER:
         this.spawnParry(EffectType.PARRY_SPARK, defender, params);
+        if (defender.moves?.special?.counter?.flourish) {
+          this.startCounterFlourish(defender, params);
+        }
         break;
       case CombatEvent.PARRY:
         this.startTremor(attacker);
@@ -284,6 +289,23 @@ export class EffectsSystem {
     params.x = (first.x + second.x) / 2 + side * shift;
     params.y = first.y - this.config.bladeLock.contactHeight;
     return params;
+  }
+
+  startCounterFlourish(defender, params) {
+    this.counterFlourishes.add(defender);
+    this.saberFlares.set(defender, this.config.saberFlare.duration);
+    this.spawn(EffectType.COUNTER_FLOURISH, params);
+  }
+
+  isCounterFlourish(fighter) {
+    return this.counterFlourishes.has(fighter);
+  }
+
+  updateCounterFlourishes() {
+    for (const fighter of this.counterFlourishes) {
+      const attacking = fighter.state === FighterState.ATTACKING || fighter.state === FighterState.HEAVY_ATTACK;
+      if (!attacking || fighter.combat.attackType !== 'riposte') this.counterFlourishes.delete(fighter);
+    }
   }
 
   isLockWinner(fighter) {
@@ -649,6 +671,7 @@ export class EffectsSystem {
     this.updateTremors(dt);
     this.updateDesaturation(dt);
     this.updateBladeLock(dt);
+    this.updateCounterFlourishes();
   }
 
   updateShockwaves(dt) {

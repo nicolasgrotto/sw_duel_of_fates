@@ -1,8 +1,14 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
+import { CombatEvent } from '../src/combat/combatEvents.js';
 import { createBox, getAttackHitbox } from '../src/combat/hitboxes.js';
+import { effectsConfig } from '../src/config/effectsConfig.js';
+import { Camera } from '../src/core/Camera.js';
 import { computePose, createPose } from '../src/rendering/fighterPose.js';
 import { getBladeWorldPoints } from '../src/rendering/saberRenderer.js';
+import { EffectsSystem } from '../src/systems/EffectsSystem.js';
+import { TimeControl } from '../src/systems/TimeControl.js';
+import { createRandom } from '../src/utils/random.js';
 import { spawnFighter } from './helpers.js';
 
 function attackAt(fighter, moveId, time) {
@@ -103,4 +109,80 @@ describe('technique keyframe tracks', () => {
     }
   }
 
+});
+
+describe('guardian counter flourish', () => {
+  function createEffects() {
+    const random = createRandom(5);
+    return new EffectsSystem(effectsConfig, new Camera(effectsConfig, random), random, new TimeControl());
+  }
+
+  function counterEvent(defender, attacker) {
+    return { type: CombatEvent.COUNTER, attacker, defender, attackType: 'light', x: 560, y: 480 };
+  }
+
+  it('marks only the guardian counter as a flourish with upward sparks and a blade flare', () => {
+    const effects = createEffects();
+    const guardian = spawnFighter(500, 1, 'guardian');
+    const attacker = spawnFighter(620, -1, 'shadow');
+    attackAt(guardian, 'riposte', 0);
+    effects.handleEvents([counterEvent(guardian, attacker)]);
+    assert.equal(effects.isCounterFlourish(guardian), true);
+    assert.ok(effects.getSaberFlare(guardian) > 0);
+    const upward = effects.particles.particles.filter((particle) => particle.active && particle.vy < 0 && Math.abs(particle.vy) > Math.abs(particle.vx));
+    assert.ok(upward.length >= effectsConfig.recipes.counterFlourish.count[0]);
+
+    const ember = spawnFighter(500, 1, 'ember');
+    attackAt(ember, 'counterStrike', 0);
+    effects.handleEvents([counterEvent(ember, attacker)]);
+    assert.equal(effects.isCounterFlourish(ember), false);
+  });
+
+  it('keeps the flourish while the riposte lasts', () => {
+    const effects = createEffects();
+    const guardian = spawnFighter(500, 1, 'guardian');
+    attackAt(guardian, 'riposte', 0);
+    effects.handleEvents([counterEvent(guardian, spawnFighter(620, -1, 'shadow'))]);
+    effects.update(0.05);
+    assert.equal(effects.isCounterFlourish(guardian), true);
+    guardian.restartState('IDLE');
+    guardian.combat.attack = null;
+    guardian.combat.attackType = null;
+    effects.update(0.016);
+    assert.equal(effects.isCounterFlourish(guardian), false);
+  });
+
+  it('deflects the blade up, steps back half a step and answers with a short thrust', () => {
+    const fighter = spawnFighter(500, 1, 'guardian');
+    const move = fighter.moves.riposte;
+    const flourish = { advantage: 0, victory: false, flourish: true };
+    const idle = computePose(spawnFighter(500, 1, 'guardian'), createPose());
+    attackAt(fighter, 'riposte', move.startup * 0.35);
+    const deflect = computePose(fighter, createPose(), false, flourish);
+    assert.ok(Math.sin(deflect.bladeAngle) < -0.8);
+    assert.ok(idle.backFootX - deflect.backFootX > fighter.height * 0.04);
+    attackAt(fighter, 'riposte', move.startup + move.active);
+    const thrust = computePose(fighter, createPose(), false, flourish);
+    assert.ok(Math.abs(Math.sin(thrust.bladeAngle)) < 0.1);
+    assert.ok(thrust.handX - idle.handX > fighter.height * 0.15);
+    attackAt(fighter, 'riposte', move.startup + move.active);
+    const plain = computePose(fighter, createPose());
+    assert.notEqual(plain.bladeAngle, thrust.bladeAngle);
+  });
+
+  for (const facing of [-1, 1]) {
+    it(`guardian/counterRiposte/${facing}: the thrust reaches the real riposte hitbox`, () => {
+      const fighter = spawnFighter(500, facing, 'guardian');
+      const move = fighter.moves.riposte;
+      const box = getAttackHitbox(fighter, move, createBox());
+      const flourish = { advantage: 0, victory: false, flourish: true };
+      const blade = {};
+      let touches = false;
+      for (let sample = 0; sample <= 60; sample += 1) {
+        attackAt(fighter, 'riposte', move.startup + move.active * sample / 60);
+        if (bladeTouchesBox(getBladeWorldPoints(fighter, computePose(fighter, createPose(), false, flourish), blade), box)) touches = true;
+      }
+      assert.ok(touches);
+    });
+  }
 });

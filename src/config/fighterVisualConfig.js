@@ -276,6 +276,12 @@ export const techniqueKeyframes = {
       { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: 68, lean: 18, crouch: 14, reach: 0.18, step: 0.08, hip: 0.03 },
     ],
   },
+  counterRiposte: [
+    { phase: STARTUP, at: 0.35, ease: 'out', blade: -115, lean: -6, lift: 0.08, slide: 0.05, hip: -0.02 },
+    { phase: STARTUP, at: 1, ease: 'inOut', blade: -15, lean: -3, lift: 0.03, reach: -0.02, slide: 0.05, hip: -0.015 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: -3, lean: 12, reach: 0.21, step: 0.04, slide: 0.02, hip: 0.025 },
+    { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: 2, lean: 11, reach: 0.19, step: 0.04, slide: 0.02, hip: 0.025 },
+  ],
   saberThrow: [
     { phase: STARTUP, at: 0.7, ease: 'out', blade: -150, lean: -8, lift: 0.12, reach: -0.04, slide: 0.04, hip: -0.02 },
     { phase: STARTUP, at: 1, ease: 'inOut', blade: -165, lean: -10, lift: 0.13, reach: -0.05, slide: 0.05, hip: -0.025 },
