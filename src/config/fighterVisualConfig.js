@@ -203,6 +203,8 @@ export const combatPoses = {
     hip: 0,
     offHand: 0,
     offHandDegrees: 70,
+    turn: 0,
+    minTurnScale: 0.08,
     chainBlend: 0.06,
   },
   bladeLock: {
@@ -246,6 +248,39 @@ const guardianKeyframes = {
     { phase: STARTUP, at: 1, ease: 'out', blade: -40, lean: -6, lift: 0.02, slide: 0.02, hip: -0.01, offHand: 0.6, offHandDegrees: 40 },
     { phase: ACTIVE, at: 1, ease: 'outQuad', blade: -75, lean: 16, reach: 0.12, step: 0.06, hip: 0.03, offHand: 1, offHandDegrees: 5 },
     { phase: RECOVERY, at: 0.4, ease: 'inOut', blade: -70, lean: 12, reach: 0.08, step: 0.05, hip: 0.02, offHand: 0.7, offHandDegrees: 20 },
+  ],
+};
+
+export const techniqueKeyframes = {
+  spin: [
+    { phase: STARTUP, at: 0.4, ease: 'out', blade: -120, lean: -2, crouch: 4, lift: 0.04, slide: 0.01 },
+    { phase: STARTUP, at: 1, ease: 'inOut', blade: -165, lean: -5, crouch: 8, lift: 0.07, slide: 0.03, hip: -0.015 },
+    { phase: ACTIVE, at: 0.5, ease: 'linear', blade: 15, lean: 3, crouch: 10, reach: 0.06, lift: 0.03, step: 0.02, turn: 0.5 },
+    { phase: ACTIVE, at: 1, ease: 'linear', blade: 195, lean: 4, crouch: 10, reach: 0.04, step: 0.03, turn: 1 },
+    { phase: RECOVERY, at: 0.35, ease: 'outQuad', blade: 215, lean: 2, crouch: 8, reach: 0.02, step: 0.02, turn: 1 },
+    { phase: RECOVERY, at: 1, ease: 'inOut', twirl: 360, turn: 1 },
+  ],
+  dashSlash: {
+    rising: [
+      { phase: STARTUP, at: 0.6, ease: 'out', blade: 120, lean: 10, crouch: 16, slide: 0.03, hip: -0.01 },
+      { phase: STARTUP, at: 1, ease: 'inOut', blade: 140, lean: 16, crouch: 20, slide: 0.04, hip: -0.015, step: 0.02 },
+      { phase: ACTIVE, at: 0.5, ease: 'in', blade: 45, lean: 20, crouch: 14, reach: 0.12, step: 0.06, hip: 0.02 },
+      { phase: ACTIVE, at: 1, ease: 'outQuad', blade: -75, lean: 18, crouch: 6, reach: 0.2, lift: 0.04, step: 0.08, hip: 0.03 },
+      { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: -85, lean: 16, crouch: 6, reach: 0.18, lift: 0.04, step: 0.08, hip: 0.03 },
+    ],
+    falling: [
+      { phase: STARTUP, at: 0.6, ease: 'out', blade: -120, lean: 4, crouch: 6, lift: 0.1, slide: 0.03 },
+      { phase: STARTUP, at: 1, ease: 'inOut', blade: -150, lean: 8, crouch: 8, lift: 0.14, slide: 0.04, hip: -0.01 },
+      { phase: ACTIVE, at: 0.5, ease: 'in', blade: -50, lean: 16, crouch: 10, reach: 0.12, lift: 0.07, step: 0.06, hip: 0.02 },
+      { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 60, lean: 20, crouch: 14, reach: 0.2, step: 0.08, hip: 0.03 },
+      { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: 68, lean: 18, crouch: 14, reach: 0.18, step: 0.08, hip: 0.03 },
+    ],
+  },
+  saberThrow: [
+    { phase: STARTUP, at: 0.7, ease: 'out', blade: -150, lean: -8, lift: 0.12, reach: -0.04, slide: 0.04, hip: -0.02 },
+    { phase: STARTUP, at: 1, ease: 'inOut', blade: -165, lean: -10, lift: 0.13, reach: -0.05, slide: 0.05, hip: -0.025 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 10, lean: 14, lift: 0.02, reach: 0.24, step: 0.07, hip: 0.03 },
+    { phase: RECOVERY, at: 0.6, ease: 'inOut', blade: 5, lean: 10, reach: 0.2, step: 0.06, hip: 0.02 },
   ],
 };
 
@@ -295,6 +330,7 @@ export const motionStyles = {
   standard: {
     stance: { crouch: 0, lean: 0, guardOffset: 0, breathScale: 1, swayScale: 1, bobScale: 1 },
     followThrough: 0,
+    dashSlash: 'rising',
     block: {},
     evade: [
       { lean: -22, crouch: 8, bladeOffset: 0 },
@@ -309,6 +345,7 @@ export const motionStyles = {
   guardian: {
     stance: { crouch: 4, lean: -1, guardOffset: -4, breathScale: 0.7, swayScale: 0.4, bobScale: 0.8 },
     followThrough: 0.03,
+    dashSlash: 'falling',
     block: { bladeDegrees: -92, reach: 0.06, crouch: 9 },
     evade: [
       { lean: -16, crouch: 10, bladeOffset: 0 },

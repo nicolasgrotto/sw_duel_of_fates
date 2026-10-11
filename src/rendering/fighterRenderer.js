@@ -144,7 +144,7 @@ export function drawFighterBody(renderer, fighter, pose, floorY, withShadow = tr
 
   renderer.save();
   renderer.translate(fighter.x, fighter.y);
-  renderer.scale(fighter.facing, 1);
+  renderer.scale(fighter.facing * (pose.turnScale ?? 1), 1);
   renderer.translate(0, -pose.bodyLift);
   renderer.rotate(pose.bodyRotation);
 

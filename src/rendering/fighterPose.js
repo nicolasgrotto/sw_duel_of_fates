@@ -1,7 +1,7 @@
 import { AttackPhase, getAttackPhase, getPhaseProgress } from '../combat/attackPhases.js';
 import { combatRulesConfig } from '../config/combatRulesConfig.js';
 import { effectsConfig } from '../config/effectsConfig.js';
-import { animation as animationStyle, combatPoses, motionStyles, proportions } from '../config/fighterVisualConfig.js';
+import { animation as animationStyle, combatPoses, motionStyles, proportions, techniqueKeyframes } from '../config/fighterVisualConfig.js';
 import { FighterState } from '../entities/fighterStates.js';
 import { easeInOutSine, easeInQuad, easeOutCubic, easeOutQuad } from '../utils/easing.js';
 import { TAU, clamp, degreesToRadians, lerp } from '../utils/math.js';
@@ -30,6 +30,7 @@ export function createPose() {
     bladeExtension: 1,
     bodyRotation: 0,
     bodyLift: 0,
+    turnScale: 1,
     clothSway: 0,
     offHand: 0,
     freeHandX: 0,
@@ -40,7 +41,7 @@ export function createPose() {
 }
 
 const TRACK_CHANNELS = ['bladeDegrees', 'leanDegrees', 'crouch', 'reach', 'lift', 'step', 'slide', 'hip', 'offHand', 'offHandDegrees'];
-const KEY_CHANNELS = { blade: 'bladeDegrees', lean: 'leanDegrees', crouch: 'crouch', reach: 'reach', lift: 'lift', step: 'step', slide: 'slide', hip: 'hip', offHand: 'offHand', offHandDegrees: 'offHandDegrees', twirl: 'twirl' };
+const KEY_CHANNELS = { blade: 'bladeDegrees', lean: 'leanDegrees', crouch: 'crouch', reach: 'reach', lift: 'lift', step: 'step', slide: 'slide', hip: 'hip', offHand: 'offHand', offHandDegrees: 'offHandDegrees', twirl: 'twirl', turn: 'turn' };
 const PHASE_OFFSET = { [AttackPhase.STARTUP]: 0, [AttackPhase.ACTIVE]: 1, [AttackPhase.RECOVERY]: 2 };
 const TRACK_END = 3;
 const EASINGS = {
@@ -76,6 +77,7 @@ const combatPose = {
   hip: 0,
   offHand: 0,
   offHandDegrees: 0,
+  turn: 0,
 };
 
 function resetCombatPose(guardDegrees) {
@@ -84,6 +86,7 @@ function resetCombatPose(guardDegrees) {
   combatPose.hip = 0;
   combatPose.offHand = 0;
   combatPose.offHandDegrees = combatPoses.keyframeDefaults.offHandDegrees;
+  combatPose.turn = 0;
   combatPose.leanDegrees = 0;
   combatPose.crouch = 0;
   combatPose.reach = 0;
@@ -115,7 +118,7 @@ function resolveTrackKey(key, defaults) {
 }
 
 function resolveTrack(keys) {
-  const defaults = { bladeDegrees: null, twirl: 0 };
+  const defaults = { bladeDegrees: null, twirl: 0, turn: combatPoses.keyframeDefaults.turn };
   for (const channel of TRACK_CHANNELS) {
     if (channel !== 'bladeDegrees') defaults[channel] = combatPoses.keyframeDefaults[channel];
   }
@@ -200,6 +203,12 @@ function placeLockedBlade(pose, fighter, motion, advantage) {
   pose.bladeAngle = lerp(pose.bladeAngle, contactAngle, getLockEntry(fighter));
 }
 
+const techniqueTracks = {
+  spin: resolveTrack(techniqueKeyframes.spin),
+  saberThrow: resolveTrack(techniqueKeyframes.saberThrow),
+  dashSlash: Object.fromEntries(Object.entries(techniqueKeyframes.dashSlash).map(([variant, keys]) => [variant, resolveTrack(keys)])),
+};
+
 const resolvedMotionStyles = Object.fromEntries(
   Object.entries(motionStyles).map(([id, style]) => [id, resolveMotionStyle(style)]),
 );
@@ -230,11 +239,17 @@ function applyTrackPose(track, fighter, guardDegrees) {
   for (const channel of TRACK_CHANNELS) {
     combatPose[channel] = lerp(getTrackChannel(from, channel, guardDegrees), getTrackChannel(to, channel, guardDegrees), amount);
   }
+  combatPose.turn = lerp(from.values.turn, to.values.turn, amount);
+}
+
+function getTechniqueTrack(motion, key) {
+  if (key === 'dashSlash') return techniqueTracks.dashSlash[motion.dashSlash] ?? techniqueTracks.dashSlash.rising;
+  return techniqueTracks[key] ?? null;
 }
 
 function getAttackTrack(motion, attack, attackType) {
-  if (!motion.tracks) return null;
-  return motion.tracks[attackType] ?? motion.tracks[attack.pose ?? attackType] ?? null;
+  const key = attack.pose ?? attackType;
+  return motion.tracks?.[attackType] ?? motion.tracks?.[key] ?? getTechniqueTrack(motion, key);
 }
 
 function applyAttackPose(fighter, guardDegrees, motion) {
@@ -490,6 +505,12 @@ function placeKnees(pose, kneeBend) {
   pose.backKneeY = (pose.hipY + pose.backFootY) / 2;
 }
 
+function getTurnScale(turn) {
+  const scale = Math.cos(turn * TAU);
+  const minimum = combatPoses.keyframeDefaults.minTurnScale;
+  return Math.abs(scale) < minimum ? Math.sign(scale || 1) * minimum : scale;
+}
+
 export function computePose(fighter, pose, forceEvade = false, lockContext = noLockContext) {
   if (!forceEvade && pose.computed && fighter.combat.freezeTime > 0) {
     return pose;
@@ -539,6 +560,7 @@ export function computePose(fighter, pose, forceEvade = false, lockContext = noL
   }
   pose.bladeVisible = combatPose.bladeVisible && !fighter.combat.saberThrown;
   pose.bodyRotation = degreesToRadians(combatPose.bodyRotationDegrees);
+  pose.turnScale = getTurnScale(combatPose.turn);
   pose.bodyLift = combatPose.bodyLift;
 
   const forwardSpeed = fighter.vx * fighter.facing;

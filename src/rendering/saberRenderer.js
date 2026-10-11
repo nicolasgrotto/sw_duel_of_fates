@@ -51,7 +51,7 @@ function updateSecondBladeGeometry(fighter, pose) {
 
 function toWorldX(fighter, pose, localX, localY) {
   const rotatedX = localX * Math.cos(pose.bodyRotation) - localY * Math.sin(pose.bodyRotation);
-  return fighter.x + fighter.facing * rotatedX;
+  return fighter.x + fighter.facing * (pose.turnScale ?? 1) * rotatedX;
 }
 
 function toWorldY(fighter, pose, localX, localY) {
@@ -97,7 +97,7 @@ export function drawSaberFloorLight(renderer, fighter, pose, floorY) {
     return;
   }
   updateBladeGeometry(fighter, pose);
-  const centerX = fighter.x + (fighter.facing * (blade.baseX + blade.tipX)) / 2;
+  const centerX = fighter.x + (fighter.facing * (pose.turnScale ?? 1) * (blade.baseX + blade.tipX)) / 2;
 
   renderer.save();
   renderer.setBlendMode('lighter');
@@ -142,7 +142,7 @@ function drawBlade(renderer, geometry, fighter, pose, flare) {
 export function drawSaber(renderer, fighter, pose, flare = 0) {
   renderer.save();
   renderer.translate(fighter.x, fighter.y);
-  renderer.scale(fighter.facing, 1);
+  renderer.scale(fighter.facing * (pose.turnScale ?? 1), 1);
   renderer.translate(0, -pose.bodyLift);
   renderer.rotate(pose.bodyRotation);
 
