@@ -25,7 +25,8 @@ function getStagger(context) {
 
 function push(context) {
   const { combat, caster, target, power, interaction, scale, guarded } = context;
-  const knockback = caster.facing * power.knockback * scale * interaction.knockback;
+  const direction = power.around ? Math.sign(target.x - caster.x) || caster.facing : caster.facing;
+  const knockback = direction * power.knockback * scale * interaction.knockback;
   if (guarded) {
     target.vx = knockback * interaction.guardSlide;
     applyGuarded(context);
@@ -165,6 +166,7 @@ export const powerEffects = Object.freeze({
       interrupt(target, FighterState.HIT, power.stun * interaction.duration);
     }
   } },
+  supremePush: { active: push },
   push: { active: push },
   pull: { active: pull },
   lightning: { tick: lightning },

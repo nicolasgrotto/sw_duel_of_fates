@@ -314,6 +314,7 @@ export const en = {
     powers: {
       absorb: 'Absorption',
       drain: 'Drain',
+      supremePush: 'Supreme Push',
       mindTwist: 'Mind Twist',
       storm: 'Storm',
       push: 'Repulse',

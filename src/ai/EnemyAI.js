@@ -1,5 +1,5 @@
 import { AttackPhase, AttackType, getAttackDuration, getAttackPhase, isHeavyAttack } from '../combat/attackPhases.js';
-import { isBarrierUp, isChannelOpen, isInPowerRange, isUsingPower } from '../combat/PowerSystem.js';
+import { getPowerMode, isBarrierUp, isChannelOpen, isInPowerRange, isUsingPower } from '../combat/PowerSystem.js';
 import { isStormShieldUp } from '../combat/StormSystem.js';
 import { getFlowDifference, resolveInteraction, resolveLevelBand } from '../combat/flowInteractions.js';
 import { projectilesConfig } from '../config/projectilesConfig.js';
@@ -97,6 +97,9 @@ export class EnemyAI {
     this.decision = AiDecision.WAIT;
     this.habits = new HabitMemory(perception.habits);
     this.chainRolledFor = null;
+    this.observedBladeHit = self.combat.bladeHitSequence;
+    this.comboHits = 0;
+    this.comboElapsed = Infinity;
     this.plan = {
       moveX: 0,
       blockTime: 0,
@@ -114,6 +117,13 @@ export class EnemyAI {
   }
 
   updateIntent(intent, dt) {
+    this.comboElapsed += dt;
+    if (this.observedBladeHit !== this.self.combat.bladeHitSequence) {
+      const use = this.perception.powerUse.supremePush;
+      this.comboHits = this.comboElapsed < use.comboWindow ? this.comboHits + this.self.combat.bladeHitSequence - this.observedBladeHit : 1;
+      this.comboElapsed = 0;
+      this.observedBladeHit = this.self.combat.bladeHitSequence;
+    }
     if (this.self.state === FighterState.BLADE_LOCK) {
       this.requestBladeLockPress(intent, dt);
       return;
@@ -272,6 +282,8 @@ export class EnemyAI {
       this.plan.parryDelay = -1;
       return AiDecision.WAIT;
     }
+    const escapeAnswer = this.trySupremeEscape();
+    if (escapeAnswer) return escapeAnswer;
     const stormAnswer = this.tryEscapeStorm();
     if (stormAnswer) return stormAnswer;
     if (this.powersEnabled && this.difficulty.powerAware && isChannelOpen(self)
@@ -563,6 +575,17 @@ export class EnemyAI {
       && (use.targetMeterAbove === undefined || this.opponent.flowMeter > use.targetMeterAbove)
       && (!use.avoidPressure || !isThreatening(this.opponent, this.self, this.perception.threatMargin))
       && isInPowerRange(this.self, this.opponent, power) && this.getPowerScale(power) > 0;
+  }
+
+  trySupremeEscape() {
+    const { self } = this;
+    const use = this.perception.powerUse.supremePush;
+    if (!this.powersEnabled || this.comboHits < use.comboHits || this.comboElapsed >= use.comboWindow) return null;
+    for (const slot of POWER_SLOTS) {
+      const power = self.stats.power.loadout?.[slot];
+      if (power?.escape && getPowerMode(self, power) === 'escape' && this.canUsePower(power)) return this.startPower(slot, 0);
+    }
+    return null;
   }
 
   tryPower() {

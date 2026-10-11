@@ -2,7 +2,7 @@ import { ProjectileKind } from '../config/projectilesConfig.js';
 import { FighterState } from '../entities/fighterStates.js';
 import { CombatEvent } from './combatEvents.js';
 import { resolveLevelBand } from './flowInteractions.js';
-import { boxesOverlap, createBox, getHurtbox, isInvulnerable } from './hitboxes.js';
+import { boxesOverlap, createBox, getHurtbox, isBladeInvulnerable, isInvulnerable } from './hitboxes.js';
 import { isBarrierUp } from './PowerSystem.js';
 import { isStormShieldUp } from './StormSystem.js';
 
@@ -187,7 +187,7 @@ export class ProjectileSystem {
     box.top = projectile.y - projectile.radius;
     box.bottom = projectile.y + projectile.radius;
     for (const target of this.fighters) {
-      if (target === owner || !target.isAlive || isInvulnerable(target) || !boxesOverlap(box, getHurtbox(target, this.hurtbox))) {
+      if (target === owner || !target.isAlive || isInvulnerable(target) || projectile.kind !== ProjectileKind.THROW && isBladeInvulnerable(target) || !boxesOverlap(box, getHurtbox(target, this.hurtbox))) {
         continue;
       }
       projectile.hit = true;

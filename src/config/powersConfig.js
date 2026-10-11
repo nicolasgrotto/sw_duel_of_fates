@@ -21,7 +21,7 @@ export const powersConfig = {
   castHeight: 0.6,
   airReach: 320,
   categories: {
-    flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull', 'throw', 'mindTwist'] },
+    flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull', 'throw', 'mindTwist', 'supremePush'] },
     aurora: { alignments: ['light'], abilities: ['barrier', 'heal', 'focus', 'absorb'] },
     eclipse: { alignments: ['dark'], abilities: ['lightning', 'choke', 'freeze', 'storm', 'wrath', 'drain'] },
     blade: { alignments: ['light', 'dark'], abilities: ['spin', 'dashSlash', 'saberThrow'] },
@@ -47,6 +47,12 @@ export const powersConfig = {
       stormPhases: STORM_PHASES, range: 600, damage: 5, stun: 0.12, strikeWarning: 0.5, strikeWidth: 80, barrierDrainPerStrike: 30,
       strikesByTier: [{ minLevel: 3, strikes: 8 }, { minLevel: 8, strikes: 10 }, { minLevel: 10, strikes: 12 }],
       strikeOffsets: [0, -24, 18, -12, 30, -30, 12, -18, 24, 0, -6, 6], hudMark: 'powerCostStorm',
+    },
+    supremePush: {
+      id: 'supremePush', effect: 'supremePush', channel: false, pose: 'cast', interaction: 'push', around: true,
+      cost: 75, cooldown: 6, startup: 0.25, active: 0.08, recovery: 0.34, range: 240,
+      damage: 10, knockback: 1100, stagger: 0.45, guard: { staminaCost: 12 },
+      escape: { startup: 0.1, damage: 4, bladeInvulnerable: true }, hudMark: 'powerCostSupremePush',
     },
     push: {
       id: 'push', effect: 'push', channel: false, pose: 'cast', interaction: 'push',

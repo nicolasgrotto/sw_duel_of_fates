@@ -1358,3 +1358,7 @@ Santuário com reflexos e F3: referência Sombra/Raio contra Guardião/Barreira;
 | Tempestade + projéteis + estados | reduzidos | 8 | 0,67 / 0,97 ms | 6,95 / 9,79 ms | 59,88 |
 
 Todas as janelas dentro de update ≤ 2 ms e render ≤ 10 ms; sem erros JavaScript. Capturas desktop e mobile conferidas no QA. A medição emulada não substitui hardware: os testes em Chrome Android/Safari iOS e teclado nativo são os já concluídos pelo autor nas etapas anteriores, não foram refeitos nesta etapa. Arquivos temporários e perfil do Chrome são removidos ao concluir.
+
+### Repulsão Suprema (2.18)
+
+`getPowerMode` centraliza os estados permitidos: ataque neutro ou guarda livre; fuga em HIT, STAGGERED e blockstun. O buffer consulta esse contrato antes de exigir canAct. A variante da fuga é criada apenas no lançamento; powerMode entra no snapshot e nos eventos POWER_START/POWER_ACTIVE. isBladeInvulnerable protege somente sua preparação contra lâmina corpo a corpo e arremessada; não protege contra poderes ou empurrão. A área usa distância entre centros e o impulso aponta para longe do lançador. finish lê cooldown do poder antes da recarga geral. A IA observa bladeHitSequence, sem alterar combate, e solicita fuga após a sequência e janela definidas em aiConfig. Nenhum loadout do elenco recebe o poder.

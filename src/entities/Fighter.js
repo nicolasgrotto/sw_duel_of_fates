@@ -74,6 +74,8 @@ function createCombat() {
     parryLockout: 0,
     riposteTime: 0,
     power: null,
+    powerMode: null,
+    bladeHitSequence: 0,
     powerEndTime: 0,
     powerTick: 0,
     powerTargeted: false,
@@ -237,6 +239,7 @@ export class Fighter {
     this.combat.stormNextStrike = 0;
     this.combat.stormTarget = -1;
     this.combat.power = null;
+    this.combat.powerMode = null;
     this.combat.powerEndTime = 0;
     this.combat.powerTick = 0;
     this.combat.powerTargeted = false;

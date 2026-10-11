@@ -1,6 +1,11 @@
 import { FighterState } from '../entities/fighterStates.js';
 import { AttackPhase, getAttackPhase, isSaberAttack } from './attackPhases.js';
 
+export function isBladeInvulnerable(fighter) {
+  return fighter.state === FighterState.CASTING && fighter.combat.powerMode === 'escape'
+    && fighter.combat.power?.bladeInvulnerable === true && fighter.stateTime < fighter.combat.power.startup;
+}
+
 export function createBox() {
   return { left: 0, right: 0, top: 0, bottom: 0 };
 }

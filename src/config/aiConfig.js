@@ -435,6 +435,7 @@ export const aiConfig = {
       drain: { minGap: 120, maxGap: 300, targetMeterAbove: 25 },
       absorb: { minDifference: -1 },
       storm: { minGap: 0, maxGap: 600, avoidPressure: true },
+      supremePush: { minGap: 0, maxGap: 100, comboHits: 2, comboWindow: 1 },
       push: { minGap: 0, maxGap: 100 },
       pull: { minGap: 250, maxGap: Infinity },
       lightning: { minGap: 110, maxGap: Infinity },

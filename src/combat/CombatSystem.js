@@ -8,8 +8,8 @@ import { CombatAction, clearActionBuffer, updateActionBuffer } from './actionBuf
 import { clamp } from '../utils/math.js';
 import { ATTACK_STATES, AttackPhase, AttackType, getAttackDuration, getAttackPhase, getChargeLevel, isSaberAttack } from './attackPhases.js';
 import { CombatEvent, createCombatEvent } from './combatEvents.js';
-import { boxesOverlap, comesFromFront, createBox, getAttackHitbox, getHurtbox, hasActiveHitbox, hasHurtbox, isGuardingAgainst, isInvulnerable } from './hitboxes.js';
-import { PowerSystem, isBarrierUp, selectTechnique } from './PowerSystem.js';
+import { boxesOverlap, comesFromFront, createBox, getAttackHitbox, getHurtbox, hasActiveHitbox, hasHurtbox, isBladeInvulnerable, isGuardingAgainst, isInvulnerable } from './hitboxes.js';
+import { PowerSystem, isBarrierUp, selectPower, selectTechnique } from './PowerSystem.js';
 import { ProjectileSystem } from './ProjectileSystem.js';
 import { StatusSystem } from './StatusSystem.js';
 import { projectilesConfig } from '../config/projectilesConfig.js';
@@ -169,6 +169,9 @@ export class CombatSystem {
   }
 
   startActions(fighter) {
+    if (fighter.combat.bufferedAction === CombatAction.POWER && selectPower(fighter)?.escape
+      && this.powers.canCast(fighter, selectPower(fighter)) && !fighter.canAct
+      && this.tryBufferedAction(fighter, CombatAction.POWER)) return;
     if (this.tryFeint(fighter) || this.tryAttackChain(fighter)) {
       return;
     }
@@ -534,7 +537,7 @@ export class CombatSystem {
   }
 
   resolveContact(contact) {
-    if (!contact.defender.isAlive) {
+    if (!contact.defender.isAlive || isSaberAttack(contact.attackType) && isBladeInvulnerable(contact.defender)) {
       return;
     }
     if (contact.evaded) {
@@ -579,6 +582,7 @@ export class CombatSystem {
     defender.vx = attacker.facing * attack.knockback;
     defender.combat.parryArmed = false;
     defender.combat.blockstun = 0;
+    defender.combat.bladeHitSequence += 1;
     defender.combat.stunDuration = attack.hitstun;
     defender.restartState(FighterState.STAGGERED);
     this.emit(CombatEvent.SHOVE, contact);
@@ -666,6 +670,7 @@ export class CombatSystem {
   }
 
   applyHit(contact) {
+    if (isSaberAttack(contact.attackType) && isBladeInvulnerable(contact.defender)) return;
     const { attacker, defender, attack } = contact;
     const armored = hasArmor(defender);
     const damage = this.getHitDamage(attacker, defender, attack);
@@ -802,6 +807,7 @@ export class CombatSystem {
         attacker: fighter,
         defender: null,
         attackType,
+        mode: fighter.combat.powerMode ?? undefined,
         x: fighter.x,
         y: fighter.y - fighter.height / 2,
       }),

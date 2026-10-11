@@ -16,6 +16,13 @@ export function isUsingPower(fighter) {
   return POWER_STATES.has(fighter.state) && fighter.combat.power !== null;
 }
 
+export function getPowerMode(fighter, power) {
+  if (!power?.escape || isUsingPower(fighter)) return null;
+  if (fighter.state === FighterState.HIT || fighter.state === FighterState.STAGGERED
+    || fighter.state === FighterState.BLOCKING && fighter.combat.blockstun > 0) return 'escape';
+  return fighter.canAct || fighter.state === FighterState.BLOCKING && fighter.grounded && fighter.combat.blockstun === 0 ? 'attack' : null;
+}
+
 export function isChannelOpen(fighter) {
   const { power, powerEndTime } = fighter.combat;
   return fighter.state === FighterState.CHANNELING && power !== null && fighter.stateTime >= power.startup && powerEndTime === 0;
@@ -111,17 +118,20 @@ export class PowerSystem {
   }
 
   canCast(fighter, power) {
-    return this.enabled && power !== null && fighter.flowLevel >= (power.minFlowLevel ?? 0) && fighter.combat.powerCooldown === 0 && fighter.flowMeter >= this.getCost(fighter, power);
+    return this.enabled && power !== null && (!power.escape || getPowerMode(fighter, power) !== null) && fighter.flowLevel >= (power.minFlowLevel ?? 0) && fighter.combat.powerCooldown === 0 && fighter.flowMeter >= this.getCost(fighter, power);
   }
 
   tryCast(fighter) {
-    const power = selectPower(fighter);
+    let power = selectPower(fighter);
     if (!this.canCast(fighter, power)) {
       return false;
     }
+    const mode = getPowerMode(fighter, power);
     fighter.flowMeter -= this.getCost(fighter, power);
+    if (mode === 'escape') power = { ...power, ...power.escape };
     fighter.clearAttack();
     fighter.combat.power = power;
+    fighter.combat.powerMode = mode;
     fighter.restartState(power.channel ? FighterState.CHANNELING : FighterState.CASTING);
     if (power.stormPhases) this.storms.start(fighter);
     this.aim(fighter, null, power);
@@ -315,9 +325,10 @@ export class PowerSystem {
   }
 
   finish(caster) {
-    const variant = this.getVariant(caster, caster.combat.power);
+    const power = caster.combat.power;
+    const variant = this.getVariant(caster, power);
     caster.clearPower();
-    caster.combat.powerCooldown = variant?.cooldown ?? this.config.cooldown;
+    caster.combat.powerCooldown = variant?.cooldown ?? power.cooldown ?? this.config.cooldown;
     caster.setState(FighterState.IDLE);
   }
 }
