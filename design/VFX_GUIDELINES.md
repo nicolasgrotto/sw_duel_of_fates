@@ -116,7 +116,7 @@ Camada de cor sobre a cena inteira (abaixo da UI), com blend aditivo e alpha que
 | Hit stop | 0,03 a 0,1 s |
 | Punch-in (zoom máximo) | 6% |
 | Dessaturação | 0,15 s |
-| Raio (polilinhas por lutador) | 2, com até 10 segmentos |
+| Raio (feixes por lutador) | até 3 feixes e 1 ramo, com até 10 segmentos cada (v2.16) |
 | Canal de poder (raio, barreira) | dura o estado do lutador, no máximo 1,5 s |
 
 ## Implementação
@@ -162,3 +162,14 @@ Disputa de lâminas (v2.5): sem câmera lenta, dessaturação nem tela sobrepost
 - **Vibração do gamepad:** entrada como o clash, pulso fraco por pressão, desfecho como golpe forte.
 
 Sons: entrada reaproveita `clash`. Durante a disputa, um **atrito contínuo** (`bladeLockGrind`: ruído em banda estreita com crepitação e um zumbido grave desafinado) sobe de volume e brilho com o tempo da disputa e para no desfecho, na pausa e na saída do duelo. Cada pressão toca `bladeLockPress` (batida metálica curta com baque grave). Vitória toca `bladeLockWin` (lâmina empurrada que escapa, com baque grave); empate, `bladeLockBreak` (raspão mais curto e agudo).
+
+Poderes por tier (v2.16): o tier do Fluxo de quem lança passa a mudar a forma, não só a cor. Tudo é desenho: alcance, dano, hitbox e estados vêm do gameplay. Números por tier em `powersConfig.tiers` e `powersConfig.render`; nada alocado por frame.
+
+- **Raio:** feixes por tier (`bolts`): Tênue 1; Firme 1 com ramo; Profundo 2; Ápice 3. Os feixes extras saem da mesma mão e chegam a alturas próximas no alvo (peito, ombro, quadril). Mesmo dano por tick: os feixes são leitura de intensidade.
+- **Tempestade:** além do círculo de alcance, arcos curtos e trêmulos percorrem os braços e o tronco de quem canaliza, na cor do tier (mesmo jitter do Raio, 2–3 arcos). No alvo atingido, espasmo de 1–2 px por 0,12 s e contorno claro piscando uma vez por pulso, sem cobrir o corpo.
+- **Congelar:** o alvo fica parado na pose em que estava (sem o balanço do atordoado), dentro da casca, com 2–3 silhuetas na cor do tier, defasadas 2–4 px e tremendo rápido (tremor de 0,05 s), alpha 0,25. Sem blur de tela.
+- **Estrangular:** a vítima sobe 10% da altura no desenho, pés juntos pendurados, mãos no pescoço, lâmina caída; a sombra continua no chão. O brilho do pescoço continua.
+- **Barreira:** a elipse cresce por tier (`barrierScale` 0,85/1/1,15/1,3).
+- **Repulsão:** chevrons e poeira crescem por tier (`waveScale` 0,85/1/1,15/1,3 na altura, na espessura e na faixa; poeira pelo `particleScale`). O alcance desenhado continua o de gameplay.
+- **Puxão:** o anel que fecha cresce por tier e começa no alcance real do Puxão de quem lança (que agora muda por tier).
+- **Arremesso:** deixa de parecer uma esfera. Na preparação, as pedras sobem do chão perto de quem lança, com poeira; no lançamento, seguem o projétil girando. Uma pedra nas faixas pequenas, duas nas médias e três nas maiores, todas dentro do raio da hitbox; brilho reduzido a um contorno na cor do tier; no impacto, 4–6 fragmentos escuros caem com gravidade. Uma colisão só. Efeitos reduzidos cortam a poeira pela metade.

@@ -187,6 +187,16 @@ Os golpes deixam de ser um arco de dois pontos (preparação → corte) e passam
 - **Guardião:** passos curtos, quadril firme, pouco giro de tronco, sem giro de lâmina; o empurrão solta a mão livre para a frente.
 - **Vespa:** passos longos, quadril e tronco acompanhando o corte, follow-through largo e o giro da lâmina na recuperação do forte e do quinto rápido; as duas mãos ficam nas lâminas.
 
+### Técnicas e status (v2.16)
+
+As técnicas de lâmina ganham trilhas de poses-chave (sistema da 2.12) válidas para todos os estilos, em `techniqueKeyframes`. Frame data, alcance e acertos não mudam.
+
+- **Giro:** preparação com a lâmina recolhida atrás do ombro, rotação do corpo simulada (o corpo e a lâmina estreitam e espelham pela escala horizontal, canal `turn`), dois arcos de lâmina e recuperação de frente. Um acerto só.
+- **Avanço com corte:** duas variantes por estilo de movimento (`motionStyles[].dashSlash`). `rising` (padrão e Vespa): joelhos dobram, avanço baixo e arco diagonal de baixo para cima. `falling` (Guardião): lâmina acima do ombro, avanço e corte de cima para baixo. Tronco, passo e quadril acompanham.
+- **Arremesso da lâmina:** a lâmina recua atrás do corpo, o pé de trás desliza, e a soltura vem com passo e braço estendido; a mão vazia acompanha a volta.
+- **Contraguarda do Guardião:** no contato, a lâmina desvia para cima com faíscas e brilho, o corpo recua meio passo e a resposta é uma estocada curta (`counterRiposte`). Só o Guardião: marcado nos dados da habilidade (`counter.flourish`).
+- **Congelado e estrangulado** deixam de usar a pose do atordoado: o congelado fica parado na pose do instante, o estrangulado é erguido com as mãos no pescoço (VFX_GUIDELINES → "Poderes por tier").
+
 ### Disputa de lâminas (v2.5)
 
 Pose `BLADE_LOCK`, com números por estilo em `motionStyles[motion].lock` e `lockVictory`:

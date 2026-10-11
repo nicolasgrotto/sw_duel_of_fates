@@ -590,6 +590,8 @@ O Fluxo é a energia dos poderes. Nomes de tela em `uiConfig`; no código, `powe
 
 Na guarda, o Puxão não causa dano e puxa pela metade; o Raio causa um quarto do dano.
 
+Alcance do Puxão por tier do Fluxo de quem lança (v2.16): Tênue 330 px, Firme 380 px, Profundo 430 px, Ápice 480 px. A força da puxada não muda.
+
 **Repulsão pela diferença (v1.14).** A Repulsão tem faixas próprias, simétricas: quem lança acima fura a guarda; quem lança abaixo empurra menos.
 
 | Diferença | Sem guarda | Com guarda |
@@ -626,7 +628,7 @@ Na guarda, o Puxão não causa dano e puxa pela metade; o Raio causa um quarto d
 | 10 | máximo | 17 | 520 | 48 | 1,5 s |
 
   No impacto valem a tabela de interação (resistido a −3 ou menos), a guarda de frente (um quarto do dano passa), a Barreira (absorve) e a invulnerabilidade da esquiva (passa através). Some ao bater na parede.
-- **Arremesso da lâmina** (técnica, v1.16): a lâmina sai girando para a frente, vai até cerca de 380 px e volta para a mão. Acerta uma vez (na ida ou, se errou, na volta); a guarda de frente bloqueia e a Barreira absorve, e a lâmina volta mesmo assim. Enquanto ela não volta, o lutador não ataca, não bloqueia e não apara com a lâmina (empurrão, esquiva e poderes continuam valendo).
+- **Arremesso da lâmina** (técnica, v1.16): a lâmina sai girando para a frente, vai até um alcance que cresce com a Lâmina (380 px na Lâmina 4; 20 px por ponto, entre 320 e 460 px, v2.16) e volta para a mão. Acerta uma vez (na ida ou, se errou, na volta); a guarda de frente bloqueia e a Barreira absorve, e a lâmina volta mesmo assim. Enquanto ela não volta, o lutador não ataca, não bloqueia e não apara com a lâmina (empurrão, esquiva e poderes continuam valendo).
 
 **Efeitos de estado (v1.17).** Duram um tempo e ficam no lutador.
 - **Estrangular** (Eclipse, 240 px): custa 45, prende o alvo (não age) e drena vida enquanto dura (0,5 s, 4 de dano por segundo). +3 ou mais fura a guarda; −2 dura metade e drena metade; −3 ou menos falha. Janela reduzida na v1.19 para limitar a punição garantida.
