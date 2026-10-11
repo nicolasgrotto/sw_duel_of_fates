@@ -6,7 +6,7 @@ import { ArenaRenderer } from './arenaRenderer.js';
 import { DodgeAfterimage } from './DodgeAfterimage.js';
 import { PowerRenderer } from './PowerRenderer.js';
 import { ProjectileRenderer } from './ProjectileRenderer.js';
-import { drawDesaturation, drawFlash, drawImpactLights, drawParticles, drawRings, drawShockwaves } from './effectsRenderer.js';
+import { drawDebris, drawDesaturation, drawFlash, drawImpactLights, drawParticles, drawRings, drawShockwaves } from './effectsRenderer.js';
 import { computePose, createPose, getBladeLockAdvantage } from './fighterPose.js';
 import { drawFighterBody } from './fighterRenderer.js';
 import { SaberTrail } from './SaberTrail.js';
@@ -108,6 +108,7 @@ export class DuelRenderer {
     drawImpactLights(renderer, effects.lights);
     drawRings(renderer, effects.rings);
     drawShockwaves(renderer, effects.shockwaves, effectsConfig.shockwave);
+    if (effects.debris) drawDebris(renderer, effects.debris.particles);
     drawParticles(renderer, effects.particles.particles, effectsConfig.particle.streakTime);
 
     renderer.restore();

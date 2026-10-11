@@ -1,12 +1,15 @@
-import { getPowerTier } from '../combat/flowInteractions.js';
+import { getPowerTier, resolveLevelBand } from '../combat/flowInteractions.js';
 import { isBarrierUp, isChannelOpen, isUsingPower } from '../combat/PowerSystem.js';
 import { hasStatus } from '../combat/StatusSystem.js';
 import { effectsConfig } from '../config/effectsConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
+import { projectilesConfig } from '../config/projectilesConfig.js';
 import { colors } from '../config/themeConfig.js';
+import { easeOutCubic } from '../utils/easing.js';
 import { TAU, clamp, lerp } from '../utils/math.js';
 import { createRandom } from '../utils/random.js';
 import { drawFighterBody } from './fighterRenderer.js';
+import { drawRockCluster, getRockCount } from './rockCluster.js';
 
 const style = powersConfig.render;
 
@@ -131,6 +134,10 @@ export class PowerRenderer {
     const originX = fighter.x + fighter.facing * (fighter.width / 2 + style.handOffset);
     const originY = fighter.y - fighter.height * powersConfig.castHeight;
 
+    if (fighter.stateTime < power.startup && power.effect === 'throw') {
+      this.drawRisingRocks(renderer, fighter, tier, power);
+      return;
+    }
     if (fighter.stateTime < power.startup) {
       const scale = power.effect === 'push'
         ? effectsConfig.shockwave.chargeScale
@@ -154,11 +161,23 @@ export class PowerRenderer {
     }
   }
 
+  drawRisingRocks(renderer, fighter, tier, power) {
+    const rocks = projectilesConfig.render.rocks;
+    const size = resolveLevelBand(fighter.flowLevel, projectilesConfig.throw.sizes);
+    const rise = easeOutCubic(clamp(fighter.stateTime / power.startup, 0, 1));
+    const x = fighter.x + fighter.facing * fighter.width / 2;
+    const y = lerp(fighter.y - size.radius * rocks.riseStart, fighter.y - fighter.height * projectilesConfig.height, rise);
+    renderer.save();
+    renderer.setBlendMode('source-over');
+    drawRockCluster(renderer, x, y, size.radius, fighter.stateTime * rocks.riseSpin * fighter.facing, getRockCount(size.id), tier.color);
+    renderer.restore();
+  }
+
   drawBarrier(renderer, fighter, tier) {
     const centerX = fighter.x;
     const centerY = fighter.y - fighter.height * style.barrierCenter;
-    const radiusX = fighter.height * style.barrierRadiusX;
-    const radiusY = fighter.height * style.barrierRadiusY;
+    const radiusX = fighter.height * style.barrierRadiusX * tier.barrierScale;
+    const radiusY = fighter.height * style.barrierRadiusY * tier.barrierScale;
     const pulse = (Math.sin(fighter.animation.time * style.barrierPulseSpeed * TAU) + 1) / 2;
     renderer.drawGlow(centerX, centerY, radiusY * style.barrierGlowScale, tier.color, style.barrierGlowAlpha);
     renderer.setAlpha(lerp(style.barrierAlpha[0], style.barrierAlpha[1], pulse));

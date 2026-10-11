@@ -3,6 +3,7 @@ export const effectsConfig = {
   maxLights: 8,
   maxRings: 4,
   maxShockwaves: 2,
+  maxDebris: 24,
   bladeLock: {
     contactHeight: 125,
     contactShift: 18,
@@ -11,6 +12,8 @@ export const effectsConfig = {
     pressLight: { radius: 70, alpha: 0.35, duration: 0.1 },
   },
   woundHealedLight: { radius: 60, alpha: 0.45, duration: 0.3 },
+  throwDust: { count: 8, reducedScale: 0.5, spread: 36, speed: [20, 90], lift: [90, 200], life: [0.25, 0.5], size: [1.5, 2.5] },
+  throwDebris: { count: [4, 6], speed: [120, 280], upwardDegrees: 55, spreadDegrees: 90, life: [0.45, 0.7], size: [3, 5] },
   stormSpasm: { duration: 0.12, amplitude: 1.5, interval: 0.03, outlineAlpha: 0.5, outlineOffset: 2 },
   shockwave: {
     duration: 0.3,

@@ -1,6 +1,7 @@
 import { isStrongAttack } from '../combat/attackPhases.js';
 import { CombatEvent } from '../combat/combatEvents.js';
 import { getPowerTier } from '../combat/flowInteractions.js';
+import { getPowerRange } from '../combat/PowerSystem.js';
 import { combatRulesConfig } from '../config/combatRulesConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { colors } from '../config/themeConfig.js';
@@ -38,7 +39,7 @@ function getTierColor(fighter) {
 }
 
 function createShockwave() {
-  return { active: false, x: 0, y: 0, direction: 1, range: 0, color: '', time: 0 };
+  return { active: false, x: 0, y: 0, direction: 1, range: 0, scale: 1, color: '', time: 0 };
 }
 
 function createLight() {
@@ -72,6 +73,8 @@ function createRing() {
   };
 }
 
+const THROW_IMPACTS = new Set([CombatEvent.POWER_HIT, CombatEvent.POWER_BLOCKED, CombatEvent.POWER_RESISTED, CombatEvent.POWER_ABSORBED]);
+
 export class EffectsSystem {
   constructor(config, camera, random, timeControl) {
     this.config = config;
@@ -89,6 +92,8 @@ export class EffectsSystem {
     this.tremors = new Map();
     this.spasms = new Map();
     this.particles = new ParticlePool(config.maxParticles);
+    this.debris = new ParticlePool(config.maxDebris);
+    this.ringParams = { radius: 0, lineWidth: 0, alpha: 0, duration: 0 };
     this.lights = Array.from({ length: config.maxLights }, createLight);
     this.rings = Array.from({ length: config.maxRings }, createRing);
     this.shockwaves = Array.from({ length: config.maxShockwaves }, createShockwave);
@@ -127,6 +132,12 @@ export class EffectsSystem {
     if (event.type === CombatEvent.POWER_PULSE) {
       this.spawnStorm(attacker);
       return;
+    }
+    if (event.attackType === 'throw' && THROW_IMPACTS.has(event.type)) {
+      this.spawnDebris(x, y, attacker.facing);
+    }
+    if (event.type === CombatEvent.POWER_START && event.attackType === 'throw') {
+      this.spawnThrowDust(attacker);
     }
     const params = this.eventParams;
     params.x = x;
@@ -350,14 +361,16 @@ export class EffectsSystem {
     wave.y = caster.y - caster.height * powersConfig.castHeight;
     wave.direction = caster.facing;
     wave.range = powersConfig.powers.push.range;
-    wave.color = getTierColor(caster);
+    const tier = getPowerTier(caster.flowLevel, powersConfig.tiers);
+    wave.scale = tier.waveScale;
+    wave.color = tier.color;
     wave.time = 0;
     this.spawnLight(style.light, wave.x, wave.y, wave.color);
-    this.spawnShockwaveDust(caster, wave, style.dust);
+    this.spawnShockwaveDust(caster, wave, style.dust, tier.particleScale);
   }
 
-  spawnShockwaveDust(caster, wave, dust) {
-    const count = this.reduced ? dust.reducedCount : dust.count;
+  spawnShockwaveDust(caster, wave, dust, scale) {
+    const count = Math.round((this.reduced ? dust.reducedCount : dust.count) * scale);
     for (let i = 0; i < count; i += 1) {
       const particle = this.particles.acquire();
       if (!particle) return;
@@ -374,12 +387,63 @@ export class EffectsSystem {
 
   spawnPowerWave(caster, contract, params) {
     const recipe = this.config.recipes[EffectType.POWER_WAVE];
-    params.color = getTierColor(caster);
-    params.particleScale = getPowerTier(caster.flowLevel, powersConfig.tiers).particleScale;
-    params.x = caster.x + caster.facing * (caster.width / 2 + powersConfig.render.waveOffset);
+    const tier = getPowerTier(caster.flowLevel, powersConfig.tiers);
+    const handOffset = caster.width / 2 + powersConfig.render.waveOffset;
+    params.color = tier.color;
+    params.particleScale = tier.particleScale;
+    params.x = caster.x + caster.facing * handOffset;
     params.y = caster.y - caster.height * powersConfig.castHeight;
     this.spawn(EffectType.POWER_WAVE, params);
-    this.spawnRing(recipe.ring, params.x, params.y, params.color, contract);
+    if (!contract) {
+      this.spawnRing(recipe.ring, params.x, params.y, params.color);
+      return;
+    }
+    const ring = this.ringParams;
+    ring.radius = getPowerRange(caster, powersConfig.powers.pull) - handOffset;
+    ring.lineWidth = recipe.ring.lineWidth * tier.waveScale;
+    ring.alpha = recipe.ring.alpha;
+    ring.duration = recipe.ring.duration;
+    this.spawnRing(ring, params.x, params.y, params.color, true);
+  }
+
+  spawnThrowDust(caster) {
+    const dust = this.config.throwDust;
+    const count = Math.round(dust.count * (this.reduced ? dust.reducedScale : 1));
+    const originX = caster.x + caster.facing * caster.width / 2;
+    for (let i = 0; i < count; i += 1) {
+      const particle = this.particles.acquire();
+      if (!particle) return;
+      particle.x = originX + (this.random() * 2 - 1) * dust.spread;
+      particle.y = caster.y;
+      particle.vx = (this.random() * 2 - 1) * randomRange(this.random, dust.speed);
+      particle.vy = -randomRange(this.random, dust.lift);
+      particle.life = randomRange(this.random, dust.life);
+      particle.maxLife = particle.life;
+      particle.size = randomRange(this.random, dust.size);
+      particle.color = colors.shockwaveDust;
+    }
+  }
+
+  spawnDebris(x, y, direction) {
+    const recipe = this.config.throwDebris;
+    const count = randomInt(this.random, recipe.count);
+    const upward = degreesToRadians(recipe.upwardDegrees);
+    const baseAngle = direction >= 0 ? -upward : Math.PI + upward;
+    const spread = degreesToRadians(recipe.spreadDegrees);
+    for (let i = 0; i < count; i += 1) {
+      const piece = this.debris.acquire();
+      if (!piece) return;
+      const angle = baseAngle + (this.random() - 0.5) * spread;
+      const speed = randomRange(this.random, recipe.speed);
+      piece.x = x;
+      piece.y = y;
+      piece.vx = Math.cos(angle) * speed;
+      piece.vy = Math.sin(angle) * speed;
+      piece.life = randomRange(this.random, recipe.life);
+      piece.maxLife = piece.life;
+      piece.size = randomRange(this.random, recipe.size);
+      piece.color = colors.floorEdge;
+    }
   }
 
   spawnPowerRing(type, owner, params) {
@@ -573,6 +637,7 @@ export class EffectsSystem {
 
   update(dt) {
     this.particles.update(dt, this.config.particle);
+    this.debris.update(dt, this.config.particle);
     this.updateLights(dt);
     this.updateFlash(dt);
     this.updateRings(dt);

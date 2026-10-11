@@ -45,12 +45,13 @@ function placeChevron(points, offset, wave, radius, armHeight, armBack, upward =
 }
 
 function drawShockwaveChevron(renderer, wave, style, radius, progress) {
-  const armHeight = Math.min(style.halfHeight, radius * style.armRatio);
+  const scale = wave.scale ?? 1;
+  const armHeight = Math.min(style.halfHeight * scale, radius * style.armRatio);
   const armBack = armHeight / Math.tan((style.chevronDegrees * Math.PI) / 180);
-  const width = style.lineWidth[0] + (style.lineWidth[1] - style.lineWidth[0]) * progress;
+  const width = (style.lineWidth[0] + (style.lineWidth[1] - style.lineWidth[0]) * progress) * scale;
   const fade = 1 - progress;
   placeChevron(bandPoints, 0, wave, radius, armHeight, armBack);
-  placeChevron(bandPoints, 6, wave, Math.max(0, radius - style.bandDepth), armHeight, armBack, -1);
+  placeChevron(bandPoints, 6, wave, Math.max(0, radius - style.bandDepth * scale), armHeight, armBack, -1);
   renderer.setAlpha(style.bandAlpha * fade);
   renderer.fillPolygon(bandPoints, wave.color);
   placeChevron(chevronPoints, 0, wave, radius, armHeight, armBack);
@@ -75,6 +76,18 @@ export function drawShockwaves(renderer, waves, style) {
       const radius = style.startRadius + (wave.range - style.startRadius) * (1 - (1 - progress) * (1 - progress));
       drawShockwaveChevron(renderer, wave, style, radius, progress);
     }
+  }
+  renderer.restore();
+}
+
+export function drawDebris(renderer, debris) {
+  renderer.save();
+  for (const piece of debris) {
+    if (!piece.active) {
+      continue;
+    }
+    renderer.setAlpha(Math.min(1, (piece.life / piece.maxLife) * 2));
+    renderer.fillRect(piece.x - piece.size / 2, piece.y - piece.size / 2, piece.size, piece.size, piece.color);
   }
   renderer.restore();
 }

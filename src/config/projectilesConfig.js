@@ -25,9 +25,18 @@ export const projectilesConfig = {
   render: {
     fragmentPoints: [1, 0.15, 0.55, 0.85, -0.35, 0.95, -1, 0.1, -0.6, -0.8, 0.4, -0.9],
     fragmentSpin: 7,
-    fragmentGlowScale: 2.4,
-    fragmentGlowAlpha: 0.35,
     fragmentEdgeWidth: 1.5,
+    rocks: {
+      bySize: { small: 1, medium: 2, large: 2, huge: 3, max: 3 },
+      layouts: [
+        [0, 0, 1],
+        [-0.35, 0.1, 0.62, 0.38, -0.12, 0.55],
+        [-0.4, 0.15, 0.5, 0.4, 0.2, 0.45, 0, -0.38, 0.48],
+      ],
+      twist: 2.1,
+      riseSpin: 2.5,
+      riseStart: 0.4,
+    },
     saberSpin: 18,
     saberLengthScale: 1.6,
     saberGlowScale: 1.1,

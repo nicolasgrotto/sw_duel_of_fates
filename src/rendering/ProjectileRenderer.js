@@ -1,16 +1,13 @@
-import { getPowerTier } from '../combat/flowInteractions.js';
+import { getPowerTier, resolveLevelBand } from '../combat/flowInteractions.js';
 import { saberStyle } from '../config/fighterVisualConfig.js';
 import { ProjectileKind, projectilesConfig } from '../config/projectilesConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { colors } from '../config/themeConfig.js';
+import { drawRockCluster, getRockCount } from './rockCluster.js';
 
 const style = projectilesConfig.render;
 
 export class ProjectileRenderer {
-  constructor() {
-    this.points = new Float32Array(style.fragmentPoints.length);
-  }
-
   draw(renderer, projectiles, fighters) {
     if (!projectiles) {
       return;
@@ -29,26 +26,10 @@ export class ProjectileRenderer {
   }
 
   drawFragment(renderer, projectile, owner) {
-    const { x, y, radius } = projectile;
     const tier = getPowerTier(owner.flowLevel, powersConfig.tiers);
+    const size = resolveLevelBand(owner.flowLevel, projectilesConfig.throw.sizes);
     const angle = projectile.age * style.fragmentSpin * (Math.sign(projectile.vx) || 1);
-    const cos = Math.cos(angle);
-    const sin = Math.sin(angle);
-    const shape = style.fragmentPoints;
-    for (let i = 0; i < shape.length; i += 2) {
-      const px = shape[i] * radius;
-      const py = shape[i + 1] * radius;
-      this.points[i] = x + px * cos - py * sin;
-      this.points[i + 1] = y + px * sin + py * cos;
-    }
-    renderer.save();
-    renderer.setBlendMode('lighter');
-    renderer.drawGlow(x, y, radius * style.fragmentGlowScale, tier.color, style.fragmentGlowAlpha);
-    renderer.restore();
-    renderer.fillPolygon(this.points, colors.floorEdge);
-    renderer.polyline(this.points, tier.color, style.fragmentEdgeWidth);
-    const last = this.points.length - 2;
-    renderer.line(this.points[last], this.points[last + 1], this.points[0], this.points[1], tier.color, style.fragmentEdgeWidth);
+    drawRockCluster(renderer, projectile.x, projectile.y, projectile.radius, angle, getRockCount(size.id), tier.color);
   }
 
   drawSaber(renderer, projectile, owner) {

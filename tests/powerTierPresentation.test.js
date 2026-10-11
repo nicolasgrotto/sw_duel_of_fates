@@ -37,7 +37,7 @@ function recordingRenderer() {
     drawGlow: record('drawGlow'),
     polyline: record('polyline'),
     strokeEllipse: record('strokeEllipse'),
-    fillPolygon: record('fillPolygon'),
+    fillPolygon: (points, ...rest) => calls.push({ name: 'fillPolygon', args: [Array.from(points), ...rest] }),
     line: record('line'),
     translate: record('translate'),
     scale: record('scale'),
@@ -184,5 +184,91 @@ describe('frozen and choked targets', () => {
     const stunned = computePose(fighter, createPose());
     assert.equal(stunned.bodyLift, 0);
     assert.equal(stunned.offHand, 0);
+  });
+});
+
+describe('barrier, push, pull and throw by tier', () => {
+  it('grows the barrier ellipse with the tier', () => {
+    const radii = TIER_LEVELS.map((level) => {
+      const holder = spawnFighter(400, 1, 'guardian');
+      holder.stats.flowLevel = level;
+      startPower(holder, 'barrier', 0.5);
+      const renderer = recordingRenderer();
+      new PowerRenderer().draw(renderer, [holder]);
+      return renderer.calls.find((call) => call.name === 'strokeEllipse').args[3];
+    });
+    const base = radii[1];
+    assert.deepEqual(radii.map((radius) => Number((radius / base).toFixed(2))), powersConfig.tiers.map((tier) => tier.barrierScale));
+  });
+
+  it('scales the push chevrons and dust with the tier but keeps the gameplay range', () => {
+    const results = TIER_LEVELS.map((level) => {
+      const effects = createEffects();
+      const caster = spawnFighter(400, 1, 'mirror');
+      caster.stats.flowLevel = level;
+      effects.handleEvents([{ type: CombatEvent.POWER_ACTIVE, attacker: caster, defender: null, attackType: 'push', x: 400, y: 500 }]);
+      const wave = effects.shockwaves.find((candidate) => candidate.active);
+      const dust = effects.particles.particles.filter((particle) => particle.active).length;
+      return { scale: wave.scale, range: wave.range, dust };
+    });
+    assert.deepEqual(results.map(({ scale }) => scale), powersConfig.tiers.map((tier) => tier.waveScale));
+    assert.ok(results.every(({ range }) => range === powersConfig.powers.push.range));
+    assert.ok(results[0].dust < results[1].dust && results[1].dust < results[3].dust);
+  });
+
+  it('starts the closing pull ring at the real pull range of the caster', () => {
+    for (const [index, level] of TIER_LEVELS.entries()) {
+      const effects = createEffects();
+      const caster = spawnFighter(400, 1, 'shadow');
+      caster.stats.flowLevel = level;
+      effects.handleEvents([{ type: CombatEvent.POWER_ACTIVE, attacker: caster, defender: null, attackType: 'pull', x: 400, y: 500 }]);
+      const ring = effects.rings.find((candidate) => candidate.active);
+      const reach = Math.abs(ring.x - caster.x) + ring.radius;
+      assert.equal(reach, powersConfig.powers.pull.rangeByLevel[index].range);
+      assert.equal(ring.lineWidth, effectsConfig.recipes.powerWave.ring.lineWidth * powersConfig.tiers[index].waveScale);
+      assert.equal(ring.contract, true);
+    }
+  });
+
+  it('raises one, two or three stones from the floor during the throw startup', () => {
+    for (const [level, stones] of [[1, 1], [4, 2], [6, 2], [9, 3], [10, 3]]) {
+      const caster = spawnFighter(400, 1, 'shadow');
+      caster.stats.flowLevel = level;
+      const power = startPower(caster, 'throw', 0.01);
+      const early = recordingRenderer();
+      new PowerRenderer().draw(early, [caster]);
+      assert.equal(early.calls.filter((call) => call.name === 'fillPolygon').length, stones);
+      assert.equal(early.calls.filter((call) => call.name === 'drawGlow').length, 0);
+      caster.stateTime = power.startup * 0.99;
+      const late = recordingRenderer();
+      new PowerRenderer().draw(late, [caster]);
+      const lowest = (calls) => Math.max(...calls.filter((call) => call.name === 'fillPolygon').map((call) => Math.max(...call.args[0].filter((_, i) => i % 2 === 1))));
+      assert.ok(lowest(late.calls) < lowest(early.calls));
+    }
+  });
+
+  it('kicks dust on the throw startup, halved with reduced effects', () => {
+    const counts = [false, true].map((reduced) => {
+      const effects = createEffects(reduced);
+      const caster = spawnFighter(400, 1, 'shadow');
+      effects.handleEvents([{ type: CombatEvent.POWER_START, attacker: caster, defender: null, attackType: 'throw', x: 400, y: 500 }]);
+      return effects.particles.particles.filter((particle) => particle.active).length;
+    });
+    assert.deepEqual(counts, [effectsConfig.throwDust.count, effectsConfig.throwDust.count / 2]);
+  });
+
+  it('drops four to six dark fragments with gravity when the stones hit', () => {
+    const effects = createEffects();
+    const caster = spawnFighter(400, 1, 'shadow');
+    const target = spawnFighter(700, -1, 'guardian');
+    effects.handleEvents([{ type: CombatEvent.POWER_HIT, attacker: caster, defender: target, attackType: 'throw', x: 700, y: 500 }]);
+    const pieces = effects.debris.particles.filter((piece) => piece.active);
+    assert.ok(pieces.length >= 4 && pieces.length <= 6);
+    const vy = pieces[0].vy;
+    effects.update(0.1);
+    assert.ok(pieces[0].vy > vy);
+    const quiet = createEffects();
+    quiet.handleEvents([{ type: CombatEvent.POWER_HIT, attacker: caster, defender: target, attackType: 'push', x: 700, y: 500 }]);
+    assert.equal(quiet.debris.particles.filter((piece) => piece.active).length, 0);
   });
 });
