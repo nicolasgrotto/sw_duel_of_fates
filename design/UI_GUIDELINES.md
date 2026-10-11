@@ -83,6 +83,7 @@ NOME ESQUERDA                                         NOME DIREITA
 - Dano recebido: a parte perdida fica visível como barra "fantasma" (`hudGhost`) e encolhe depois de um pequeno atraso.
 - Stamina: barra mais fina abaixo da vida (`hudStamina`).
 - **Medidor do Fluxo**: só com poderes ligados. Barra ainda mais fina logo abaixo da stamina, na cor do tier do lutador. Poder recusado por falta de medidor ou recarga pisca a barra em `hudDanger`, como a stamina.
+- **Marcas de custo alto (decisão da 2.17):** uma marca fina sobre o medidor no custo de cada poder caro equipado, apagada (`hudTrack`) até o medidor alcançar o custo, e acesa numa cor própria daquele poder quando dá para lançar. Sem texto, número ou barra nova. As cores, que precisam se distinguir das cores de tier, e as medidas são definidas e registradas aqui na primeira task de UI da 2.17, antes do código.
 - **Ação recusada**: quando o lutador tenta uma ação sem stamina, a barra de stamina dele fica `hudDanger` e pisca por ~0,3 s. Diz ao jogador por que nada aconteceu.
 - **Rounds**: quadrados pequenos embaixo da stamina, um por round necessário para vencer. Round vencido = cheio (`hudHealth`), não vencido = só contorno (`hudTrack`).
 - Fundo das barras: `hudTrack`, quase invisível.

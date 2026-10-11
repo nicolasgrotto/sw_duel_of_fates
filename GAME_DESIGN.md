@@ -745,3 +745,33 @@ Cura remove ferimento somente ao completar sua dura??o sem dano. Pode ser lan?ad
 Ira (`wrath`, Eclipse) custa 35 de Fluxo, prepara por 0,3 s e dura 5 s ? pot?ncia. Dano causado ? 1,2 e recebido ? 0,85 em l?minas e poderes; dano peri?dico n?o muda. Reaplica??o substitui e reinicia, sem empilhar. N?o impede interrup??o, stun, parry, empurr?o nem quebra de guarda. Nenhum loadout do elenco a recebe na 2.4. Ordem da l?mina: dano ? puni??o ? carga ? ponto doce ? exaust?o ? Ira atacante ? Ira defensor ? armadura. Poderes usam dano ? pot?ncia ? Ira atacante ? Ira defensor.
 
 Foco mant?m redu??o de custos e evita v?rios contatos de l?mina corpo a corpo por 12 de Fluxo cada, at? sua dura??o terminar. Exige ch?o, IDLE e intent sem movimento nem a??o. Manual v?lido tem prioridade e n?o custa Fluxo. Autom?tico n?o altera sequ?ncia manual nem renova dura??o. Empurr?es, poderes e proj?teis n?o s?o eleg?veis. Saldo insuficiente para a pr?xima defesa encerra o Foco, incluindo redu??o de custos, sem reativa??o pela regenera??o.
+
+## 27. Poderes novos e poderes de custo alto (v3, etapas 2.17 e 2.18)
+
+Especificação aprovada pelo autor. Números marcados como **inicial** são ponto de partida da calibração; os finais entram aqui no fechamento de cada etapa. Até a implementação, valem as regras da seção 22.
+
+**Custo alto sinalizado na barra.** Não há categoria "supremo" nem barra nova. Poderes de custo alto são poderes do catálogo com custo elevado de Fluxo. O medidor de Fluxo mostra uma marca fina no custo de cada poder caro equipado, e a marca acende numa cor própria daquele poder quando o medidor alcança o custo (desenho na UI_GUIDELINES). O custo de cada um é calibrado pela frequência de uso no simulador: um round dura cerca de 15 s e o medidor começa em 20.
+
+### Poderes novos (2.17)
+
+- **Absorção** (Aurora): substitui o Redirecionamento no catálogo e nos loadouts do Bastião e da Garça. Reação curta (janela inicial de 0,3 s) contra **qualquer poder** recebido: reduz ou anula pela diferença de Fluxo, pela tabela de interação e sem sorteio, e converte parte da energia absorvida em medidor de Fluxo. Não segura lâmina (isso é da Barreira) e não absorve a Tempestade.
+- **Dreno** (Eclipse): canal com alcance que tira medidor de Fluxo do alvo (e talvez um pouco de Vigor, a calibrar) e devolve parte a quem drena. Não tira vida. O laço rompe se o alvo sair do alcance; um golpe interrompe o canal pelas regras existentes.
+- **Truque Mental** (Fluxo comum): inverte **só a direção** do alvo (andar e a escolha frente/trás de poder e técnica) por pouco tempo: 0,8 s na diferença 0 (inicial), reduzido pela tabela de interação; −3 ou menos resiste. Ataque, guarda, esquiva e pulo não mudam. A inversão é aplicada pela simulação sobre a intenção, então vale igual para os dois jogadores locais e para a IA, e o replay grava os comandos originais. A IA pode compensar conforme a dificuldade (Fácil não compensa; Normal depois de um tempo de reação; Difícil rápido), sempre só pedindo ações.
+- **Tempestade** (Eclipse, reformulada, custo alto, continua exigindo Fluxo 6):
+  1. **Invocação** (~0,5 s): o braço sobe e um raio vai ao céu; a arena escurece. É a **única janela de interrupção**.
+  2. **Escudo de raios**: logo depois da invocação, arcos envolvem quem lança, que fica parado canalizando e não sofre lâmina nem poder até o encerramento.
+  3. **Tempestade** (~4 s): raios caem perto da posição do oponente, cada um marcado no chão cerca de 0,5 s antes (8, 10 e 12 raios por tier, inicial). Sem fogo amigo. **A guarda não bloqueia e a Absorção não absorve.** A esquiva com invulnerabilidade passa. A **Barreira** segura, mas cada raio absorvido drena muito medidor (30, inicial), e ela cai quando o medidor acaba.
+  4. **Encerramento** (~0,8 s): o escudo some, o céu volta ao normal e quem lançou fica vulnerável (janela de punição).
+  Dano por raio moderado: quem se move bem sofre pouco; quem fica parado perde cerca de 35–40% da vida (alvo de calibração). A IA lê as marcas para fugir.
+
+### Poderes de custo alto (2.18)
+
+- **Repulsão Suprema** (Fluxo comum): onda em todas as direções em volta de quem lança. Pode ser lançada **também enquanto o lutador apanha** (estados exatos definidos no detalhamento da 2.18). Usada como fuga causa menos dano; usada como ataque, com o lutador livre, causa mais. Guarda e resultado pela diferença de Fluxo, como a Repulsão (seção 22): com diferença pequena, pode ser bloqueada. Custo alto e recarga longa.
+- **Chuva de Meteoros** (Aurora): reaproveita o sistema de impactos marcados da Tempestade, com outro equilíbrio: menos impactos e maiores, com empurrão; sem escudo; quem lança pode se mover, mas não atacar, durante a chuva. Rochas puxadas do céu; sem céu à vista, fragmentos conjurados.
+- **Santuário** (Aurora): escudo que absorve uma quantidade de dano enquanto o lutador age normalmente, com duração máxima. Desfaz ao absorver o limite ou ao acabar o tempo. Diferente da Barreira, que é canal segurado.
+- **Esmagamento** (Eclipse): preparação longa e interrompível; prende o alvo no ar, comprime e o joga no chão. Golpe único e pesado, diferente do dreno contínuo do Estrangular.
+- **Ira** (Eclipse, revista): passa a ser poder de custo alto e ganha resistência a interrupção nos segundos ativos. Não dá invulnerabilidade. Cobre a ideia de "Fúria".
+
+Fora do ciclo: Cataclismo e Redemoinho (repetem a chuva de impactos); Suspensão Suprema no backlog (repete o Congelar e levaria a combo garantido entre jogadores).
+
+**Escolha de poderes na seleção (2.13).** Opção **Base** (loadout do personagem, padrão) ou **Personalizar**. Personagens Aurora escolhem entre Fluxo comum e Aurora; Eclipse, entre Fluxo comum e Eclipse. Valem os requisitos de Fluxo (por exemplo, Tempestade exige Fluxo 6) e não há poder repetido. Só em Duelar, 2 Jogadores e Treino; Arcade, Sobrevivência e História usam o loadout base. O loadout escolhido entra no replay e no simulador.

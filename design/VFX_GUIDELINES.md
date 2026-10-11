@@ -182,3 +182,17 @@ Decisões da implementação (v2.16):
 - **Puxão:** o anel nasce na mão com raio = alcance do Puxão menos a distância até a mão, então a borda da frente toca o alcance real. Espessura × `waveScale`.
 - **Arremesso:** com duas pedras, raios 0,62 e 0,55 do raio da hitbox; com três, 0,5/0,45/0,48, sempre dentro dela. Na preparação o grupo sobe do chão até a altura do projétil. Fragmentos do impacto na cor da pedra (`floorEdge`), desenhados sem modo aditivo (cor escura some no `lighter`), num pool próprio de 24.
 - **Contraguarda:** 8–12 faíscas abertas 40° para cima (75°), luz na cor da lâmina e o brilho curto da lâmina do parry.
+
+## Poderes novos e de custo alto (direção, v2.17 e v2.18)
+
+Direção aprovada junto com as regras (GAME_DESIGN, seção 27). Os números finais entram no detalhamento de cada etapa, sempre dentro dos limites desta página.
+
+- **Absorção:** anel curto que se fecha na mão de quem absorve e partículas do poder recebido sendo puxadas para ela, na cor do tier do defensor; o medidor sobe junto.
+- **Dreno:** fio de partículas que sai do alvo e chega a quem drena (o sentido inverso do Raio), na cor do tier de quem drena; o fio afina perto do alcance máximo, para o alvo ler que pode romper.
+- **Truque Mental:** ondulação na cabeça do alvo (dois ou três anéis elípticos deformados, alpha baixo) enquanto dura. Sem filtro de tela, para não atrapalhar o outro jogador na tela compartilhada.
+- **Tempestade:** a arena escurece em camada própria, e lâminas e efeitos continuam com cor total (mesma ideia da dessaturação do parry perfeito). O raio da invocação sobe pela polilinha do Raio. As marcas no chão são elipses na cor do tier que fecham até o impacto. Cada raio que cai tem flash curto e shake pequeno, dentro dos limites; com efeitos reduzidos, sem flash e com shake a 25%. O escudo usa os arcos da 2.16 em volta do corpo inteiro.
+- **Repulsão Suprema:** a onda de chevrons da Repulsão em volta do corpo todo, com poeira para os dois lados.
+- **Chuva de Meteoros:** as mesmas marcas da Tempestade; pedras maiores (o grupo de pedras do Arremesso) caindo com rastro curto e fragmentos no impacto.
+- **Santuário:** domo que acompanha o corpo e racha conforme absorve.
+- **Esmagamento:** o alvo é erguido (como o estrangulado), comprime na horizontal e cai com poeira no impacto.
+- **Ira revista:** o brilho atual da Ira com uma borda mais firme enquanto resiste a interrupções.
