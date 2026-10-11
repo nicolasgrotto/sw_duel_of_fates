@@ -33,7 +33,7 @@ describe('AI ability coverage', () => {
     it(`requests ${id} only while its blade is available and powers are enabled`, () => {
       const { self, ai } = setup(30);
       self.stats.techniques = { forward: id };
-      self.stats.attacks = { ...self.moves, [id]: { ...self.moves.heavy, ...bladeTechniques[id] } };
+      self.stats.attacks = { ...self.moves, [id]: self.moves[id] ?? { ...self.moves.heavy, ...bladeTechniques[id] } };
       assert.equal(ai.tryTechnique(), AiDecision.TECHNIQUE);
       ai.writeIntent(self.intent);
       assert.equal(self.intent.special, true);
