@@ -38,13 +38,13 @@ export const powersConfig = {
     },
     absorb: {
       id: 'absorb', effect: 'absorb', channel: false, pose: 'barrier', self: true, reaction: true, interaction: 'absorb',
-      cost: 18, startup: 0.05, active: 0.3, recovery: 0.2, window: 0.3,
+      cost: 18, startup: 0.05, active: 0.3, recovery: 0.2, window: 0.4,
       absorbGain: 0.5,
     },
     storm: {
       id: 'storm', effect: 'storm', channel: true, automatic: true, pose: 'invoke', interaction: 'storm', around: true,
       minFlowLevel: 6, cost: 70, startup: STORM_PHASES.invocation, maxChannel: STORM_PHASES.storm, recovery: STORM_PHASES.recovery,
-      stormPhases: STORM_PHASES, range: 600, damage: 6, stun: 0.12, strikeWarning: 0.5, strikeWidth: 60, barrierDrainPerStrike: 30,
+      stormPhases: STORM_PHASES, range: 600, damage: 5, stun: 0.12, strikeWarning: 0.5, strikeWidth: 80, barrierDrainPerStrike: 30,
       strikesByTier: [{ minLevel: 3, strikes: 8 }, { minLevel: 8, strikes: 10 }, { minLevel: 10, strikes: 12 }],
       strikeOffsets: [0, -24, 18, -12, 30, -30, 12, -18, 24, 0, -6, 6], hudMark: 'powerCostStorm',
     },

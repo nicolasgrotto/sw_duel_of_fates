@@ -756,7 +756,7 @@ Especificação aprovada pelo autor. Números marcados como **inicial** são pon
 
 ### Poderes novos (2.17)
 
-- **Absorção** (Aurora): substitui o Redirecionamento no catálogo e nos loadouts do Bastião e da Garça. Reação curta (janela inicial de 0,3 s) contra **qualquer poder** recebido: reduz ou anula pela diferença de Fluxo, pela tabela de interação e sem sorteio, e converte parte da energia absorvida em medidor de Fluxo. Não segura lâmina (isso é da Barreira) e não absorve a Tempestade.
+- **Absorção** (Aurora): substitui o Redirecionamento no catálogo e nos loadouts do Bastião e da Garça. Reação curta (janela de 0,4 s, calibrada na 2.17) contra **qualquer poder** recebido: reduz ou anula pela diferença de Fluxo, pela tabela de interação e sem sorteio, e converte parte da energia absorvida em medidor de Fluxo. Não segura lâmina (isso é da Barreira) e não absorve a Tempestade.
 - **Dreno** (Eclipse): canal com alcance que tira medidor de Fluxo do alvo (e talvez um pouco de Vigor, a calibrar) e devolve parte a quem drena. Não tira vida. O laço rompe se o alvo sair do alcance; um golpe interrompe o canal pelas regras existentes.
 - **Truque Mental** (Fluxo comum): inverte **só a direção** do alvo (andar e a escolha frente/trás de poder e técnica) por pouco tempo: 0,8 s na diferença 0 (inicial), reduzido pela tabela de interação; −3 ou menos resiste. Ataque, guarda, esquiva e pulo não mudam. A inversão é aplicada pela simulação sobre a intenção, então vale igual para os dois jogadores locais e para a IA, e o replay grava os comandos originais. A IA pode compensar conforme a dificuldade (Fácil não compensa; Normal depois de um tempo de reação; Difícil rápido), sempre só pedindo ações.
 - **Tempestade** (Eclipse, reformulada, custo alto, continua exigindo Fluxo 6):
@@ -764,7 +764,7 @@ Especificação aprovada pelo autor. Números marcados como **inicial** são pon
   2. **Escudo de raios**: logo depois da invocação, arcos envolvem quem lança, que fica parado canalizando e não sofre lâmina nem poder até o encerramento.
   3. **Tempestade** (~5 s, decisão do autor na implementação da 2.17): impactos igualmente de 0,5 até 5 s, com marcas 0,5 s antes; raios caem perto da posição do oponente, cada um marcado no chão cerca de 0,5 s antes (8, 10 e 12 raios por tier, inicial). Sem fogo amigo. **A guarda não bloqueia e a Absorção não absorve.** A esquiva com invulnerabilidade passa. A **Barreira** segura, mas cada raio absorvido drena muito medidor (30, inicial), e ela cai quando o medidor acaba.
   4. **Encerramento** (~0,8 s): o escudo some, o céu volta ao normal e quem lançou fica vulnerável (janela de punição).
-  Dano por raio moderado: quem se move bem sofre pouco; quem fica parado perde cerca de 35–40% da vida (alvo de calibração). A IA lê as marcas para fugir.
+  Dano por raio moderado: quem se move bem sofre pouco; quem fica parado perde cerca de 35–40% da vida no tier de base (alvo de calibração). **Calibrado na 2.17:** custo 70, dano 5 por raio, coluna de 80 px; parado, perde cerca de 42% no Firme, 57% no Profundo e 71% no Ápice. A IA lê as marcas para fugir.
 
 ### Poderes de custo alto (2.18)
 
