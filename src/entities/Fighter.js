@@ -89,6 +89,12 @@ function createCombat() {
     stormNextStrike: 0,
     stormTarget: -1,
     chokeTime: 0,
+    chokeSource: -1,
+    chokeTarget: -1,
+    chokeAttempted: false,
+    chokeMaxChannel: 0,
+    chokeRelease: 0,
+    chokeY: 0,
     chokeDamageRate: 0,
     freezeTime: 0,
     focusTime: 0,
@@ -221,6 +227,9 @@ export class Fighter {
   }
 
   clearPower() {
+    this.combat.chokeTarget = -1;
+    this.combat.chokeAttempted = false;
+    this.combat.chokeMaxChannel = 0;
     this.combat.absorbTime = 0;
     this.combat.stormPhase = null;
     this.combat.stormMarks.length = 0;

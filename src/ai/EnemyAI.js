@@ -580,7 +580,9 @@ export class EnemyAI {
       const power = loadout[slot];
       if (power && power.effect !== 'barrier' && this.canUsePower(power) && (power.self ? this.wantsSelfPower(power) : this.wantsPower(power))) {
         const [minHold, maxHold] = this.perception.lightningHold;
-        return this.startPower(slot, power.channel && !power.automatic ? minHold + (maxHold - minHold) * this.random() : 0);
+        const hold = power.channel && !power.automatic
+          ? this.perception.powerUse[power.effect]?.holdToLimit ? power.startup + power.maxChannel : minHold + (maxHold - minHold) * this.random() : 0;
+        return this.startPower(slot, hold);
       }
     }
     return null;

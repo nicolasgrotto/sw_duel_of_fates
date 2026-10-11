@@ -134,12 +134,34 @@ export class StatusSystem {
 
   choke(fighter, opponent, dt) {
     const { combat } = fighter;
+    const source = this.combat.projectiles.fighters[combat.chokeSource];
+    if (combat.chokeSource >= 0 && (!source?.isAlive || source.state !== FighterState.CHANNELING
+      || source.combat.power?.effect !== 'choke' || source.combat.powerEndTime > 0
+      || source.combat.chokeTarget !== this.combat.projectiles.fighters.indexOf(fighter))) {
+      this.releaseChoke(fighter);
+      return;
+    }
     const step = Math.min(dt, combat.chokeTime);
-    combat.chokeTime -= step;
+    if (combat.chokeSource < 0) combat.chokeTime -= step;
     if (fighter.isAlive) {
       fighter.vx = 0;
-      this.combat.applyStatusDamage(fighter, opponent, combat.chokeDamageRate * step);
+      if (combat.chokeSource >= 0) {
+        fighter.vy = 0;
+        fighter.y = combat.chokeY;
+      }
+      this.combat.applyStatusDamage(fighter, source ?? opponent, combat.chokeDamageRate * step);
     }
+  }
+
+  releaseChoke(fighter) {
+    const { combat } = fighter;
+    combat.chokeTime = 0;
+    combat.chokeDamageRate = 0;
+    combat.chokeSource = -1;
+    if (!fighter.isAlive) return;
+    fighter.clearAttack();
+    combat.stunDuration = combat.chokeRelease;
+    fighter.restartState(FighterState.STAGGERED);
   }
 
   onDamaged(fighter) {
@@ -148,6 +170,8 @@ export class StatusSystem {
   }
 
   onDeath(fighter) {
+    fighter.combat.chokeTime = 0;
+    fighter.combat.chokeSource = -1;
     fighter.combat.confuseTime = 0;
     fighter.combat.confuseElapsed = 0;
     this.end(fighter, 'heal', 'death');

@@ -7,6 +7,7 @@ import { getFlowDifference, resolveInteraction, resolveLevelBand } from './flowI
 import { projectilesConfig } from '../config/projectilesConfig.js';
 import { getMoveX } from '../entities/fighterIntent.js';
 import { isStormShieldUp, StormSystem } from './StormSystem.js';
+import { ChokeSystem } from './ChokeSystem.js';
 
 const POWER_STATES = new Set([FighterState.CASTING, FighterState.CHANNELING]);
 const GROUNDED = Object.freeze({ scale: 1, duration: 1, stagger: 1 });
@@ -63,6 +64,7 @@ export class PowerSystem {
     this.enabled = enabled;
     this.friction = friction;
     this.storms = new StormSystem(this);
+    this.chokes = new ChokeSystem(this);
     this.context = { system: this, combat, caster: null, target: null, power: null, interaction: null, air: GROUNDED, scale: 1, remainder: 1, guarded: false, projectile: null };
   }
 
@@ -143,6 +145,8 @@ export class PowerSystem {
       const target = this.findOpponent(caster, fighters);
       if (caster.combat.power.stormPhases) {
         this.storms.update(caster, target, fighters);
+      } else if (caster.combat.power.boundChannel) {
+        this.chokes.update(caster, target, fighters, dt);
       } else if (caster.combat.power.channel) {
         this.updateChannel(caster, target, dt);
       } else {
@@ -227,6 +231,7 @@ export class PowerSystem {
     if (inRange) {
       this.strike(caster, target, power, phase, null);
     }
+    return inRange;
   }
 
   strike(caster, target, power, phase, projectile) {

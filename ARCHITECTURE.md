@@ -114,6 +114,7 @@ src/
     powerEffects.js         ✅ registro de efeitos por poder (`push`, `pull`, `lightning`, `barrier`, `throw`)
     StatusSystem.js         ✅ duração, motivos de término e Foco automático (Estrangular, Congelar, Foco, Cura, Ira) em `fighter.combat`
     StormSystem.js          ✅ fases automáticas da Tempestade, marcas e impactos determinísticos em combat
+    ChokeSystem.js          ✅ canal do Estrangular e vínculo determinístico com a vítima
     ProjectileSystem.js     ✅ pool fixo de projéteis (Arremesso e lâmina arremessada), voo, retorno, impacto e snapshot
     flowInteractions.js     ✅ diferença de Fluxo, `resolveInteraction` (faixas por habilidade em dados) e tier visual (puros)
   simulation/               ✅
@@ -614,6 +615,8 @@ Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 22).
 - **Tier visual.** `getPowerTier(level, powersConfig.tiers)` escolhe cor (`themeConfig`) e intensidade. A HUD desenha o medidor na cor do tier, abaixo da stamina, só com `rules.powers`.
 
 ### Poderes
+
+- **Estrangular canalizado (2.18).** PowerSystem monta ChokeSystem para dados boundChannel/requiresHold. A primeira tentativa em alcance passa pelas defesas e tabela comuns, aplica dano de entrada uma vez e liga índices chokeSource/chokeTarget no combat dos dois lutadores. chokeMaxChannel limita a duração efetiva a maxChannel, inclusive com multiplicadores no ar e +3; chokeTime acompanha o tempo restante do canal. Enquanto ligado, StatusSystem mantém STUNNED e a posição da vítima e aplica o dano periódico, sem nova verificação de distância. Soltura, medidor, limite ou morte entram em recuperação e soltam a vítima com STAGGERED da mesma duração; interrupção por lâmina/projétil desfaz a ligação no mesmo passo pela validação do estado de quem lançou. A comparação de tempo da recuperação ligada tolera só o erro de ponto flutuante para não dar vantagem de um frame. Todos os campos são dados no snapshot, zerados no round; clearPower desfaz o vínculo de quem lança. IA lê holdToLimit em aiConfig e segura por startup + maxChannel, preservando o consumo de RNG dos demais poderes. Render e loadouts preservados.
 
 - **Truque Mental (2.17).** `mindTwist` é instantâneo do Fluxo comum, sem guarda nem dano. Aplica `confuseTime` pela tabela e reinicia `confuseElapsed`; ambos ficam em `combat` e no snapshot, zeram no round e na morte, e `StatusSystem.update` avança/encerra o relógio. A leitura única `entities/fighterIntent.getMoveX(fighter)` inverte a direção sem escrever em `intent`: `MovementSystem` a usa no chão, ar e caminhada em guarda; `getIntentSlot` a usa para escolher poderes e técnicas. Os demais botões e as regras de esquiva/ataque continuam iguais. `ReplayBuffer` e `IntentRecorder` gravam os intents originais, sem aplicar a inversão outra vez. A IA lê seus próprios tempos de confusão e `difficulties.*.confusionCompensation`; só inverte a direção solicitada em `writeIntent` depois do atraso, mantendo o plano e os recursos intactos. Não há novo loadout no elenco nem apresentação nesta task.
 

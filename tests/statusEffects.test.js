@@ -39,6 +39,7 @@ function step(setup, count = 1, each = () => {}) {
 function cast(setup, fighter, slot) {
   fighter.intent.moveX = slot === 'forward' ? fighter.facing : slot === 'back' ? -fighter.facing : 0;
   fighter.intent.power = true;
+  fighter.intent.powerHeld = true;
   step(setup);
   fighter.intent.moveX = 0;
 }

@@ -90,17 +90,13 @@ function getStatusDuration(context) {
 }
 
 function choke(context) {
-  const { combat, caster, target, power, scale, guarded } = context;
+  const { system, combat, caster, target, power, scale, guarded, interaction, air, remainder } = context;
   if (guarded) {
     applyGuarded(context);
     return;
   }
-  const duration = getStatusDuration(context);
   if (combat.dealPowerDamage(caster, target, power, power.damage * scale, CombatEvent.POWER_HIT)) {
-    holdTarget(target, duration);
-    target.combat.chokeTime = duration;
-    target.combat.chokeDamageRate = power.damagePerSecond * scale;
-    target.combat.statusLevel = caster.flowLevel;
+    system.chokes.capture(caster, target, power, interaction.duration * air.duration * remainder, power.damagePerSecond * scale);
   }
 }
 

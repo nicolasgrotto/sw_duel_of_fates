@@ -123,7 +123,8 @@ export class CombatSystem {
       case FighterState.HIT:
       case FighterState.STAGGERED:
       case FighterState.STUNNED:
-        if (fighter.stateTime >= combat.stunDuration) {
+        if (combat.chokeTime <= 0 && fighter.stateTime + (combat.chokeRelease > 0 && fighter.state === FighterState.STAGGERED ? Number.EPSILON : 0) >= combat.stunDuration) {
+          combat.chokeRelease = 0;
           fighter.setState(FighterState.IDLE);
         }
         break;
