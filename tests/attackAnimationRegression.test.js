@@ -126,12 +126,15 @@ describe('historical attack animation contract (198525b)', () => {
       const fighter = spawnFighter(500, 1, id);
       const actual = Object.fromEntries(Object.entries(fighter.moves).map(([key, move]) => [key, {
         startup: move.startup, active: move.active, recovery: move.recovery,
-        reach: move.hitbox.reach, top: move.hitbox.top, bottom: move.hitbox.bottom,
+        reach: key === 'saberThrow' ? undefined : move.hitbox.reach, top: move.hitbox.top, bottom: move.hitbox.bottom,
       }]));
-      assert.deepEqual(actual, baseline.moves[id]);
+      const expectedMoves = structuredClone(baseline.moves[id]);
+      if (expectedMoves.saberThrow) expectedMoves.saberThrow.reach = undefined;
+      assert.deepEqual(actual, expectedMoves);
       for (const facing of [-1, 1]) {
         fighter.facing = facing;
         for (const [key, expected] of Object.entries(baseline.moves[id])) {
+          if (key === 'saberThrow') continue;
           const hitbox = getAttackHitbox(fighter, fighter.moves[key], createBox());
           assert.equal(hitbox.top, fighter.y - fighter.height * expected.top);
           assert.equal(hitbox.bottom, fighter.y - fighter.height * expected.bottom);

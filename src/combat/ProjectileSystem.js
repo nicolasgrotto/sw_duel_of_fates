@@ -147,7 +147,7 @@ export class ProjectileSystem {
       this.release(projectile);
       return;
     }
-    if (!projectile.returning && (Math.abs(projectile.x - projectile.originX) >= saber.range || this.isOutside(projectile))) {
+    if (!projectile.returning && (Math.abs(projectile.x - projectile.originX) >= owner.moves[projectile.source].throwRange || this.isOutside(projectile))) {
       this.turnBack(projectile);
     }
     if (!projectile.returning) {

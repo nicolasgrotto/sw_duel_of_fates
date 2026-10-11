@@ -15,6 +15,7 @@ export const attributesConfig = {
     "10": 1.48
   },
   "perfectParryBonus": 0.0025,
+  "saberThrow": { "baseRange": 380, "rangePerRating": 20, "minRange": 320, "maxRange": 460 },
   "guardBreakStep": 1,
   "precision": 1000000000,
   "legacyScale": {

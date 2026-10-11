@@ -52,7 +52,8 @@ export class GalleryScene {
 
   get range() {
     const { item } = this.director;
-    return item.kind === 'power' ? item.data.range ?? 0 : this.fighters[0].moves[item.id].hitbox.reach;
+    const move = this.fighters[0].moves[item.id];
+    return item.kind === 'power' ? item.data.range ?? 0 : move.throwRange ?? move.hitbox.reach;
   }
 
   get gap() {

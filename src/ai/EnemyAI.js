@@ -397,7 +397,7 @@ export class EnemyAI {
     }
     for (const [slot, id] of Object.entries(self.stats.techniques ?? {})) {
       const move = self.moves[id];
-      const reach = move.hitbox.reach + (move.lunge ?? 0) * move.active;
+      const reach = move.throwRange ?? move.hitbox.reach + (move.lunge ?? 0) * move.active;
       if (!this.canSpend(move.staminaCost, move) || getGap(self, opponent) >= reach - this.perception.reachMargin) {
         continue;
       }

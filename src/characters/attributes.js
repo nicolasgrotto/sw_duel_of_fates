@@ -18,6 +18,7 @@ export function applyAttributes(base, attributes, config, { potential = 0 } = {}
     attacks[id] = { ...move, damage: rounded((base.damage[id] ?? move.damage) * multiplier('blade')) };
     if (move.dash) attacks[id].dash = { ...move.dash, speed: rounded(move.dash.speed * mobility) };
     if (move.leap) attacks[id].leap = { ...move.leap, speedX: rounded(move.leap.speedX * mobility), speedY: rounded(move.leap.speedY * mobility) };
+    if (id === 'saberThrow') attacks[id].throwRange = Math.max(config.saberThrow.minRange, Math.min(config.saberThrow.maxRange, config.saberThrow.baseRange + (ratings.blade - config.baseRating) * config.saberThrow.rangePerRating));
   }
   const { damage, guardCostScale, guardPushbackScale, evadeWindowScale, abilityMobilityScale, ...stats } = base;
   return {

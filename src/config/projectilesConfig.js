@@ -8,7 +8,6 @@ export const projectilesConfig = {
   height: 0.55,
   saber: {
     speed: 900,
-    range: 380,
     radius: 26,
     returnHeightRate: 8,
     maxLifetime: 1.6,
