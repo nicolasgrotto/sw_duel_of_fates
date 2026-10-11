@@ -553,6 +553,7 @@ export class EnemyAI {
     const use = this.perception.powerUse[power.effect];
     const gap = getGap(this.self, this.opponent);
     return Boolean(use) && gap >= use.minGap && gap <= use.maxGap && !this.isPowerBlocked(power)
+      && (use.targetMeterAbove === undefined || this.opponent.flowMeter > use.targetMeterAbove)
       && isInPowerRange(this.self, this.opponent, power) && this.getPowerScale(power) > 0;
   }
 

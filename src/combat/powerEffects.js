@@ -143,7 +143,17 @@ function wrath(context) {
   caster.combat.statusLevel = caster.flowLevel;
 }
 
+function drain(context) {
+  const { combat, caster, target, power, scale } = context;
+  const taken = Math.min(target.flowMeter, power.drainFlow * scale);
+  target.flowMeter -= taken;
+  caster.flowMeter = Math.min(caster.stats.power.max, caster.flowMeter + taken * power.flowReturn);
+  combat.spendStamina(target, power.drainStamina * scale, 'drain');
+  combat.emit(CombatEvent.POWER_HIT, combat.createPowerContact(caster, target, power, 0));
+}
+
 export const powerEffects = Object.freeze({
+  drain: { tick: drain },
   absorb: { self: ({ caster, power }) => { caster.combat.absorbTime = power.window; } },
   storm: { tick: (context) => {
     const { combat, caster, target, power, scale, guarded } = context;

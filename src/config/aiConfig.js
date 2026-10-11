@@ -426,6 +426,7 @@ export const aiConfig = {
     barrierPreference: 0.6,
     barrierVsSaberChance: 0.15,
     powerUse: {
+      drain: { minGap: 120, maxGap: 300, targetMeterAbove: 25 },
       absorb: { minDifference: -1 },
       storm: { minGap: 0, maxGap: 130 },
       push: { minGap: 0, maxGap: 100 },

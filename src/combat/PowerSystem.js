@@ -183,7 +183,7 @@ export class PowerSystem {
     if (combat.powerEndTime === 0) {
       const channelTime = caster.stateTime - power.startup;
       const holding = caster.intent.powerHeld && caster.flowMeter > 0 && channelTime < power.maxChannel;
-      if (holding || !combat.powerTargeted) {
+      if (holding || !combat.powerTargeted && !power.requiresHold) {
         combat.powerTargeted = true;
         caster.flowMeter = Math.max(0, caster.flowMeter - power.drainPerSecond * dt);
         this.tick(caster, target, power, dt);
@@ -206,6 +206,10 @@ export class PowerSystem {
       combat.powerTick += power.tickInterval;
       if (power.around) {
         this.combat.emitAction(CombatEvent.POWER_PULSE, caster, power.id);
+      }
+      if (power.breakOnRange && (target === null || !isInPowerRange(caster, target, power, this.config.airReach))) {
+        combat.powerEndTime = caster.stateTime;
+        return;
       }
       this.affect(caster, target, power, 'tick');
     }

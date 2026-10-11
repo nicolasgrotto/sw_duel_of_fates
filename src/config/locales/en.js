@@ -313,6 +313,7 @@ export const en = {
     dialogue: { hint: '{confirm}  continue  ·  {back}  skip', touchHint: 'Tap to continue' },
     powers: {
       absorb: 'Absorb',
+      drain: 'Drain',
       storm: 'Storm',
       push: 'Repulse',
       pull: 'Pull',

@@ -22,10 +22,15 @@ export const powersConfig = {
   categories: {
     flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull', 'throw'] },
     aurora: { alignments: ['light'], abilities: ['barrier', 'heal', 'focus', 'absorb'] },
-    eclipse: { alignments: ['dark'], abilities: ['lightning', 'choke', 'freeze', 'storm', 'wrath'] },
+    eclipse: { alignments: ['dark'], abilities: ['lightning', 'choke', 'freeze', 'storm', 'wrath', 'drain'] },
     blade: { alignments: ['light', 'dark'], abilities: ['spin', 'dashSlash', 'saberThrow'] },
   },
   powers: {
+    drain: {
+      id: 'drain', effect: 'drain', channel: true, pose: 'channel', interaction: 'drain', requiresHold: true, breakOnRange: true,
+      cost: 15, startup: 0.3, drainPerSecond: 0, maxChannel: 1.5, recovery: 0.35, range: 300,
+      tickInterval: 0.15, drainFlow: 4.5, drainStamina: 1.2, flowReturn: 0.5,
+    },
     absorb: {
       id: 'absorb', effect: 'absorb', channel: false, pose: 'barrier', self: true, reaction: true, interaction: 'absorb',
       cost: 18, startup: 0.05, active: 0.3, recovery: 0.2, window: 0.3,
@@ -103,6 +108,10 @@ export const powersConfig = {
     potencyPerLevel: 0.03,
   },
   interactions: {
+    drain: {
+      air: { scale: 1, duration: 1, stagger: 1 },
+      bands: [{ ...NORMAL_BAND, ...STRIKE_GUARD, blockable: false }, { ...REDUCED_BAND, ...STRIKE_GUARD, blockable: false }, { ...RESISTED_BAND, ...STRIKE_GUARD, blockable: false }],
+    },
     absorb: {
       air: { scale: 1, duration: 1, stagger: 1 },
       bands: [

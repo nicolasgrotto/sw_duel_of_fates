@@ -313,6 +313,7 @@ export const ptBR = {
     dialogue: { hint: '{confirm}  continuar  ·  {back}  pular', touchHint: 'Toque para continuar' },
     powers: {
       absorb: 'Absorção',
+      drain: 'Dreno',
       storm: 'Tempestade',
       push: 'Repulsão',
       pull: 'Puxão',
