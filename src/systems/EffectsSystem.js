@@ -217,6 +217,10 @@ export class EffectsSystem {
         if (event.attackType === 'drain') {
           break;
         }
+        if (event.attackType === 'mindTwist') {
+          this.spawnMindTwist(attacker, defender);
+          break;
+        }
         params.color = getTierColor(attacker);
         params.particleScale = getPowerTier(attacker.flowLevel, powersConfig.tiers).particleScale;
         if (this.flashScale > 0 && event.attackType !== 'storm') {
@@ -433,6 +437,15 @@ export class EffectsSystem {
     ring.alpha = recipe.ring.alpha;
     ring.duration = recipe.ring.duration;
     this.spawnRing(ring, params.x, params.y, params.color, true);
+  }
+
+  spawnMindTwist(caster, target) {
+    const style = powersConfig.render.status;
+    const color = getTierColor(caster);
+    const x = target.x;
+    const y = target.y - target.height * style.confuseHeight;
+    this.spawnRing(this.config.mindTwistRing, x, y, color);
+    this.spawnLight(this.config.mindTwistLight, x, y, color);
   }
 
   spawnAbsorb(defender) {

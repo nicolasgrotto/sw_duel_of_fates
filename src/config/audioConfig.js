@@ -189,6 +189,11 @@ export const audioConfig = {
       { type: 'tone', wave: 'sawtooth', from: 220, to: 110, duration: 0.6, attack: 0.1, gain: 0.05, filter: { type: 'lowpass', from: 900, to: 400, q: 1 } },
       { type: 'noise', duration: 0.6, attack: 0.15, gain: 0.12, filter: { type: 'bandpass', from: 600, to: 1500, q: 2 } },
     ],
+    mindTwist: [
+      { type: 'tone', wave: 'sine', from: 520, to: 340, duration: 0.45, attack: 0.03, gain: 0.08, filter: null },
+      { type: 'tone', wave: 'sine', from: 547, to: 322, duration: 0.45, attack: 0.03, gain: 0.07, filter: null },
+      { type: 'tone', wave: 'triangle', from: 130, to: 120, duration: 0.4, attack: 0.05, gain: 0.06, filter: null },
+    ],
     secret: [
       { type: 'tone', wave: 'sine', from: 440, to: 440, duration: 0.5, attack: 0.01, gain: 0.08, filter: null },
       { type: 'tone', wave: 'sine', from: 660, to: 660, duration: 0.7, attack: 0.12, gain: 0.07, filter: null },

@@ -26,7 +26,7 @@ export function isNeutralForFocus(fighter) {
 
 export function hasStatus(fighter) {
   const { combat } = fighter;
-  return combat.chokeTime > 0 || combat.freezeTime > 0 || combat.focusTime > 0 || combat.healTime > 0 || combat.wrathTime > 0;
+  return combat.chokeTime > 0 || combat.freezeTime > 0 || combat.focusTime > 0 || combat.healTime > 0 || combat.wrathTime > 0 || combat.confuseTime > 0;
 }
 
 export class StatusSystem {

@@ -97,6 +97,21 @@ export class PowerRenderer {
     renderer.restore();
   }
 
+  drawConfusion(renderer, fighter, tier, time) {
+    const status = style.status;
+    const centerX = fighter.x;
+    const centerY = fighter.y - fighter.height * status.confuseHeight;
+    for (let ring = 0; ring < status.confuseRings; ring += 1) {
+      const progress = (time * status.confuseRate + ring / status.confuseRings) % 1;
+      const radius = fighter.height * lerp(status.confuseRadius[0], status.confuseRadius[1], progress);
+      const warpX = 1 + Math.sin(time * status.confuseWarpSpeed[0] + ring * 2.1) * status.confuseWarp[0];
+      const warpY = 1 + Math.cos(time * status.confuseWarpSpeed[1] + ring * 1.3) * status.confuseWarp[1];
+      renderer.setAlpha(status.confuseAlpha * (1 - progress));
+      renderer.strokeEllipse(centerX, centerY, radius * warpX, radius * status.confuseSquash * warpY, tier.color, status.confuseLineWidth);
+    }
+    renderer.setAlpha(1);
+  }
+
   drawStatus(renderer, fighter) {
     const status = style.status;
     const { combat, x, y, height } = fighter;
@@ -121,6 +136,9 @@ export class PowerRenderer {
       const [fast, slow] = status.wrathFlicker;
       const flicker = (Math.sin(time * fast) + Math.sin(time * slow) + 2) / 4;
       renderer.drawGlow(x, y - height * status.wrathHeight, tier.glowRadius * status.wrathRadius, tier.color, lerp(status.wrathAlpha[0], status.wrathAlpha[1], flicker));
+    }
+    if (combat.confuseTime > 0) {
+      this.drawConfusion(renderer, fighter, tier, time);
     }
     if (combat.healTime > 0) {
       const rise = (time * status.healRiseSpeed) % 1;

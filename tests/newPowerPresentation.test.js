@@ -117,3 +117,35 @@ describe('drain presentation', () => {
     assert.deepEqual(playedSounds([event(CombatEvent.POWER_HIT, caster, target, 'drain'), event(CombatEvent.POWER_START, caster, null, 'drain')]), [SoundName.DRAIN]);
   });
 });
+
+describe('mind twist presentation', () => {
+  it('ripples warped rings over the head in the caster tier color while confused', () => {
+    const fighter = spawnFighter(500, 1, 'guardian');
+    fighter.combat.confuseTime = 0.6;
+    fighter.combat.statusLevel = 8;
+    const renderer = recordingRenderer();
+    new PowerRenderer().draw(renderer, [fighter]);
+    const rings = renderer.calls.filter((call) => call.name === 'strokeEllipse');
+    assert.equal(rings.length, powersConfig.render.status.confuseRings);
+    for (const call of rings) {
+      assert.equal(call.args[4], powersConfig.tiers[2].color);
+      assert.ok(Math.abs(call.args[1] - (fighter.y - fighter.height * powersConfig.render.status.confuseHeight)) < 1e-9);
+      assert.notEqual(call.args[2], call.args[3]);
+    }
+    fighter.combat.confuseTime = 0;
+    const idle = recordingRenderer();
+    new PowerRenderer().draw(idle, [fighter]);
+    assert.equal(idle.calls.filter((call) => call.name === 'strokeEllipse').length, 0);
+  });
+
+  it('marks the hit with a ring at the head, no hit flash, and its own sound', () => {
+    const effects = createEffects();
+    const caster = spawnFighter(400, 1, 'mirror');
+    const target = spawnFighter(650, -1, 'shadow');
+    effects.handleEvents([event(CombatEvent.POWER_HIT, caster, target, 'mindTwist')]);
+    const ring = effects.rings.find((candidate) => candidate.active);
+    assert.equal(ring.x, target.x);
+    assert.equal(effects.hasHitFlash(target), false);
+    assert.deepEqual(playedSounds([event(CombatEvent.POWER_HIT, caster, target, 'mindTwist')]), [SoundName.MIND_TWIST]);
+  });
+});

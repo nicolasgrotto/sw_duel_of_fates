@@ -14,6 +14,8 @@ export const effectsConfig = {
   woundHealedLight: { radius: 60, alpha: 0.45, duration: 0.3 },
   throwDust: { count: 8, reducedScale: 0.5, spread: 36, speed: [20, 90], lift: [90, 200], life: [0.25, 0.5], size: [1.5, 2.5] },
   throwDebris: { count: [4, 6], speed: [120, 280], upwardDegrees: 55, spreadDegrees: 90, life: [0.45, 0.7], size: [3, 5] },
+  mindTwistRing: { radius: 46, lineWidth: 2, alpha: 0.6, duration: 0.3 },
+  mindTwistLight: { radius: 60, alpha: 0.35, duration: 0.2 },
   stormSpasm: { duration: 0.12, amplitude: 1.5, interval: 0.03, outlineAlpha: 0.5, outlineOffset: 2 },
   shockwave: {
     duration: 0.3,

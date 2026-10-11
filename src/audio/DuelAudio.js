@@ -59,6 +59,7 @@ function getSoundForEvent(event) {
       return event.attackType === 'pull' ? SoundName.POWER_PULL : SoundName.POWER_WAVE;
     case CombatEvent.POWER_HIT:
       if (event.attackType === 'drain') return null;
+      if (event.attackType === 'mindTwist') return SoundName.MIND_TWIST;
       return event.attackType === 'lightning' ? SoundName.LIGHTNING : SoundName.POWER_IMPACT;
     case CombatEvent.POWER_BLOCKED:
       return SoundName.BLOCK;
