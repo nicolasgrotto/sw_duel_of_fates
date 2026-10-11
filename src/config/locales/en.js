@@ -333,7 +333,7 @@ export const en = {
       detail: 'Tier {tier} · level {level} · Target: {target} · Repeat: {repeat}',
       required: 'Needs level {level}',
       tiers: { faint: 'Faint', steady: 'Steady', deep: 'Deep', apex: 'Apex' },
-      targets: { idle: 'idle', blocking: 'blocking', barrier: 'with Barrier', redirect: 'with Redirect', airborne: 'airborne' },
+      targets: { idle: 'idle', blocking: 'blocking', barrier: 'with Barrier', redirect: 'with Redirect', airborne: 'airborne', attacking: 'attacking with Lightning' },
       repeat: { on: 'on', off: 'off' },
       cast: 'Cast',
       repeatChip: 'Repeat: {repeat}',

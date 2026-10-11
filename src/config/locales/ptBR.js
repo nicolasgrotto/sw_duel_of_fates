@@ -333,7 +333,7 @@ export const ptBR = {
       detail: 'Tier {tier} · nível {level} · Alvo: {target} · Repetição: {repeat}',
       required: 'Exige nível {level}',
       tiers: { faint: 'Tênue', steady: 'Firme', deep: 'Profundo', apex: 'Ápice' },
-      targets: { idle: 'parado', blocking: 'bloqueando', barrier: 'com Barreira', redirect: 'com Redirecionamento', airborne: 'no ar' },
+      targets: { idle: 'parado', blocking: 'bloqueando', barrier: 'com Barreira', redirect: 'com Redirecionamento', airborne: 'no ar', attacking: 'atacando com Raio' },
       repeat: { on: 'ligada', off: 'desligada' },
       cast: 'Lançar',
       repeatChip: 'Repetição: {repeat}',

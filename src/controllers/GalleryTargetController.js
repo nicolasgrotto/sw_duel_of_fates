@@ -17,6 +17,12 @@ export class GalleryTargetController {
     const behavior = director.selection.target;
     if (behavior === 'blocking') intent.block = true;
     if (behavior === 'airborne') intent.jump = target.grounded && director.phase === 'active';
+    if (behavior === 'attacking') {
+      intent.power = director.phase === 'active' && !this.responded;
+      this.responded ||= intent.power;
+      intent.powerHeld = this.responded && director.phase === 'active' && target.combat.power?.channel === true;
+      return;
+    }
     if (behavior !== 'barrier' && behavior !== 'redirect') return;
     const response = powersConfig.powers[behavior];
     const incoming = caster.combat.power ?? caster.combat.attack;

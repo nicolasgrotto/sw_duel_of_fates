@@ -31,8 +31,18 @@ export class GalleryScene {
   }
 
   configureTarget(level) {
-    const target = this.director.selection.target;
-    this.applyLevel(this.fighters[1], level, target === 'barrier' || target === 'redirect' ? { neutral: target } : {});
+    this.applyLevel(this.fighters[1], level, this.targetLoadout);
+  }
+
+  get targetLoadout() {
+    const { target } = this.director.selection;
+    if (target === 'barrier' || target === 'redirect') return { neutral: target };
+    return target === 'attacking' ? { neutral: galleryConfig.attackPower } : {};
+  }
+
+  get waitsForIncoming() {
+    const { item, selection } = this.director;
+    return selection.target === 'attacking' && item.kind === 'power' && !item.data.range;
   }
 
   applyLevel(fighter, level, loadout) {
@@ -47,6 +57,7 @@ export class GalleryScene {
 
   get gap() {
     const { item } = this.director;
+    if (this.waitsForIncoming) return powersConfig.powers[galleryConfig.attackPower].range * galleryConfig.distanceRatio;
     if (item.kind === 'power' && !item.data.range) return galleryConfig.selfGap;
     return Math.max(this.range * galleryConfig.distanceRatio, item.data.around ? 0 : galleryConfig.minGap);
   }
@@ -54,6 +65,11 @@ export class GalleryScene {
   changeSelection(field, value) {
     this.director.select(field, value);
     if (field === 'repeat') return;
+    if (field === 'target') {
+      this.configureTarget(this.director.level);
+      this.reset();
+      return;
+    }
     if (field === 'tier') {
       this.applyLevel(this.fighters[0], this.director.level, this.director.item.kind === 'power' ? { neutral: this.director.item.id } : {});
       this.configureTarget(this.director.level);

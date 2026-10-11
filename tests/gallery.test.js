@@ -108,6 +108,13 @@ it('uses the real barrier, redirect, block and airborne interactions', () => {
     assert.ok(events.some((event) => event.type === eventType), target);
     if (target === 'redirect') assert.ok(events.some((event) => event.type === 'powerHit' && event.attacker === scene.fighters[1]));
   }
+  for (const [ability, eventType] of [['redirect', 'powerAbsorbed'], ['barrier', 'powerAbsorbed']]) {
+    const defended = createScene({ ability, target: 'attacking', tier: 1 });
+    defended.requestCast();
+    const defenseEvents = step(defended, 200);
+    assert.ok(defenseEvents.some((event) => event.type === 'powerStart' && event.attacker === defended.fighters[1]), ability);
+    assert.ok(defenseEvents.some((event) => event.type === eventType), ability);
+  }
   const scene = createScene({ ability: 'push', target: 'airborne' });
   scene.requestCast();
   const events = step(scene, 20);
