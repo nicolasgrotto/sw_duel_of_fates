@@ -115,6 +115,68 @@ export class PowerRenderer {
     renderer.restore();
   }
 
+  drawAura(renderer, fighter, pose, floorY) {
+    const { combat } = fighter;
+    if (!(combat.focusTime > 0) && !(combat.wrathTime > 0)) {
+      return;
+    }
+    const status = style.status;
+    const color = getPowerTier(combat.statusLevel, powersConfig.tiers).color;
+    const time = fighter.animation.time;
+    renderer.save();
+    if (combat.wrathTime > 0) {
+      const outline = status.wrathOutline;
+      const flicker = (Math.sin(time * outline.flicker[0]) + Math.sin(time * outline.flicker[1]) + 2) / 4;
+      const offset = lerp(outline.offset[0], outline.offset[1], flicker);
+      renderer.setAlpha(lerp(outline.alpha[0], outline.alpha[1], flicker));
+      this.drawOffsetSilhouettes(renderer, fighter, pose, floorY, color, offset, offset * outline.rise);
+    } else {
+      const outline = status.focusOutline;
+      const breath = (Math.sin(time * outline.speed) + 1) / 2;
+      renderer.setAlpha(lerp(outline.alpha[0], outline.alpha[1], breath));
+      this.drawOffsetSilhouettes(renderer, fighter, pose, floorY, color, outline.offset, outline.offset);
+    }
+    renderer.restore();
+  }
+
+  drawOffsetSilhouettes(renderer, fighter, pose, floorY, color, side, up) {
+    for (let index = 0; index < 4; index += 1) {
+      const offsetX = index === 0 ? side : index === 1 ? -side : 0;
+      const offsetY = index === 2 ? -up : index === 3 ? side : 0;
+      renderer.translate(offsetX, offsetY);
+      drawFighterBody(renderer, fighter, pose, floorY, false, color);
+      renderer.translate(-offsetX, -offsetY);
+    }
+  }
+
+  drawFocusMotes(renderer, fighter, tier, time) {
+    const motes = style.status.focusMotes;
+    const centerY = fighter.y - fighter.height * motes.height;
+    for (let index = 0; index < motes.count; index += 1) {
+      const angle = time * motes.speed + (index / motes.count) * TAU;
+      const depth = (Math.sin(angle) + 1) / 2;
+      renderer.drawGlow(
+        fighter.x + Math.cos(angle) * fighter.height * motes.radiusX,
+        centerY + Math.sin(angle) * fighter.height * motes.radiusY,
+        motes.size, tier.color, motes.alpha * lerp(0.45, 1, depth),
+      );
+    }
+  }
+
+  drawWrathEmbers(renderer, fighter, tier, time) {
+    const embers = style.status.wrathEmbers;
+    const baseY = fighter.y - fighter.height * embers.height;
+    for (let index = 0; index < embers.count; index += 1) {
+      const progress = (time * embers.rate + index / embers.count) % 1;
+      const lane = Math.sin(index * 12.9898) * 0.5;
+      const x = fighter.x + lane * fighter.width * embers.spread + Math.sin((progress + index) * TAU) * 3;
+      const y = baseY - progress * embers.rise;
+      renderer.setAlpha(embers.alpha * (1 - progress));
+      renderer.line(x, y, x, y + embers.length, tier.color, embers.width);
+    }
+    renderer.setAlpha(1);
+  }
+
   drawConfusion(renderer, fighter, tier, time) {
     const status = style.status;
     const centerX = fighter.x;
@@ -149,11 +211,13 @@ export class PowerRenderer {
     if (combat.focusTime > 0) {
       const pulse = (Math.sin(time * status.focusPulseSpeed) + 1) / 2;
       renderer.drawGlow(x, y - height * status.focusHeight, tier.glowRadius * status.focusRadius, tier.color, lerp(status.focusAlpha[0], status.focusAlpha[1], pulse));
+      this.drawFocusMotes(renderer, fighter, tier, time);
     }
     if (combat.wrathTime > 0) {
       const [fast, slow] = status.wrathFlicker;
       const flicker = (Math.sin(time * fast) + Math.sin(time * slow) + 2) / 4;
       renderer.drawGlow(x, y - height * status.wrathHeight, tier.glowRadius * status.wrathRadius, tier.color, lerp(status.wrathAlpha[0], status.wrathAlpha[1], flicker));
+      this.drawWrathEmbers(renderer, fighter, tier, time);
     }
     if (combat.confuseTime > 0) {
       this.drawConfusion(renderer, fighter, tier, time);

@@ -82,6 +82,7 @@ export class DuelRenderer {
       renderer.save();
       renderer.translate(effects.getTremor(fighter), 0);
       this.drawPulseOutline(renderer, fighter, effects.getPulseOutline?.(fighter) ?? 0, arena.floorY);
+      this.powerView.drawAura(renderer, fighter, this.getPose(fighter), arena.floorY);
       drawFighterBody(renderer, fighter, this.getPose(fighter), arena.floorY, true, effects.hasHitFlash(fighter) ? colors.hitFlash : null);
       this.powerView.drawFrozenEchoes(renderer, fighter, this.getPose(fighter), arena.floorY);
       renderer.restore();

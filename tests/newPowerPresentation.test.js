@@ -263,3 +263,41 @@ describe('storm invocation bolts', () => {
     assert.deepEqual(counts, [1, 2, 3]);
   });
 });
+
+describe('focus and wrath auras', () => {
+  function auraCalls(setup) {
+    const fighter = spawnFighter(500, 1, 'guardian');
+    fighter.combat.statusLevel = 8;
+    setup(fighter);
+    const pose = computePose(fighter, createPose());
+    const behind = recordingRenderer();
+    const view = new PowerRenderer();
+    view.drawAura(behind, fighter, pose, fighter.y);
+    const front = recordingRenderer();
+    view.draw(front, [fighter]);
+    return { behind: behind.calls, front: front.calls };
+  }
+
+  it('outlines a focused fighter steadily and orbits two motes around the chest', () => {
+    const { behind, front } = auraCalls((fighter) => { fighter.combat.focusTime = 2; });
+    const torsos = behind.filter((call) => call.name === 'fillPolygon' && call.args[1] === powersConfig.tiers[2].color);
+    assert.ok(torsos.length >= 4);
+    const { offset } = powersConfig.render.status.focusOutline;
+    const shifts = behind.filter((call) => call.name === 'translate').map((call) => `${call.args[0]},${call.args[1]}`);
+    for (const expected of [`${offset},0`, `${-offset},0`, `0,${-offset}`, `0,${offset}`]) assert.ok(shifts.includes(expected), expected);
+    assert.equal(front.filter((call) => call.name === 'drawGlow').length, 1 + powersConfig.render.status.focusMotes.count);
+  });
+
+  it('flickers a wider outline around a wrathful fighter and raises embers', () => {
+    const { behind, front } = auraCalls((fighter) => { fighter.combat.wrathTime = 3; });
+    assert.ok(behind.some((call) => call.name === 'fillPolygon' && call.args[1] === powersConfig.tiers[2].color));
+    const embers = front.filter((call) => call.name === 'line');
+    assert.equal(embers.length, powersConfig.render.status.wrathEmbers.count);
+    assert.ok(embers.every((call) => call.args[3] > call.args[1]));
+  });
+
+  it('draws no aura without focus or wrath', () => {
+    const { behind } = auraCalls(() => {});
+    assert.equal(behind.length, 0);
+  });
+});
