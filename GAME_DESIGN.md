@@ -608,9 +608,9 @@ Alcance do Puxão por tier do Fluxo de quem lança (v2.16): Tênue 330 px, Firme
 
 | Categoria | Alinhamento | Habilidades |
 | --- | --- | --- |
-| Fluxo comum | os dois | Repulsão, Puxão, Arremesso, Redirecionamento |
-| Aurora | Aurora | Barreira, Cura, Foco |
-| Eclipse | Eclipse | Raio, Estrangular, Congelar, Tempestade |
+| Fluxo comum | os dois | Repulsão, Puxão, Arremesso, Truque Mental |
+| Aurora | Aurora | Barreira, Cura, Foco, Absorção |
+| Eclipse | Eclipse | Raio, Estrangular, Congelar, Tempestade, Ira, Dreno |
 | Técnicas de lâmina | os dois | Giro, Avanço com corte, Arremesso da lâmina; custam stamina e escalam com a Lâmina |
 
 **Comandos.** Nenhum botão novo. `Poder` + direção (neutro, frente, trás) escolhe entre até três habilidades do Fluxo; `Habilidade` + direção escolhe entre a habilidade própria (neutro) e até duas técnicas de lâmina (frente, trás). Espaço vazio cai no neutro. Técnicas só valem com a opção Poderes (os modos clássicos não mudam). O Eco e o Predestinado não têm técnicas: o avanço deles já segue a direção.
@@ -636,7 +636,7 @@ Alcance do Puxão por tier do Fluxo de quem lança (v2.16): Tênue 330 px, Firme
 - **Foco** (Aurora, em si): por 4 s × potência, atacar, bloquear e esquivar custam metade da stamina (drenos como empurrão e quebra de guarda não mudam).
 - **Cura** (Aurora, em si): custa 40, devolve vida ao longo de 2 s, até 14 × potência e nunca mais que 35% da vida perdida; ser atingido interrompe. Custo reduzido na v1.19.
 
-**Redirecionamento e Tempestade (v1.18).**
+**Redirecionamento e Tempestade (v1.18).** Histórico: na 2.17 o Redirecionamento foi substituído pela Absorção e a Tempestade foi reformulada em fases (seção 27).
 
 - **Redirecionamento** (Fluxo comum): custa 18, prepara por 0,05 s e abre uma janela de 0,3 s para um pulso de Raio em alcance, com o canal do oponente aberto. Consome a janela uma vez; se não houver Raio, expira. Interrupção ou fim do poder remove a janela. Recuperação de 0,2 s, recarga comum. A diferença abaixo é de quem redireciona menos quem canaliza; não há sorteio.
 
@@ -654,19 +654,19 @@ O retorno interrompe o canal. A parcela não absorvida causa hit; a falha extrem
 
 Loadouts da v1.18: Garça troca Barreira por Redirecionamento (trás + Poder); Soberano troca Puxão por Tempestade (frente + Poder). Demais espaços e atributos permanecem iguais. IA reage ao Raio com Redirecionamento a partir de diferença −1 e usa Tempestade de perto, respeitando o requisito de Fluxo.
 
-**Loadouts atuais (v1.19).** Direções relativas à frente do lutador. Todos os espaços abaixo vêm de `characterData.loadout`; a lista de golpes mostra os comandos do preset ativo.
+**Loadouts atuais (v1.19; Absorção no lugar do Redirecionamento desde a 2.17).** Direções relativas à frente do lutador. Todos os espaços abaixo vêm de `characterData.loadout`; a lista de golpes mostra os comandos do preset ativo.
 
 | Personagem | Poder neutro | Frente + Poder | Trás + Poder | Frente + Habilidade | Trás + Habilidade |
 | --- | --- | --- | --- | --- | --- |
 | Guardião | Repulsão | Cura | Barreira | Avanço com corte | Arremesso da lâmina |
 | Sombra | Raio | Puxão | Estrangular | Avanço com corte | Giro |
-| Bastião | Repulsão | Redirecionamento | Barreira | — | Giro |
+| Bastião | Repulsão | Absorção | Barreira | — | Giro |
 | Vespa | Repulsão | Arremesso | Barreira | Avanço com corte | Arremesso da lâmina |
 | Espelho | Repulsão | Arremesso | Barreira | — | Giro |
 | Haste | Raio | Puxão | Arremesso | — | Giro |
 | Brasa | Raio | Puxão | Congelar | Avanço com corte | Arremesso da lâmina |
 | Forja | Raio | Puxão | Arremesso | Arremesso da lâmina | Giro |
-| Garça | Repulsão | Arremesso | Redirecionamento | — | Giro |
+| Garça | Repulsão | Arremesso | Absorção | — | Giro |
 | Eco | Raio | Puxão | Arremesso | — | — |
 | Sombra Desperta | Raio | Puxão | Estrangular | Avanço com corte | Giro |
 | Soberano | Raio | Tempestade | Estrangular | — | Giro |
@@ -680,7 +680,7 @@ O protagonista recebe os poderes do caminho (`storyConfig.protagonist.loadouts`)
 - **No ar** não há guarda contra poderes, e o alcance vertical cobre o pulo duplo (`powersConfig.airReach`). Quem está no ar sofre o modificador aéreo da habilidade: a Repulsão empurra 30% mais e desequilibra 20% mais, o Puxão desequilibra 20% mais e o Raio prende 60% mais a cada pulso.
 - A Barreira contra a Repulsão segura, mas o dono recua um pouco.
 - Repulsão, Puxão e Raio não têm projétil: o efeito é decidido no instante ativo ou em cada pulso. O Arremesso e o Arremesso da lâmina são projéteis (descritos acima).
-- Nomes de tela em `uiConfig.texts.powers`; os 11 ids e suas categorias ficam em `powersConfig.categories`.
+- Nomes de tela em `uiConfig.texts.powers`; os ids e suas categorias ficam em `powersConfig.categories`.
 
 **Elenco.** Aurora: Guardião, Bastião, Vespa, Espelho, Garça. Eclipse: Sombra, Haste, Brasa, Forja, Eco. Chefe do Arcade: Eclipse, nível 7.
 
