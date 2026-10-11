@@ -156,8 +156,8 @@ export class PowerRenderer {
       if (pose) {
         this.drawStormArcs(renderer, fighter, pose, tier);
       }
-    } else if (fighter.combat.redirectTime > 0) {
-      renderer.drawGlow(originX, originY, tier.glowRadius * style.redirectGlowScale, tier.color, tier.glowAlpha);
+    } else if (fighter.combat.absorbTime > 0) {
+      renderer.drawGlow(originX, originY, tier.glowRadius * style.absorbGlowScale, tier.color, tier.glowAlpha);
     }
   }
 

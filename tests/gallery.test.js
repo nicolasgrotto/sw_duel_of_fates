@@ -89,26 +89,26 @@ for (const target of galleryConfig.targets) {
         const events = step(scene, 500);
         assert.ok(events.some((event) => event.attacker === scene.fighters[0] && event.type === (item.kind === 'power' ? 'powerStart' : 'attackStart')), item.id);
         assert.equal(scene.director.phase, 'ready', item.id);
-        if (target === 'barrier' || target === 'redirect') {
+        if (target === 'barrier' || target === 'absorb') {
           assert.equal(events.filter((event) => event.attacker === scene.fighters[1] && event.type === 'powerStart').length, 1, item.id);
         }
         scene.reset();
         assert.equal(scene.controllers[1].responded, false);
-        assert.equal(scene.fighters[1].combat.redirectTime, 0);
+        assert.equal(scene.fighters[1].combat.absorbTime, 0);
       }
     }
   });
 }
 
-it('uses the real barrier, redirect, block and airborne interactions', () => {
-  for (const [target, eventType] of [['idle', 'powerHit'], ['blocking', 'powerBlocked'], ['barrier', 'powerAbsorbed'], ['redirect', 'powerAbsorbed']]) {
+it('uses the real barrier, absorb, block and airborne interactions', () => {
+  for (const [target, eventType] of [['idle', 'powerHit'], ['blocking', 'powerBlocked'], ['barrier', 'powerAbsorbed'], ['absorb', 'powerAbsorbed']]) {
     const scene = createScene({ ability: 'lightning', target, tier: 1 });
     scene.requestCast();
     const events = step(scene, 200);
     assert.ok(events.some((event) => event.type === eventType), target);
-    if (target === 'redirect') assert.ok(events.some((event) => event.type === 'powerHit' && event.attacker === scene.fighters[1]));
+    if (target === 'absorb') assert.equal(events.some((event) => event.type === 'powerHit' && event.attacker === scene.fighters[1]), false);
   }
-  for (const [ability, eventType] of [['redirect', 'powerAbsorbed'], ['barrier', 'powerAbsorbed']]) {
+  for (const [ability, eventType] of [['absorb', 'powerAbsorbed'], ['barrier', 'powerAbsorbed']]) {
     const defended = createScene({ ability, target: 'attacking', tier: 1 });
     defended.requestCast();
     const defenseEvents = step(defended, 200);
@@ -214,7 +214,7 @@ it('validates and saves only gallery selection while preserving other settings a
   const director = new GalleryDirector(null, (selection) => saveSettings({ ...defaults, gallery: selection }, storage, 'test', story));
   director.select('ability', 'wrath');
   director.select('tier', 3);
-  director.select('target', 'redirect');
+  director.select('target', 'absorb');
   director.select('caster', 'wasp');
   director.select('repeat', false);
   assert.deepEqual(loadSettings(defaults, storage, 'test').gallery, director.selection);

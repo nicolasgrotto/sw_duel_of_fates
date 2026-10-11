@@ -37,7 +37,7 @@ export class GalleryScene {
 
   get targetLoadout() {
     const { target } = this.director.selection;
-    if (target === 'barrier' || target === 'redirect') return { neutral: target };
+    if (target === 'barrier' || target === 'absorb') return { neutral: target };
     return target === 'attacking' ? { neutral: galleryConfig.attackPower } : {};
   }
 
@@ -123,7 +123,7 @@ export class GalleryScene {
     if (this.simulation.projectiles.activeCount > 0) return true;
     for (const { combat } of this.fighters) {
       if (combat.power || combat.attack || combat.chokeTime > 0 || combat.freezeTime > 0
-        || combat.focusTime > 0 || combat.healTime > 0 || combat.wrathTime > 0 || combat.redirectTime > 0) return true;
+        || combat.focusTime > 0 || combat.healTime > 0 || combat.wrathTime > 0 || combat.absorbTime > 0) return true;
     }
     return false;
   }

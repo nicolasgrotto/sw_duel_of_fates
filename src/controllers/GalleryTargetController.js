@@ -23,11 +23,11 @@ export class GalleryTargetController {
       intent.powerHeld = this.responded && director.phase === 'active' && target.combat.power?.channel === true;
       return;
     }
-    if (behavior !== 'barrier' && behavior !== 'redirect') return;
+    if (behavior !== 'barrier' && behavior !== 'absorb') return;
     const response = powersConfig.powers[behavior];
     const incoming = caster.combat.power ?? caster.combat.attack;
     const reacting = incoming !== null && director.phase === 'active';
-    const delay = behavior === 'redirect' ? Math.max(0, (incoming?.startup ?? 0) - response.startup) : 0;
+    const delay = behavior === 'absorb' ? Math.max(0, (incoming?.startup ?? 0) - response.startup) : 0;
     if (reacting && !this.responded && caster.stateTime + dt + Number.EPSILON >= delay) {
       intent.power = true;
       this.responded = true;

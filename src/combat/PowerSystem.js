@@ -60,7 +60,7 @@ export class PowerSystem {
     this.config = config;
     this.enabled = enabled;
     this.friction = friction;
-    this.context = { system: this, combat, caster: null, target: null, power: null, interaction: null, air: GROUNDED, scale: 1, guarded: false, projectile: null };
+    this.context = { system: this, combat, caster: null, target: null, power: null, interaction: null, air: GROUNDED, scale: 1, remainder: 1, guarded: false, projectile: null };
   }
 
   update(fighters, dt) {
@@ -69,7 +69,7 @@ export class PowerSystem {
     }
     for (const fighter of fighters) {
       fighter.combat.powerCooldown = Math.max(0, fighter.combat.powerCooldown - dt);
-      fighter.combat.redirectTime = Math.max(0, fighter.combat.redirectTime - dt);
+      fighter.combat.absorbTime = Math.max(0, fighter.combat.absorbTime - dt);
       if (fighter.isAlive) {
         this.gain(fighter, this.config.meter.regenPerSecond * dt);
       }
@@ -223,14 +223,12 @@ export class PowerSystem {
     if (isInvulnerable(target)) {
       return;
     }
-    if (power.effect === 'lightning' && isChannelOpen(caster) && target.combat.redirectTime > 0) {
-      this.redirect(caster, target, power);
-      return;
-    }
     if (isBarrierUp(target)) {
-      this.absorb(caster, target, power);
+      this.barrierBlock(caster, target, power);
       return;
     }
+    const remainder = target.combat.absorbTime > 0 && power.effect !== 'storm' ? this.absorb(caster, target, power) : 1;
+    if (remainder === 0) return;
     const table = this.config.interactions[power.interaction];
     const interaction = resolveInteraction(table, getFlowDifference(caster, target));
     if (interaction.outcome === PowerOutcome.RESISTED) {
@@ -243,7 +241,8 @@ export class PowerSystem {
     context.power = power;
     context.interaction = interaction;
     context.air = target.grounded ? GROUNDED : table.air;
-    context.scale = interaction.scale * caster.stats.power.potency * context.air.scale;
+    context.remainder = remainder;
+    context.scale = interaction.scale * caster.stats.power.potency * context.air.scale * remainder;
     context.guarded = interaction.blockable && isGuardingAgainst(target, caster);
     context.projectile = projectile;
     powerEffects[power.effect][phase](context);
@@ -258,35 +257,23 @@ export class PowerSystem {
     context.interaction = null;
     context.air = GROUNDED;
     context.scale = caster.stats.power.potency;
+    context.remainder = 1;
     context.guarded = false;
     context.projectile = null;
     powerEffects[power.effect].self(context);
   }
 
-  redirect(caster, target, incoming) {
-    const power = this.config.powers.redirect;
-    const band = resolveInteraction(this.config.interactions.redirect, getFlowDifference(target, caster));
-    target.combat.redirectTime = 0;
+  absorb(caster, target, incoming) {
+    const power = this.config.powers.absorb;
+    const band = resolveInteraction(this.config.interactions.absorb, getFlowDifference(target, caster));
     if (band.absorb > 0) {
-      this.combat.emit(CombatEvent.POWER_ABSORBED, this.combat.createPowerContact(caster, target, power, 0));
-      this.gain(target, power.meterGain * band.gain);
-      if (this.combat.dealPowerDamage(target, caster, power, power.returnDamage * band.reflect * target.stats.power.potency, CombatEvent.POWER_HIT)) {
-        caster.clearAttack();
-        caster.combat.stunDuration = power.stagger;
-        caster.restartState(FighterState.STAGGERED);
-      }
-    } else {
-      this.combat.emit(CombatEvent.POWER_RESISTED, this.combat.createPowerContact(target, caster, power, 0));
+      this.combat.emit(CombatEvent.POWER_ABSORBED, this.combat.createPowerContact(caster, target, incoming, 0));
+      target.flowMeter = Math.min(target.stats.power.max, target.flowMeter + power.absorbGain * this.getCost(caster, incoming) * band.gain);
     }
-    const damage = incoming.damage * caster.stats.power.potency * (1 - band.absorb) + power.backlashDamage * band.backlash;
-    if (damage > 0 && this.combat.dealPowerDamage(caster, target, incoming, damage, CombatEvent.POWER_HIT)) {
-      target.clearAttack();
-      target.combat.stunDuration = band.backlash ? power.stagger : incoming.stun;
-      target.restartState(band.backlash ? FighterState.STAGGERED : FighterState.HIT);
-    }
+    return 1 - band.absorb;
   }
 
-  absorb(caster, target, power) {
+  barrierBlock(caster, target, power) {
     if (power.knockback) {
       target.vx = caster.facing * power.knockback * target.combat.power.pushSlide;
     }

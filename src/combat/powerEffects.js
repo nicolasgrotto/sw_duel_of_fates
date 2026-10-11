@@ -20,7 +20,7 @@ function applyGuarded(context, damage = context.power.damage) {
 
 function getStagger(context) {
   const { power, scale, interaction, air } = context;
-  return power.stagger * Math.min(1, scale) * interaction.stagger * air.stagger;
+  return power.stagger * Math.min(1, scale / context.remainder) * interaction.stagger * air.stagger * context.remainder;
 }
 
 function push(context) {
@@ -40,7 +40,7 @@ function push(context) {
 function pull(context) {
   const { system, combat, caster, target, power, interaction, scale, guarded } = context;
   const travel = Math.max(0, getGap(caster, target) - power.endGap);
-  const speed = Math.min(power.maxSpeed, Math.sqrt(2 * system.friction * travel)) * Math.min(1, scale) * interaction.knockback;
+  const speed = Math.min(power.maxSpeed, Math.sqrt(2 * system.friction * travel)) * Math.min(1, scale / context.remainder) * interaction.knockback * context.remainder;
   if (guarded) {
     target.vx = -caster.facing * speed * interaction.guardSlide;
     applyGuarded(context);
@@ -55,13 +55,13 @@ function pull(context) {
 function lightning(context) {
   const { combat, caster, target, power, interaction, air, scale, guarded } = context;
   if (guarded) {
-    target.vx = caster.facing * power.knockback * interaction.guardSlide * interaction.knockback;
+    target.vx = caster.facing * power.knockback * interaction.guardSlide * interaction.knockback * context.remainder;
     applyGuarded(context);
     return;
   }
   target.vx = caster.facing * power.knockback * scale * interaction.knockback;
   if (combat.dealPowerDamage(caster, target, power, power.damage * scale, CombatEvent.POWER_HIT)) {
-    interrupt(target, FighterState.HIT, power.stun * interaction.duration * air.duration);
+    interrupt(target, FighterState.HIT, power.stun * interaction.duration * air.duration * context.remainder);
   }
 }
 
@@ -75,7 +75,7 @@ function throwImpact(context) {
   }
   target.vx = knockback;
   if (combat.dealPowerDamage(caster, target, power, projectile.damage * scale, CombatEvent.POWER_HIT)) {
-    interrupt(target, FighterState.STAGGERED, projectile.stagger * Math.min(1, scale) * interaction.stagger * air.stagger);
+    interrupt(target, FighterState.STAGGERED, projectile.stagger * Math.min(1, scale / context.remainder) * interaction.stagger * air.stagger * context.remainder);
   }
 }
 
@@ -86,7 +86,7 @@ function holdTarget(target, duration) {
 
 function getStatusDuration(context) {
   const { power, interaction, air } = context;
-  return power.duration * interaction.duration * air.duration;
+  return power.duration * interaction.duration * air.duration * context.remainder;
 }
 
 function choke(context) {
@@ -144,7 +144,7 @@ function wrath(context) {
 }
 
 export const powerEffects = Object.freeze({
-  redirect: { self: ({ caster, power }) => { caster.combat.redirectTime = power.window; } },
+  absorb: { self: ({ caster, power }) => { caster.combat.absorbTime = power.window; } },
   storm: { tick: (context) => {
     const { combat, caster, target, power, scale, guarded } = context;
     const damage = power.damage * power.intensity;

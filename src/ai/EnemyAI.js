@@ -270,7 +270,7 @@ export class EnemyAI {
       return AiDecision.WAIT;
     }
     if (this.powersEnabled && this.difficulty.powerAware && isChannelOpen(self)
-      && self.combat.power.effect === 'lightning' && opponent.combat.redirectTime > 0) {
+      && self.combat.power.effect === 'lightning' && opponent.combat.absorbTime > 0) {
       this.plan.powerHoldTime = 0;
     }
     if (this.tryFocusNeutral()) return AiDecision.FOCUS_WAIT;
@@ -514,7 +514,7 @@ export class EnemyAI {
 
   isPowerBlocked(power) {
     if (this.difficulty.powerAware && isBarrierUp(this.opponent)) return true;
-    if (power.effect === 'lightning' && this.difficulty.powerAware && this.opponent.combat.redirectTime > 0) return true;
+    if (power.effect === 'lightning' && this.difficulty.powerAware && this.opponent.combat.absorbTime > 0) return true;
     if (this.opponent.state !== FighterState.BLOCKING) {
       return false;
     }
@@ -532,9 +532,11 @@ export class EnemyAI {
   }
 
   wantsSelfPower(power) {
-    if (power.effect === 'redirect') {
-      const use = this.perception.powerUse.redirect;
-      return isChannelOpen(this.opponent) && this.opponent.combat.power.effect === use.against
+    if (power.effect === 'absorb') {
+      const use = this.perception.powerUse.absorb;
+      const incoming = this.opponent.combat.power;
+      return isUsingPower(this.opponent) && !incoming.self && incoming.effect !== 'storm'
+        && this.opponent.combat.powerEndTime === 0 && this.opponent.stateTime >= this.difficulty.reactionTime
         && isInPowerRange(this.opponent, this.self, this.opponent.combat.power)
         && getFlowDifference(this.self, this.opponent) >= use.minDifference;
     }
@@ -629,7 +631,7 @@ export class EnemyAI {
     }
     for (const slot of POWER_SLOTS) {
       const reaction = self.stats.power.loadout?.[slot];
-      if (reaction?.effect === 'redirect' && this.canUsePower(reaction) && this.wantsSelfPower(reaction)
+      if (reaction?.effect === 'absorb' && this.canUsePower(reaction) && this.wantsSelfPower(reaction)
         && (self.canAct || (self.state === FighterState.BLOCKING && self.combat.blockstun === 0))) {
         return this.startPower(slot, 0);
       }

@@ -1,6 +1,6 @@
 export const galleryConfig = {
   levels: [1, 6, 8, 10],
-  targets: ['idle', 'blocking', 'barrier', 'redirect', 'airborne', 'attacking'],
+  targets: ['idle', 'blocking', 'barrier', 'absorb', 'airborne', 'attacking'],
   attackPower: 'lightning',
   reactionLead: 0.1,
   defaults: { ability: 'push', tier: 1, target: 'idle', caster: 'guardian', repeat: true },

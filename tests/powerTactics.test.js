@@ -46,13 +46,13 @@ describe('AI ability coverage', () => {
     });
   }
 
-  for (const [id, gap] of Object.entries({ push: 40, pull: 280, lightning: 180, throw: 240, choke: 60, freeze: 140, storm: 40, heal: 200, focus: 200, redirect: 180 })) {
+  for (const [id, gap] of Object.entries({ push: 40, pull: 280, lightning: 180, throw: 240, choke: 60, freeze: 140, storm: 40, heal: 200, focus: 200, absorb: 180 })) {
     it(`requests ${id} by intent without modifying combat resources`, () => {
       const { self, opponent, ai } = setup(gap);
       self.stats.power.loadout.neutral = powersConfig.powers[id];
       if (id === 'heal') self.health = self.stats.maxHealth / 3;
       if (id === 'focus') self.stamina = self.stats.maxStamina / 3;
-      if (id === 'redirect') casting(opponent, powersConfig.powers.lightning, true);
+      if (id === 'absorb') casting(opponent, powersConfig.powers.lightning, true);
       const before = [self.health, self.stamina, self.flowMeter, opponent.health];
       assert.equal(ai.tryPower(), AiDecision.POWER);
       ai.writeIntent(self.intent);
@@ -102,9 +102,9 @@ describe('AI ability coverage', () => {
     });
   }
 
-  it('does not start or hold lightning into a redirect window', () => {
+  it('does not start or hold lightning into a absorb window', () => {
     const { self, opponent, ai } = setup(180);
-    opponent.combat.redirectTime = 0.3;
+    opponent.combat.absorbTime = 0.3;
     assert.equal(ai.wantsPower(powersConfig.powers.lightning), false);
     casting(self, powersConfig.powers.lightning, true);
     ai.plan.powerHoldTime = 1;

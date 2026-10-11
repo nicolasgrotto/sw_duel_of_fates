@@ -130,7 +130,7 @@ it('suspends actions, state time, movement, regeneration, status and cooldowns',
     fighter.stamina = 20;
     fighter.flowMeter = 30;
     Object.assign(fighter.combat, { focusTime: 1, healTime: 1, wrathTime: 1, freezeTime: 1, chokeTime: 1,
-      healRate: 20, healCap: fighter.stats.maxHealth, powerCooldown: 1, redirectTime: 1,
+      healRate: 20, healCap: fighter.stats.maxHealth, powerCooldown: 1, absorbTime: 1,
       parryLockout: 1, riposteTime: 1, staminaRegenDelay: 1, exhausted: true, exhaustionTime: 0.5 });
   });
   const before = fighters.map((fighter) => ({ x: fighter.x, y: fighter.y, health: fighter.health,
@@ -149,7 +149,7 @@ it('suspends actions, state time, movement, regeneration, status and cooldowns',
     assert.equal(fighter.stamina, before[index].stamina);
     assert.equal(fighter.flowMeter, before[index].flow);
     for (const field of ['focusTime', 'healTime', 'wrathTime', 'freezeTime', 'chokeTime', 'powerCooldown',
-      'redirectTime', 'parryLockout', 'riposteTime', 'staminaRegenDelay', 'exhaustionTime']) {
+      'absorbTime', 'parryLockout', 'riposteTime', 'staminaRegenDelay', 'exhaustionTime']) {
       assert.equal(fighter.combat[field], before[index].combat[field], field);
     }
   });

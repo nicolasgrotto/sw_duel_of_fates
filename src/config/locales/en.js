@@ -312,7 +312,7 @@ export const en = {
     },
     dialogue: { hint: '{confirm}  continue  ·  {back}  skip', touchHint: 'Tap to continue' },
     powers: {
-      redirect: 'Redirect',
+      absorb: 'Absorb',
       storm: 'Storm',
       push: 'Repulse',
       pull: 'Pull',
@@ -333,7 +333,7 @@ export const en = {
       detail: 'Tier {tier} · level {level} · Target: {target} · Repeat: {repeat}',
       required: 'Needs level {level}',
       tiers: { faint: 'Faint', steady: 'Steady', deep: 'Deep', apex: 'Apex' },
-      targets: { idle: 'idle', blocking: 'blocking', barrier: 'with Barrier', redirect: 'with Redirect', airborne: 'airborne', attacking: 'attacking with Lightning' },
+      targets: { idle: 'idle', blocking: 'blocking', barrier: 'with Barrier', absorb: 'with Absorb', airborne: 'airborne', attacking: 'attacking with Lightning' },
       repeat: { on: 'on', off: 'off' },
       cast: 'Cast',
       repeatChip: 'Repeat: {repeat}',

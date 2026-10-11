@@ -20,16 +20,16 @@ export const powersConfig = {
   castHeight: 0.6,
   airReach: 320,
   categories: {
-    flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull', 'throw', 'redirect'] },
-    aurora: { alignments: ['light'], abilities: ['barrier', 'heal', 'focus'] },
+    flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull', 'throw'] },
+    aurora: { alignments: ['light'], abilities: ['barrier', 'heal', 'focus', 'absorb'] },
     eclipse: { alignments: ['dark'], abilities: ['lightning', 'choke', 'freeze', 'storm', 'wrath'] },
     blade: { alignments: ['light', 'dark'], abilities: ['spin', 'dashSlash', 'saberThrow'] },
   },
   powers: {
-    redirect: {
-      id: 'redirect', effect: 'redirect', channel: false, pose: 'barrier', self: true, reaction: true, interaction: 'redirect',
+    absorb: {
+      id: 'absorb', effect: 'absorb', channel: false, pose: 'barrier', self: true, reaction: true, interaction: 'absorb',
       cost: 18, startup: 0.05, active: 0.3, recovery: 0.2, window: 0.3,
-      returnDamage: 6, backlashDamage: 5, stagger: 0.25, meterGain: 8,
+      absorbGain: 0.5,
     },
     storm: {
       id: 'storm', effect: 'storm', channel: true, pose: 'channel', interaction: 'storm', around: true,
@@ -103,14 +103,14 @@ export const powersConfig = {
     potencyPerLevel: 0.03,
   },
   interactions: {
-    redirect: {
+    absorb: {
       air: { scale: 1, duration: 1, stagger: 1 },
       bands: [
-        { ...NORMAL_BAND, ...STRIKE_GUARD, atLeast: 1, absorb: 1, reflect: 1, gain: 1.5, backlash: 0 },
-        { ...NORMAL_BAND, ...STRIKE_GUARD, atLeast: 0, absorb: 1, reflect: 0.75, gain: 1, backlash: 0 },
-        { ...REDUCED_BAND, ...STRIKE_GUARD, atLeast: -1, absorb: 0.5, reflect: 0.25, gain: 0, backlash: 0 },
-        { ...RESISTED_BAND, ...STRIKE_GUARD, atLeast: -2, absorb: 0, reflect: 0, gain: 0, backlash: 0 },
-        { ...RESISTED_BAND, ...STRIKE_GUARD, absorb: 0, reflect: 0, gain: 0, backlash: 1 },
+        { atLeast: 1, absorb: 1, gain: 1.5 },
+        { atLeast: 0, absorb: 1, gain: 1 },
+        { atLeast: -1, absorb: 0.5, gain: 0.5 },
+        { atLeast: -2, absorb: 0.25, gain: 0 },
+        { atLeast: -Infinity, absorb: 0, gain: 0 },
       ],
     },
     storm: {
@@ -167,7 +167,7 @@ export const powersConfig = {
     },
   },
   render: {
-    redirectGlowScale: 0.65,
+    absorbGlowScale: 0.65,
     storm: {
       alpha: 0.25, lineWidth: 1.5, particles: 12, reducedParticles: 5, life: 0.3, speed: 65, size: 2,
       arcSegments: 5, arcJitter: 5, arcAlpha: 0.85, arcWidthScale: 0.55, arcGlowAlpha: 0.3, arcGlowScale: 3,

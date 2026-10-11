@@ -805,7 +805,7 @@ export class DuelState extends GameState {
       lines.push(
         `${fighter.id}: ${fighter.state}  hp ${fighter.health.toFixed(0)}  st ${fighter.stamina.toFixed(0)}  flow ${this.rules.powers ? fighter.flowMeter.toFixed(0) : 'off'}`,
         `  ratings ${Object.values(fighter.stats.attributes).join("/")}  flow ${fighter.flowLevel}`,
-        `  power ${fighter.combat.power?.id ?? '-'}  redirect ${fighter.combat.redirectTime.toFixed(2)}`,
+        `  power ${fighter.combat.power?.id ?? '-'}  absorb ${fighter.combat.absorbTime.toFixed(2)}`,
         `  exhaustion ${fighter.combat.exhausted} ${fighter.combat.exhaustionTime.toFixed(2)}s cause ${fighter.combat.exhaustionCause ?? '-'}`,
         `  wound ${fighter.combat.wound ?? '-'} quota ${fighter.combat.woundUsed ? 'used' : 'ready'}`,
         `  heal ${fighter.combat.healTime.toFixed(2)} ${fighter.combat.healEnd ?? '-'} focus ${fighter.combat.focusTime.toFixed(2)} ${fighter.combat.focusEnd ?? '-'}`,

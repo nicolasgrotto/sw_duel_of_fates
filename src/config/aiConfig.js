@@ -426,7 +426,7 @@ export const aiConfig = {
     barrierPreference: 0.6,
     barrierVsSaberChance: 0.15,
     powerUse: {
-      redirect: { against: 'lightning', minDifference: -1 },
+      absorb: { minDifference: -1 },
       storm: { minGap: 0, maxGap: 130 },
       push: { minGap: 0, maxGap: 100 },
       pull: { minGap: 250, maxGap: Infinity },
