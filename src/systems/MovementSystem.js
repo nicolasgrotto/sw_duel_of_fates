@@ -1,6 +1,7 @@
 import { FighterState } from '../entities/fighterStates.js';
 import { approach } from '../utils/math.js';
 import { combatRulesConfig } from '../config/combatRulesConfig.js';
+import { getMoveX } from '../entities/fighterIntent.js';
 
 export function getMaxJumps(fighter) {
   return fighter.combat.wound === 'leg' ? combatRulesConfig.wounds.leg.maxJumps : fighter.stats.movement.maxJumps ?? 1;
@@ -55,7 +56,7 @@ export class MovementSystem {
   }
 
   applyBlockWalk(fighter, dt) {
-    const targetSpeed = fighter.intent.moveX * fighter.stats.blockWalkSpeed;
+    const targetSpeed = getMoveX(fighter) * fighter.stats.blockWalkSpeed;
     fighter.vx = approach(fighter.vx, targetSpeed, fighter.stats.movement.groundAcceleration * dt);
   }
 
@@ -114,7 +115,7 @@ export class MovementSystem {
 
   applyHorizontalMovement(fighter, dt) {
     const { movement } = fighter.stats;
-    const { moveX } = fighter.intent;
+    const moveX = getMoveX(fighter);
     const movingBackward = moveX !== 0 && Math.sign(moveX) !== fighter.facing;
     const speedMultiplier = movingBackward ? movement.backwardSpeedMultiplier : 1;
     const targetSpeed = moveX * movement.walkSpeed * speedMultiplier;
@@ -128,14 +129,14 @@ export class MovementSystem {
     if (!fighter.grounded) {
       return movement.airAcceleration;
     }
-    return fighter.intent.moveX === 0 ? movement.groundDeceleration : movement.groundAcceleration;
+    return getMoveX(fighter) === 0 ? movement.groundDeceleration : movement.groundAcceleration;
   }
 
   resolveLocomotionState(fighter) {
     if (!fighter.grounded) {
       return FighterState.JUMPING;
     }
-    if (fighter.intent.moveX !== 0 || Math.abs(fighter.vx) > this.restingSpeed) {
+    if (getMoveX(fighter) !== 0 || Math.abs(fighter.vx) > this.restingSpeed) {
       return FighterState.WALKING;
     }
     return FighterState.IDLE;

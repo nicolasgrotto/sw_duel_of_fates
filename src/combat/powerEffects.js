@@ -153,6 +153,13 @@ function drain(context) {
 }
 
 export const powerEffects = Object.freeze({
+  mindTwist: { active: (context) => {
+    const { combat, caster, target, power } = context;
+    target.combat.confuseTime = getStatusDuration(context);
+    target.combat.confuseElapsed = 0;
+    target.combat.statusLevel = caster.flowLevel;
+    combat.emit(CombatEvent.POWER_HIT, combat.createPowerContact(caster, target, power, 0));
+  } },
   drain: { tick: drain },
   absorb: { self: ({ caster, power }) => { caster.combat.absorbTime = power.window; } },
   storm: { tick: (context) => {

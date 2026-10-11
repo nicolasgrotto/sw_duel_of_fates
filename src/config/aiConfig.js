@@ -16,6 +16,7 @@ export const aiConfig = {
   bossDifficulty: 'boss',
   difficulties: {
     [Difficulty.EASY]: {
+      confusionCompensation: null,
       bladeLockRate: 5,
       reactionTime: 0.45,
       evadeChance: 0.005,
@@ -42,6 +43,7 @@ export const aiConfig = {
       recoveryGuardChance: 0.1,
     },
     [Difficulty.NORMAL]: {
+      confusionCompensation: 0.35,
       bladeLockRate: 7,
       reactionTime: 0.28,
       evadeChance: 0.015,
@@ -68,6 +70,7 @@ export const aiConfig = {
       recoveryGuardChance: 0.5,
     },
     [Difficulty.HARD]: {
+      confusionCompensation: 0.12,
       bladeLockRate: 9,
       reactionTime: 0.15,
       evadeChance: 0.04,
@@ -94,6 +97,7 @@ export const aiConfig = {
       recoveryGuardChance: 0.75,
     },
     boss: {
+      confusionCompensation: 0.12,
       bladeLockRate: 9,
       reactionTime: 0.15,
       evadeChance: 0.04,
@@ -426,6 +430,7 @@ export const aiConfig = {
     barrierPreference: 0.6,
     barrierVsSaberChance: 0.15,
     powerUse: {
+      mindTwist: { minGap: 120, maxGap: 320 },
       drain: { minGap: 120, maxGap: 300, targetMeterAbove: 25 },
       absorb: { minDifference: -1 },
       storm: { minGap: 0, maxGap: 130 },

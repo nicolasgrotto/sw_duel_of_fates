@@ -20,12 +20,16 @@ export const powersConfig = {
   castHeight: 0.6,
   airReach: 320,
   categories: {
-    flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull', 'throw'] },
+    flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull', 'throw', 'mindTwist'] },
     aurora: { alignments: ['light'], abilities: ['barrier', 'heal', 'focus', 'absorb'] },
     eclipse: { alignments: ['dark'], abilities: ['lightning', 'choke', 'freeze', 'storm', 'wrath', 'drain'] },
     blade: { alignments: ['light', 'dark'], abilities: ['spin', 'dashSlash', 'saberThrow'] },
   },
   powers: {
+    mindTwist: {
+      id: 'mindTwist', effect: 'mindTwist', channel: false, pose: 'cast', interaction: 'mindTwist',
+      cost: 30, startup: 0.3, active: 0.08, recovery: 0.35, range: 320, duration: 0.8,
+    },
     drain: {
       id: 'drain', effect: 'drain', channel: true, pose: 'channel', interaction: 'drain', requiresHold: true, breakOnRange: true,
       cost: 15, startup: 0.3, drainPerSecond: 0, maxChannel: 1.5, recovery: 0.35, range: 300,
@@ -108,6 +112,16 @@ export const powersConfig = {
     potencyPerLevel: 0.03,
   },
   interactions: {
+    mindTwist: {
+      air: { scale: 1, duration: 1, stagger: 1 },
+      bands: [
+        { ...NORMAL_BAND, ...STRIKE_GUARD, atLeast: 3, blockable: false, duration: 1.25 },
+        { ...NORMAL_BAND, ...STRIKE_GUARD, atLeast: 0, blockable: false },
+        { ...NORMAL_BAND, ...STRIKE_GUARD, atLeast: -1, blockable: false, duration: 0.75 },
+        { ...REDUCED_BAND, ...STRIKE_GUARD, blockable: false, duration: 0.4 },
+        { ...RESISTED_BAND, ...STRIKE_GUARD, blockable: false },
+      ],
+    },
     drain: {
       air: { scale: 1, duration: 1, stagger: 1 },
       bands: [{ ...NORMAL_BAND, ...STRIKE_GUARD, blockable: false }, { ...REDUCED_BAND, ...STRIKE_GUARD, blockable: false }, { ...RESISTED_BAND, ...STRIKE_GUARD, blockable: false }],

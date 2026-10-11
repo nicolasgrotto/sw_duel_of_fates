@@ -5,6 +5,7 @@ import { isGuardingAgainst, isInvulnerable } from './hitboxes.js';
 import { powerEffects } from './powerEffects.js';
 import { getFlowDifference, resolveInteraction, resolveLevelBand } from './flowInteractions.js';
 import { projectilesConfig } from '../config/projectilesConfig.js';
+import { getMoveX } from '../entities/fighterIntent.js';
 
 const POWER_STATES = new Set([FighterState.CASTING, FighterState.CHANNELING]);
 const GROUNDED = Object.freeze({ scale: 1, duration: 1, stagger: 1 });
@@ -23,7 +24,7 @@ export function isBarrierUp(fighter) {
 }
 
 export function getIntentSlot(fighter) {
-  const direction = Math.sign(fighter.intent.moveX) * fighter.facing;
+  const direction = Math.sign(getMoveX(fighter)) * fighter.facing;
   return direction > 0 ? 'forward' : direction < 0 ? 'back' : 'neutral';
 }
 

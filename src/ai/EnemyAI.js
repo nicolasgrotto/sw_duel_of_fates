@@ -236,7 +236,9 @@ export class EnemyAI {
     const { plan } = this;
     const shoving = plan.pendingAction === PendingAction.SHOVE;
 
-    intent.moveX = plan.moveX;
+    const compensation = this.difficulty.confusionCompensation;
+    const confused = this.self.combat.confuseTime > 0 && compensation != null && this.self.combat.confuseElapsed >= compensation;
+    intent.moveX = confused ? -plan.moveX : plan.moveX;
     intent.jump = plan.pendingAction === PendingAction.JUMP;
     intent.block = plan.blockTime > 0 || shoving;
     intent.blockPressed = plan.pendingAction === PendingAction.PARRY;

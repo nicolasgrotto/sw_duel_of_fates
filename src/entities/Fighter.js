@@ -82,6 +82,8 @@ function createCombat() {
     powerTargetX: 0,
     powerTargetY: 0,
     statusLevel: 0,
+    confuseTime: 0,
+    confuseElapsed: 0,
     chokeTime: 0,
     chokeDamageRate: 0,
     freezeTime: 0,

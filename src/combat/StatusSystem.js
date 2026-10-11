@@ -45,6 +45,11 @@ export class StatusSystem {
       this.checkFocusResource(fighter);
       this.advance(fighter, 'wrath', dt);
       combat.freezeTime = Math.max(0, combat.freezeTime - dt);
+      if (combat.confuseTime > 0) {
+        combat.confuseElapsed += Math.min(dt, combat.confuseTime);
+        combat.confuseTime = Math.max(0, combat.confuseTime - dt);
+        if (combat.confuseTime === 0) combat.confuseElapsed = 0;
+      }
       if (combat.chokeTime > 0) {
         this.choke(fighter, findOpponent(fighter, fighters), dt);
       }
@@ -143,6 +148,8 @@ export class StatusSystem {
   }
 
   onDeath(fighter) {
+    fighter.combat.confuseTime = 0;
+    fighter.combat.confuseElapsed = 0;
     this.end(fighter, 'heal', 'death');
     this.end(fighter, 'focus', 'death');
     this.end(fighter, 'wrath', 'death');
