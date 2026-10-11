@@ -256,10 +256,11 @@ export const techniqueKeyframes = {
   spin: [
     { phase: STARTUP, at: 0.4, ease: 'out', blade: -120, lean: -2, crouch: 4, lift: 0.04, slide: 0.01 },
     { phase: STARTUP, at: 1, ease: 'inOut', blade: -165, lean: -5, crouch: 8, lift: 0.07, slide: 0.03, hip: -0.015 },
-    { phase: ACTIVE, at: 0.5, ease: 'linear', blade: 15, lean: 3, crouch: 10, reach: 0.06, lift: 0.03, step: 0.02, turn: 0.5 },
-    { phase: ACTIVE, at: 1, ease: 'linear', blade: 195, lean: 4, crouch: 10, reach: 0.04, step: 0.03, turn: 1 },
-    { phase: RECOVERY, at: 0.35, ease: 'outQuad', blade: 215, lean: 2, crouch: 8, reach: 0.02, step: 0.02, turn: 1 },
-    { phase: RECOVERY, at: 1, ease: 'inOut', twirl: 360, turn: 1 },
+    { phase: ACTIVE, at: 0.25, ease: 'in', blade: 12, lean: 4, crouch: 10, reach: 0.08, lift: 0.02, step: 0.03, turn: 0.04 },
+    { phase: ACTIVE, at: 0.6, ease: 'linear', blade: 12, lean: 3, crouch: 10, reach: 0.08, lift: 0.02, step: 0.03, turn: 0.52 },
+    { phase: ACTIVE, at: 1, ease: 'linear', blade: 18, lean: 4, crouch: 10, reach: 0.06, step: 0.03, turn: 1 },
+    { phase: RECOVERY, at: 0.35, ease: 'outQuad', blade: 30, lean: 3, crouch: 8, reach: 0.03, step: 0.02, turn: 1 },
+    { phase: RECOVERY, at: 1, ease: 'inOut', turn: 1 },
   ],
   dashSlash: {
     rising: [

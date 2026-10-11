@@ -57,17 +57,33 @@ describe('technique keyframe tracks', () => {
     assert.equal(segmentEntersBox({ baseX: -5, baseY: 5, tipX: 15, tipY: 5 }, box), true);
   });
 
-  it('turns the body during the spin and faces front again in the recovery', () => {
-    const fighter = spawnFighter(500, 1, 'shadow');
-    const move = fighter.moves.spin;
-    assert.equal(poseAt(fighter, 'spin', move.startup).turnScale, 1);
-    const middle = poseAt(fighter, 'spin', move.startup + move.active / 2);
-    assert.ok(middle.turnScale < -0.9);
-    const quarter = poseAt(fighter, 'spin', move.startup + move.active / 4);
-    assert.ok(Math.abs(quarter.turnScale) < 0.2);
-    const end = poseAt(fighter, 'spin', move.startup + move.active + move.recovery * 0.999);
-    assert.ok(end.turnScale > 0.99);
+  it('turns the body during the spin so the blade sweeps front, back and front again', () => {
+    for (const id of ['shadow', 'forge', 'guardian']) {
+      for (const facing of [-1, 1]) {
+        const fighter = spawnFighter(500, facing, id);
+        if (!fighter.moves.spin) {
+          fighter.moves.spin = spawnFighter(500, facing, 'shadow').moves.spin;
+        }
+        const move = fighter.moves.spin;
+        const blade = {};
+        const side = (point) => {
+          getBladeWorldPoints(fighter, poseAt(fighter, 'spin', move.startup + move.active * point), blade);
+          return Math.sign(blade.tipX - fighter.x) * facing;
+        };
+        assert.equal(side(0.25), 1, `${id}/${facing} front`);
+        assert.equal(side(0.6), -1, `${id}/${facing} back`);
+        assert.equal(side(1), 1, `${id}/${facing} front again`);
+        let lowest = 1;
+        for (let sample = 0; sample <= 40; sample += 1) {
+          lowest = Math.min(lowest, poseAt(fighter, 'spin', move.startup + move.active * sample / 40).turnScale);
+        }
+        assert.ok(lowest < -0.9);
+        const end = poseAt(fighter, 'spin', move.startup + move.active + move.recovery * 0.999);
+        assert.ok(end.turnScale > 0.99);
+      }
+    }
   });
+
 
   it('pulls the blade behind the shoulder before the spin', () => {
     const fighter = spawnFighter(500, 1, 'forge');
