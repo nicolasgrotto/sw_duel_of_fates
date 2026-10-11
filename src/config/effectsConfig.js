@@ -11,6 +11,7 @@ export const effectsConfig = {
     pressLight: { radius: 70, alpha: 0.35, duration: 0.1 },
   },
   woundHealedLight: { radius: 60, alpha: 0.45, duration: 0.3 },
+  stormSpasm: { duration: 0.12, amplitude: 1.5, interval: 0.03, outlineAlpha: 0.5, outlineOffset: 2 },
   shockwave: {
     duration: 0.3,
     arcs: 3,

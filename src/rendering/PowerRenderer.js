@@ -9,8 +9,8 @@ import { createRandom } from '../utils/random.js';
 
 const style = powersConfig.render;
 
-function createBolt() {
-  const count = style.boltSegments + 1;
+function createBolt(segments) {
+  const count = segments + 1;
   return {
     refreshedAt: -Infinity,
     offsets: new Float32Array(count),
@@ -20,27 +20,50 @@ function createBolt() {
   };
 }
 
+function createChannelView() {
+  return {
+    bolts: Array.from({ length: style.maxBolts }, () => createBolt(style.boltSegments)),
+    arcs: Array.from({ length: style.maxBolts }, () => createBolt(style.storm.arcSegments)),
+  };
+}
+
+const arcEnds = new Float32Array(4);
+
+function setArcEnds(fromX, fromY, toX, toY) {
+  arcEnds[0] = fromX;
+  arcEnds[1] = fromY;
+  arcEnds[2] = toX;
+  arcEnds[3] = toY;
+  return arcEnds;
+}
+
+function placeBodyArc(index, pose) {
+  if (index === 0) return setArcEnds(pose.shoulderX + 3, pose.shoulderY + 3, pose.handX, pose.handY);
+  if (index === 1) return setArcEnds(pose.hipX, pose.hipY, pose.shoulderX, pose.shoulderY);
+  return setArcEnds(pose.handX, pose.handY, pose.hipX, pose.hipY);
+}
+
 export class PowerRenderer {
   constructor() {
     this.random = createRandom(style.seed);
     this.bolts = new Map();
   }
 
-  getBolt(fighter) {
-    let bolt = this.bolts.get(fighter);
-    if (!bolt) {
-      bolt = createBolt();
-      this.bolts.set(fighter, bolt);
+  getChannelView(fighter) {
+    let view = this.bolts.get(fighter);
+    if (!view) {
+      view = createChannelView();
+      this.bolts.set(fighter, view);
     }
-    return bolt;
+    return view;
   }
 
-  draw(renderer, fighters) {
+  draw(renderer, fighters, poses = null) {
     renderer.save();
     renderer.setBlendMode('lighter');
     for (const fighter of fighters) {
       if (isUsingPower(fighter)) {
-        this.drawFighter(renderer, fighter);
+        this.drawFighter(renderer, fighter, poses?.get(fighter) ?? null);
       }
       if (hasStatus(fighter)) {
         this.drawStatus(renderer, fighter);
@@ -80,7 +103,7 @@ export class PowerRenderer {
     }
   }
 
-  drawFighter(renderer, fighter) {
+  drawFighter(renderer, fighter, pose) {
     const { power } = fighter.combat;
     const tier = getPowerTier(fighter.flowLevel, powersConfig.tiers);
     const originX = fighter.x + fighter.facing * (fighter.width / 2 + style.handOffset);
@@ -101,6 +124,9 @@ export class PowerRenderer {
       renderer.setAlpha(style.storm.alpha);
       renderer.strokeEllipse(fighter.x, fighter.y - fighter.height / 2, power.range, power.range, tier.color, style.storm.lineWidth);
       renderer.setAlpha(1);
+      if (pose) {
+        this.drawStormArcs(renderer, fighter, pose, tier);
+      }
     } else if (fighter.combat.redirectTime > 0) {
       renderer.drawGlow(originX, originY, tier.glowRadius * style.redirectGlowScale, tier.color, tier.glowAlpha);
     }
@@ -117,7 +143,7 @@ export class PowerRenderer {
     renderer.strokeEllipse(centerX, centerY, radiusX, radiusY, tier.color, style.barrierLineWidth);
   }
 
-  refreshBolt(bolt, time) {
+  refreshBolt(bolt, time, jitter, branchScale) {
     if (time >= bolt.refreshedAt && time - bolt.refreshedAt < style.boltRefresh) {
       return;
     }
@@ -125,8 +151,8 @@ export class PowerRenderer {
     const last = bolt.offsets.length - 1;
     for (let index = 0; index <= last; index += 1) {
       const envelope = Math.sin((index / last) * Math.PI);
-      bolt.offsets[index] = (this.random() * 2 - 1) * style.boltJitter * envelope;
-      bolt.branchOffsets[index] = (this.random() * 2 - 1) * style.boltJitter * style.branchJitterScale * envelope;
+      bolt.offsets[index] = (this.random() * 2 - 1) * jitter * envelope;
+      bolt.branchOffsets[index] = (this.random() * 2 - 1) * jitter * branchScale * envelope;
     }
   }
 
@@ -143,19 +169,49 @@ export class PowerRenderer {
   }
 
   drawLightning(renderer, fighter, tier, originX, originY) {
-    const bolt = this.getBolt(fighter);
+    const { bolts } = this.getChannelView(fighter);
     const { powerTargetX: targetX, powerTargetY: targetY } = fighter.combat;
-    this.refreshBolt(bolt, fighter.animation.time);
-    this.tracePoints(bolt.points, bolt.offsets, originX, originY, targetX, targetY);
-    this.tracePoints(bolt.branch, bolt.branchOffsets, originX, originY, targetX, targetY);
-
-    renderer.setAlpha(style.boltGlowAlpha);
-    renderer.polyline(bolt.points, tier.color, tier.boltWidth * style.boltGlowScale);
-    renderer.setAlpha(style.branchAlpha);
-    renderer.polyline(bolt.branch, tier.color, tier.boltWidth * style.branchWidthScale);
-    renderer.setAlpha(1);
-    renderer.polyline(bolt.points, tier.color, tier.boltWidth);
-    renderer.polyline(bolt.points, colors.saberCore, tier.boltWidth * style.coreWidthScale);
+    const time = fighter.animation.time;
+    const count = Math.min(tier.bolts, bolts.length);
+    for (let index = 0; index < count; index += 1) {
+      const bolt = bolts[index];
+      const boltTargetY = targetY + style.boltTargetOffsets[index];
+      this.refreshBolt(bolt, time, style.boltJitter, style.branchJitterScale);
+      this.tracePoints(bolt.points, bolt.offsets, originX, originY, targetX, boltTargetY);
+      renderer.setAlpha(style.boltGlowAlpha);
+      renderer.polyline(bolt.points, tier.color, tier.boltWidth * style.boltGlowScale);
+      if (index === 0 && tier.branch) {
+        this.tracePoints(bolt.branch, bolt.branchOffsets, originX, originY, targetX, boltTargetY);
+        renderer.setAlpha(style.branchAlpha);
+        renderer.polyline(bolt.branch, tier.color, tier.boltWidth * style.branchWidthScale);
+      }
+      renderer.setAlpha(1);
+      renderer.polyline(bolt.points, tier.color, tier.boltWidth);
+      renderer.polyline(bolt.points, colors.saberCore, tier.boltWidth * style.coreWidthScale);
+    }
     renderer.drawGlow(targetX, targetY, tier.glowRadius * style.impactGlowScale, tier.color, tier.glowAlpha);
+  }
+
+  drawStormArcs(renderer, fighter, pose, tier) {
+    const storm = style.storm;
+    const { arcs } = this.getChannelView(fighter);
+    const time = fighter.animation.time;
+    const count = Math.min(tier.stormArcs, arcs.length);
+    for (let index = 0; index < count; index += 1) {
+      const arc = arcs[index];
+      const ends = placeBodyArc(index, pose);
+      this.refreshBolt(arc, time, storm.arcJitter, 0);
+      this.tracePoints(
+        arc.points, arc.offsets,
+        fighter.x + fighter.facing * ends[0], fighter.y + ends[1],
+        fighter.x + fighter.facing * ends[2], fighter.y + ends[3],
+      );
+      renderer.setAlpha(storm.arcGlowAlpha);
+      renderer.polyline(arc.points, tier.color, tier.boltWidth * storm.arcGlowScale);
+      renderer.setAlpha(storm.arcAlpha);
+      renderer.polyline(arc.points, tier.color, tier.boltWidth * storm.arcWidthScale);
+      renderer.polyline(arc.points, colors.saberCore, tier.boltWidth * storm.arcWidthScale * style.coreWidthScale);
+    }
+    renderer.setAlpha(1);
   }
 }

@@ -81,6 +81,7 @@ export class DuelRenderer {
     for (const fighter of fighters) {
       renderer.save();
       renderer.translate(effects.getTremor(fighter), 0);
+      this.drawPulseOutline(renderer, fighter, effects.getPulseOutline?.(fighter) ?? 0, arena.floorY);
       drawFighterBody(renderer, fighter, this.getPose(fighter), arena.floorY, true, effects.hasHitFlash(fighter) ? colors.hitFlash : null);
       renderer.restore();
     }
@@ -102,7 +103,7 @@ export class DuelRenderer {
     }
 
     this.projectileView.draw(renderer, projectiles, fighters);
-    this.powerView.draw(renderer, fighters);
+    this.powerView.draw(renderer, fighters, this.poses);
     drawImpactLights(renderer, effects.lights);
     drawRings(renderer, effects.rings);
     drawShockwaves(renderer, effects.shockwaves, effectsConfig.shockwave);
@@ -112,6 +113,24 @@ export class DuelRenderer {
 
     drawFlash(renderer, effects.flash);
     renderer.drawVignette(effectsConfig.vignette);
+  }
+
+  drawPulseOutline(renderer, fighter, amount, floorY) {
+    if (amount <= 0) {
+      return;
+    }
+    const { outlineAlpha, outlineOffset } = effectsConfig.stormSpasm;
+    const pose = this.getPose(fighter);
+    renderer.save();
+    renderer.setAlpha(outlineAlpha * amount);
+    for (let side = 0; side < 4; side += 1) {
+      const offsetX = side < 2 ? (side === 0 ? outlineOffset : -outlineOffset) : 0;
+      const offsetY = side < 2 ? 0 : (side === 2 ? outlineOffset : -outlineOffset);
+      renderer.translate(offsetX, offsetY);
+      drawFighterBody(renderer, fighter, pose, floorY, false, colors.hitFlash);
+      renderer.translate(-offsetX, -offsetY);
+    }
+    renderer.restore();
   }
 
   drawReflections(renderer, fighters, floorY) {

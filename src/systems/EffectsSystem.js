@@ -87,6 +87,7 @@ export class EffectsSystem {
     this.evadeAfterimages = new Map();
     this.hitFlashes = new Map();
     this.tremors = new Map();
+    this.spasms = new Map();
     this.particles = new ParticlePool(config.maxParticles);
     this.lights = Array.from({ length: config.maxLights }, createLight);
     this.rings = Array.from({ length: config.maxRings }, createRing);
@@ -201,6 +202,9 @@ export class EffectsSystem {
         params.particleScale = getPowerTier(attacker.flowLevel, powersConfig.tiers).particleScale;
         if (this.flashScale > 0 && event.attackType !== 'storm') {
           this.hitFlashes.set(defender, this.config.hitFlashDuration);
+        }
+        if (event.attackType === 'storm') {
+          this.spasms.set(defender, this.config.stormSpasm.duration);
         }
         this.spawn(event.attackType === 'lightning' || event.attackType === 'storm' ? EffectType.LIGHTNING_TICK : EffectType.POWER_IMPACT, params);
         break;
@@ -391,7 +395,24 @@ export class EffectsSystem {
   }
 
   getTremor(fighter) {
-    return this.tremors.get(fighter)?.offset ?? 0;
+    return (this.tremors.get(fighter)?.offset ?? 0) + this.getSpasm(fighter);
+  }
+
+  getSpasm(fighter) {
+    const remaining = this.spasms.get(fighter);
+    if (!remaining) {
+      return 0;
+    }
+    const { amplitude, interval } = this.config.stormSpasm;
+    const direction = Math.floor(remaining / interval) % 2 === 0 ? 1 : -1;
+    return direction * amplitude * this.shakeScale;
+  }
+
+  getPulseOutline(fighter) {
+    if (this.flashScale <= 0) {
+      return 0;
+    }
+    return (this.spasms.get(fighter) ?? 0) / this.config.stormSpasm.duration;
   }
 
   hasEvadeAfterimage(fighter) {
@@ -559,6 +580,7 @@ export class EffectsSystem {
     this.updateTimers(this.saberFlares, dt);
     this.updateTimers(this.hitFlashes, dt);
     this.updateTimers(this.evadeAfterimages, dt);
+    this.updateTimers(this.spasms, dt);
     this.updateTremors(dt);
     this.updateDesaturation(dt);
     this.updateBladeLock(dt);
