@@ -3,15 +3,47 @@ import { getPowerTier } from '../combat/flowInteractions.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
 import { layout, texts } from '../config/uiConfig.js';
-import { TAU, approach } from '../utils/math.js';
+import { TAU, approach, lerp } from '../utils/math.js';
 
 const Side = Object.freeze({
   LEFT: 'left',
   RIGHT: 'right',
 });
 
+export function canLightCostMark(fighter, power) {
+  return fighter.flowMeter >= power.cost && fighter.combat.powerCooldown === 0 && fighter.flowLevel >= (power.minFlowLevel ?? 0);
+}
+
+function placeCostMarks(marks, width) {
+  const { minGap, spread } = layout.hud.costMark;
+  marks.sort((a, b) => a.ratio - b.ratio);
+  for (let index = 0; index < marks.length; index += 1) {
+    marks[index].offset = 0;
+  }
+  for (let index = 1; index < marks.length; index += 1) {
+    if ((marks[index].ratio - marks[index - 1].ratio) * width < minGap) {
+      marks[index - 1].offset -= spread;
+      marks[index].offset += spread;
+    }
+  }
+  return marks;
+}
+
+function createCostMarks(fighter) {
+  const loadout = fighter.stats.power?.loadout ?? null;
+  const marks = [];
+  for (const power of Object.values(loadout ?? {})) {
+    if (power?.hudMark && !marks.some((mark) => mark.power === power)) {
+      marks.push({ power, ratio: power.cost / fighter.stats.power.max, color: colors[power.hudMark], offset: 0, lit: false, pulse: 0 });
+    }
+  }
+  return placeCostMarks(marks, layout.hud.healthWidth);
+}
+
 function createSideState(fighter, side) {
   return {
+    costMarks: createCostMarks(fighter),
+    costLoadout: fighter.stats.power?.loadout ?? null,
     fighter,
     side,
     ghostHealth: fighter.health,
@@ -40,6 +72,20 @@ export class Hud {
       state.rejectTime = Math.max(0, state.rejectTime - dt);
       state.powerRejectTime = Math.max(0, state.powerRejectTime - dt);
       state.exhaustion = approach(state.exhaustion, state.fighter.combat.exhausted ? 1 : 0, layout.hud.exhaustFadeRate * dt);
+      this.updateCostMarks(state, dt);
+    }
+  }
+
+  updateCostMarks(state, dt) {
+    const loadout = state.fighter.stats.power?.loadout ?? null;
+    if (loadout !== state.costLoadout) {
+      state.costLoadout = loadout;
+      state.costMarks = createCostMarks(state.fighter);
+    }
+    for (const mark of state.costMarks) {
+      const lit = canLightCostMark(state.fighter, mark.power);
+      mark.pulse = lit && !mark.lit ? layout.hud.costMark.pulseDuration : Math.max(0, mark.pulse - dt);
+      mark.lit = lit;
     }
   }
 
@@ -169,6 +215,27 @@ export class Hud {
     const color = state.powerRejectTime > 0 && state.powerRejectTime % period >= period / 2 ? colors.hudDanger : tierColor;
     renderer.fillRect(barX, barY, healthWidth, powerHeight, colors.hudTrack);
     this.fillBar(renderer, barX, barY, healthWidth, powerHeight, fighter.flowMeter / fighter.stats.power.max, isLeft, color);
+    this.renderCostMarks(renderer, state, barX, barY + powerHeight / 2, isLeft);
+  }
+
+  renderCostMarks(renderer, state, barX, centerY, isLeft) {
+    const mark = layout.hud.costMark;
+    const width = layout.hud.healthWidth;
+    for (const cost of state.costMarks) {
+      const x = (isLeft ? barX + cost.ratio * width : barX + width - cost.ratio * width) + cost.offset;
+      renderer.fillRect(x - mark.width / 2, centerY - mark.height / 2, mark.width, mark.height, cost.lit ? cost.color : colors.hudMarkIdle);
+      if (!cost.lit) {
+        continue;
+      }
+      renderer.save();
+      renderer.setBlendMode('lighter');
+      renderer.drawGlow(x, centerY, mark.glowRadius, cost.color, mark.glowAlpha);
+      if (cost.pulse > 0) {
+        const progress = cost.pulse / mark.pulseDuration;
+        renderer.drawGlow(x, centerY, lerp(mark.glowRadius, mark.pulseRadius, 1 - progress), cost.color, mark.pulseAlpha * progress);
+      }
+      renderer.restore();
+    }
   }
 
   renderRounds(renderer, isLeft, viewLeft = 0, viewRight = renderer.width) {

@@ -126,3 +126,70 @@ describe('Hud power meter', () => {
     assert.ok(renderColors(true).includes(colors.powerTierSteady));
   });
 });
+
+describe('Hud cost marks', () => {
+  function setup() {
+    const left = spawnFighter(300, 1, 'sovereign');
+    const right = spawnFighter(900, -1, 'guardian');
+    const hud = new Hud(left, right, null, null, true);
+    return { left, right, hud };
+  }
+
+  function render(hud) {
+    const fills = [];
+    const glows = [];
+    hud.render({
+      width: 1280,
+      text: () => {},
+      save: () => {},
+      restore: () => {},
+      setAlpha: () => {},
+      setBlendMode: () => {},
+      strokeRect: () => {},
+      measureText: () => 0,
+      drawGlow: (x, y, radius, color, alpha) => glows.push({ x, radius, color, alpha }),
+      fillRect: (x, y, width, height, color) => fills.push({ x, y, width, height, color }),
+    });
+    return { fills, glows };
+  }
+
+  it('marks only the equipped high-cost power at its cost, measured from the anchored edge', () => {
+    const { left, hud } = setup();
+    const [leftState, rightState] = hud.sides;
+    assert.deepEqual(leftState.costMarks.map((mark) => mark.power.id), ['storm']);
+    assert.equal(rightState.costMarks.length, 0);
+    left.flowMeter = 0;
+    hud.update(STEP);
+    const { fills, glows } = render(hud);
+    const mark = fills.find((fill) => fill.width === layout.hud.costMark.width);
+    const { margin, healthWidth } = layout.hud;
+    const storm = leftState.costMarks[0].power;
+    assert.equal(mark.x + mark.width / 2, margin + (storm.cost / left.stats.power.max) * healthWidth);
+    assert.equal(mark.height, layout.hud.costMark.height);
+    assert.equal(mark.color, colors.hudMarkIdle);
+    assert.equal(glows.length, 0);
+  });
+
+  it('lights the mark in the power color with a single pulse when the power can be cast', () => {
+    const { left, hud } = setup();
+    left.flowMeter = 100;
+    left.combat.powerCooldown = 0;
+    hud.update(STEP);
+    const first = render(hud);
+    assert.ok(first.fills.some((fill) => fill.color === colors.powerCostStorm));
+    assert.equal(first.glows.length, 2);
+    repeat(Math.ceil(layout.hud.costMark.pulseDuration / STEP) + 1, () => hud.update(STEP));
+    assert.equal(render(hud).glows.length, 1);
+    left.combat.powerCooldown = 0.5;
+    hud.update(STEP);
+    assert.equal(render(hud).glows.length, 0);
+  });
+
+  it('keeps the mark off below the flow requirement even with a full meter', () => {
+    const { left, hud } = setup();
+    left.flowMeter = 100;
+    left.stats.flowLevel = 5;
+    hud.update(STEP);
+    assert.equal(hud.sides[0].costMarks[0].lit, false);
+  });
+});

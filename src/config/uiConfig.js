@@ -165,6 +165,7 @@ export const layout = {
     staminaHeight: 4,
     powerGap: 3,
     powerHeight: 3,
+    costMark: { width: 2, height: 9, minGap: 4, spread: 2, glowRadius: 10, glowAlpha: 0.45, pulseRadius: 18, pulseAlpha: 0.5, pulseDuration: 0.3 },
     ghostDelay: 0.4,
     ghostSpeed: 0.6,
     lowHealthRatio: 0.25,
