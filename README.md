@@ -9,6 +9,8 @@ Não há intenção de violação de direitos autorais. Todo o código e impleme
 
 Jogo 2D de duelo de lâminas de energia para navegador, feito com HTML5, CSS3, JavaScript puro (ES Modules) e Canvas 2D. Sem frameworks, sem engine e sem bundler.
 
+**Jogue no navegador:** https://nicolasgrotto.github.io/sw_duel_of_fates/
+
 > Projeto acadêmico, sem fins comerciais, inspirado nos duelos de sabre de Star Wars. Não é um produto oficial e não tem afiliação com a Lucasfilm ou a Disney. O código usa termos neutros e não inclui assets oficiais, para que o jogo possa receber uma identidade própria no futuro (ver [DESIGN.md](DESIGN.md#propriedade-intelectual)).
 
 ![Duelo na Mina de Cristal](media/duel-crystal-mine.png)
@@ -58,6 +60,8 @@ O jogo é um site estático: não tem build, e todos os caminhos são relativos.
 1. Envie o repositório para o GitHub.
 2. Em **Settings → Pages**, escolha **Deploy from a branch**, a branch `main` e a pasta `/ (root)`.
 3. O jogo fica em `https://<usuário>.github.io/<repositório>/`.
+
+Versão publicada: https://nicolasgrotto.github.io/sw_duel_of_fates/
 
 As opções e o progresso (teclas, cores desbloqueadas, recorde) ficam no `localStorage` do navegador de cada jogador.
 
