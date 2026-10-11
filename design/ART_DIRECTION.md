@@ -175,6 +175,18 @@ Cada personagem tem um **estilo de movimento** (`appearance.motion`, tabela `mot
 
 O protagonista do estilo Técnica herda o estilo do Guardião pela base de aparência.
 
+### Poses-chave de ataque (v2.12)
+
+Os golpes deixam de ser um arco de dois pontos (preparação → corte) e passam a ser uma **trilha de poses-chave** que atravessa as três fases do golpe. Continua procedural: sem sprites nem esqueleto novo, e startup, ativo, recuperação, alcance e hitbox não mudam.
+
+- **Trilha.** Cada pose-chave tem a fase (preparação, ativo, recuperação), o ponto dentro dela (0 a 1), o easing do trecho que termina nela e os valores dos canais. A trilha começa e termina na guarda; canais omitidos voltam ao valor de guarda.
+- **Canais.** Ângulo da lâmina, inclinação do tronco, agachamento, alcance e altura da mão (os mesmos da v2) e cinco novos: **passo** (o pé da frente avança no corte), **deslize** (o pé de trás recua na preparação e acompanha no corte), **quadril** (o quadril vai para trás na preparação e para a frente no corte, levando o tronco), **mão livre** (a segunda mão solta o cabo e vai para um ângulo próprio, para equilíbrio ou para empurrar) e **giro** (voltas da lâmina somadas ao ângulo, na recuperação).
+- **Leitura das quatro fases.** Antecipação clara (peso para trás, lâmina recua, pé de trás desliza) no fim da preparação; arco rápido no ativo, passando por uma pose intermediária que coincide com a hitbox; impacto com passo e quadril à frente; recuperação com follow-through curto e volta à guarda com easing suave.
+- **Encadeamento.** Quando um golpe começa logo depois de outro, a pose sai de onde o anterior estava, numa mistura curta (`chainBlend`, 0,06 s), em vez de saltar para a guarda.
+- **Opt-in por estilo.** Só estilos com `keyframes` usam a trilha; os demais seguem a pose de dois pontos da v2. Golpes sem trilha no estilo (técnicas, postura, arremesso da lâmina) também seguem a pose antiga.
+- **Guardião:** passos curtos, quadril firme, pouco giro de tronco, sem giro de lâmina; o empurrão solta a mão livre para a frente.
+- **Vespa:** passos longos, quadril e tronco acompanhando o corte, follow-through largo e o giro da lâmina na recuperação do forte e do quinto rápido; as duas mãos ficam nas lâminas.
+
 ### Disputa de lâminas (v2.5)
 
 Pose `BLADE_LOCK`, com números por estilo em `motionStyles[motion].lock` e `lockVictory`:
