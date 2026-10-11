@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { CombatEvent } from '../src/combat/combatEvents.js';
 import { effectsConfig } from '../src/config/effectsConfig.js';
 import { powersConfig } from '../src/config/powersConfig.js';
+import { projectilesConfig } from '../src/config/projectilesConfig.js';
 import { Camera } from '../src/core/Camera.js';
 import { FighterState } from '../src/entities/fighterStates.js';
 import { computePose, createPose } from '../src/rendering/fighterPose.js';
@@ -230,8 +231,8 @@ describe('barrier, push, pull and throw by tier', () => {
     }
   });
 
-  it('raises one, two or three stones from the floor during the throw startup', () => {
-    for (const [level, stones] of [[1, 1], [4, 2], [6, 2], [9, 3], [10, 3]]) {
+  it('raises one to four separate stones from the floor during the throw startup', () => {
+    for (const [level, stones] of [[1, 1], [4, 2], [6, 2], [9, 3], [10, 4]]) {
       const caster = spawnFighter(400, 1, 'shadow');
       caster.stats.flowLevel = level;
       const power = startPower(caster, 'throw', 0.01);
@@ -270,5 +271,23 @@ describe('barrier, push, pull and throw by tier', () => {
     const quiet = createEffects();
     quiet.handleEvents([{ type: CombatEvent.POWER_HIT, attacker: caster, defender: target, attackType: 'push', x: 700, y: 500 }]);
     assert.equal(quiet.debris.particles.filter((piece) => piece.active).length, 0);
+  });
+});
+
+describe('stone cluster', () => {
+  it('keeps the stones of every layout apart and within 1.2 hitbox radii', () => {
+    const { layouts } = projectilesConfig.render.rocks;
+    const reach = Math.max(...projectilesConfig.render.fragmentPoints.map((value, index, all) => (index % 2 === 0 ? Math.hypot(value, all[index + 1]) : 0)));
+    for (const layout of layouts) {
+      const stones = [];
+      for (let index = 0; index < layout.length; index += 3) stones.push(layout.slice(index, index + 3));
+      for (const [x, y, size] of stones) assert.ok(Math.hypot(x, y) + size * reach <= 1.2 + 1e-9);
+      for (let a = 0; a < stones.length; a += 1) {
+        for (let b = a + 1; b < stones.length; b += 1) {
+          const gap = Math.hypot(stones[a][0] - stones[b][0], stones[a][1] - stones[b][1]) - (stones[a][2] + stones[b][2]) * reach;
+          assert.ok(gap > 0.1, `gap ${gap}`);
+        }
+      }
+    }
   });
 });

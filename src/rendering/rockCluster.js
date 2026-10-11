@@ -18,10 +18,14 @@ function drawRock(renderer, x, y, radius, angle, edgeColor) {
     points[i] = x + px * cos - py * sin;
     points[i + 1] = y + px * sin + py * cos;
   }
-  renderer.fillPolygon(points, colors.floorEdge);
-  renderer.polyline(points, edgeColor, style.fragmentEdgeWidth);
   const last = points.length - 2;
-  renderer.line(points[last], points[last + 1], points[0], points[1], edgeColor, style.fragmentEdgeWidth);
+  renderer.fillPolygon(points, colors.floorEdge);
+  renderer.polyline(points, colors.rockShade, style.fragmentEdgeWidth);
+  renderer.line(points[last], points[last + 1], points[0], points[1], colors.rockShade, style.fragmentEdgeWidth);
+  renderer.setAlpha(style.rocks.energyAlpha);
+  renderer.polyline(points, edgeColor, style.rocks.energyWidth);
+  renderer.line(points[last], points[last + 1], points[0], points[1], edgeColor, style.rocks.energyWidth);
+  renderer.setAlpha(1);
 }
 
 export function drawRockCluster(renderer, x, y, radius, angle, count, edgeColor) {
@@ -36,7 +40,7 @@ export function drawRockCluster(renderer, x, y, radius, angle, count, edgeColor)
       x + offsetX * cos - offsetY * sin,
       y + offsetX * sin + offsetY * cos,
       radius * layout[index * 3 + 2],
-      angle + index * style.rocks.twist,
+      angle * (1 + index * style.rocks.ownSpin) + index * style.rocks.twist,
       edgeColor,
     );
   }

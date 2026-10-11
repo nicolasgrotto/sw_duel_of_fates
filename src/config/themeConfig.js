@@ -39,6 +39,7 @@ export const colors = {
   desaturateGray: '#808080',
   desaturateDim: '#000000',
   stormDarken: '#04060d',
+  rockShade: '#1a2030',
   powerCostStorm: '#ffd76a',
   hudMarkIdle: 'rgba(255, 255, 255, 0.25)',
   hitFlash: '#ffffff',
