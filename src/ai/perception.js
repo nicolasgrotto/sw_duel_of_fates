@@ -11,8 +11,12 @@ export function getDirectionTo(self, target) {
   return Math.sign(target.x - self.x) || self.facing;
 }
 
+export function getAttackReach(attack) {
+  return attack.throwRange ?? attack.hitbox.reach;
+}
+
 export function canReach(attacker, defender, attack, margin) {
-  return getGap(attacker, defender) < attack.hitbox.reach - margin;
+  return getGap(attacker, defender) < getAttackReach(attack) - margin;
 }
 
 export function isThreatening(attacker, defender, margin) {
@@ -24,7 +28,7 @@ export function isThreatening(attacker, defender, margin) {
   const phase = getAttackPhase(attack, attacker.stateTime);
   const isComing = phase === AttackPhase.STARTUP || phase === AttackPhase.ACTIVE;
   const isFacing = getDirectionTo(attacker, defender) === attacker.facing;
-  return isComing && isFacing && getGap(attacker, defender) < attack.hitbox.reach + margin;
+  return isComing && isFacing && getGap(attacker, defender) < getAttackReach(attack) + margin;
 }
 
 export function getVulnerableTime(fighter) {

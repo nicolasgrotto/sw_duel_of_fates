@@ -10,7 +10,7 @@ import { FighterState } from '../entities/fighterStates.js';
 import { canAfford, getStaminaCost } from '../systems/StaminaSystem.js';
 import { getMaxJumps } from '../systems/MovementSystem.js';
 import { HabitMemory } from './HabitMemory.js';
-import { canReach, findIncomingProjectile, getDirectionTo, getGap, getVulnerableTime, getTimeUntilAttackActive, isPunishable, isThreatening } from './perception.js';
+import { canReach, findIncomingProjectile, getAttackReach, getDirectionTo, getGap, getVulnerableTime, getTimeUntilAttackActive, isPunishable, isThreatening } from './perception.js';
 
 export const AiDecision = Object.freeze({
   BUSY: 'busy',
@@ -397,7 +397,7 @@ export class EnemyAI {
     }
     for (const [slot, id] of Object.entries(self.stats.techniques ?? {})) {
       const move = self.moves[id];
-      const reach = move.throwRange ?? move.hitbox.reach + (move.lunge ?? 0) * move.active;
+      const reach = move.throwRange ?? getAttackReach(move) + (move.lunge ?? 0) * move.active;
       if (!this.canSpend(move.staminaCost, move) || getGap(self, opponent) >= reach - this.perception.reachMargin) {
         continue;
       }
