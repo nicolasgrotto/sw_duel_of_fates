@@ -214,6 +214,9 @@ export class EffectsSystem {
         }
         break;
       case CombatEvent.POWER_HIT:
+        if (event.attackType === 'drain') {
+          break;
+        }
         params.color = getTierColor(attacker);
         params.particleScale = getPowerTier(attacker.flowLevel, powersConfig.tiers).particleScale;
         if (this.flashScale > 0 && event.attackType !== 'storm') {
@@ -233,6 +236,10 @@ export class EffectsSystem {
         this.spawnPowerRing(EffectType.POWER_RESISTED, defender, params);
         break;
       case CombatEvent.POWER_ABSORBED:
+        if (defender.combat.absorbTime > 0 && event.attackType !== 'storm') {
+          this.spawnAbsorb(defender);
+          break;
+        }
         this.spawnPowerRing(EffectType.POWER_ABSORBED, defender, params);
         break;
       default:
@@ -426,6 +433,34 @@ export class EffectsSystem {
     ring.alpha = recipe.ring.alpha;
     ring.duration = recipe.ring.duration;
     this.spawnRing(ring, params.x, params.y, params.color, true);
+  }
+
+  spawnAbsorb(defender) {
+    const style = powersConfig.render.absorb;
+    const tier = getPowerTier(defender.flowLevel, powersConfig.tiers);
+    const x = defender.x + defender.facing * (defender.width / 2 + powersConfig.render.handOffset);
+    const y = defender.y - defender.height * powersConfig.castHeight;
+    const ring = this.ringParams;
+    ring.radius = style.ringRadius;
+    ring.lineWidth = this.config.recipes[EffectType.POWER_ABSORBED].ring.lineWidth;
+    ring.alpha = this.config.recipes[EffectType.POWER_ABSORBED].ring.alpha;
+    ring.duration = style.life;
+    this.spawnRing(ring, x, y, tier.color, true);
+    this.spawnLight(this.config.recipes[EffectType.POWER_ABSORBED].light, x, y, tier.color);
+    const count = Math.round((this.reduced ? style.reducedParticles : style.particles) * tier.particleScale);
+    for (let i = 0; i < count; i += 1) {
+      const particle = this.particles.acquire();
+      if (!particle) return;
+      const angle = ((i + this.random()) / count) * Math.PI * 2;
+      particle.x = x + Math.cos(angle) * style.radius;
+      particle.y = y + Math.sin(angle) * style.radius;
+      particle.vx = -Math.cos(angle) * (style.radius / style.life);
+      particle.vy = -Math.sin(angle) * (style.radius / style.life);
+      particle.life = style.life;
+      particle.maxLife = style.life;
+      particle.size = style.size;
+      particle.color = tier.color;
+    }
   }
 
   spawnThrowDust(caster) {

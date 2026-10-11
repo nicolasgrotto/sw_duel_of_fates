@@ -1,5 +1,5 @@
 import { getPowerTier, resolveLevelBand } from '../combat/flowInteractions.js';
-import { isBarrierUp, isChannelOpen, isUsingPower } from '../combat/PowerSystem.js';
+import { getPowerRange, isBarrierUp, isChannelOpen, isUsingPower } from '../combat/PowerSystem.js';
 import { hasStatus } from '../combat/StatusSystem.js';
 import { effectsConfig } from '../config/effectsConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
@@ -149,6 +149,8 @@ export class PowerRenderer {
       this.drawBarrier(renderer, fighter, tier);
     } else if (isChannelOpen(fighter) && power.effect === 'lightning') {
       this.drawLightning(renderer, fighter, tier, originX, originY);
+    } else if (isChannelOpen(fighter) && power.effect === 'drain') {
+      this.drawDrain(renderer, fighter, tier, originX, originY);
     } else if (isChannelOpen(fighter) && power.effect === 'storm') {
       renderer.setAlpha(style.storm.alpha);
       renderer.strokeEllipse(fighter.x, fighter.y - fighter.height / 2, power.range, power.range, tier.color, style.storm.lineWidth);
@@ -231,6 +233,28 @@ export class PowerRenderer {
       renderer.polyline(bolt.points, colors.saberCore, tier.boltWidth * style.coreWidthScale);
     }
     renderer.drawGlow(targetX, targetY, tier.glowRadius * style.impactGlowScale, tier.color, tier.glowAlpha);
+  }
+
+  drawDrain(renderer, fighter, tier, originX, originY) {
+    const drain = style.drain;
+    const { powerTargetX: targetX, powerTargetY: targetY } = fighter.combat;
+    const length = Math.hypot(originX - targetX, originY - targetY) || 1;
+    const reach = clamp((Math.abs(targetX - fighter.x) - fighter.width / 2) / getPowerRange(fighter, fighter.combat.power), 0, 1);
+    const thin = 1 - clamp((reach - drain.thinFrom) / (1 - drain.thinFrom), 0, 1) * (1 - drain.thinAlpha);
+    const normalX = -(originY - targetY) / length;
+    const normalY = (originX - targetX) / length;
+    renderer.setAlpha(drain.lineAlpha * thin);
+    renderer.line(targetX, targetY, originX, originY, tier.color, drain.lineWidth);
+    renderer.setAlpha(1);
+    const phase = fighter.animation.time * drain.cyclesPerSecond;
+    for (let index = 0; index < drain.motes; index += 1) {
+      const t = (phase + index / drain.motes) % 1;
+      const wobble = Math.sin((t + index) * Math.PI * 2) * drain.wobble * (1 - t);
+      const x = lerp(targetX, originX, t) + normalX * wobble;
+      const y = lerp(targetY, originY, t) + normalY * wobble;
+      renderer.drawGlow(x, y, drain.moteRadius * lerp(1, 0.5, t), tier.color, drain.moteAlpha * thin);
+    }
+    renderer.drawGlow(originX, originY, tier.glowRadius * style.absorbGlowScale, tier.color, tier.glowAlpha * thin);
   }
 
   drawStormArcs(renderer, fighter, pose, tier) {

@@ -30,6 +30,8 @@ export const SoundName = Object.freeze({
   BARRIER: 'barrier',
   POWER_RESISTED: 'powerResisted',
   POWER_ABSORBED: 'powerAbsorbed',
+  ABSORB: 'absorb',
+  DRAIN: 'drain',
   SECRET: 'secret',
   UI_MOVE: 'uiMove',
   UI_CONFIRM: 'uiConfirm',

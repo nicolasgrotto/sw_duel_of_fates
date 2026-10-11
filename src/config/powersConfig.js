@@ -194,6 +194,8 @@ export const powersConfig = {
   },
   render: {
     absorbGlowScale: 0.65,
+    absorb: { ringRadius: 70, particles: 8, reducedParticles: 4, radius: 70, life: 0.22, size: 2 },
+    drain: { motes: 10, cyclesPerSecond: 1.6, wobble: 6, moteRadius: 9, moteAlpha: 0.65, lineAlpha: 0.22, lineWidth: 1.5, thinFrom: 0.7, thinAlpha: 0.35 },
     storm: {
       alpha: 0.25, lineWidth: 1.5, particles: 12, reducedParticles: 5, life: 0.3, speed: 65, size: 2,
       arcSegments: 5, arcJitter: 5, arcAlpha: 0.85, arcWidthScale: 0.55, arcGlowAlpha: 0.3, arcGlowScale: 3,

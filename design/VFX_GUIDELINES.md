@@ -196,3 +196,8 @@ Direção aprovada junto com as regras (GAME_DESIGN, seção 27). Os números fi
 - **Santuário:** domo que acompanha o corpo e racha conforme absorve.
 - **Esmagamento:** o alvo é erguido (como o estrangulado), comprime na horizontal e cai com poeira no impacto.
 - **Ira revista:** o brilho atual da Ira com uma borda mais firme enquanto resiste a interrupções.
+
+Decisões da implementação (v2.17):
+
+- **Absorção:** a janela mantém o brilho de mão de antes. Cada poder absorvido fecha um anel de 70 px na mão (0,22 s), acende a luz do impacto e puxa 8 partículas (4 com efeitos reduzidos, escala do tier) do raio de 70 px até a mão, na cor do tier de quem absorve. Som `absorb`: inspiração descendente. Barreira e escudo da Tempestade continuam com o anel que abre.
+- **Dreno:** linha fina (alpha 0,22) do alvo até a mão e 10 brilhos que correm nesse sentido com ondulação de 6 px, encolhendo ao chegar. Perto do limite do alcance (acima de 70%) tudo esmaece até 35%, para o alvo ler que pode romper. Os pulsos não têm hit flash, partículas nem som; o som `drain` (sucção grave) toca no início.

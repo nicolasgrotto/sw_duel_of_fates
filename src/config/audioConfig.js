@@ -181,6 +181,14 @@ export const audioConfig = {
       { type: 'tone', wave: 'triangle', from: 700, to: 640, duration: 0.2, attack: 0.002, gain: 0.12, filter: null },
       { type: 'noise', duration: 0.05, attack: 0.002, gain: 0.18, filter: { type: 'bandpass', from: 2000, to: 2000, q: 1.5 } },
     ],
+    absorb: [
+      { type: 'tone', wave: 'sine', from: 900, to: 300, duration: 0.25, attack: 0.01, gain: 0.1, filter: null },
+      { type: 'noise', duration: 0.2, attack: 0.05, gain: 0.15, filter: { type: 'bandpass', from: 3000, to: 800, q: 1.2 } },
+    ],
+    drain: [
+      { type: 'tone', wave: 'sawtooth', from: 220, to: 110, duration: 0.6, attack: 0.1, gain: 0.05, filter: { type: 'lowpass', from: 900, to: 400, q: 1 } },
+      { type: 'noise', duration: 0.6, attack: 0.15, gain: 0.12, filter: { type: 'bandpass', from: 600, to: 1500, q: 2 } },
+    ],
     secret: [
       { type: 'tone', wave: 'sine', from: 440, to: 440, duration: 0.5, attack: 0.01, gain: 0.08, filter: null },
       { type: 'tone', wave: 'sine', from: 660, to: 660, duration: 0.7, attack: 0.12, gain: 0.07, filter: null },
