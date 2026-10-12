@@ -136,6 +136,29 @@ describe('historical attack animation contract (198525b)', () => {
   }
 });
 
+describe('combo variety', () => {
+  for (const id of Object.keys(characters)) {
+    it(`${id}: each light combo step swings a different arc from the step before`, () => {
+      const fighter = spawnFighter(500, 1, id);
+      const arcOf = (moveId) => {
+        const move = fighter.moves[moveId];
+        return [move.startup, move.startup + move.active].map((time) => {
+          attackAt(fighter, moveId, time);
+          return computePose(fighter, createPose()).bladeAngle;
+        });
+      };
+      for (const [fromId, from] of Object.entries(fighter.moves).filter(([key]) => /^light\d*$/.test(key))) {
+        for (const toId of from.cancelsInto) {
+          const [fromStart, fromEnd] = arcOf(fromId);
+          const [toStart, toEnd] = arcOf(toId);
+          const difference = Math.max(angularDistance(fromStart, toStart), angularDistance(fromEnd, toEnd));
+          assert.ok(difference > Math.PI / 6, `${id}/${fromId} → ${toId}: ${(difference * 180 / Math.PI).toFixed(1)} degrees`);
+        }
+      }
+    });
+  }
+});
+
 describe('keyframe blade geometry and chain continuity', () => {
   for (const id of Object.keys(characters)) {
     const template = spawnFighter(500, 1, id);

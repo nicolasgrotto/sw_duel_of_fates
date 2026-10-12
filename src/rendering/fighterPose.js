@@ -122,7 +122,8 @@ function resolveTrack(keys) {
   for (const channel of TRACK_CHANNELS) {
     if (channel !== 'bladeDegrees') defaults[channel] = combatPoses.keyframeDefaults[channel];
   }
-  const track = [resolveTrackKey({ phase: AttackPhase.STARTUP, at: 0 }, defaults)];
+  const opensWithKey = keys[0]?.phase === AttackPhase.STARTUP && keys[0].at === 0;
+  const track = opensWithKey ? [] : [resolveTrackKey({ phase: AttackPhase.STARTUP, at: 0 }, defaults)];
   for (const key of keys) track.push(resolveTrackKey(key, defaults));
   if (track.at(-1).time < TRACK_END) track.push(resolveTrackKey({ phase: AttackPhase.RECOVERY, at: 1 }, defaults));
   return track;

@@ -235,6 +235,16 @@ const STARTUP = 'startup';
 const ACTIVE = 'active';
 const RECOVERY = 'recovery';
 
+function chainThrust(fromDegrees) {
+  return [
+    { phase: STARTUP, at: 0, blade: fromDegrees },
+    { phase: STARTUP, at: 1, ease: 'out', blade: -12, lean: -5, lift: 0.03, reach: -0.04, slide: 0.03, hip: -0.02 },
+    { phase: ACTIVE, at: 0.5, ease: 'in', blade: -4, lean: 5, lift: 0.01, reach: 0.11, step: 0.05, hip: 0.01 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 4, lean: 13, reach: 0.22, step: 0.09, hip: 0.035 },
+    { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: 6, lean: 12, reach: 0.19, step: 0.09, hip: 0.035 },
+  ];
+}
+
 const guardianReverse = [
   { phase: STARTUP, at: 1, ease: 'out', blade: 65, lean: 3, lift: 0.02, slide: 0.01 },
   { phase: ACTIVE, at: 0.5, ease: 'in', blade: 0, lean: 5, reach: 0.06, lift: 0.04, step: 0.02 },
@@ -263,6 +273,7 @@ const guardianKeyframes = {
     { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: 34, lean: 12, reach: 0.15, step: 0.06, hip: 0.03 },
   ],
   light2: guardianReverse,
+  light3: chainThrust(-65),
   shove: [
     { phase: STARTUP, at: 1, ease: 'out', blade: -40, lean: -6, lift: 0.02, slide: 0.02, hip: -0.01, offHand: 0.6, offHandDegrees: 40 },
     { phase: ACTIVE, at: 1, ease: 'outQuad', blade: -75, lean: 16, reach: 0.12, step: 0.06, hip: 0.03, offHand: 1, offHandDegrees: 5 },
@@ -338,6 +349,7 @@ const waspLight = [
 
 const waspKeyframes = {
   light: waspLight,
+  light3: chainThrust(-25),
   lightReverse: [
     { phase: STARTUP, at: 1, ease: 'out', blade: 75, lean: 6, lift: 0.02, slide: 0.015, hip: -0.005 },
     { phase: ACTIVE, at: 0.5, ease: 'in', blade: -5, lean: 9, reach: 0.07, lift: 0.04, step: 0.03, hip: 0.01 },
@@ -378,6 +390,14 @@ const aggressorKeyframes = {
     { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 45, lean: 13, reach: 0.11, step: 0.06, hip: 0.03 },
     { phase: RECOVERY, at: 0.35, ease: 'outQuad', blade: 58, lean: 13, reach: 0.1, step: 0.06, hip: 0.03 },
   ],
+  light2: [
+    { phase: STARTUP, at: 0, blade: 50 },
+    { phase: STARTUP, at: 1, ease: 'out', blade: 115, lean: 2, crouch: 6, slide: 0.02, hip: -0.015 },
+    { phase: ACTIVE, at: 0.5, ease: 'in', blade: 40, lean: 8, crouch: 5, reach: 0.08, step: 0.05, hip: 0.015 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: -55, lean: 14, reach: 0.13, lift: 0.04, step: 0.07, hip: 0.03 },
+    { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: -65, lean: 13, reach: 0.12, lift: 0.04, step: 0.07, hip: 0.03 },
+  ],
+  light3: chainThrust(-20),
   heavy: [
     { phase: STARTUP, at: 0.5, ease: 'out', blade: -140, lean: -4, crouch: 4, lift: 0.1, slide: 0.03, hip: -0.02 },
     { phase: STARTUP, at: 1, ease: 'inOut', blade: -175, lean: -8, crouch: 6, lift: 0.17, slide: 0.04, hip: -0.03 },
@@ -411,6 +431,13 @@ const juggernautKeyframes = {
     { phase: ACTIVE, at: 0.5, ease: 'in', blade: -30, lean: 3, crouch: 6, reach: 0.06, lift: 0.03, step: 0.02 },
     { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 30, lean: 7, crouch: 8, reach: 0.09, step: 0.03, hip: 0.02 },
     { phase: RECOVERY, at: 0.25, ease: 'outQuad', blade: 33, lean: 7, crouch: 8, reach: 0.09, step: 0.03, hip: 0.02 },
+  ],
+  light2: [
+    { phase: STARTUP, at: 0, blade: 10 },
+    { phase: STARTUP, at: 1, ease: 'out', blade: 95, lean: -2, crouch: 10, slide: 0.015, hip: -0.015 },
+    { phase: ACTIVE, at: 0.5, ease: 'in', blade: 30, lean: 4, crouch: 9, reach: 0.07, step: 0.02, hip: 0.01 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: -45, lean: 10, crouch: 5, reach: 0.11, lift: 0.05, step: 0.04, hip: 0.025 },
+    { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: -50, lean: 10, crouch: 5, reach: 0.1, lift: 0.05, step: 0.04, hip: 0.025 },
   ],
   heavy: [
     { phase: STARTUP, at: 0.6, ease: 'out', blade: -150, lean: -4, crouch: 8, lift: 0.14, slide: 0.03, hip: -0.025 },
@@ -454,6 +481,13 @@ const fencerKeyframes = {
     { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: 25, lean: 6, reach: 0.11, step: 0.05, hip: 0.015 },
   ],
   thrust: fencerThrust,
+  light2: [
+    { phase: STARTUP, at: 0, blade: -25 },
+    { phase: STARTUP, at: 1, ease: 'out', blade: 80, lean: -2, crouch: 4, slide: 0.02, hip: -0.01 },
+    { phase: ACTIVE, at: 0.5, ease: 'in', blade: 20, lean: 4, crouch: 3, reach: 0.08, step: 0.03, hip: 0.01 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: -50, lean: 9, reach: 0.13, lift: 0.04, step: 0.05, hip: 0.02 },
+    { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: -55, lean: 9, reach: 0.12, lift: 0.04, step: 0.05, hip: 0.02 },
+  ],
   heavy: [
     { phase: STARTUP, at: 0.6, ease: 'out', blade: -125, lean: -4, lift: 0.1, slide: 0.02, hip: -0.015 },
     { phase: STARTUP, at: 1, ease: 'inOut', blade: -148, lean: -5, lift: 0.14, slide: 0.03, hip: -0.02 },
@@ -489,6 +523,14 @@ const dancerKeyframes = {
     { phase: ACTIVE, at: 1, ease: 'outQuad', blade: -90, lean: 12, reach: 0.11, lift: 0.05, step: 0.06, hip: 0.025, offHand: 0.6, offHandDegrees: 160 },
     { phase: RECOVERY, at: 0.35, ease: 'outQuad', blade: -100, lean: 12, reach: 0.1, lift: 0.05, step: 0.06, hip: 0.025, offHand: 0.3, offHandDegrees: 120 },
   ],
+  light3: [
+    { phase: STARTUP, at: 0, blade: -110 },
+    { phase: STARTUP, at: 1, ease: 'out', blade: -160, lean: -4, lift: 0.1, slide: 0.03, hip: -0.02 },
+    { phase: ACTIVE, at: 0.5, ease: 'in', blade: -60, lean: 8, reach: 0.09, lift: 0.05, step: 0.06, hip: 0.02 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 30, lean: 15, reach: 0.15, step: 0.1, hip: 0.04 },
+    { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: 40, lean: 15, reach: 0.14, step: 0.1, hip: 0.04 },
+    { phase: RECOVERY, at: 1, ease: 'inOut', twirl: 360 },
+  ],
   heavy: [
     { phase: STARTUP, at: 0.5, ease: 'out', blade: -125, lean: -2, crouch: 2, lift: 0.1, slide: 0.03, hip: -0.02 },
     { phase: STARTUP, at: 1, ease: 'inOut', blade: -160, lean: -5, crouch: 4, lift: 0.15, slide: 0.04, hip: -0.025 },
@@ -518,11 +560,13 @@ const strikerKeyframes = {
     { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: 0, lean: 13, crouch: 4, reach: 0.13, lift: 0.03, step: 0.07, hip: 0.03 },
   ],
   light2: [
-    { phase: STARTUP, at: 1, ease: 'out', blade: 105, lean: 6, crouch: 12, slide: 0.025, hip: -0.015 },
-    { phase: ACTIVE, at: 0.5, ease: 'in', blade: 55, lean: 11, crouch: 10, reach: 0.1, step: 0.05, hip: 0.015 },
-    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 28, lean: 17, crouch: 13, reach: 0.18, step: 0.09, hip: 0.035 },
-    { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: 32, lean: 16, crouch: 13, reach: 0.16, step: 0.09, hip: 0.035 },
+    { phase: STARTUP, at: 0, blade: 60 },
+    { phase: STARTUP, at: 1, ease: 'inOut', blade: -65, lean: -2, crouch: 2, lift: 0.08, slide: 0.02, hip: -0.015 },
+    { phase: ACTIVE, at: 0.5, ease: 'in', blade: -10, lean: 7, crouch: 6, reach: 0.08, lift: 0.04, step: 0.05, hip: 0.015 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 60, lean: 14, crouch: 10, reach: 0.13, step: 0.07, hip: 0.03 },
+    { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: 70, lean: 14, crouch: 10, reach: 0.12, step: 0.07, hip: 0.03 },
   ],
+  light3: chainThrust(70),
   heavy: [
     { phase: STARTUP, at: 0.6, ease: 'out', blade: 115, lean: 8, crouch: 10, slide: 0.03, hip: -0.01 },
     { phase: STARTUP, at: 1, ease: 'inOut', blade: 135, lean: 12, crouch: 14, slide: 0.04, hip: -0.02 },
