@@ -721,6 +721,7 @@ O total máximo impede um protagonista com tudo no teto: ele termina forte, mas 
 - Não aparecem na seleção até serem liberados. Liberação salva no navegador (`settings.unlockedCharacters`).
 - **Pela História**: vencer o Soberano libera o Soberano; vencer o Predestinado (final secreto) libera o Predestinado; terminar a campanha pelo Caminho da Aurora (qualquer final) libera o Ancião.
 - **Pelo segredo da intro**: uma sequência digitada no teclado, feita no direcional/stick ou tocando o título várias vezes libera os três de uma vez, com som e frase próprios. As sequências ficam em `src/config/secretsConfig.js`; a tela não dá pista.
+- **Segredo dos trajes**: outra sequência na tela de abertura (teclado, direcional ou toques na frase abaixo do título) libera todas as cores de lâmina e trajes de uma vez. Desde a 2.20 ele tem som próprio (arpejo claro subindo), diferente do acorde grave do segredo dos personagens.
 - **Final secreto**: na História, vencer o Soberano com mais de 75% de vida leva ao duelo contra o Predestinado em vez do final normal. Esse duelo usa sempre a IA de chefe, em qualquer dificuldade.
 - **Trajes**: outra sequência da intro (teclado, direcional ou toques na frase de apoio) libera todas as skins de todos os personagens, sem mexer nas cores de lâmina.
 - Equilíbrio com poderes ligados (40 duelos por par, v1.19): médias Normal/Difícil de 78,9% para o Ancião, 82,5% para o Soberano e 87,5% para o Predestinado. Ordem Ancião < Soberano < Predestinado, todos acima do elenco; tabela por dificuldade na ARCHITECTURE.

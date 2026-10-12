@@ -276,6 +276,13 @@ export const audioConfig = {
       { type: 'tone', wave: 'sine', from: 880, to: 990, duration: 1, attack: 0.25, gain: 0.06, filter: null },
       { type: 'tone', wave: 'triangle', from: 55, to: 55, duration: 1.2, attack: 0.05, gain: 0.12, filter: null },
     ],
+    secretWardrobe: [
+      { type: 'tone', wave: 'triangle', from: 784, to: 784, duration: 0.22, attack: 0.005, gain: 0.08, filter: null },
+      { type: 'tone', wave: 'triangle', from: 988, to: 988, duration: 0.32, attack: 0.1, gain: 0.07, filter: null },
+      { type: 'tone', wave: 'triangle', from: 1175, to: 1175, duration: 0.42, attack: 0.2, gain: 0.07, filter: null },
+      { type: 'tone', wave: 'sine', from: 1568, to: 1568, duration: 0.7, attack: 0.3, gain: 0.05, filter: null },
+      { type: 'noise', duration: 0.6, attack: 0.25, gain: 0.05, filter: { type: 'highpass', from: 6000, to: 9000, q: 0.7 } },
+    ],
     feint: [
       { type: 'noise', duration: 0.12, attack: 0.01, gain: 0.22, filter: { type: 'bandpass', from: 1800, to: 3200, q: 2 } },
     ],

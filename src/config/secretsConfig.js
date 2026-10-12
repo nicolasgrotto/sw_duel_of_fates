@@ -25,7 +25,7 @@ export const secretsConfig = {
     { id: 'wardrobeTouch', reward: 'wardrobe', tokens: Array.from({ length: TAGLINE_TAPS }, () => SecretToken.tap('tagline')) },
   ],
   rewards: {
-    balance: { unlocks: ['elder', 'sovereign', 'foretold'], message: 'balance' },
-    wardrobe: { allSkins: true, message: 'wardrobe' },
+    balance: { unlocks: ['elder', 'sovereign', 'foretold'], message: 'balance', sound: 'secret' },
+    wardrobe: { allSkins: true, message: 'wardrobe', sound: 'secretWardrobe' },
   },
 };

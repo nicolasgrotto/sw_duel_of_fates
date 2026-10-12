@@ -83,7 +83,7 @@ export class IntroState extends GameState {
     }
   }
 
-  reward({ unlocks = [], allSkins = false, message }) {
+  reward({ unlocks = [], allSkins = false, message, sound }) {
     const { settings } = this.game;
     const current = settings.unlockedCharacters ?? [];
     const fresh = unlocks.filter((id) => !current.includes(id));
@@ -97,7 +97,7 @@ export class IntroState extends GameState {
     this.message = texts.intro.secrets[message][changed ? 'unlocked' : 'known'];
     this.messageTime = introConfig.secret.messageDuration;
     this.time = Math.max(this.time, introConfig.prompt.start);
-    this.game.audio.play(SoundName.SECRET);
+    this.game.audio.play(sound ?? SoundName.SECRET);
   }
 
   render(renderer) {

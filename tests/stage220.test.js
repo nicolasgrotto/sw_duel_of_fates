@@ -81,3 +81,16 @@ describe('gallery descriptions', () => {
     }
   });
 });
+
+describe('wardrobe secret sound', () => {
+  it('gives each secret reward its own unlock sound', async () => {
+    const { secretsConfig } = await import('../src/config/secretsConfig.js');
+    const { SoundName } = await import('../src/audio/soundNames.js');
+    const { audioConfig } = await import('../src/config/audioConfig.js');
+    const { balance, wardrobe } = secretsConfig.rewards;
+    assert.equal(balance.sound, SoundName.SECRET);
+    assert.equal(wardrobe.sound, SoundName.SECRET_WARDROBE);
+    assert.notEqual(balance.sound, wardrobe.sound);
+    assert.ok(audioConfig.sounds[wardrobe.sound].length > 0);
+  });
+});

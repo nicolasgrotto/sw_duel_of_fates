@@ -53,6 +53,7 @@ export const SoundName = Object.freeze({
   STORM_MARK: 'stormMark',
   STORM_STRIKE: 'stormStrike',
   SECRET: 'secret',
+  SECRET_WARDROBE: 'secretWardrobe',
   UI_MOVE: 'uiMove',
   UI_CONFIRM: 'uiConfirm',
 });
