@@ -16,7 +16,7 @@ function setup() {
 }
 it('scales shield capacity without extending the maximum duration or limiting actions', () => {
   const s = setup(); s.target.stats.power.potency = 1.5; s.combat.powers.applySelf(s.target,power);
-  assert.equal(s.target.combat.sanctuaryShield,45); assert.equal(s.target.combat.sanctuaryTime,6);
+  assert.equal(s.target.combat.sanctuaryShield,power.shield*1.5); assert.equal(s.target.combat.sanctuaryTime,6);
   assert.equal(s.target.canAct,true);
 });
 for (const state of [FighterState.IDLE,FighterState.ATTACKING,FighterState.CASTING,FighterState.CHANNELING]) it('preserves ' + state + ' while shield remains without spending wrath armor', () => {
@@ -33,8 +33,9 @@ for (const state of [FighterState.IDLE,FighterState.ATTACKING,FighterState.CASTI
 for (const source of ['blade','power','periodic']) it('absorbs ' + source + ' damage before health and passes only overflow on break', () => {
   const s = setup(); const health = s.target.health;
   const c = { attacker:s.caster,defender:s.target,attack:s.caster.moves.light,attackType:'light' };
-  assert.equal(s.combat.applyDamage(c,10,source),false); assert.equal(s.target.health,health);
-  assert.equal(s.combat.applyDamage(c,25,source),true); assert.equal(s.target.health,health-5);
+  const first = power.shield / 2;
+  assert.equal(s.combat.applyDamage(c,first,source),false); assert.equal(s.target.health,health);
+  assert.equal(s.combat.applyDamage(c,power.shield,source),true); assert.equal(s.target.health,health-first);
   assert.equal(s.target.combat.sanctuaryShield,0); assert.equal(s.target.combat.sanctuaryEnd,'broken');
   assert.equal(s.combat.events.filter(e => e.type === CombatEvent.SANCTUARY_BREAK).length,1);
   s.combat.applyDamage(c,1,source);
@@ -68,7 +69,7 @@ it('expires with its own event and survives snapshot but clears on death and rou
   s.combat.statuses.update([s.caster,s.target],power.duration);
   assert.equal(s.target.combat.sanctuaryShield,0);
   assert.equal(s.combat.events.filter(e => e.type === CombatEvent.SANCTUARY_END).length,1);
-  restoreFighter(s.target,snap); assert.equal(s.target.combat.sanctuaryShield,30);
+  restoreFighter(s.target,snap); assert.equal(s.target.combat.sanctuaryShield,power.shield);
   s.combat.statuses.onDeath(s.target); assert.equal(s.target.combat.sanctuaryShield,0);
   s.combat.powers.applySelf(s.target,power); s.target.resetForRound(620,-1); assert.equal(s.target.combat.sanctuaryShield,0);
 });

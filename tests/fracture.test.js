@@ -45,7 +45,7 @@ for(const defense of ['guard','absorb','barrier','dodge','storm'])it('passes thr
 });
 it('still sends ground damage through Sanctuary without interrupting its remaining shield',()=>{
   const s=setup();launch(s);s.combat.powers.applySelf(s.target,powersConfig.powers.sanctuary);firstBurst(s);
-  assert.equal(s.target.health,s.target.stats.maxHealth);assert.equal(s.target.combat.sanctuaryShield,30-power.damage);
+  assert.equal(s.target.health,s.target.stats.maxHealth);assert.equal(s.target.combat.sanctuaryShield,powersConfig.powers.sanctuary.shield-power.damage);
   assert.equal(s.target.state,FighterState.IDLE);assert.equal(s.target.grounded,true);
 });
 it('checks grounded feet rather than the hurtbox, never the caster or someone behind',()=>{

@@ -62,7 +62,7 @@ it('protects only escape preparation from melee and thrown blades and leaves pow
 });
 it('pays once, deals reduced escape damage and starts its own cooldown at finish', () => {
   const s = setup(); s.caster.state = FighterState.HIT; s.combat.powers.tryCast(s.caster);
-  assert.equal(s.caster.flowMeter, 25);
+  assert.equal(s.caster.flowMeter, 100 - power.cost);
   s.caster.stateTime = power.escape.startup; s.combat.powers.resolve([s.caster,s.target], STEP);
   assert.equal(s.target.health, s.target.stats.maxHealth - power.escape.damage);
   const snap = captureFighter(s.caster); s.caster.clearPower(); restoreFighter(s.caster, snap);

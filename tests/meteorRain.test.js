@@ -22,7 +22,7 @@ for(const [level,count] of [[6,5],[7,5],[8,6],[9,6],[10,7]])it('schedules '+coun
   assert.equal(marks.length,count);assert.equal(marks[0].impactTime,power.startup+power.strikeWarning);
   assert.ok(Math.abs(marks.at(-1).impactTime-power.startup-power.active)<1e-12);
   assert.equal(s.combat.events.filter(e=>e.type===CombatEvent.RAIN_CALL).length,1);
-  assert.equal(s.caster.state,FighterState.IDLE);assert.equal(s.caster.flowMeter,30);
+  assert.equal(s.caster.state,FighterState.IDLE);assert.equal(s.caster.flowMeter,100-power.cost);
 });
 it('requires minimum flow and remains interruptible until invocation ends',()=>{
   const low=setup(5);assert.equal(low.combat.powers.tryCast(low.caster),false);

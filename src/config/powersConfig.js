@@ -35,9 +35,9 @@ export const powersConfig = {
     },
     meteorRain: {
       id: 'meteorRain', effect: 'meteorRain', channel: false, pose: 'invoke', interaction: 'storm', around: true,
-      minFlowLevel: 6, cost: 70, startup: 0.8, active: 4, recovery: 0.5, range: Infinity,
+      minFlowLevel: 6, cost: 80, startup: 0.8, active: 4, recovery: 0.5, range: Infinity,
       rainPhases: { invocation: 0.8, rain: 4, recovery: 0.5 }, markedRain: true,
-      damage: 9, knockback: 500, stagger: 0.3, strikeWarning: 0.6, strikeWidth: 120, barrierDrainPerStrike: 30,
+      damage: 7, knockback: 500, stagger: 0.3, strikeWarning: 0.6, strikeWidth: 120, barrierDrainPerStrike: 30,
       strikesByTier: [{ minLevel: 3, strikes: 5 }, { minLevel: 8, strikes: 6 }, { minLevel: 10, strikes: 7 }],
       strikeOffsets: [0, -40, 30, -20, 50, -50, 20], markEvent: 'rainMark', strikeEvent: 'rainStrike', hudMark: 'powerCostMeteor',
     },
@@ -48,7 +48,7 @@ export const powersConfig = {
     },
     sanctuary: {
       id: 'sanctuary', effect: 'sanctuary', channel: false, pose: 'barrier', self: true,
-      cost: 65, startup: 0.3, active: 0.08, recovery: 0.3, duration: 6, shield: 30, controlCost: 10,
+      cost: 65, startup: 0.3, active: 0.08, recovery: 0.3, duration: 6, shield: 20, controlCost: 10,
       hudMark: 'powerCostSanctuary',
     },
     mindTwist: {
@@ -75,8 +75,8 @@ export const powersConfig = {
     },
     supremePush: {
       id: 'supremePush', effect: 'supremePush', channel: false, pose: 'cast', interaction: 'push', around: true,
-      cost: 75, cooldown: 6, startup: 0.25, active: 0.08, recovery: 0.34, range: 240,
-      damage: 10, knockback: 1100, stagger: 0.45, guard: { staminaCost: 12 },
+      cost: 60, cooldown: 6, startup: 0.25, active: 0.08, recovery: 0.34, range: 240,
+      damage: 14, knockback: 1100, stagger: 0.45, guard: { staminaCost: 12 },
       escape: { startup: 0.1, damage: 4, bladeInvulnerable: true }, hudMark: 'powerCostSupremePush',
     },
     push: {
@@ -105,8 +105,8 @@ export const powersConfig = {
     },
     choke: {
       id: 'choke', effect: 'choke', control: true, channel: true, requiresHold: true, boundChannel: true, pose: 'grip', interaction: 'choke',
-      cost: 45, drainPerSecond: 20, startup: 0.3, maxChannel: 1.8, recovery: 0.25, range: 240,
-      damage: 2, damagePerSecond: 2,
+      cost: 45, drainPerSecond: 10, startup: 0.3, maxChannel: 1.8, recovery: 0.25, range: 240,
+      damage: 2, damagePerSecond: 3,
       guard: { staminaCost: 14 },
     },
     freeze: {
