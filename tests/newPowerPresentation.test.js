@@ -486,3 +486,17 @@ describe('fracture presentation', () => {
     assert.ok(pose.freeHandY > pose.shoulderY + fighter.height * 0.25);
   });
 });
+
+describe('power names', () => {
+  it('names every power of the catalog in both languages and keeps power ids out of the arena names', async () => {
+    const { ptBR } = await import('../src/config/locales/ptBR.js');
+    const { en } = await import('../src/config/locales/en.js');
+    const { arenas } = await import('../src/arenas/arenaData.js');
+    for (const locale of [ptBR, en]) {
+      for (const id of Object.keys(powersConfig.powers)) {
+        assert.equal(typeof locale.ui.powers[id], 'string', `${locale.id}/${id}`);
+        if (!arenas[id]) assert.equal(locale.ui.arenas[id], undefined, `${locale.id}/${id}`);
+      }
+    }
+  });
+});
