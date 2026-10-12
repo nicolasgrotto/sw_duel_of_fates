@@ -202,6 +202,20 @@ As técnicas de lâmina ganham trilhas de poses-chave (sistema da 2.12) válidas
 
 Todo o elenco passa ao sistema de trilhas da 2.12, agrupado em **famílias de movimento**: personagens com o mesmo jeito de lutar compartilham postura, trilhas, defesa, esquiva, disputa e vitória da disputa; a diferença entre eles continua vindo da silhueta, da lâmina, dos golpes e da habilidade. Frame data, alcance e hitboxes não mudam; a lâmina tem de passar pela hitbox real no ativo e nenhuma transição gira mais de 60° por frame. O estilo `standard` continua existindo, idêntico à v2, mas nenhum personagem o usa mais.
 
+**Combos (pedido do autor na conferência da 2.6).** Golpes rápidos seguidos nunca repetem o arco: cada passo da cadeia tem trilha própria (pelo tipo, `light2`, `light3`), e um teste exige mais de 30° de diferença no começo ou no fim do ativo entre um passo e o seguinte.
+
+| Família | 1º | 2º | 3º |
+| --- | --- | --- | --- |
+| `guardian` | de cima | reverso, de baixo para cima | estocada (Predestinado) |
+| `wasp` | de cima | reverso | estocada; o 4º é reverso e o 5º fecha com giro da lâmina |
+| `aggressor` | de cima, largo | ascendente | estocada com passo |
+| `juggernaut` | golpe curto de cima | ascendente pesado | — |
+| `fencer` | diagonal (Espelho) ou estocada (Haste, Soberano) | ascendente | — |
+| `dancer` | de cima | reverso | corte largo de trás do ombro com giro da lâmina |
+| `striker` | de baixo | de cima | estocada (Brasa) |
+
+Uma trilha encadeada pode declarar a pose de partida (chave na preparação em `at: 0`), entre o fim do golpe anterior e a guarda; é isso que deixa a Brasa ir de um corte de baixo para um de cima sem girar mais de 60° num frame.
+
 **Decisões da implementação (2.6).** Nas cadeias, o fim de um golpe e a preparação do seguinte ficam a menos de ~150° um do outro, e o fim do golpe fica a menos de ~120° da guarda do personagem; com mais que isso a mistura de encadeamento gira mais de 60° num frame. Por isso a Brasa e o Eco, de guarda baixa, encadeiam golpes ascendentes (o rápido termina na linha do peito, não acima da cabeça), e a preparação do reverso da Garça é curta. O corte rápido de cada família não cobre a estocada da Haste e do Soberano: a trilha pelo tipo do golpe só vale quando o tipo difere da base do golpe (`light2`, `light5`), e o resto segue pela pose (`thrust`, `sweep`, `hammer`, `impetus`).
 
 | Família | Personagens | Intenção | Como aparece |
