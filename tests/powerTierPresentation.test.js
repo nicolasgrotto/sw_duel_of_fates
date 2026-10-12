@@ -297,12 +297,14 @@ describe('stone cluster', () => {
 });
 
 describe('stone size', () => {
-  it('draws the smaller sizes larger than their hitbox so the stones read at every tier', () => {
+  it('draws every size larger than its hitbox and the single stones of the top sizes larger', () => {
     const { sizes } = projectilesConfig.throw;
     const { drawScale } = projectilesConfig.render.rocks;
     const drawn = sizes.map((size) => size.radius * drawScale[size.id]);
     for (let index = 1; index < drawn.length; index += 1) assert.ok(drawn[index] > drawn[index - 1]);
-    assert.ok(sizes.slice(0, -1).every((size) => drawScale[size.id] > 1));
-    assert.equal(drawScale.max, 1);
+    assert.ok(sizes.every((size) => drawScale[size.id] > 1));
+    const stone = (size) => size.radius * drawScale[size.id] * Math.min(...projectilesConfig.render.rocks.layouts[projectilesConfig.render.rocks.bySize[size.id] - 1].filter((_, index) => index % 3 === 2));
+    const byId = Object.fromEntries(sizes.map((size) => [size.id, stone(size)]));
+    assert.ok(byId.huge > byId.large * 1.15 && byId.max > byId.large * 1.15);
   });
 });
