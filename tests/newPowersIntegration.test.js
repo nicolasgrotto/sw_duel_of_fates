@@ -49,7 +49,8 @@ for (const level of [6, 8, 10]) {
         assert.deepEqual(fighters.map(captureFighter), expected);
         assert.deepEqual(replayedEvents, recordedEvents);
         if (startFrame === 0) {
-          const count = powersConfig.powers.storm.strikesByTier.findLast(band => level >= band.minLevel).strikes;
+          const count = powersConfig.powers.storm.strikesByTier.findLast(band => level >= band.minLevel).strikes
+            * powersConfig.powers.storm.boltsByTier.findLast(band => level >= band.minLevel).bolts;
           assert.equal(recordedEvents.filter(event => event.type === CombatEvent.STORM_MARK).length, count);
           assert.equal(recordedEvents.filter(event => event.type === CombatEvent.STORM_STRIKE).length, count);
         }
@@ -98,8 +99,9 @@ it('gallery storm keeps its real marks, bypasses Absorb and blocking, then ends 
     const s = scene('storm', target, 3);
     s.requestCast();
     const events = stepGallery(s, 450);
-    assert.equal(events.filter(event => event.type === CombatEvent.STORM_MARK).length, 12);
-    assert.equal(events.filter(event => event.type === CombatEvent.STORM_STRIKE).length, 12);
+    const count = powersConfig.powers.storm.strikesByTier.at(-1).strikes * powersConfig.powers.storm.boltsByTier.at(-1).bolts;
+    assert.equal(events.filter(event => event.type === CombatEvent.STORM_MARK).length, count);
+    assert.equal(events.filter(event => event.type === CombatEvent.STORM_STRIKE).length, count);
     assert.ok(events.some(event => event.type === CombatEvent.POWER_HIT), target);
     assert.equal(s.director.phase, 'ready');
     assert.equal(s.fighters[0].combat.stormPhase, null);
@@ -121,7 +123,7 @@ it('F3 reads Absorb, confusion and pending storm marks in gallery and normal due
   let lines = view.getDebugInfo();
   assert.ok(lines.some(line => line.includes('phase: storm')));
   assert.ok(lines.some(line => line.includes('confuse 0.80')));
-  assert.ok(lines.some(line => line.includes('marks 1')));
+  assert.ok(lines.some(line => line.includes('marks '+powersConfig.powers.storm.boltsByTier.at(-1).bolts)));
   view.gallery = null;
   view.game = { input: { lastInputKind: 'keyboard' }, settings: { difficulty: 'normal' } };
   view.rules = { powers: true };

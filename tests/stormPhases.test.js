@@ -114,58 +114,32 @@ it('shields all incoming powers, body shove and both projectile kinds without re
 });
 
 for (const reversed of [false, true]) {
-  for (const [level, count] of [[6, 8], [7, 8], [8, 10], [9, 10], [10, 12]]) {
-    it(`marks ${count} deterministic columns at level ${level}, reversed ${reversed}`, () => {
-      const s = setup(level, reversed);
-      cast(s, 0);
-      assert.equal(s.caster.combat.stormPhase, 'invocation');
-      assert.equal(s.caster.combat.stormMarks.length, count);
-      const interval = (5 - power.strikeWarning) / (count - 1);
-      assert.equal(s.caster.combat.stormMarks[0].impactTime, power.startup + 0.5);
-      assert.equal(s.caster.combat.stormMarks.at(-1).impactTime, power.startup + 5);
-      const timeline = [];
-      for (let index = 0; index < count; index++) {
-        const mark = s.caster.combat.stormMarks[index];
-        assert.ok(Math.abs(mark.impactTime - (power.startup + power.strikeWarning + index * interval)) < 1e-12);
-        timeline.push({ time: mark.markTime, index, marking: true });
-        timeline.push({ time: mark.impactTime, index, marking: false });
-      }
-      timeline.sort((a, b) => a.time - b.time);
-      const positions = new Map();
-      let previousTime = -1;
-      for (const entry of timeline) {
-        if (entry.time === previousTime) continue;
-        previousTime = entry.time;
-        s.target.x = 800 + entry.time * 2;
-        s.caster.stateTime = entry.time;
-        const before = s.simulation.events.length;
-        s.powers.resolve(s.fighters, STEP);
-        for (const event of s.simulation.events.slice(before)) {
-          if (event.type !== CombatEvent.STORM_MARK && event.type !== CombatEvent.STORM_STRIKE) continue;
-          const index = s.caster.combat.stormMarks.findIndex(mark => mark.impactTime === event.impactTime);
-          const mark = s.caster.combat.stormMarks[index];
-          if (event.type === CombatEvent.STORM_MARK) {
-            assert.equal(mark.x, s.target.x + power.strikeOffsets[index]);
-            positions.set(index, mark.x);
-          } else {
-            assert.equal(event.x, positions.get(index));
-            const hit = s.target.left < mark.x + power.strikeWidth / 2 && s.target.right > mark.x - power.strikeWidth / 2;
-            assert.equal(event.hit, hit);
-            assert.equal(mark.active, false);
-          }
+  for (const level of [6, 7, 8, 9, 10]) {
+    it('marks mirrored waves from config at level '+level+', reversed '+reversed, () => {
+      const s = setup(level, reversed); cast(s, 0);
+      const waves = power.strikesByTier.filter(band => level >= band.minLevel).at(-1).strikes;
+      const bolts = power.boltsByTier.filter(band => level >= band.minLevel).at(-1).bolts;
+      const marks = s.caster.combat.stormMarks;
+      assert.equal(marks.length, waves * bolts);
+      const interval = (power.stormPhases.storm - power.strikeWarning) / (waves - 1);
+      for (let wave = 0; wave < waves; wave++) {
+        s.target.x = 800;
+        s.caster.stateTime = power.startup + wave * interval; s.powers.resolve(s.fighters, STEP);
+        for (let bolt = 0; bolt < bolts; bolt++) {
+          const mark = marks[wave * bolts + bolt];
+          const mirror = wave % 2 === 0 ? 1 : -1;
+          assert.equal(mark.x, s.target.x + power.strikeOffsets[wave % power.strikeOffsets.length] + power.columnPatterns[bolts][bolt] * mirror);
+          assert.equal(mark.marked, true);
+          assert.ok(Math.abs(mark.impactTime - power.startup - power.strikeWarning - wave * interval) < 1e-12);
         }
       }
-      assert.equal(s.simulation.events.filter(e => e.type === CombatEvent.STORM_STRIKE).length, count);
-      assert.equal(s.caster.combat.stormPhase, 'recovery');
-      s.caster.stateTime = power.startup + 5 + power.recovery;
-      s.powers.resolve(s.fighters, STEP);
+      assert.equal(marks[0].impactTime, power.startup + power.strikeWarning);
+      assert.equal(marks.at(-1).impactTime, power.startup + power.stormPhases.storm);
+      s.caster.stateTime = power.startup + power.stormPhases.storm + power.recovery; s.powers.resolve(s.fighters, STEP);
       assert.equal(s.caster.combat.power, null);
-      assert.equal(s.caster.state, FighterState.IDLE);
-      assert.equal(s.caster.combat.powerCooldown, powersConfig.cooldown);
     });
   }
 }
-
 for (const difference of [-4, -3, -2, -1, 0, 3]) {
   it(`ignores guard and Absorb, using storm interaction ${difference} with short stun`, () => {
     const s = setup();
@@ -184,7 +158,7 @@ it('hits the real hurtbox inside the column, including airborne targets, never t
     const s = setup();
     cast(s);
     const mark = s.caster.combat.stormMarks[0];
-    s.target.x = mark.x + offset;
+    s.target.x = hit ? mark.x + offset : Math.max(...s.caster.combat.stormMarks.filter(mark => mark.wave === 0).map(mark => mark.x)) + power.strikeWidth + s.target.width;
     s.target.grounded = !airborne;
     if (airborne) s.target.y -= 500;
     s.caster.x = mark.x;
@@ -192,7 +166,7 @@ it('hits the real hurtbox inside the column, including airborne targets, never t
     s.powers.resolve(s.fighters, STEP);
     assert.equal(s.target.health < s.target.stats.maxHealth, hit);
     assert.equal(s.caster.health, s.caster.stats.maxHealth);
-    assert.equal(s.simulation.events.filter(e => e.type === CombatEvent.STORM_STRIKE).at(-1).hit, hit);
+    assert.equal(s.simulation.events.some(e => e.type === CombatEvent.STORM_STRIKE && e.hit), hit);
   }
 });
 

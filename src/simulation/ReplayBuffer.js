@@ -21,6 +21,9 @@ export function captureFighter(fighter) {
     combat: {
       ...fighter.combat,
       fracture: fighter.combat.fracture ? { ...fighter.combat.fracture, segments: fighter.combat.fracture.segments.map(segment => ({ ...segment })) } : null,
+      fractures: fighter.combat.fractures.map(wave => ({ ...wave, segments: wave.segments.map(segment => ({ ...segment })) })),
+      stormWaveHits: [...fighter.combat.stormWaveHits],
+      stormFractureHits: [...fighter.combat.stormFractureHits],
       rain: fighter.combat.rain ? { ...fighter.combat.rain, marks: fighter.combat.rain.marks.map(mark => ({ ...mark })) } : null,
       stormMarks: fighter.combat.stormMarks.map(mark => ({ ...mark })),
     },
@@ -33,6 +36,9 @@ export function restoreFighter(fighter, snapshot) {
   Object.assign(fighter, scalars);
   Object.assign(fighter.combat, combat);
   fighter.combat.fracture = combat.fracture ? { ...combat.fracture, segments: combat.fracture.segments.map(segment => ({ ...segment })) } : null;
+  fighter.combat.fractures = combat.fractures.map(wave => ({ ...wave, segments: wave.segments.map(segment => ({ ...segment })) }));
+  fighter.combat.stormWaveHits = [...combat.stormWaveHits];
+  fighter.combat.stormFractureHits = [...combat.stormFractureHits];
   fighter.combat.rain = combat.rain ? { ...combat.rain, marks: combat.rain.marks.map(mark => ({ ...mark })) } : null;
   fighter.combat.stormMarks = combat.stormMarks.map(mark => ({ ...mark }));
   Object.assign(fighter.animation, animation);

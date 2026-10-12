@@ -14,6 +14,18 @@ export class FractureSystem {
     const direction = caster.facing;
     const start = caster.x + direction * caster.width / 2;
     const end = direction > 0 ? this.combat.arena.right : this.combat.arena.left;
+    caster.combat.fracture = this.createWave(caster, target, power, start, direction, end);
+    if (!this.advance(caster, target, caster.combat.fracture)) caster.combat.fracture = null;
+  }
+
+  launchAt(caster, target, power, start, direction, group) {
+    const end = direction > 0 ? Math.min(this.combat.arena.right, start + power.range)
+      : Math.max(this.combat.arena.left, start - power.range);
+    const wave = this.createWave(caster, target, power, start, direction, end, group);
+    if (this.advance(caster, target, wave)) caster.combat.fractures.push(wave);
+  }
+
+  createWave(caster, target, power, start, direction, end, group = null) {
     const distance = Math.max(0, direction * (end - start));
     const segments = Array.from({ length: Math.ceil(distance / power.segmentLength) }, (_, index) => {
       const near = start + direction * index * power.segmentLength;
@@ -22,38 +34,50 @@ export class FractureSystem {
       return { left: Math.min(near, far), right: Math.max(near, far), marked: false, burst: false,
         markTime, impactTime: markTime + power.fractureWarning };
     });
-    caster.combat.fracture = { power, direction, time: 0, target: this.combat.projectiles.fighters.indexOf(target), hit: false, segments };
-    this.advance(caster, target);
+    return { power, direction, time: 0, target: this.combat.projectiles.fighters.indexOf(target), hit: false, group, segments };
   }
 
   update(caster, fighters, dt) {
-    if (!caster.isAlive) { caster.combat.fracture = null; return; }
-    const wave = caster.combat.fracture;
-    wave.time += dt;
-    this.advance(caster, fighters[wave.target] ?? null);
+    if (!caster.isAlive) {
+      caster.combat.fracture = null;
+      caster.combat.fractures.length = 0;
+      return;
+    }
+    const primary = caster.combat.fracture;
+    if (primary) {
+      primary.time += dt;
+      if (!this.advance(caster, fighters[primary.target] ?? null, primary)) caster.combat.fracture = null;
+    }
+    const waves = caster.combat.fractures;
+    let remaining = 0;
+    for (const wave of waves) {
+      wave.time += dt;
+      if (this.advance(caster, fighters[wave.target] ?? null, wave)) waves[remaining++] = wave;
+    }
+    waves.length = remaining;
   }
 
-  advance(caster, target) {
-    const wave = caster.combat.fracture;
+  advance(caster, target, wave) {
     const time = wave.time + Number.EPSILON * Math.max(1, wave.time);
     let pending = false;
     for (const segment of wave.segments) {
       if (!segment.marked && time >= segment.markTime) {
         segment.marked = true;
-        this.emit(CombatEvent.FRACTURE_CRACK, caster, target, segment);
+        this.emit(CombatEvent.FRACTURE_CRACK, caster, target, wave, segment);
       }
       if (!segment.burst && time >= segment.impactTime) {
         segment.burst = true;
-        const hit = !wave.hit && target?.isAlive && target.grounded && target.x >= segment.left && target.x <= segment.right;
+        const hit = !wave.hit && !(wave.group !== null && caster.combat.stormFractureHits[wave.group]) && target?.isAlive && target.grounded && target.x >= segment.left && target.x <= segment.right;
         if (hit) {
           wave.hit = true;
+          if (wave.group !== null) caster.combat.stormFractureHits[wave.group] = true;
           this.strike(caster, target, wave.power);
         }
-        this.emit(CombatEvent.FRACTURE_BURST, caster, target, segment, Boolean(hit));
+        this.emit(CombatEvent.FRACTURE_BURST, caster, target, wave, segment, Boolean(hit));
       }
       pending ||= !segment.burst;
     }
-    if (!pending) caster.combat.fracture = null;
+    return pending;
   }
 
   strike(caster, target, power) {
@@ -71,8 +95,8 @@ export class FractureSystem {
     }
   }
 
-  emit(type, caster, target, segment, hit) {
-    this.combat.emit(type, { attacker: caster, defender: target, attackType: caster.combat.fracture.power.id,
+  emit(type, caster, target, wave, segment, hit) {
+    this.combat.emit(type, { attacker: caster, defender: target, attackType: wave.power.id,
       x: (segment.left + segment.right) / 2, y: this.combat.arena.floorY, impactTime: segment.impactTime, hit });
   }
 }

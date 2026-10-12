@@ -146,7 +146,7 @@ export class PowerSystem {
       return;
     }
     for (const caster of fighters) {
-      if (caster.combat.fracture) this.fractures.update(caster, fighters, dt);
+      if (caster.combat.fracture || caster.combat.fractures.length) this.fractures.update(caster, fighters, dt);
       if (caster.combat.rainActive) this.storms.updateRain(caster, fighters, dt);
       if (isUsingPower(caster) && caster.combat.power.reaction) {
         this.updateInstant(caster, null);
@@ -262,7 +262,7 @@ export class PowerSystem {
       return;
     }
     if (isBarrierUp(target)) {
-      if (power.markedRain) {
+      if (power.barrierDrainPerStrike) {
         target.flowMeter = Math.max(0, target.flowMeter - power.barrierDrainPerStrike);
         if (target.flowMeter === 0) target.combat.powerEndTime = target.stateTime;
       }

@@ -74,6 +74,25 @@ export function findIncomingProjectile(self, system, horizon) {
   return nearest;
 }
 
+export function findStormEscapeX(self, opponent, arena, margin) {
+  const marks = opponent.combat.stormMarks;
+  const clearance = opponent.combat.power.strikeWidth / 2 + self.width / 2 + margin;
+  let nearest = null;
+  let distance = Infinity;
+  for (const mark of marks) {
+    if (!mark.active) continue;
+    const preferred = Math.sign(self.x - mark.x) || -getDirectionTo(self, opponent);
+    for (const side of [preferred, -preferred]) {
+      const x = mark.x + side * clearance;
+      if (arena && (x < arena.left + self.width / 2 || x > arena.right - self.width / 2)) continue;
+      if (marks.some(other => other.active && Math.abs(x - other.x) < clearance)) continue;
+      const gap = Math.abs(x - self.x);
+      if (gap < distance) { nearest = x; distance = gap; }
+    }
+  }
+  return nearest;
+}
+
 export function findStormThreat(self, opponent, reactionTime, margin) {
   const power = opponent.combat.power;
   if (!power?.stormPhases) return null;

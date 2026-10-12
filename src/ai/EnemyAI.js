@@ -11,7 +11,7 @@ import { FighterState } from '../entities/fighterStates.js';
 import { canAfford, getStaminaCost } from '../systems/StaminaSystem.js';
 import { getMaxJumps } from '../systems/MovementSystem.js';
 import { HabitMemory } from './HabitMemory.js';
-import { canReach, findIncomingProjectile, findStormThreat, getAttackReach, getDirectionTo, getGap, getVulnerableTime, getTimeUntilAttackActive, isPunishable, isThreatening } from './perception.js';
+import { canReach, findIncomingProjectile, findStormEscapeX, findStormThreat, getAttackReach, getDirectionTo, getGap, getVulnerableTime, getTimeUntilAttackActive, isPunishable, isThreatening } from './perception.js';
 
 export const AiDecision = Object.freeze({
   BUSY: 'busy',
@@ -589,18 +589,27 @@ export class EnemyAI {
 
   tryJumpFracture() {
     const { self, opponent } = this;
-    const wave = opponent.combat.fracture;
-    if (!this.powersEnabled || !this.difficulty.powerAware || !wave || wave.hit || !self.grounded
+    if (!this.powersEnabled || !this.difficulty.powerAware || !self.grounded
       || !self.canMove && !(self.state === FighterState.BLOCKING && self.combat.blockstun === 0)) return null;
+    if (opponent.combat.fracture && this.jumpFromFracture(opponent.combat.fracture)) return AiDecision.JUMP;
+    for (const wave of opponent.combat.fractures) {
+      if (this.jumpFromFracture(wave)) return AiDecision.JUMP;
+    }
+    return null;
+  }
+
+  jumpFromFracture(wave) {
+    const { self, opponent } = this;
+    if (wave.hit || wave.group !== null && opponent.combat.stormFractureHits[wave.group]) return false;
     for (const segment of wave.segments) {
       if (!segment.marked || segment.burst || wave.time < segment.markTime + this.difficulty.reactionTime
         || wave.time >= segment.impactTime || self.x < segment.left || self.x > segment.right) continue;
       this.plan.blockTime = 0;
       this.plan.moveX = 0;
       this.plan.pendingAction = PendingAction.JUMP;
-      return AiDecision.JUMP;
+      return true;
     }
-    return null;
+    return false;
   }
 
   trySupremeEscape() {
@@ -722,11 +731,13 @@ export class EnemyAI {
     const margin = this.perception.stormEscapeMargin;
     const mark = findStormThreat(this.self, this.opponent, this.difficulty.reactionTime, margin);
     if (!mark) return null;
-    let direction = Math.sign(this.self.x - mark.x) || -getDirectionTo(this.self, this.opponent);
+    const destination = findStormEscapeX(this.self, this.opponent, this.arena, margin);
+    let direction = destination === null ? Math.sign(this.self.x - mark.x) || -getDirectionTo(this.self, this.opponent)
+      : Math.sign(destination - this.self.x);
     const clearance = this.opponent.combat.power.strikeWidth / 2 + this.self.width / 2 + margin;
     if (this.arena && (direction < 0 && mark.x - clearance < this.arena.left + this.self.width / 2
       || direction > 0 && mark.x + clearance > this.arena.right - this.self.width / 2)) direction = -direction;
-    const distance = clearance - Math.abs(this.self.x - mark.x);
+    const distance = destination === null ? clearance - Math.abs(this.self.x - mark.x) : Math.abs(destination - this.self.x);
     const time = mark.impactTime - this.opponent.stateTime;
     this.plan.blockTime = 0;
     this.plan.moveX = direction;
