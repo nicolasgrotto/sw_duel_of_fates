@@ -5,6 +5,7 @@ import { SoundName } from '../src/audio/soundNames.js';
 import { CombatEvent } from '../src/combat/combatEvents.js';
 import { effectsConfig } from '../src/config/effectsConfig.js';
 import { powersConfig } from '../src/config/powersConfig.js';
+import { projectilesConfig } from '../src/config/projectilesConfig.js';
 import { colors } from '../src/config/themeConfig.js';
 import { Camera } from '../src/core/Camera.js';
 import { FighterState } from '../src/entities/fighterStates.js';
@@ -508,23 +509,20 @@ describe('stage 2.19 presentation', () => {
     assert.equal(renderer.calls.filter((call) => call.name === 'polyline').length, 6);
   });
 
-  it('orbits the arsenal stones around the body, larger in front than behind', () => {
+  it('orbits the arsenal blades around the body, pointing out and longer in front than behind', () => {
     const caster = spawnFighter(400, 1, 'shadow');
     const power = powersConfig.powers.arsenal;
     caster.combat.arsenal = { power, angle: 0, time: power.orbit.period / 4, launchCooldown: 0, objects: [{ id: 0, offset: 0 }, { id: 1, offset: Math.PI }] };
+    caster.stats.flowLevel = 10;
     const renderer = recordingRenderer();
     new PowerRenderer().draw(renderer, [caster]);
-    const stones = renderer.calls.filter((call) => call.name === 'fillPolygon').map((call) => {
-      const xs = call.args[0].filter((_, index) => index % 2 === 0);
-      const ys = call.args[0].filter((_, index) => index % 2 === 1);
-      const cx = xs.reduce((sum, value) => sum + value, 0) / xs.length;
-      const cy = ys.reduce((sum, value) => sum + value, 0) / ys.length;
-      return { width: Math.max(...xs.map((x, index) => Math.hypot(x - cx, ys[index] - cy))), y: cy };
-    });
-    assert.equal(stones.length, 2);
-    const [front, back] = stones[0].y > stones[1].y ? stones : [stones[1], stones[0]];
-    assert.ok(front.width > back.width);
+    const blades = renderer.calls.filter((call) => call.name === 'line' && call.args[5] === projectilesConfig.render.energyBlade.width && call.args[4] === powersConfig.tiers[3].color);
+    assert.equal(blades.length, 2);
+    const length = (call) => Math.hypot(call.args[2] - call.args[0], call.args[3] - call.args[1]);
+    const [front, back] = blades[0].args[1] > blades[1].args[1] ? blades : [blades[1], blades[0]];
+    assert.ok(length(front) > length(back));
   });
+
 
   it('draws the cleave wave as a crescent in the saber color of its current owner', async () => {
     const { ProjectileRenderer } = await import('../src/rendering/ProjectileRenderer.js');
@@ -541,7 +539,7 @@ describe('stage 2.19 presentation', () => {
     assert.ok(Math.min(...xs) < projectile.x);
   });
 
-  it('flashes the reflector blade on a wave reflect and breaks a stone on an arsenal block', () => {
+  it('flashes the reflector blade on a wave reflect and sparks a blade on an arsenal block', () => {
     const effects = createEffects();
     const caster = spawnFighter(400, 1, 'guardian');
     const reflector = spawnFighter(700, -1, 'shadow');
@@ -550,7 +548,7 @@ describe('stage 2.19 presentation', () => {
     assert.ok(effects.rings.some((ring) => ring.active && ring.color === reflector.appearance.saberColor));
     const blocks = createEffects();
     blocks.handleEvents([{ type: CombatEvent.ARSENAL_BLOCK, attacker: caster, defender: reflector, attackType: 'throw', x: 650, y: 500 }]);
-    assert.ok(blocks.debris.particles.some((piece) => piece.active));
+    assert.ok(blocks.particles.particles.some((particle) => particle.active));
     assert.deepEqual(playedSounds([
       event(CombatEvent.POWER_START, reflector, null, 'arsenal'),
       event(CombatEvent.POWER_ACTIVE, caster, null, 'flowCleave'),

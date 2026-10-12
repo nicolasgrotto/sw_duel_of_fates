@@ -10,6 +10,7 @@ import { easeOutCubic } from '../utils/easing.js';
 import { TAU, clamp, lerp } from '../utils/math.js';
 import { createRandom } from '../utils/random.js';
 import { drawFighterBody } from './fighterRenderer.js';
+import { drawEnergyBlade } from './energyBlade.js';
 import { drawRockCluster, getRockCount, getRockScale } from './rockCluster.js';
 
 const style = powersConfig.render;
@@ -506,22 +507,18 @@ export class PowerRenderer {
     const orbit = arsenal.power.orbit;
     const tier = getPowerTier(fighter.flowLevel, powersConfig.tiers);
     const base = arsenal.angle + arsenal.time * TAU / orbit.period;
-    const radius = projectilesConfig.arsenal.radius * look.rockScale;
-    renderer.save();
-    renderer.setBlendMode('source-over');
+    const length = projectilesConfig.render.energyBlade.length;
     for (const object of arsenal.objects) {
       const angle = base + object.offset;
       const depth = (Math.sin(angle) + 1) / 2;
-      renderer.setAlpha(lerp(look.backAlpha, 1, depth));
-      drawRockCluster(
+      const offsetX = fighter.facing * Math.cos(angle) * orbit.radiusX;
+      const offsetY = Math.sin(angle) * orbit.radiusY;
+      drawEnergyBlade(
         renderer,
-        fighter.x + fighter.facing * Math.cos(angle) * orbit.radiusX,
-        fighter.y - fighter.height / 2 + Math.sin(angle) * orbit.radiusY,
-        radius * lerp(look.backScale, look.frontScale, depth),
-        angle * 2, 1, tier.color,
+        fighter.x + offsetX, fighter.y - fighter.height / 2 + offsetY,
+        Math.atan2(offsetY, offsetX), length * lerp(look.backScale, look.frontScale, depth), tier.color, lerp(look.backAlpha, 1, depth),
       );
     }
-    renderer.restore();
   }
 
   drawFracture(renderer, fighter, wave, floorY) {

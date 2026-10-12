@@ -3,6 +3,7 @@ import { saberStyle } from '../config/fighterVisualConfig.js';
 import { ProjectileKind, projectilesConfig } from '../config/projectilesConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { colors } from '../config/themeConfig.js';
+import { drawEnergyBlade } from './energyBlade.js';
 import { drawRockCluster, getRockCount, getRockScale } from './rockCluster.js';
 
 const style = projectilesConfig.render;
@@ -22,7 +23,7 @@ export class ProjectileRenderer {
         continue;
       }
       if (projectile.kind === ProjectileKind.THROW && projectile.source === 'arsenal') {
-        this.drawArsenalStone(renderer, projectile, owner);
+        this.drawArsenalBlade(renderer, projectile, owner);
       } else if (projectile.kind === ProjectileKind.THROW) {
         this.drawFragment(renderer, projectile, owner);
       } else if (projectile.kind === ProjectileKind.WAVE) {
@@ -40,10 +41,10 @@ export class ProjectileRenderer {
     drawRockCluster(renderer, projectile.x, projectile.y, projectile.radius * getRockScale(size.id), angle, getRockCount(size.id), tier.color);
   }
 
-  drawArsenalStone(renderer, projectile, owner) {
+  drawArsenalBlade(renderer, projectile, owner) {
     const tier = getPowerTier(owner.flowLevel, powersConfig.tiers);
-    const angle = projectile.age * style.fragmentSpin * (Math.sign(projectile.vx) || 1);
-    drawRockCluster(renderer, projectile.x, projectile.y, projectile.radius * style.arsenalRockScale, angle, 1, tier.color);
+    const blade = style.energyBlade;
+    drawEnergyBlade(renderer, projectile.x, projectile.y, projectile.age * blade.spin * (Math.sign(projectile.vx) || 1), blade.length, tier.color);
   }
 
   drawWave(renderer, projectile, owner) {
