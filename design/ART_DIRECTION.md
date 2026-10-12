@@ -251,6 +251,17 @@ Pose `BLADE_LOCK`, com números por estilo em `motionStyles[motion].lock` e `loc
 
 O perdedor usa a pose de desequilíbrio existente.
 
+### Ocaso (v2.7)
+
+Traje do Predestinado, nas duas variantes, sem vantagem e com a cor da lâmina independente. Intenção: presença austera, de quem já passou pelo fim; silhueta reconhecível do Predestinado, mais fechada e mais longa.
+
+- **Peças existentes:** capuz levantado (`hoodUp: true`), manto longo (`longCape: true`), sem máscara e sem ombreiras, para o rosto ficar na sombra do capuz e não atrás de uma peça.
+- **Peças novas (desenhadas aqui antes de implementar):**
+  - `layeredTunic`: uma segunda barra de túnica abaixo da cintura, na `trimColor`, com 6 px de altura lógica e começando a 60% da altura do tronco, acompanhando a inclinação do tronco e o balanço do manto. Lê como túnica em camadas sem novo contorno.
+  - `gloves`: mãos desenhadas na `trimColor` escurecida (o mesmo fator de sombra que o corpo já usa), nas duas mãos e na mão livre das trilhas; sem detalhe interno.
+- **Paleta (do personagem, como os outros trajes):** manto `#1c1a20`, corpo `#26222b`, acabamento bronze fosco `#7a6650`. Nenhum brilho, glow ou partícula própria.
+- **Id e nome:** id `skin-dusk`; nome de tela Ocaso / Dusk nas tabelas de texto.
+
 ## Camadas de arena como dados
 
 Cada arena descreve camadas estáticas de geometria em tokens da paleta existente. O renderer pré-renderiza essas camadas em canvases internos e as reutiliza. Partículas ambientes são poucas, lentas e pouco opacas, atrás dos corpos; não geram eventos nem colisão. A plataforma provisória mantém o desenho atual até a implementação da Plataforma de Refino.
