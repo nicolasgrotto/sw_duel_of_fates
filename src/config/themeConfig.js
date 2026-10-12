@@ -39,6 +39,8 @@ export const colors = {
   desaturateGray: '#808080',
   desaturateDim: '#000000',
   stormDarken: '#04060d',
+  sideLight: '#5aa2ff',
+  sideDark: '#ff4458',
   rockShade: '#1a2030',
   powerCostStorm: '#ffd76a',
   powerCostSupremePush: '#7ff0e0',
@@ -72,6 +74,12 @@ export const colors = {
 
 export const textStyles = {
   galleryDanger: { font: `20px ${FONT_FAMILY}`, color: colors.hudDanger, align: 'center', baseline: 'middle' },
+  galleryTitleAurora: { font: `28px ${FONT_FAMILY}`, color: colors.sideLight, align: 'center', baseline: 'middle' },
+  galleryTitleEclipse: { font: `28px ${FONT_FAMILY}`, color: colors.sideDark, align: 'center', baseline: 'middle' },
+  galleryCategoryFlow: { font: `20px ${FONT_FAMILY}`, color: colors.accent, align: 'center', baseline: 'middle' },
+  galleryCategoryAurora: { font: `20px ${FONT_FAMILY}`, color: colors.sideLight, align: 'center', baseline: 'middle' },
+  galleryCategoryEclipse: { font: `20px ${FONT_FAMILY}`, color: colors.sideDark, align: 'center', baseline: 'middle' },
+  galleryCategoryBlade: { font: `20px ${FONT_FAMILY}`, color: colors.textMuted, align: 'center', baseline: 'middle' },
   attributeLabel: { font: `18px ${FONT_FAMILY}`, color: colors.textMuted, align: 'left', baseline: 'middle' },
   attributeValue: { font: `18px ${FONT_FAMILY}`, color: colors.text, align: 'center', baseline: 'middle' },
   touchLabel: { font: `18px ${FONT_FAMILY}`, color: colors.textMuted, align: 'center', baseline: 'middle' },

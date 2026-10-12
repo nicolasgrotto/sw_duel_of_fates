@@ -12,6 +12,9 @@ function pickFooterCode(codes) {
   return codes.find((code) => code.startsWith('Arrow')) ?? codes[0] ?? '';
 }
 
+const CATEGORY_TITLES = { aurora: textStyles.galleryTitleAurora, eclipse: textStyles.galleryTitleEclipse };
+const CATEGORY_LABELS = { flow: textStyles.galleryCategoryFlow, aurora: textStyles.galleryCategoryAurora, eclipse: textStyles.galleryCategoryEclipse, blade: textStyles.galleryCategoryBlade };
+
 export class GalleryPanel {
   constructor(scene, input, onChange) {
     this.scene = scene;
@@ -92,7 +95,7 @@ export class GalleryPanel {
     const { director } = this.scene;
     const config = layout.gallery;
     renderer.text(texts.touch.colorLeft, config.previousX, layout.banner.titleY, textStyles.subtitle);
-    renderer.text(texts.powers[director.item.id], renderer.width / 2, layout.banner.titleY, textStyles.subtitle);
+    renderer.text(texts.powers[director.item.id], renderer.width / 2, layout.banner.titleY, CATEGORY_TITLES[director.item.category] ?? textStyles.subtitle);
     renderer.text(texts.touch.colorRight, config.nextX, layout.banner.titleY, textStyles.subtitle);
     renderer.text(this.detail, renderer.width / 2, layout.banner.detailY, director.allowed ? textStyles.hint : textStyles.galleryDanger);
     for (let index = 0; this.showsTiers && index < powersConfig.tiers.length; index += 1) {
@@ -102,6 +105,7 @@ export class GalleryPanel {
       if (index === director.selection.tier) renderer.line(x - config.underlineWidth / 2, config.underlineY, x + config.underlineWidth / 2, config.underlineY, tier.color, config.underlineThickness);
     }
     this.renderFitted(renderer, texts.gallery.descriptions[director.item.id], config.descriptionY);
+    renderer.text(texts.gallery.categories[director.item.category], renderer.width / 2, config.categoryY, CATEGORY_LABELS[director.item.category]);
     if (this.input.lastInputKind === 'touch') {
       this.renderChip(renderer, config.targetX, formatText(texts.gallery.targetChip, { target: texts.gallery.targets[director.selection.target] }));
       this.renderChip(renderer, config.castX, texts.gallery.cast);

@@ -342,6 +342,7 @@ export const ptBR = {
       required: 'Exige nível {level}',
       tiers: { faint: 'Tênue', steady: 'Firme', deep: 'Profundo', apex: 'Ápice' },
       targets: { idle: 'parado', blocking: 'bloqueando', barrier: 'com Barreira', absorb: 'com Absorção', airborne: 'no ar', attacking: 'atacando com Raio' },
+      categories: { flow: 'Fluxo comum · os dois lados', aurora: 'Aurora · lado da luz', eclipse: 'Eclipse · lado sombrio', blade: 'Técnica de lâmina · os dois lados' },
       descriptions: {
         push: 'Empurra o oponente para longe; com Fluxo bem maior, atravessa a guarda.',
         pull: 'Puxa o oponente para perto e o desequilibra; o alcance cresce com o tier.',

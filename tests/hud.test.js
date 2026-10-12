@@ -121,9 +121,11 @@ describe('Hud power meter', () => {
     return fills;
   }
 
-  it('draws the meter in the tier color only when powers are on', () => {
-    assert.ok(!renderColors(false).includes(colors.powerTierSteady));
-    assert.ok(renderColors(true).includes(colors.powerTierSteady));
+  it('draws the meter in the side color only when powers are on, blue for light and red for dark', () => {
+    assert.ok(!renderColors(false).includes(colors.sideLight));
+    const fills = renderColors(true);
+    assert.ok(fills.includes(colors.sideLight));
+    assert.ok(fills.includes(colors.sideDark));
   });
 });
 

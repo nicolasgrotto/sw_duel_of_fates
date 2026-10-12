@@ -10,6 +10,12 @@ const Side = Object.freeze({
   RIGHT: 'right',
 });
 
+export function getSideColor(fighter) {
+  if (fighter.stats.alignment === 'dark') return colors.sideDark;
+  if (fighter.stats.alignment === 'light') return colors.sideLight;
+  return getPowerTier(fighter.flowLevel, powersConfig.tiers).color;
+}
+
 export function canLightCostMark(fighter, power) {
   return fighter.flowMeter >= power.cost && fighter.combat.powerCooldown === 0 && fighter.flowLevel >= (power.minFlowLevel ?? 0);
 }
@@ -210,9 +216,9 @@ export class Hud {
     const { fighter } = state;
     const { healthWidth, powerGap, powerHeight } = layout.hud;
     const barY = y + powerGap;
-    const tierColor = getPowerTier(fighter.flowLevel, powersConfig.tiers).color;
+    const sideColor = getSideColor(fighter);
     const period = layout.hud.rejectBlinkPeriod;
-    const color = state.powerRejectTime > 0 && state.powerRejectTime % period >= period / 2 ? colors.hudDanger : tierColor;
+    const color = state.powerRejectTime > 0 && state.powerRejectTime % period >= period / 2 ? colors.hudDanger : sideColor;
     renderer.fillRect(barX, barY, healthWidth, powerHeight, colors.hudTrack);
     this.fillBar(renderer, barX, barY, healthWidth, powerHeight, fighter.flowMeter / fighter.stats.power.max, isLeft, color);
     this.renderCostMarks(renderer, state, barX, barY + powerHeight / 2, isLeft);

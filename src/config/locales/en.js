@@ -342,6 +342,7 @@ export const en = {
       required: 'Needs level {level}',
       tiers: { faint: 'Faint', steady: 'Steady', deep: 'Deep', apex: 'Apex' },
       targets: { idle: 'idle', blocking: 'blocking', barrier: 'with Barrier', absorb: 'with Absorption', airborne: 'airborne', attacking: 'attacking with Lightning' },
+      categories: { flow: 'Common Flow · both sides', aurora: 'Aurora · light side', eclipse: 'Eclipse · dark side', blade: 'Blade technique · both sides' },
       descriptions: {
         push: 'Pushes the opponent away; with much more Flow, it breaks through the guard.',
         pull: 'Pulls the opponent in and staggers them; the reach grows with the tier.',

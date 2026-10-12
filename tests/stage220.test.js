@@ -94,3 +94,16 @@ describe('wardrobe secret sound', () => {
     assert.ok(audioConfig.sounds[wardrobe.sound].length > 0);
   });
 });
+
+describe('gallery sides', () => {
+  it('labels every gallery category in both languages', async () => {
+    const { galleryCatalog } = await import('../src/modes/galleryCatalog.js');
+    const { ptBR } = await import('../src/config/locales/ptBR.js');
+    const { en } = await import('../src/config/locales/en.js');
+    const categories = new Set(galleryCatalog.map((item) => item.category));
+    assert.deepEqual([...categories].sort(), ['aurora', 'blade', 'eclipse', 'flow']);
+    for (const locale of [ptBR, en]) {
+      for (const category of categories) assert.equal(typeof locale.ui.gallery.categories[category], 'string', `${locale.id}/${category}`);
+    }
+  });
+});
