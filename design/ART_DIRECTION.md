@@ -198,6 +198,20 @@ As técnicas de lâmina ganham trilhas de poses-chave (sistema da 2.12) válidas
 - **Leitura do giro:** a escala horizontal segue o cosseno das voltas do corpo, com módulo mínimo de 0,08 (o corpo nunca vira uma linha). A lâmina sai de trás do ombro num corte para a frente no primeiro quarto do ativo e fica estendida quase na horizontal; quem gira é o corpo (frente → costas → frente), então a lâmina passa pela frente, por trás e volta à frente, como uma rotação vista de lado. A recuperação volta à guarda de frente. (Correção da 2.17: a versão da 2.16 girava a lâmina junto com o espelhamento e ela passava quase todo o ativo atrás do corpo.)
 - **Congelado e estrangulado** deixam de usar a pose do atordoado: o congelado fica parado na pose do instante, o estrangulado é erguido com as mãos no pescoço (VFX_GUIDELINES → "Poderes por tier").
 
+### Cobertura do elenco (v2.6)
+
+Todo o elenco passa ao sistema de trilhas da 2.12, agrupado em **famílias de movimento**: personagens com o mesmo jeito de lutar compartilham postura, trilhas, defesa, esquiva, disputa e vitória da disputa; a diferença entre eles continua vindo da silhueta, da lâmina, dos golpes e da habilidade. Frame data, alcance e hitboxes não mudam; a lâmina tem de passar pela hitbox real no ativo e nenhuma transição gira mais de 60° por frame. O estilo `standard` continua existindo, idêntico à v2, mas nenhum personagem o usa mais.
+
+| Família | Personagens | Intenção | Como aparece |
+| --- | --- | --- | --- |
+| `guardian` | Guardião, Ancião, Predestinado (e o protagonista Técnica) | Econômico, preciso, guarda firme | O da 2.3/2.12; ganha o corte reverso (`lightReverse`) para o Ancião |
+| `wasp` | Vespa | Duas lâminas, giros curtos | O da 2.3/2.12 |
+| `aggressor` | Sombra, Sombra Desperta (e o protagonista Fúria) | Agressivo, amplo, pressiona | Tronco à frente, preparação alta atrás da cabeça, arcos longos com passo grande e quadril, follow-through largo; o ímpeto (`impetus`) avança com o corpo inteiro; disputa inclinada e vitória larga |
+| `juggernaut` | Bastião, Forja | Pesado, lento, inevitável | Base larga e baixa, quase sem balanço, golpes curtos e secos no rápido e martelada sobre a cabeça no forte e no `hammer`, agachando no impacto; empurrão de ombro; disputa enraizada e vitória curta |
+| `fencer` | Espelho, Haste, Soberano | Ereto, preciso, de ponta | Tronco reto, preparação contida, estocadas com braço estendido (o `thrust` da Haste vira lunge), o forte num corte diagonal limpo, a varredura (`sweep`) baixa e longa; disputa firme e vitória curta e precisa |
+| `dancer` | Garça (e o protagonista Voo) | Leve, fluido, acrobático | Base alta e solta, arcos largos com o corpo acompanhando, corte reverso cruzado, pirueta do corpo na recuperação do forte (canal `turn`); disputa leve e vitória com giro da lâmina |
+| `striker` | Brasa, Eco | Enrolado, explosivo, de resposta | Base baixa e contida, preparação curta, cortes que explodem para a frente, forte de baixo para cima, reverso rápido (`lightReverse`); disputa baixa e vitória curta |
+
 ### Disputa de lâminas (v2.5)
 
 Pose `BLADE_LOCK`, com números por estilo em `motionStyles[motion].lock` e `lockVictory`:
