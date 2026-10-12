@@ -790,7 +790,7 @@ export class DuelState extends GameState {
       return [
         `gallery: ${item.id}  phase: ${phase}  cycle: ${this.gallery.phase}  caster: ${this.player.id}  target: ${this.gallery.selection.target}`,
         `level: ${this.gallery.level}  potency: ${this.player.stats.power.potency.toFixed(2)}  range: ${this.galleryScene.range}  cost: ${cost}`,
-        `state: ${this.player.state} ${this.player.stateTime.toFixed(2)}s  projectiles: ${this.simulation.projectiles.activeCount}`,
+        `state: ${this.player.state} ${this.player.stateTime.toFixed(2)}s  projectiles: ${this.simulation.projectiles.activeCount}  reflected waves: ${this.simulation.projectiles.pool.filter(projectile => projectile.active && projectile.reflected).length}`,
         `events: ${this.gallery.lastEvents || '-'}`,
         ...this.fighters.map(getPowerDebugInfo),
         ...this.fighters.map((fighter) => `${fighter.id}: ${fighter.state}  pos ${fighter.x.toFixed(0)},${fighter.y.toFixed(0)}  vel ${fighter.vx.toFixed(0)},${fighter.vy.toFixed(0)}  absorb ${fighter.combat.absorbTime.toFixed(2)}  confuse ${fighter.combat.confuseTime.toFixed(2)}  storm ${fighter.combat.stormPhase ?? '-'}  marks ${fighter.combat.stormMarks.filter(mark => mark.active).length}`),
@@ -799,7 +799,7 @@ export class DuelState extends GameState {
     const lines = [
       `round: ${this.roundNumber}  wins: ${this.roundWins.join(" / ")}`,
       `input: ${this.game.input.lastInputKind ?? 'keyboard'}  touch pointers: ${this.game.touch?.pointers.size ?? 0}`,
-      `duel time: ${this.duelTime.toFixed(2)}s  projectiles: ${this.simulation.projectiles.activeCount}`,
+      `duel time: ${this.duelTime.toFixed(2)}s  projectiles: ${this.simulation.projectiles.activeCount}  reflected waves: ${this.simulation.projectiles.pool.filter(projectile => projectile.active && projectile.reflected).length}`,
       this.usesDummy
         ? `dummy (F4): ${this.opponentController.behavior}`
         : `ai: ${this.opponentController.decision} (${this.game.settings.difficulty})`,

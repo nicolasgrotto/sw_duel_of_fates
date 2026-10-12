@@ -780,7 +780,7 @@ Especificação aprovada pelo autor. Números marcados como **inicial** são pon
 
 ### Tempestade revista, Corte de Fluxo e Arsenal (2.19)
 
-- **Barreira e raios (pedido do autor):** o Raio comum drena 5 pontos de medidor por pulso que a Barreira segura; a Tempestade mantém 30 por raio, independentemente do limite de dano por onda. Valores iniciais em powersConfig.barrierDrainPerStrike para a calibração do Claude.
+- **Barreira e raios (pedido do autor):** o Raio comum drena 5 pontos de medidor por pulso que a Barreira segura; a Tempestade mantém 30 por raio, independentemente do limite de dano por onda. Valores iniciais em powersConfig.powers.lightning.barrierDrainPerStrike e powersConfig.powers.storm.barrierDrainPerStrike para a calibração do Claude.
 - **Tempestade revista** (decisão do autor: estava fácil de esquivar): cada onda derruba vários raios ao mesmo tempo — 2 no Firme, 3 no Profundo e 4 no Ápice —, um na posição do oponente e os outros em colunas vizinhas, cobrindo as rotas de fuga; no máximo um acerto por onda. **No Ápice** (o tier do Predestinado), cada raio abre uma fratura curta que corre pelo chão para os dois lados, com as regras da Fratura (só pulando). Menos ondas que antes, para o dano total não explodir.
 
 - **Corte de Fluxo** (Aurora, custo médio; "Força" fica fora do nome pela regra de propriedade intelectual): um golpe de sabre solta uma onda de energia em arco que viaja em linha reta por uma distância considerável. Preparação curta. Pode ser esquivada, bloqueada pela guarda e **devolvida por um parry perfeito** (regra nova: o projétil volta contra quem lançou). Visual: o arco luminoso acompanha o movimento da lâmina.

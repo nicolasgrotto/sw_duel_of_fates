@@ -39,11 +39,15 @@ export class GalleryScene {
     return this.director.selection.target === 'attacking' && this.director.item.kind === 'power' && Boolean(this.director.item.data.escape);
   }
 
+  get attackPower() {
+    return this.director.item.id === 'arsenal' ? galleryConfig.arsenalAttackPower : galleryConfig.attackPower;
+  }
+
   get targetLoadout() {
     if (this.demonstratesEscape) return {};
     const { target } = this.director.selection;
     if (target === 'barrier' || target === 'absorb') return { neutral: target };
-    return target === 'attacking' ? { neutral: galleryConfig.attackPower } : {};
+    return target === 'attacking' ? { neutral: this.attackPower } : {};
   }
 
   get waitsForIncoming() {
@@ -66,7 +70,7 @@ export class GalleryScene {
   get gap() {
     const { item } = this.director;
     if (this.demonstratesEscape) return this.fighters[1].width / 2 + this.fighters[1].moves.light.hitbox.reach * galleryConfig.distanceRatio;
-    if (this.waitsForIncoming) return powersConfig.powers[galleryConfig.attackPower].range * galleryConfig.distanceRatio;
+    if (this.waitsForIncoming) return powersConfig.powers[this.attackPower].range * galleryConfig.distanceRatio;
     if (item.kind === 'power' && !item.data.range) return galleryConfig.selfGap;
     return Math.max(this.range * galleryConfig.distanceRatio, item.data.around ? 0 : galleryConfig.minGap);
   }
@@ -130,7 +134,7 @@ export class GalleryScene {
     if (this.simulation.projectiles.activeCount > 0) return true;
     for (const { combat } of this.fighters) {
       if (combat.power || combat.attack || combat.chokeTime > 0 || combat.freezeTime > 0
-        || combat.rainActive || combat.fracture || combat.sanctuaryTime > 0
+        || combat.rainActive || combat.fracture || combat.fractures.length || combat.arsenal?.objects.length || combat.sanctuaryTime > 0
         || combat.focusTime > 0 || combat.healTime > 0 || combat.wrathTime > 0 || combat.absorbTime > 0 || combat.confuseTime > 0) return true;
     }
     return false;

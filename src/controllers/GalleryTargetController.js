@@ -53,7 +53,8 @@ export class GalleryTargetController {
 
   getFlightTime(caster, target, incoming) {
     const projectile = incoming.effect === 'throw'
-      ? resolveLevelBand(caster.flowLevel, projectilesConfig.throw.sizes) : projectilesConfig.saber;
+      ? resolveLevelBand(caster.flowLevel, projectilesConfig.throw.sizes)
+      : incoming.wave ? projectilesConfig.wave : incoming.effect === 'arsenal' ? projectilesConfig.arsenal : projectilesConfig.saber;
     const gap = Math.abs(target.x - caster.x) - (caster.width + target.width) / 2;
     return Math.max(0, gap - projectile.radius) / projectile.speed;
   }
