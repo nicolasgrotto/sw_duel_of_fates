@@ -177,6 +177,38 @@ export class PowerRenderer {
     renderer.setAlpha(1);
   }
 
+  drawSanctuary(renderer, fighter, tier, time) {
+    const status = style.status;
+    const maxShield = powersConfig.powers.sanctuary.shield * fighter.stats.power.potency;
+    const integrity = clamp(fighter.combat.sanctuaryShield / maxShield, 0, 1);
+    const centerX = fighter.x;
+    const centerY = fighter.y - fighter.height * status.sanctuaryCenter;
+    const radiusX = fighter.height * status.sanctuaryRadiusX;
+    const radiusY = fighter.height * status.sanctuaryRadiusY;
+    const pulse = (Math.sin(time * status.sanctuaryPulseSpeed * TAU) + 1) / 2;
+    renderer.drawGlow(centerX, centerY, radiusY, tier.color, status.sanctuaryGlowAlpha * (0.5 + integrity / 2));
+    renderer.setAlpha(lerp(status.sanctuaryAlpha[0], status.sanctuaryAlpha[1], pulse) * (0.5 + integrity / 2));
+    renderer.strokeEllipse(centerX, centerY, radiusX, radiusY, tier.color, status.sanctuaryLineWidth);
+    const [first, second] = status.sanctuaryCrackSteps;
+    const cracks = integrity <= second ? status.sanctuaryCracks.length : integrity <= first ? status.sanctuaryCracks.length / 2 : 0;
+    for (let index = 0; index < cracks; index += 1) {
+      const [from, to] = status.sanctuaryCracks[index];
+      const middle = (from + to) / 2;
+      const depth = 1 - status.sanctuaryCrackDepth;
+      renderer.line(
+        centerX + Math.cos(from) * radiusX, centerY + Math.sin(from) * radiusY,
+        centerX + Math.cos(middle) * radiusX * depth, centerY + Math.sin(middle) * radiusY * depth,
+        tier.color, status.sanctuaryLineWidth * 0.6,
+      );
+      renderer.line(
+        centerX + Math.cos(middle) * radiusX * depth, centerY + Math.sin(middle) * radiusY * depth,
+        centerX + Math.cos(to) * radiusX, centerY + Math.sin(to) * radiusY,
+        tier.color, status.sanctuaryLineWidth * 0.6,
+      );
+    }
+    renderer.setAlpha(1);
+  }
+
   drawConfusion(renderer, fighter, tier, time) {
     const status = style.status;
     const centerX = fighter.x;
@@ -221,6 +253,9 @@ export class PowerRenderer {
     }
     if (combat.confuseTime > 0) {
       this.drawConfusion(renderer, fighter, tier, time);
+    }
+    if (combat.sanctuaryTime > 0 && combat.sanctuaryShield > 0) {
+      this.drawSanctuary(renderer, fighter, tier, time);
     }
     if (combat.healTime > 0) {
       const rise = (time * status.healRiseSpeed) % 1;

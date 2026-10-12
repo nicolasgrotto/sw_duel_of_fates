@@ -1,6 +1,7 @@
 import { AttackPhase, getAttackPhase, getPhaseProgress } from '../combat/attackPhases.js';
 import { combatRulesConfig } from '../config/combatRulesConfig.js';
 import { effectsConfig } from '../config/effectsConfig.js';
+import { powersConfig } from '../config/powersConfig.js';
 import { animation as animationStyle, combatPoses, motionStyles, proportions, techniqueKeyframes } from '../config/fighterVisualConfig.js';
 import { FighterState } from '../entities/fighterStates.js';
 import { easeInOutSine, easeInQuad, easeOutCubic, easeOutQuad } from '../utils/easing.js';
@@ -334,6 +335,15 @@ function getChokeLift(fighter) {
   return getChokeRise(fighter) * lerp(style.lift, style.maxLift, easeInOutSine(hold));
 }
 
+function getCrushSqueeze(fighter) {
+  const { crushTime } = fighter.combat;
+  if (!(crushTime > 0)) return 1;
+  const style = combatPoses.crushed;
+  const progress = clamp(1 - crushTime / powersConfig.powers.crush.duration, 0, 1);
+  const tremble = Math.sin(fighter.animation.time * style.trembleSpeed * TAU) * style.tremble * progress;
+  return lerp(1, style.squeeze, easeOutCubic(progress)) + tremble;
+}
+
 function applyChokedPose(fighter) {
   const style = combatPoses.choked;
   combatPose.leanDegrees = style.lean;
@@ -440,7 +450,10 @@ function resolveCombatPose(fighter, guardDegrees, motion, forceEvade, lockContex
     }
     case FighterState.STUNNED:
       if (isChoked(fighter)) applyChokedPose(fighter);
-      else applyStunnedPose(fighter);
+      else if (fighter.combat.crushTime > 0) {
+        combatPose.leanDegrees = combatPoses.crushed.lean;
+        combatPose.bladeDegrees = combatPoses.crushed.bladeDegrees;
+      } else applyStunnedPose(fighter);
       break;
     case FighterState.DEAD: {
       const { dead } = combatPoses;
@@ -574,7 +587,7 @@ export function computePose(fighter, pose, forceEvade = false, lockContext = noL
   }
   pose.bladeVisible = combatPose.bladeVisible && !fighter.combat.saberThrown;
   pose.bodyRotation = degreesToRadians(combatPose.bodyRotationDegrees);
-  pose.turnScale = getTurnScale(combatPose.turn);
+  pose.turnScale = getTurnScale(combatPose.turn) * getCrushSqueeze(fighter);
   pose.bodyLift = combatPose.bodyLift;
 
   const forwardSpeed = fighter.vx * fighter.facing;

@@ -5,6 +5,7 @@ import { SoundName } from '../src/audio/soundNames.js';
 import { CombatEvent } from '../src/combat/combatEvents.js';
 import { effectsConfig } from '../src/config/effectsConfig.js';
 import { powersConfig } from '../src/config/powersConfig.js';
+import { colors } from '../src/config/themeConfig.js';
 import { Camera } from '../src/core/Camera.js';
 import { FighterState } from '../src/entities/fighterStates.js';
 import { computePose, createPose } from '../src/rendering/fighterPose.js';
@@ -321,5 +322,68 @@ describe('choke caster and wrath armor', () => {
     assert.equal(ring.color, powersConfig.tiers[3].color);
     assert.equal(ring.x, defender.x);
     assert.deepEqual(playedSounds([event(CombatEvent.WRATH_ARMOR, attacker, defender, 'heavy')]), [SoundName.WRATH_ARMOR]);
+  });
+});
+
+describe('supreme push, sanctuary and crush presentation', () => {
+  it('sends chevrons both ways with a full ring in attack mode and a short burst in escape mode', () => {
+    const effects = createEffects();
+    const caster = spawnFighter(500, 1, 'mirror');
+    caster.combat.powerMode = 'attack';
+    effects.handleEvents([event(CombatEvent.POWER_ACTIVE, caster, null, 'supremePush')]);
+    const waves = effects.shockwaves.filter((wave) => wave.active);
+    assert.deepEqual(waves.map((wave) => wave.direction).sort(), [-1, 1]);
+    assert.ok(waves.every((wave) => wave.range === powersConfig.powers.supremePush.range));
+    assert.ok(effects.rings.some((ring) => ring.active && ring.maxRadius === effectsConfig.supremePush.ring.radius));
+    const escape = createEffects();
+    caster.combat.powerMode = 'escape';
+    escape.handleEvents([event(CombatEvent.POWER_ACTIVE, caster, null, 'supremePush')]);
+    assert.equal(escape.shockwaves.filter((wave) => wave.active).length, 0);
+    assert.ok(escape.rings.some((ring) => ring.active && ring.maxRadius === effectsConfig.supremePush.escapeRing.radius));
+  });
+
+  it('draws the sanctuary dome and cracks it as the shield wears down', () => {
+    const counts = [];
+    for (const fraction of [1, 0.5, 0.2]) {
+      const fighter = spawnFighter(500, 1, 'guardian');
+      fighter.combat.sanctuaryTime = 3;
+      fighter.combat.sanctuaryShield = powersConfig.powers.sanctuary.shield * fighter.stats.power.potency * fraction;
+      fighter.combat.statusLevel = 5;
+      const renderer = recordingRenderer();
+      new PowerRenderer().draw(renderer, [fighter]);
+      assert.equal(renderer.calls.filter((call) => call.name === 'strokeEllipse').length, 1);
+      counts.push(renderer.calls.filter((call) => call.name === 'line').length);
+    }
+    const cracks = powersConfig.render.status.sanctuaryCracks.length;
+    assert.deepEqual(counts, [0, cracks, cracks * 2]);
+  });
+
+  it('shatters the sanctuary on break and marks protected hits', () => {
+    const effects = createEffects();
+    const attacker = spawnFighter(400, 1, 'shadow');
+    const defender = spawnFighter(520, -1, 'guardian');
+    effects.handleEvents([event(CombatEvent.SANCTUARY_BREAK, attacker, defender, 'heavy')]);
+    assert.ok(effects.particles.particles.filter((particle) => particle.active).length >= effectsConfig.recipes.sanctuaryShatter.count[0]);
+    assert.deepEqual(playedSounds([event(CombatEvent.SANCTUARY_BREAK, attacker, defender, 'heavy')]), [SoundName.SANCTUARY_BREAK]);
+    const guarded = createEffects();
+    defender.combat.sanctuaryShield = 10;
+    guarded.handleEvents([event(CombatEvent.HIT, attacker, defender, 'light')]);
+    assert.ok(guarded.rings.some((ring) => ring.active && ring.maxRadius === effectsConfig.sanctuaryHitRing.radius));
+  });
+
+  it('squeezes the crushed target and slams it with dust and a heavy shake', () => {
+    const fighter = spawnFighter(500, 1, 'guardian');
+    fighter.restartState(FighterState.STUNNED);
+    fighter.combat.crushTime = powersConfig.powers.crush.duration * 0.1;
+    const squeezed = computePose(fighter, createPose());
+    assert.ok(squeezed.turnScale < 0.85);
+    fighter.combat.crushTime = 0;
+    assert.equal(computePose(fighter, createPose()).turnScale, 1);
+    const effects = createEffects();
+    const caster = spawnFighter(300, 1, 'shadow');
+    effects.handleEvents([event(CombatEvent.POWER_HIT, caster, fighter, 'crush')]);
+    assert.ok(effects.particles.particles.some((particle) => particle.active && particle.color === colors.shockwaveDust));
+    assert.equal(effects.hasHitFlash(fighter), true);
+    assert.deepEqual(playedSounds([event(CombatEvent.POWER_HIT, caster, fighter, 'crush')]), [SoundName.CRUSH]);
   });
 });

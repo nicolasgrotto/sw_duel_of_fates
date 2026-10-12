@@ -28,6 +28,8 @@ export const EffectType = Object.freeze({
   BLADE_LOCK_BREAK: 'bladeLockBreak',
   COUNTER_FLOURISH: 'counterFlourish',
   STORM_STRIKE: 'stormStrike',
+  CRUSH_SLAM: 'crushSlam',
+  SANCTUARY_SHATTER: 'sanctuaryShatter',
   STORM_CALL: 'stormCall',
   POWER_WAVE: 'powerWave',
   POWER_IMPACT: 'powerImpact',
@@ -169,6 +171,9 @@ export class EffectsSystem {
         }
         this.startTremor(defender);
         this.spawn(isStrongAttack(event.attackType) ? EffectType.HEAVY_IMPACT : EffectType.HIT_SPARK, params);
+        if (defender.combat.sanctuaryShield > 0) {
+          this.spawnRing(this.config.sanctuaryHitRing, x, y, getTierColor(defender));
+        }
         break;
       case CombatEvent.BLOCK:
         this.spawn(EffectType.BLOCK_SPARK, params);
@@ -209,6 +214,9 @@ export class EffectsSystem {
         this.startTremor(attacker);
         this.spawnParry(EffectType.PERFECT_PARRY, defender, params);
         break;
+      case CombatEvent.SANCTUARY_BREAK:
+        this.spawnSanctuaryBreak(defender, params);
+        break;
       case CombatEvent.WRATH_ARMOR:
         this.spawnWrathArmor(defender);
         break;
@@ -220,12 +228,18 @@ export class EffectsSystem {
           this.spawnStormCall(attacker, params);
         } else if (event.attackType === 'push') {
           this.spawnShockwave(attacker);
+        } else if (event.attackType === 'supremePush') {
+          this.spawnSupremePush(attacker);
         } else {
           this.spawnPowerWave(attacker, event.attackType === 'pull', params);
         }
         break;
       case CombatEvent.POWER_HIT:
         if (event.attackType === 'drain') {
+          break;
+        }
+        if (event.attackType === 'crush') {
+          this.spawnCrushSlam(attacker, defender, params);
           break;
         }
         if (event.attackType === 'mindTwist') {
@@ -368,7 +382,7 @@ export class EffectsSystem {
     }
   }
 
-  spawnShockwave(caster) {
+  spawnShockwave(caster, direction = caster.facing, range = powersConfig.powers.push.range, scale = 1) {
     const style = this.config.shockwave;
     let wave = this.shockwaves[0];
     for (const candidate of this.shockwaves) {
@@ -381,12 +395,12 @@ export class EffectsSystem {
       }
     }
     wave.active = true;
-    wave.x = caster.x + caster.facing * (caster.width / 2 + powersConfig.render.waveOffset);
+    wave.x = caster.x + direction * (caster.width / 2 + powersConfig.render.waveOffset);
     wave.y = caster.y - caster.height * powersConfig.castHeight;
-    wave.direction = caster.facing;
-    wave.range = powersConfig.powers.push.range;
+    wave.direction = direction;
+    wave.range = range;
     const tier = getPowerTier(caster.flowLevel, powersConfig.tiers);
-    wave.scale = tier.waveScale;
+    wave.scale = tier.waveScale * scale;
     wave.color = tier.color;
     wave.time = 0;
     this.spawnLight(style.light, wave.x, wave.y, wave.color);
@@ -475,6 +489,58 @@ export class EffectsSystem {
       if (!strike.active) continue;
       strike.time += dt;
       if (strike.time >= duration) strike.active = false;
+    }
+  }
+
+  spawnSupremePush(caster) {
+    const style = this.config.supremePush;
+    const color = getTierColor(caster);
+    const x = caster.x;
+    const y = caster.y - caster.height / 2;
+    if (caster.combat.powerMode === 'escape') {
+      this.spawnRing(style.escapeRing, x, y, color);
+      this.spawnLight(style.escapeLight, x, y, color);
+      return;
+    }
+    const range = powersConfig.powers.supremePush.range;
+    this.spawnShockwave(caster, 1, range, style.waveScale);
+    this.spawnShockwave(caster, -1, range, style.waveScale);
+    this.spawnRing(style.ring, x, y, color);
+    this.spawnLight(style.light, x, y, color);
+  }
+
+  spawnSanctuaryBreak(fighter, params) {
+    const style = this.config.sanctuaryBreak;
+    const color = getTierColor(fighter);
+    params.x = fighter.x;
+    params.y = fighter.y - fighter.height / 2;
+    params.color = color;
+    params.particleScale = 1;
+    this.spawn(EffectType.SANCTUARY_SHATTER, params);
+    this.spawnRing(style.ring, params.x, params.y, color);
+    this.spawnLight(style.light, params.x, params.y, color);
+  }
+
+  spawnCrushSlam(caster, target, params) {
+    const dust = this.config.crushSlam.dust;
+    params.x = target.x;
+    params.y = target.y;
+    params.color = getTierColor(caster);
+    params.direction = caster.facing;
+    if (this.flashScale > 0) this.hitFlashes.set(target, this.config.hitFlashDuration);
+    this.spawn(EffectType.CRUSH_SLAM, params);
+    const count = this.reduced ? dust.reducedCount : dust.count;
+    for (let i = 0; i < count; i += 1) {
+      const particle = this.particles.acquire();
+      if (!particle) return;
+      particle.x = target.x + (this.random() * 2 - 1) * dust.spread;
+      particle.y = target.y;
+      particle.vx = (this.random() * 2 - 1) * randomRange(this.random, dust.speed);
+      particle.vy = -randomRange(this.random, dust.lift);
+      particle.life = randomRange(this.random, dust.life);
+      particle.maxLife = particle.life;
+      particle.size = randomRange(this.random, dust.size);
+      particle.color = colors.shockwaveDust;
     }
   }
 

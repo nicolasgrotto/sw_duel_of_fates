@@ -198,6 +198,23 @@ export const audioConfig = {
       { type: 'tone', wave: 'sawtooth', from: 90, to: 60, duration: 0.25, attack: 0.002, gain: 0.12, filter: { type: 'lowpass', from: 900, to: 300, q: 1.2 } },
       { type: 'noise', duration: 0.12, attack: 0.002, gain: 0.25, filter: { type: 'bandpass', from: 900, to: 400, q: 1 } },
     ],
+    supremePush: [
+      { type: 'noise', duration: 0.45, attack: 0.01, gain: 0.45, filter: { type: 'lowpass', from: 1600, to: 200, q: 0.8 } },
+      { type: 'tone', wave: 'sine', from: 90, to: 38, duration: 0.45, attack: 0.005, gain: 0.3, filter: null },
+    ],
+    sanctuary: [
+      { type: 'tone', wave: 'triangle', from: 260, to: 390, duration: 0.5, attack: 0.08, gain: 0.1, filter: null },
+      { type: 'tone', wave: 'sine', from: 520, to: 780, duration: 0.5, attack: 0.08, gain: 0.05, filter: null },
+      { type: 'tone', wave: 'sine', from: 780, to: 1170, duration: 0.5, attack: 0.1, gain: 0.03, filter: null },
+    ],
+    sanctuaryBreak: [
+      { type: 'noise', duration: 0.3, attack: 0.002, gain: 0.35, filter: { type: 'highpass', from: 2500, to: 1500, q: 0.8 } },
+      { type: 'tone', wave: 'triangle', from: 900, to: 300, duration: 0.3, attack: 0.002, gain: 0.1, filter: null },
+    ],
+    crush: [
+      { type: 'tone', wave: 'sine', from: 70, to: 30, duration: 0.45, attack: 0.002, gain: 0.4, filter: null },
+      { type: 'noise', duration: 0.35, attack: 0.002, gain: 0.4, filter: { type: 'lowpass', from: 900, to: 150, q: 0.8 } },
+    ],
     stormInvoke: [
       { type: 'noise', duration: 0.5, attack: 0.3, gain: 0.28, filter: { type: 'bandpass', from: 400, to: 3000, q: 1 } },
       { type: 'tone', wave: 'sawtooth', from: 60, to: 180, duration: 0.5, attack: 0.25, gain: 0.06, filter: { type: 'lowpass', from: 400, to: 1400, q: 1 } },

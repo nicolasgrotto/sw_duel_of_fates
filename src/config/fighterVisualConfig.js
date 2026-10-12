@@ -178,6 +178,7 @@ export const combatPoses = {
     crouch: 4,
     bladeDegrees: -150,
   },
+  crushed: { squeeze: 0.74, tremble: 0.03, trembleSpeed: 14, lean: -4, bladeDegrees: 95 },
   choked: {
     lift: 0.1,
     maxLift: 0.18,
