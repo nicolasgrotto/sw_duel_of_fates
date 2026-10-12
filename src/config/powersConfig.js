@@ -29,14 +29,14 @@ export const powersConfig = {
   powers: {
     arsenal: {
       id: 'arsenal', effect: 'arsenal', self: true, pose: 'cast', interaction: 'throw',
-      cost: 40, startup: 0.35, active: SELF_BUFF_PHASES.active, recovery: 0.25, duration: 6, guard: { staminaCost: 10 },
+      cost: 55, startup: 0.35, active: SELF_BUFF_PHASES.active, recovery: 0.25, duration: 6, guard: { staminaCost: 10 },
       objectsByTier: [{ minLevel: 1, objects: 2 }, { minLevel: 3, objects: 2 }, { minLevel: 8, objects: 3 }, { minLevel: 10, objects: 4 }],
       orbit: { radiusX: 45, radiusY: 32, period: 1.2, initialAngle: 0 }, launchInterval: 0.35,
       launch: { id: 'arsenal', effect: 'arsenal', pose: 'cast', arsenalLaunch: true, startup: 0, active: 0, recovery: 0.15 },
     },
     flowCleave: {
       id: 'flowCleave', effect: 'flowCleave', projectile: true, wave: true, channel: false, pose: 'cleave', interaction: 'throw',
-      cost: 30, startup: 0.2, active: 0.08, recovery: 0.3, range: 520, guard: { staminaCost: 10 },
+      cost: 20, startup: 0.2, active: 0.08, recovery: 0.3, range: 520, guard: { staminaCost: 10 },
     },
     fracture: {
       id: 'fracture', effect: 'fracture', channel: false, pose: 'slam', interaction: 'fracture', fracture: true,
@@ -75,7 +75,7 @@ export const powersConfig = {
       id: 'storm', effect: 'storm', channel: true, automatic: true, pose: 'invoke', interaction: 'storm', around: true,
       minFlowLevel: 6, cost: 70, startup: STORM_PHASES.invocation, maxChannel: STORM_PHASES.storm, recovery: STORM_PHASES.recovery,
       markedRain: true, markEvent: 'stormMark', strikeEvent: 'stormStrike',
-      stormPhases: STORM_PHASES, range: 600, damage: 5, stun: 0.12, strikeWarning: 0.5, strikeWidth: 80, barrierDrainPerStrike: 30,
+      stormPhases: STORM_PHASES, range: 600, damage: 4, stun: 0.12, strikeWarning: 0.5, strikeWidth: 80, barrierDrainPerStrike: 30,
       strikesByTier: [{ minLevel: 3, strikes: 6 }, { minLevel: 8, strikes: 7 }, { minLevel: 10, strikes: 8 }],
       boltsByTier: [{ minLevel: 3, bolts: 2 }, { minLevel: 8, bolts: 3 }, { minLevel: 10, bolts: 4 }],
       columnPatterns: { 2: [0, 140], 3: [0, -140, 140], 4: [0, -140, 140, 280] },
