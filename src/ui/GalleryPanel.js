@@ -101,20 +101,25 @@ export class GalleryPanel {
       renderer.text(texts.gallery.tiers[tier.id], x, config.tiersY, textStyles.hint);
       if (index === director.selection.tier) renderer.line(x - config.underlineWidth / 2, config.underlineY, x + config.underlineWidth / 2, config.underlineY, tier.color, config.underlineThickness);
     }
+    this.renderFitted(renderer, texts.gallery.descriptions[director.item.id], config.descriptionY);
     if (this.input.lastInputKind === 'touch') {
       this.renderChip(renderer, config.targetX, formatText(texts.gallery.targetChip, { target: texts.gallery.targets[director.selection.target] }));
       this.renderChip(renderer, config.castX, texts.gallery.cast);
       this.renderChip(renderer, config.repeatX, formatText(texts.gallery.repeatChip, { repeat: texts.gallery.repeat[director.selection.repeat ? 'on' : 'off'] }));
       this.renderChip(renderer, config.casterX, formatText(texts.gallery.casterChip, { name: characters[director.selection.caster].name }));
     } else {
-      const footer = this.footer();
-      const scale = Math.min(1, (renderer.width - config.footerMargin * 2) / renderer.measureText(footer, textStyles.hint));
-      renderer.save();
-      renderer.translate(renderer.width / 2, config.footerY);
-      renderer.scale(scale, 1);
-      renderer.text(footer, 0, 0, textStyles.hint);
-      renderer.restore();
+      this.renderFitted(renderer, this.footer(), config.footerY);
     }
+  }
+
+  renderFitted(renderer, label, y) {
+    const config = layout.gallery;
+    const scale = Math.min(1, (renderer.width - config.footerMargin * 2) / renderer.measureText(label, textStyles.hint));
+    renderer.save();
+    renderer.translate(renderer.width / 2, y);
+    renderer.scale(scale, 1);
+    renderer.text(label, 0, 0, textStyles.hint);
+    renderer.restore();
   }
 
   renderChip(renderer, x, label) {

@@ -38,6 +38,7 @@ export const layout = {
     underlineY: 207, underlineWidth: 90, underlineThickness: 2,
     footerY: 650, targetX: 220, castX: 500, repeatX: 780, casterX: 1060, footerChipWidth: 250, tapHeight: 44,
     footerMargin: 24,
+    descriptionY: 240,
     meterY: 100,
   },
   attributes: { firstRowY: 410, rowSpacing: 30, labelX: 620, barX: 745, valueX: 925, segmentWidth: 19, segmentHeight: 5, segmentGap: 4, previewX: 1080, previewScale: 1 },

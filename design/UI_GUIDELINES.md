@@ -185,7 +185,7 @@ Modo do menu, logo depois de **Treino**, sempre disponível. Mostra a cena de du
 - **Alvos**: parado, bloqueando, com Barreira, com Redirecionamento, no ar e atacando com Raio. Contra o alvo que ataca, poderes sem alcance (Barreira, Redirecionamento, Cura, Foco, Ira) esperam o Raio começar e são lançados a tempo de recebê-lo, a 60% do alcance do Raio.
 - Sem painel DOM, sem caixas cobrindo a área de luta, sem números de dano. O F3 continua sendo o lugar dos números (fase, potência, alcance, custo, eventos).
 
-Medidas de implementação: painel em y=120/152, tiers em y=190 (sublinhado em 207) e rodapé em y=650. O medidor conserva a largura da HUD e começa em y=103, abaixo do botão Voltar do toque. A dica de pausa usa P no teclado e Start no gamepad; Esc sai. O menu usa espaçamento de 36 px para acomodar a galeria. Rodapés muito largos são ajustados horizontalmente dentro das margens, mantendo o estilo hint.
+Medidas de implementação: painel em y=120/152, tiers em y=190 (sublinhado em 207) e rodapé em y=650. **Descrição (2.20, pedido do autor):** uma linha curta por poder ou técnica em y=240, estilo `hint`, centralizada, comprimida na horizontal se passar da largura (mesma regra do rodapé); textos em `gallery.descriptions`, até 100 caracteres. O medidor conserva a largura da HUD e começa em y=103, abaixo do botão Voltar do toque. A dica de pausa usa P no teclado e Start no gamepad; Esc sai. O menu usa espaçamento de 36 px para acomodar a galeria. Rodapés muito largos são ajustados horizontalmente dentro das margens, mantendo o estilo hint.
 
 ### Ferramentas do Treino
 

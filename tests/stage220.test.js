@@ -66,3 +66,18 @@ describe('flow cleave by tier', () => {
     assert.equal(events.filter((event) => event.type === CombatEvent.POWER_ACTIVE && event.attacker === s.caster).length, 1);
   });
 });
+
+describe('gallery descriptions', () => {
+  it('describes every gallery item in both languages', async () => {
+    const { galleryCatalog } = await import('../src/modes/galleryCatalog.js');
+    const { ptBR } = await import('../src/config/locales/ptBR.js');
+    const { en } = await import('../src/config/locales/en.js');
+    for (const locale of [ptBR, en]) {
+      for (const item of galleryCatalog) {
+        const text = locale.ui.gallery.descriptions[item.id];
+        assert.equal(typeof text, 'string', `${locale.id}/${item.id}`);
+        assert.ok(text.length > 20 && text.length <= 100, `${locale.id}/${item.id}`);
+      }
+    }
+  });
+});
