@@ -30,6 +30,8 @@ export const EffectType = Object.freeze({
   STORM_STRIKE: 'stormStrike',
   CRUSH_SLAM: 'crushSlam',
   METEOR_IMPACT: 'meteorImpact',
+  FRACTURE_SLAM: 'fractureSlam',
+  FRACTURE_BURST: 'fractureBurst',
   SANCTUARY_SHATTER: 'sanctuaryShatter',
   STORM_CALL: 'stormCall',
   POWER_WAVE: 'powerWave',
@@ -221,6 +223,9 @@ export class EffectsSystem {
           this.camera.cinematic(cinematic.lift, cinematic.zoom, powersConfig.powers.meteorRain.startup + cinematic.extra);
         }
         break;
+      case CombatEvent.FRACTURE_BURST:
+        this.spawnFractureBurst(attacker, x, y, params);
+        break;
       case CombatEvent.RAIN_CALL:
         this.spawnMeteorBreak(attacker, params);
         break;
@@ -243,6 +248,8 @@ export class EffectsSystem {
           this.spawnShockwave(attacker);
         } else if (event.attackType === 'meteorRain') {
           break;
+        } else if (event.attackType === 'fracture') {
+          this.spawnFractureSlam(attacker, params);
         } else if (event.attackType === 'supremePush') {
           this.spawnSupremePush(attacker);
         } else {
@@ -505,6 +512,48 @@ export class EffectsSystem {
       strike.time += dt;
       if (strike.time >= duration) strike.active = false;
     }
+  }
+
+  spawnFractureSlam(caster, params) {
+    const dust = this.config.fractureSlam.dust;
+    const x = caster.x + caster.facing * caster.width / 2;
+    params.x = x;
+    params.y = caster.y;
+    params.color = getTierColor(caster);
+    this.spawn(EffectType.FRACTURE_SLAM, params);
+    const count = this.reduced ? dust.reducedCount : dust.count;
+    for (let i = 0; i < count; i += 1) {
+      const particle = this.particles.acquire();
+      if (!particle) return;
+      particle.x = x + (this.random() * 2 - 1) * dust.spread;
+      particle.y = caster.y;
+      particle.vx = (this.random() * 2 - 1) * randomRange(this.random, dust.speed);
+      particle.vy = -randomRange(this.random, dust.lift);
+      particle.life = randomRange(this.random, dust.life);
+      particle.maxLife = particle.life;
+      particle.size = randomRange(this.random, dust.size);
+      particle.color = colors.shockwaveDust;
+    }
+  }
+
+  spawnFractureBurst(caster, x, floorY, params) {
+    const tier = getPowerTier(caster.flowLevel, powersConfig.tiers);
+    params.x = x;
+    params.y = floorY;
+    params.direction = caster.facing;
+    params.color = tier.color;
+    params.particleScale = tier.particleScale;
+    this.spawn(EffectType.FRACTURE_BURST, params);
+    const piece = this.debris.acquire();
+    if (!piece) return;
+    piece.x = x;
+    piece.y = floorY;
+    piece.vx = (this.random() * 2 - 1) * 120;
+    piece.vy = -randomRange(this.random, [180, 320]);
+    piece.life = 0.5;
+    piece.maxLife = 0.5;
+    piece.size = randomRange(this.random, [3, 5]);
+    piece.color = colors.floorEdge;
   }
 
   spawnMeteorBreak(caster, params) {

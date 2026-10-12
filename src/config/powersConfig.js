@@ -28,7 +28,7 @@ export const powersConfig = {
   },
   powers: {
     fracture: {
-      id: 'fracture', effect: 'fracture', channel: false, pose: 'cast', interaction: 'fracture', fracture: true,
+      id: 'fracture', effect: 'fracture', channel: false, pose: 'slam', interaction: 'fracture', fracture: true,
       cost: 70, startup: 0.45, active: 0.08, recovery: 0.5, range: Infinity,
       speed: 900, segmentLength: 60, fractureWarning: 0.25, damage: 12, launchSpeed: 650, stagger: 0.4,
       hudMark: 'powerCostFracture',
@@ -248,6 +248,9 @@ export const powersConfig = {
       shieldArcs: 6, shieldRadiusX: 0.34, shieldRadiusY: 0.56, shieldSpan: 1.1, shieldSpin: 1.3, shieldGlowScale: 0.6, shieldGlowAlpha: 0.18,
       markRadiusY: 7, markWidthScale: [1.1, 0.5], markAlpha: [0.3, 0.85], markFillAlpha: 0.2, markLineWidth: 2, columnHeight: 260, columnAlpha: 0.14,
       darkAlpha: 0.4,
+    },
+    fracture: {
+      zigzag: [0, -4, 3, -5, 2, 0], lineWidth: 2.5, glowScale: 3, glowAlpha: 0.3, alpha: [0.35, 1], depth: 3,
     },
     meteor: {
       asteroidOffsetX: 260, asteroidFromY: -160, asteroidToY: 70, asteroidRadius: [30, 60], asteroidSpin: 0.6,

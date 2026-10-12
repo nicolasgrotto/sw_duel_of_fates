@@ -215,6 +215,14 @@ export const audioConfig = {
       { type: 'tone', wave: 'sine', from: 70, to: 30, duration: 0.45, attack: 0.002, gain: 0.4, filter: null },
       { type: 'noise', duration: 0.35, attack: 0.002, gain: 0.4, filter: { type: 'lowpass', from: 900, to: 150, q: 0.8 } },
     ],
+    fractureRun: [
+      { type: 'noise', duration: 0.9, attack: 0.02, gain: 0.32, filter: { type: 'lowpass', from: 500, to: 1400, q: 1.2 } },
+      { type: 'tone', wave: 'sawtooth', from: 55, to: 45, duration: 0.9, attack: 0.02, gain: 0.08, filter: { type: 'lowpass', from: 300, to: 200, q: 1 } },
+    ],
+    fractureHit: [
+      { type: 'noise', duration: 0.2, attack: 0.001, gain: 0.45, filter: { type: 'highpass', from: 1500, to: 900, q: 0.8 } },
+      { type: 'tone', wave: 'sine', from: 95, to: 40, duration: 0.35, attack: 0.002, gain: 0.3, filter: null },
+    ],
     meteorCall: [
       { type: 'noise', duration: 0.8, attack: 0.5, gain: 0.3, filter: { type: 'lowpass', from: 200, to: 900, q: 0.9 } },
       { type: 'tone', wave: 'sine', from: 45, to: 70, duration: 0.8, attack: 0.4, gain: 0.2, filter: null },

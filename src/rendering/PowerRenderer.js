@@ -49,6 +49,7 @@ export function getStormDarkness(fighters) {
 
 const arcEnds = new Float32Array(4);
 const asteroidPoint = { x: 0, y: 0, progress: 0 };
+const crackPoints = new Float32Array(powersConfig.render.fracture.zigzag.length * 2);
 
 function setArcEnds(fromX, fromY, toX, toY) {
   arcEnds[0] = fromX;
@@ -83,6 +84,9 @@ export class PowerRenderer {
     renderer.save();
     renderer.setBlendMode('lighter');
     for (const fighter of fighters) {
+      if (fighter.combat.fracture) {
+        this.drawFracture(renderer, fighter, floorY ?? fighter.y);
+      }
       if (fighter.combat.rain) {
         this.drawRain(renderer, fighter, floorY ?? fighter.y);
       }
@@ -472,6 +476,30 @@ export class PowerRenderer {
       renderer.strokeEllipse(mark.x, floorY, radiusX, storm.markRadiusY, tier.color, storm.markLineWidth);
       renderer.setAlpha(storm.columnAlpha * progress);
       renderer.line(mark.x, floorY, mark.x, floorY - storm.columnHeight, tier.color, power.strikeWidth * 0.5);
+    }
+    renderer.setAlpha(1);
+  }
+
+  drawFracture(renderer, fighter, floorY) {
+    const crack = style.fracture;
+    const wave = fighter.combat.fracture;
+    const tier = getPowerTier(fighter.flowLevel, powersConfig.tiers);
+    const last = crack.zigzag.length - 1;
+    for (let index = 0; index < wave.segments.length; index += 1) {
+      const segment = wave.segments[index];
+      if (!segment.marked || segment.burst) continue;
+      const progress = clamp((wave.time - segment.markTime) / (segment.impactTime - segment.markTime), 0, 1);
+      const flip = index % 2 === 0 ? 1 : -1;
+      for (let point = 0; point <= last; point += 1) {
+        crackPoints[point * 2] = lerp(segment.left, segment.right, point / last);
+        crackPoints[point * 2 + 1] = floorY + crack.depth + crack.zigzag[point] * flip;
+      }
+      const alpha = lerp(crack.alpha[0], crack.alpha[1], progress);
+      renderer.setAlpha(crack.glowAlpha * alpha);
+      renderer.polyline(crackPoints, tier.color, crack.lineWidth * crack.glowScale);
+      renderer.setAlpha(alpha);
+      renderer.polyline(crackPoints, tier.color, crack.lineWidth);
+      renderer.polyline(crackPoints, colors.saberCore, crack.lineWidth * style.coreWidthScale * progress);
     }
     renderer.setAlpha(1);
   }

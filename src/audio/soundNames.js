@@ -38,6 +38,8 @@ export const SoundName = Object.freeze({
   SANCTUARY: 'sanctuary',
   SANCTUARY_BREAK: 'sanctuaryBreak',
   CRUSH: 'crush',
+  FRACTURE_RUN: 'fractureRun',
+  FRACTURE_HIT: 'fractureHit',
   METEOR_CALL: 'meteorCall',
   METEOR_BREAK: 'meteorBreak',
   METEOR_FALL: 'meteorFall',

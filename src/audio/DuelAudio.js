@@ -61,6 +61,7 @@ function getSoundForEvent(event) {
       if (event.attackType === 'wrath') return SoundName.WRATH;
       if (event.attackType === 'storm') return SoundName.STORM_CALL;
       if (event.attackType === 'supremePush') return SoundName.SUPREME_PUSH;
+      if (event.attackType === 'fracture') return SoundName.FRACTURE_RUN;
       if (event.attackType === 'meteorRain') return null;
       return event.attackType === 'pull' ? SoundName.POWER_PULL : SoundName.POWER_WAVE;
     case CombatEvent.POWER_HIT:
@@ -68,6 +69,7 @@ function getSoundForEvent(event) {
       if (event.attackType === 'mindTwist') return SoundName.MIND_TWIST;
       if (event.attackType === 'storm') return null;
       if (event.attackType === 'crush') return SoundName.CRUSH;
+      if (event.attackType === 'fracture') return SoundName.FRACTURE_HIT;
       if (event.attackType === 'meteorRain') return null;
       return event.attackType === 'lightning' ? SoundName.LIGHTNING : SoundName.POWER_IMPACT;
     case CombatEvent.POWER_BLOCKED:

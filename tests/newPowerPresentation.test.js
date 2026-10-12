@@ -443,3 +443,46 @@ describe('mass telekinesis presentation', () => {
     ]), [SoundName.METEOR_CALL, SoundName.METEOR_BREAK, SoundName.METEOR_FALL, SoundName.METEOR_IMPACT]);
   });
 });
+
+describe('fracture presentation', () => {
+  it('draws only the cracked segments that have not burst, brighter as the burst nears', () => {
+    const caster = spawnFighter(300, 1, 'shadow');
+    caster.combat.fracture = { power: powersConfig.powers.fracture, direction: 1, time: 0.3, target: 1, hit: false, segments: [
+      { left: 330, right: 390, marked: true, burst: true, markTime: 0, impactTime: 0.25 },
+      { left: 390, right: 450, marked: true, burst: false, markTime: 0.07, impactTime: 0.32 },
+      { left: 450, right: 510, marked: true, burst: false, markTime: 0.13, impactTime: 0.38 },
+      { left: 510, right: 570, marked: false, burst: false, markTime: 0.4, impactTime: 0.65 },
+    ] };
+    const renderer = recordingRenderer();
+    new PowerRenderer().draw(renderer, [caster], null, 600);
+    const cracks = renderer.calls.filter((call) => call.name === 'polyline');
+    assert.equal(cracks.length, 6);
+    const alphas = renderer.calls.filter((call) => call.name === 'setAlpha').map((call) => call.args[0]);
+    assert.ok(alphas[1] > alphas[3]);
+  });
+
+  it('slams the floor with dust, pops each segment and sounds the run and the hit', () => {
+    const effects = createEffects();
+    const caster = spawnFighter(300, 1, 'shadow');
+    const target = spawnFighter(700, -1, 'guardian');
+    effects.handleEvents([event(CombatEvent.POWER_ACTIVE, caster, null, 'fracture')]);
+    assert.ok(effects.particles.particles.some((particle) => particle.active && particle.color === colors.shockwaveDust));
+    effects.handleEvents([{ type: CombatEvent.FRACTURE_BURST, attacker: caster, defender: target, attackType: 'fracture', x: 420, y: 600, hit: false }]);
+    assert.ok(effects.debris.particles.some((piece) => piece.active));
+    assert.deepEqual(playedSounds([
+      event(CombatEvent.POWER_ACTIVE, caster, null, 'fracture'),
+      { type: CombatEvent.FRACTURE_CRACK, attacker: caster, defender: target, attackType: 'fracture', x: 420, y: 600 },
+      { type: CombatEvent.FRACTURE_BURST, attacker: caster, defender: target, attackType: 'fracture', x: 420, y: 600, hit: false },
+      event(CombatEvent.POWER_HIT, caster, target, 'fracture'),
+    ]), [SoundName.FRACTURE_RUN, SoundName.FRACTURE_HIT]);
+  });
+
+  it('crouches the caster with the free hand to the floor while striking the ground', () => {
+    const fighter = spawnFighter(400, 1, 'shadow');
+    channel(fighter, 'fracture', powersConfig.powers.fracture.startup);
+    const pose = computePose(fighter, createPose());
+    const idle = computePose(spawnFighter(400, 1, 'shadow'), createPose());
+    assert.ok(pose.hipY > idle.hipY + 15);
+    assert.ok(pose.freeHandY > pose.shoulderY + fighter.height * 0.25);
+  });
+});
