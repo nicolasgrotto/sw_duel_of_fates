@@ -202,15 +202,17 @@ As técnicas de lâmina ganham trilhas de poses-chave (sistema da 2.12) válidas
 
 Todo o elenco passa ao sistema de trilhas da 2.12, agrupado em **famílias de movimento**: personagens com o mesmo jeito de lutar compartilham postura, trilhas, defesa, esquiva, disputa e vitória da disputa; a diferença entre eles continua vindo da silhueta, da lâmina, dos golpes e da habilidade. Frame data, alcance e hitboxes não mudam; a lâmina tem de passar pela hitbox real no ativo e nenhuma transição gira mais de 60° por frame. O estilo `standard` continua existindo, idêntico à v2, mas nenhum personagem o usa mais.
 
+**Decisões da implementação (2.6).** Nas cadeias, o fim de um golpe e a preparação do seguinte ficam a menos de ~150° um do outro, e o fim do golpe fica a menos de ~120° da guarda do personagem; com mais que isso a mistura de encadeamento gira mais de 60° num frame. Por isso a Brasa e o Eco, de guarda baixa, encadeiam golpes ascendentes (o rápido termina na linha do peito, não acima da cabeça), e a preparação do reverso da Garça é curta. O corte rápido de cada família não cobre a estocada da Haste e do Soberano: a trilha pelo tipo do golpe só vale quando o tipo difere da base do golpe (`light2`, `light5`), e o resto segue pela pose (`thrust`, `sweep`, `hammer`, `impetus`).
+
 | Família | Personagens | Intenção | Como aparece |
 | --- | --- | --- | --- |
-| `guardian` | Guardião, Ancião, Predestinado (e o protagonista Técnica) | Econômico, preciso, guarda firme | O da 2.3/2.12; ganha o corte reverso (`lightReverse`) para o Ancião |
+| `guardian` | Guardião, Ancião, Predestinado (e o protagonista Técnica) | Econômico, preciso, guarda firme | O da 2.3/2.12; o segundo golpe da cadeia (`light2`) vira um corte reverso, de baixo para cima, também no Ancião e no Predestinado |
 | `wasp` | Vespa | Duas lâminas, giros curtos | O da 2.3/2.12 |
 | `aggressor` | Sombra, Sombra Desperta (e o protagonista Fúria) | Agressivo, amplo, pressiona | Tronco à frente, preparação alta atrás da cabeça, arcos longos com passo grande e quadril, follow-through largo; o ímpeto (`impetus`) avança com o corpo inteiro; disputa inclinada e vitória larga |
 | `juggernaut` | Bastião, Forja | Pesado, lento, inevitável | Base larga e baixa, quase sem balanço, golpes curtos e secos no rápido e martelada sobre a cabeça no forte e no `hammer`, agachando no impacto; empurrão de ombro; disputa enraizada e vitória curta |
 | `fencer` | Espelho, Haste, Soberano | Ereto, preciso, de ponta | Tronco reto, preparação contida, estocadas com braço estendido (o `thrust` da Haste vira lunge), o forte num corte diagonal limpo, a varredura (`sweep`) baixa e longa; disputa firme e vitória curta e precisa |
 | `dancer` | Garça (e o protagonista Voo) | Leve, fluido, acrobático | Base alta e solta, arcos largos com o corpo acompanhando, corte reverso cruzado, pirueta do corpo na recuperação do forte (canal `turn`); disputa leve e vitória com giro da lâmina |
-| `striker` | Brasa, Eco | Enrolado, explosivo, de resposta | Base baixa e contida, preparação curta, cortes que explodem para a frente, forte de baixo para cima, reverso rápido (`lightReverse`); disputa baixa e vitória curta |
+| `striker` | Brasa, Eco | Enrolado, explosivo, de resposta | Base baixa e contida a partir da guarda baixa do personagem; o rápido sobe de baixo até a linha do peito, o segundo da cadeia é uma estocada baixa e longa, o forte é um corte ascendente com o corpo subindo junto; disputa baixa e vitória curta |
 
 ### Disputa de lâminas (v2.5)
 
@@ -227,7 +229,13 @@ Pose `BLADE_LOCK`, com números por estilo em `motionStyles[motion].lock` e `loc
 | `guardian` | base mais baixa e firme, tremor menor | empurra curto e controlado (25°), tronco quase parado, volta direto à guarda |
 | `wasp` | tronco mais à frente, tremor maior | empurra largo (55°) com o tronco e fecha com um giro completo da lâmina |
 
-O perdedor usa a pose de desequilíbrio existente. Os demais estilos recebem disputa e vitória próprias na 2.6.
+| `aggressor` | tronco bem à frente, tremor alto | empurra largo (50°) com o tronco |
+| `juggernaut` | base mais baixa de todas, tremor mínimo | empurra curto (30°) e volta |
+| `fencer` | tronco reto, tremor médio | empurra mínimo (20°), preciso |
+| `dancer` | leve, tremor médio | empurra largo (50°) e fecha com giro da lâmina |
+| `striker` | base baixa, tremor médio | empurra médio (40°) com o tronco |
+
+O perdedor usa a pose de desequilíbrio existente.
 
 ## Camadas de arena como dados
 
