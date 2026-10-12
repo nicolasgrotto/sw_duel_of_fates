@@ -4,7 +4,7 @@ export const effectsConfig = {
   maxRings: 4,
   maxShockwaves: 3,
   maxDebris: 24,
-  maxStormStrikes: 4,
+  maxStormStrikes: 8,
   stormStrike: { segments: 14, jitter: 22, skyY: -60, duration: 0.18, glowAlpha: 0.35, glowScale: 3, widthScale: 1.6, floorGlowRadius: 70 },
   bladeLock: {
     contactHeight: 125,
@@ -28,6 +28,8 @@ export const effectsConfig = {
   sanctuaryBreak: { ring: { radius: 120, lineWidth: 3, alpha: 0.8, duration: 0.3 }, light: { radius: 120, alpha: 0.5, duration: 0.2 } },
   sanctuaryHitRing: { radius: 60, lineWidth: 2, alpha: 0.6, duration: 0.15 },
   fractureSlam: { dust: { count: 10, reducedCount: 5, spread: 30, speed: [60, 200], lift: [60, 160], life: [0.25, 0.5], size: [1.5, 2.5] } },
+  waveReflect: { ring: { radius: 70, lineWidth: 3, alpha: 0.85, duration: 0.2 }, light: { radius: 110, alpha: 0.55, duration: 0.15 } },
+  arsenalBlock: { ring: { radius: 40, lineWidth: 2, alpha: 0.7, duration: 0.15 } },
   meteorCinematic: { lift: 70, zoom: 0.95, extra: 0.5 },
   meteorBreak: { light: { radius: 160, alpha: 0.5, duration: 0.25 } },
   mindTwistRing: { radius: 46, lineWidth: 2, alpha: 0.6, duration: 0.3 },

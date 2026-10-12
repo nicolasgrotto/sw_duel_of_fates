@@ -85,7 +85,13 @@ export class PowerRenderer {
     renderer.setBlendMode('lighter');
     for (const fighter of fighters) {
       if (fighter.combat.fracture) {
-        this.drawFracture(renderer, fighter, floorY ?? fighter.y);
+        this.drawFracture(renderer, fighter, fighter.combat.fracture, floorY ?? fighter.y);
+      }
+      for (const wave of fighter.combat.fractures ?? []) {
+        this.drawFracture(renderer, fighter, wave, floorY ?? fighter.y);
+      }
+      if (fighter.combat.arsenal) {
+        this.drawArsenal(renderer, fighter);
       }
       if (fighter.combat.rain) {
         this.drawRain(renderer, fighter, floorY ?? fighter.y);
@@ -480,9 +486,32 @@ export class PowerRenderer {
     renderer.setAlpha(1);
   }
 
-  drawFracture(renderer, fighter, floorY) {
+  drawArsenal(renderer, fighter) {
+    const arsenal = fighter.combat.arsenal;
+    const look = style.arsenal;
+    const orbit = arsenal.power.orbit;
+    const tier = getPowerTier(fighter.flowLevel, powersConfig.tiers);
+    const base = arsenal.angle + arsenal.time * TAU / orbit.period;
+    const radius = projectilesConfig.arsenal.radius * look.rockScale;
+    renderer.save();
+    renderer.setBlendMode('source-over');
+    for (const object of arsenal.objects) {
+      const angle = base + object.offset;
+      const depth = (Math.sin(angle) + 1) / 2;
+      renderer.setAlpha(lerp(look.backAlpha, 1, depth));
+      drawRockCluster(
+        renderer,
+        fighter.x + fighter.facing * Math.cos(angle) * orbit.radiusX,
+        fighter.y - fighter.height / 2 + Math.sin(angle) * orbit.radiusY,
+        radius * lerp(look.backScale, look.frontScale, depth),
+        angle * 2, 1, tier.color,
+      );
+    }
+    renderer.restore();
+  }
+
+  drawFracture(renderer, fighter, wave, floorY) {
     const crack = style.fracture;
-    const wave = fighter.combat.fracture;
     const tier = getPowerTier(fighter.flowLevel, powersConfig.tiers);
     const last = crack.zigzag.length - 1;
     for (let index = 0; index < wave.segments.length; index += 1) {

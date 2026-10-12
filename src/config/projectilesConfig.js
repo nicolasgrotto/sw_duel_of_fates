@@ -45,6 +45,8 @@ export const projectilesConfig = {
       riseSpin: 2.5,
       riseStart: 0.4,
     },
+    wave: { points: 9, heightScale: 1.7, bow: 0.55, glowWidth: 14, glowAlpha: 0.35, width: 5, coreWidth: 2 },
+    arsenalRockScale: 1.1,
     saberSpin: 18,
     saberLengthScale: 1.6,
     saberGlowScale: 1.1,

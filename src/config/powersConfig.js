@@ -35,7 +35,7 @@ export const powersConfig = {
       launch: { id: 'arsenal', effect: 'arsenal', pose: 'cast', arsenalLaunch: true, startup: 0, active: 0, recovery: 0.15 },
     },
     flowCleave: {
-      id: 'flowCleave', effect: 'flowCleave', projectile: true, wave: true, channel: false, pose: 'cast', interaction: 'throw',
+      id: 'flowCleave', effect: 'flowCleave', projectile: true, wave: true, channel: false, pose: 'cleave', interaction: 'throw',
       cost: 30, startup: 0.2, active: 0.08, recovery: 0.3, range: 520, guard: { staminaCost: 10 },
     },
     fracture: {
@@ -252,6 +252,7 @@ export const powersConfig = {
     fracture: {
       zigzag: [0, -4, 3, -5, 2, 0], lineWidth: 2.5, glowScale: 3, glowAlpha: 0.3, alpha: [0.35, 1], depth: 3,
     },
+    arsenal: { rockScale: 1.1, frontScale: 1.15, backScale: 0.8, backAlpha: 0.55 },
     meteor: {
       asteroidOffsetX: 260, asteroidFromY: -160, asteroidToY: 70, asteroidRadius: [30, 60], asteroidSpin: 0.6,
       breakAt: 0.72, breakSpread: 2.2, fallDriftX: 140, rockScale: 0.24, trailAlpha: 0.4, trailLength: 0.12, trailWidth: 5,

@@ -24,7 +24,7 @@ function createEffects(reduced = false) {
 
 function recordingRenderer() {
   const calls = [];
-  const record = (name) => (...args) => calls.push({ name, args });
+  const record = (name) => (...args) => calls.push({ name, args: args.map((value) => (value instanceof Float32Array ? Array.from(value) : value)) });
   const names = ['save', 'restore', 'setBlendMode', 'setAlpha', 'drawGlow', 'polyline', 'strokeEllipse', 'fillPolygon', 'line', 'translate', 'scale', 'rotate', 'fillCircle', 'fillEllipse', 'fillRect', 'strokeCircle'];
   return { calls, ...Object.fromEntries(names.map((name) => [name, record(name)])) };
 }
@@ -492,5 +492,71 @@ describe('sanctuary and barrier shapes', () => {
     const smallest = Math.min(...powersConfig.tiers.map((tier) => tier.barrierScale));
     assert.ok(render.status.sanctuaryRadiusX < render.barrierRadiusX * smallest);
     assert.ok(render.status.sanctuaryRadiusY < render.barrierRadiusY * smallest);
+  });
+});
+
+describe('stage 2.19 presentation', () => {
+  it('draws every storm fracture wave with the fracture cracks', () => {
+    const caster = spawnFighter(300, 1, 'sovereign');
+    const segment = (left) => ({ left, right: left + 60, marked: true, burst: false, markTime: 0, impactTime: 0.2 });
+    caster.combat.fractures = [
+      { power: powersConfig.powers.storm.fractureByLevel, direction: 1, time: 0.1, target: 1, hit: false, group: 0, segments: [segment(500)] },
+      { power: powersConfig.powers.storm.fractureByLevel, direction: -1, time: 0.1, target: 1, hit: false, group: 0, segments: [segment(440)] },
+    ];
+    const renderer = recordingRenderer();
+    new PowerRenderer().draw(renderer, [caster], null, 600);
+    assert.equal(renderer.calls.filter((call) => call.name === 'polyline').length, 6);
+  });
+
+  it('orbits the arsenal stones around the body, larger in front than behind', () => {
+    const caster = spawnFighter(400, 1, 'shadow');
+    const power = powersConfig.powers.arsenal;
+    caster.combat.arsenal = { power, angle: 0, time: power.orbit.period / 4, launchCooldown: 0, objects: [{ id: 0, offset: 0 }, { id: 1, offset: Math.PI }] };
+    const renderer = recordingRenderer();
+    new PowerRenderer().draw(renderer, [caster]);
+    const stones = renderer.calls.filter((call) => call.name === 'fillPolygon').map((call) => {
+      const xs = call.args[0].filter((_, index) => index % 2 === 0);
+      const ys = call.args[0].filter((_, index) => index % 2 === 1);
+      const cx = xs.reduce((sum, value) => sum + value, 0) / xs.length;
+      const cy = ys.reduce((sum, value) => sum + value, 0) / ys.length;
+      return { width: Math.max(...xs.map((x, index) => Math.hypot(x - cx, ys[index] - cy))), y: cy };
+    });
+    assert.equal(stones.length, 2);
+    const [front, back] = stones[0].y > stones[1].y ? stones : [stones[1], stones[0]];
+    assert.ok(front.width > back.width);
+  });
+
+  it('draws the cleave wave as a crescent in the saber color of its current owner', async () => {
+    const { ProjectileRenderer } = await import('../src/rendering/ProjectileRenderer.js');
+    const { ProjectileKind } = await import('../src/config/projectilesConfig.js');
+    const caster = spawnFighter(400, 1, 'guardian');
+    const reflector = spawnFighter(700, -1, 'shadow');
+    const projectile = { active: true, kind: ProjectileKind.WAVE, owner: 1, source: 'flowCleave', x: 600, y: 500, vx: -1000, radius: 28, age: 0.1 };
+    const renderer = recordingRenderer();
+    new ProjectileRenderer().draw(renderer, [projectile], [caster, reflector]);
+    const lines = renderer.calls.filter((call) => call.name === 'polyline');
+    assert.equal(lines.length, 3);
+    assert.equal(lines[0].args[1], reflector.appearance.saberColor);
+    const xs = lines[1].args[0].filter((_, index) => index % 2 === 0);
+    assert.ok(Math.min(...xs) < projectile.x);
+  });
+
+  it('flashes the reflector blade on a wave reflect and breaks a stone on an arsenal block', () => {
+    const effects = createEffects();
+    const caster = spawnFighter(400, 1, 'guardian');
+    const reflector = spawnFighter(700, -1, 'shadow');
+    effects.handleEvents([{ type: CombatEvent.WAVE_REFLECT, attacker: reflector, defender: caster, attackType: 'flowCleave', x: 660, y: 500 }]);
+    assert.ok(effects.getSaberFlare(reflector) > 0);
+    assert.ok(effects.rings.some((ring) => ring.active && ring.color === reflector.appearance.saberColor));
+    const blocks = createEffects();
+    blocks.handleEvents([{ type: CombatEvent.ARSENAL_BLOCK, attacker: caster, defender: reflector, attackType: 'throw', x: 650, y: 500 }]);
+    assert.ok(blocks.debris.particles.some((piece) => piece.active));
+    assert.deepEqual(playedSounds([
+      event(CombatEvent.POWER_START, reflector, null, 'arsenal'),
+      event(CombatEvent.POWER_ACTIVE, caster, null, 'flowCleave'),
+      { type: CombatEvent.WAVE_REFLECT, attacker: reflector, defender: caster, attackType: 'flowCleave', x: 660, y: 500 },
+      { type: CombatEvent.ARSENAL_LAUNCH, attacker: reflector, defender: null, attackType: 'arsenal', x: 700, y: 500 },
+      { type: CombatEvent.ARSENAL_BLOCK, attacker: caster, defender: reflector, attackType: 'throw', x: 650, y: 500 },
+    ]), [SoundName.ARSENAL, SoundName.FLOW_CLEAVE, SoundName.WAVE_REFLECT, SoundName.ARSENAL_LAUNCH, SoundName.ARSENAL_BLOCK]);
   });
 });

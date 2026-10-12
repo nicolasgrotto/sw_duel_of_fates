@@ -8,6 +8,10 @@ import { drawRockCluster, getRockCount, getRockScale } from './rockCluster.js';
 const style = projectilesConfig.render;
 
 export class ProjectileRenderer {
+  constructor() {
+    this.wavePoints = new Float32Array(style.wave.points * 2);
+  }
+
   draw(renderer, projectiles, fighters) {
     if (!projectiles) {
       return;
@@ -17,8 +21,12 @@ export class ProjectileRenderer {
       if (!projectile.active || !owner) {
         continue;
       }
-      if (projectile.kind === ProjectileKind.THROW) {
+      if (projectile.kind === ProjectileKind.THROW && projectile.source === 'arsenal') {
+        this.drawArsenalStone(renderer, projectile, owner);
+      } else if (projectile.kind === ProjectileKind.THROW) {
         this.drawFragment(renderer, projectile, owner);
+      } else if (projectile.kind === ProjectileKind.WAVE) {
+        this.drawWave(renderer, projectile, owner);
       } else {
         this.drawSaber(renderer, projectile, owner);
       }
@@ -30,6 +38,33 @@ export class ProjectileRenderer {
     const size = resolveLevelBand(owner.flowLevel, projectilesConfig.throw.sizes);
     const angle = projectile.age * style.fragmentSpin * (Math.sign(projectile.vx) || 1);
     drawRockCluster(renderer, projectile.x, projectile.y, projectile.radius * getRockScale(size.id), angle, getRockCount(size.id), tier.color);
+  }
+
+  drawArsenalStone(renderer, projectile, owner) {
+    const tier = getPowerTier(owner.flowLevel, powersConfig.tiers);
+    const angle = projectile.age * style.fragmentSpin * (Math.sign(projectile.vx) || 1);
+    drawRockCluster(renderer, projectile.x, projectile.y, projectile.radius * style.arsenalRockScale, angle, 1, tier.color);
+  }
+
+  drawWave(renderer, projectile, owner) {
+    const wave = style.wave;
+    const direction = Math.sign(projectile.vx) || 1;
+    const half = projectile.radius * wave.heightScale;
+    const last = wave.points - 1;
+    for (let index = 0; index <= last; index += 1) {
+      const t = index / last * 2 - 1;
+      this.wavePoints[index * 2] = projectile.x + direction * projectile.radius * wave.bow * (1 - t * t);
+      this.wavePoints[index * 2 + 1] = projectile.y + t * half;
+    }
+    const color = owner.appearance.saberColor;
+    renderer.save();
+    renderer.setBlendMode('lighter');
+    renderer.setAlpha(wave.glowAlpha);
+    renderer.polyline(this.wavePoints, color, wave.glowWidth);
+    renderer.setAlpha(1);
+    renderer.polyline(this.wavePoints, color, wave.width);
+    renderer.polyline(this.wavePoints, colors.saberCore, wave.coreWidth);
+    renderer.restore();
   }
 
   drawSaber(renderer, projectile, owner) {

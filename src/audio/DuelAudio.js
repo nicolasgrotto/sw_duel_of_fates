@@ -56,12 +56,14 @@ function getSoundForEvent(event) {
       if (event.attackType === 'storm') return SoundName.STORM_INVOKE;
       if (event.attackType === 'sanctuary') return SoundName.SANCTUARY;
       if (event.attackType === 'meteorRain') return SoundName.METEOR_CALL;
+      if (event.attackType === 'arsenal') return SoundName.ARSENAL;
       return event.attackType === 'barrier' ? SoundName.BARRIER : SoundName.POWER_CHARGE;
     case CombatEvent.POWER_ACTIVE:
       if (event.attackType === 'wrath') return SoundName.WRATH;
       if (event.attackType === 'storm') return SoundName.STORM_CALL;
       if (event.attackType === 'supremePush') return SoundName.SUPREME_PUSH;
       if (event.attackType === 'fracture') return SoundName.FRACTURE_RUN;
+      if (event.attackType === 'flowCleave') return SoundName.FLOW_CLEAVE;
       if (event.attackType === 'meteorRain') return null;
       return event.attackType === 'pull' ? SoundName.POWER_PULL : SoundName.POWER_WAVE;
     case CombatEvent.POWER_HIT:
@@ -75,6 +77,12 @@ function getSoundForEvent(event) {
       return SoundName.BLOCK;
     case CombatEvent.POWER_RESISTED:
       return SoundName.POWER_RESISTED;
+    case CombatEvent.WAVE_REFLECT:
+      return SoundName.WAVE_REFLECT;
+    case CombatEvent.ARSENAL_LAUNCH:
+      return SoundName.ARSENAL_LAUNCH;
+    case CombatEvent.ARSENAL_BLOCK:
+      return SoundName.ARSENAL_BLOCK;
     case CombatEvent.RAIN_CALL:
       return SoundName.METEOR_BREAK;
     case CombatEvent.RAIN_MARK:

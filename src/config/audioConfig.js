@@ -211,6 +211,25 @@ export const audioConfig = {
       { type: 'noise', duration: 0.3, attack: 0.002, gain: 0.35, filter: { type: 'highpass', from: 2500, to: 1500, q: 0.8 } },
       { type: 'tone', wave: 'triangle', from: 900, to: 300, duration: 0.3, attack: 0.002, gain: 0.1, filter: null },
     ],
+    flowCleave: [
+      { type: 'noise', duration: 0.3, attack: 0.02, gain: 0.35, filter: { type: 'bandpass', from: 700, to: 2600, q: 1.2 } },
+      { type: 'tone', wave: 'sawtooth', from: 160, to: 320, duration: 0.3, attack: 0.02, gain: 0.07, filter: { type: 'lowpass', from: 900, to: 1800, q: 1 } },
+    ],
+    waveReflect: [
+      { type: 'tone', wave: 'triangle', from: 1200, to: 1500, duration: 0.2, attack: 0.002, gain: 0.12, filter: null },
+      { type: 'noise', duration: 0.1, attack: 0.002, gain: 0.3, filter: { type: 'highpass', from: 2400, to: 2400, q: 0.8 } },
+    ],
+    arsenal: [
+      { type: 'noise', duration: 0.45, attack: 0.15, gain: 0.25, filter: { type: 'lowpass', from: 300, to: 1100, q: 1 } },
+      { type: 'tone', wave: 'triangle', from: 70, to: 110, duration: 0.45, attack: 0.15, gain: 0.12, filter: null },
+    ],
+    arsenalLaunch: [
+      { type: 'noise', duration: 0.18, attack: 0.01, gain: 0.3, filter: { type: 'bandpass', from: 500, to: 1600, q: 1 } },
+    ],
+    arsenalBlock: [
+      { type: 'noise', duration: 0.15, attack: 0.001, gain: 0.35, filter: { type: 'bandpass', from: 1400, to: 500, q: 0.9 } },
+      { type: 'tone', wave: 'triangle', from: 220, to: 110, duration: 0.15, attack: 0.002, gain: 0.08, filter: null },
+    ],
     fractureRun: [
       { type: 'noise', duration: 0.9, attack: 0.02, gain: 0.32, filter: { type: 'lowpass', from: 500, to: 1400, q: 1.2 } },
       { type: 'tone', wave: 'sawtooth', from: 55, to: 45, duration: 0.9, attack: 0.02, gain: 0.08, filter: { type: 'lowpass', from: 300, to: 200, q: 1 } },

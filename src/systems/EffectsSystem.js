@@ -225,6 +225,12 @@ export class EffectsSystem {
       case CombatEvent.FRACTURE_BURST:
         this.spawnFractureBurst(attacker, x, y, params);
         break;
+      case CombatEvent.WAVE_REFLECT:
+        this.spawnWaveReflect(attacker, x, y, params);
+        break;
+      case CombatEvent.ARSENAL_BLOCK:
+        this.spawnArsenalBlock(defender ?? attacker, x, y);
+        break;
       case CombatEvent.RAIN_CALL:
         this.spawnMeteorBreak(attacker, params);
         break;
@@ -507,6 +513,25 @@ export class EffectsSystem {
       strike.time += dt;
       if (strike.time >= duration) strike.active = false;
     }
+  }
+
+  spawnWaveReflect(reflector, x, y, params) {
+    const style = this.config.waveReflect;
+    params.x = x;
+    params.y = y;
+    params.direction = reflector.facing;
+    params.color = reflector.appearance.saberColor;
+    this.spawn(EffectType.PARRY_SPARK, params);
+    this.spawnRing(style.ring, x, y, params.color);
+    this.spawnLight(style.light, x, y, params.color);
+    this.saberFlares.set(reflector, this.config.saberFlare.duration);
+  }
+
+  spawnArsenalBlock(owner, x, y) {
+    const color = getTierColor(owner);
+    this.spawnRing(this.config.arsenalBlock.ring, x, y, color);
+    this.spawnDebris(x, y, 1);
+    this.spawnDebris(x, y, -1);
   }
 
   spawnFractureSlam(caster, params) {
