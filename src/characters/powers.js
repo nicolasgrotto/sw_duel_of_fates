@@ -32,8 +32,13 @@ export function getAbilityCategory(id, { categories }) {
   return null;
 }
 
-export function findLoadoutProblems(loadout, alignment, config, techniques) {
+export const POWER_SLOTS = Object.freeze(['neutral', 'forward', 'back', 'fourth']);
+
+export function findLoadoutProblems(loadout, alignment, config, techniques, powerSlots = 3) {
   const problems = [];
+  const powers = Object.entries(loadout?.powers ?? {});
+  if (![3, 4].includes(powerSlots)) problems.push(`powers: invalid capacity ${powerSlots}`);
+  if (powers.length > powerSlots) problems.push(`powers: exceeds capacity ${powerSlots}`);
   const check = (slot, id, known) => {
     const category = getAbilityCategory(id, config);
     if (!known || !category) {
@@ -43,9 +48,11 @@ export function findLoadoutProblems(loadout, alignment, config, techniques) {
     }
   };
   for (const [slot, id] of Object.entries(loadout?.powers ?? {})) {
+    if (!POWER_SLOTS.slice(0, powerSlots).includes(slot)) problems.push(`powers.${slot}: invalid slot`);
     check(`powers.${slot}`, id, id in config.powers);
   }
   for (const [slot, id] of Object.entries(loadout?.techniques ?? {})) {
+    if (!['forward', 'back'].includes(slot)) problems.push(`techniques.${slot}: invalid slot`);
     check(`techniques.${slot}`, id, id in techniques);
   }
   return problems;

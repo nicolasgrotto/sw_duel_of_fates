@@ -138,3 +138,14 @@ describe('technique names', () => {
     }
   });
 });
+
+
+describe('power slot capacity', () => {
+  it('checks capacity, power names and technique slots', () => {
+    const loadout = { powers: { neutral: 'push', forward: 'throw', back: 'barrier', fourth: 'meteorRain' } };
+    assert.deepEqual(findLoadoutProblems(loadout, 'light', powersConfig, bladeTechniques, 4), []);
+    assert.deepEqual(findLoadoutProblems(loadout, 'light', powersConfig, bladeTechniques), ['powers: exceeds capacity 3', 'powers.fourth: invalid slot']);
+    assert.deepEqual(findLoadoutProblems({ powers: { typo: 'push' }, techniques: { fourth: 'spin' } }, 'light', powersConfig, bladeTechniques), ['powers.typo: invalid slot', 'techniques.fourth: invalid slot']);
+    assert.ok(findLoadoutProblems(loadout, 'light', powersConfig, bladeTechniques, 5).includes('powers: invalid capacity 5'));
+  });
+});

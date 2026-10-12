@@ -1397,3 +1397,7 @@ Só desenho, lendo o estado da simulação. `fighterPose` ergue o estrangulado d
 ### Integração das regras de custo alto (2.18)
 
 GalleryScene mantém o ciclo enquanto há Santuário, rainActive ou trajetória da Fratura. Com Repulsão Suprema e alvo atacando, posiciona os corpos no alcance da lâmina; GalleryTargetController solicita um golpe real, e GalleryController espera o estado elegível para fuga antes de solicitar o poder. powerDebugInfo fornece a leitura pura dos campos novos para F3 no duelo e na galeria. ReplayBuffer registra a intenção original e clona as estruturas de chuva/Fratura na captura e restauração. Hud ignora hudMark cujo token ainda não exista em themeConfig, preservando o render até a apresentação do Claude; nenhum desenho ou cor foi introduzido. O deslizamento da Barreira usa o centro do lançador para poderes radiais ou o centro marcado para a chuva. Nenhum poder novo foi atribuído ao elenco.
+
+### Capacidade de poderes (2.7)
+
+`powerSlots` ? a capacidade num?rica do personagem (padr?o 3; 4 nas variantes do Predestinado). `unlockedPowerSlots` restringe os espa?os dispon?veis na campanha, antes representados pelo array `powerSlots`; n?o confundir progress?o com capacidade. `findLoadoutProblems` recebe a capacidade e valida quantidade, ids, alinhamento e nomes: poderes neutral/forward/back/fourth, t?cnicas forward/back. F3 exp?e os quatro espa?os, inclusive vazios.

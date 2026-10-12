@@ -20,7 +20,8 @@ export function createProtagonistCharacter(profile, { protagonist }, slots = nul
     skins: protagonist.skins,
     sound: template.sound,
     loadout,
-    powerSlots: slots,
+    powerSlots: 3,
+    unlockedPowerSlots: slots,
     appearance: resolveAppearance({ appearance: { ...template.appearance, ...protagonist.appearance, saberColor: profile.saberColor }, skins: protagonist.skins }, profile.skin),
   };
 }
