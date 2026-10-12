@@ -560,6 +560,7 @@ export class EnemyAI {
   }
 
   wantsSelfPower(power) {
+    if (power.effect === 'arsenal') return !this.self.combat.arsenal?.objects.length;
     if (power.effect === 'absorb') {
       const use = this.perception.powerUse.absorb;
       const incoming = this.opponent.combat.power;
@@ -636,6 +637,12 @@ export class EnemyAI {
     }
     for (const slot of POWER_SLOTS) {
       const power = loadout[slot];
+      if (power?.effect === 'arsenal' && self.combat.arsenal?.objects.length) {
+        const use = this.perception.powerUse.arsenal, gap = getGap(self, this.opponent);
+        const reserve = this.difficulty.powerAware && Object.values(this.opponent.stats.power.loadout ?? {}).some(incoming => incoming?.projectile || incoming?.effect === 'arsenal') ? use.reserveObjects : 0;
+        if (self.combat.arsenal.launchCooldown === 0 && self.combat.arsenal.objects.length > reserve && gap >= use.minGap && gap <= use.maxGap) return this.startPower(slot, 0);
+        continue;
+      }
       if (power && power.effect !== 'barrier' && this.canUsePower(power) && (power.self ? this.wantsSelfPower(power) : this.wantsPower(power))) {
         const [minHold, maxHold] = this.perception.lightningHold;
         const hold = power.channel && !power.automatic

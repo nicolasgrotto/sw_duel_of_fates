@@ -35,6 +35,8 @@ export const CombatEvent = Object.freeze({
   RAIN_CALL: 'rainCall',
   RAIN_MARK: 'rainMark',
   RAIN_STRIKE: 'rainStrike',
+  ARSENAL_LAUNCH: 'arsenalLaunch',
+  ARSENAL_BLOCK: 'arsenalBlock',
   WAVE_REFLECT: 'waveReflect',
   STORM_MARK: 'stormMark',
   STORM_STRIKE: 'stormStrike',

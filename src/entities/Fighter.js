@@ -86,6 +86,7 @@ function createCombat() {
     statusLevel: 0,
     confuseTime: 0,
     confuseElapsed: 0,
+    arsenal: null,
     fracture: null,
     fractures: [],
     stormWaveHits: [],

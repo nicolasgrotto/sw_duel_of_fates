@@ -23,10 +23,17 @@ export const powersConfig = {
   categories: {
     flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull', 'throw', 'mindTwist', 'supremePush', 'fracture'] },
     aurora: { alignments: ['light'], abilities: ['barrier', 'heal', 'focus', 'absorb', 'sanctuary', 'meteorRain', 'flowCleave'] },
-    eclipse: { alignments: ['dark'], abilities: ['lightning', 'choke', 'freeze', 'storm', 'wrath', 'drain'] },
+    eclipse: { alignments: ['dark'], abilities: ['lightning', 'choke', 'freeze', 'storm', 'wrath', 'drain', 'arsenal'] },
     blade: { alignments: ['light', 'dark'], abilities: ['spin', 'dashSlash', 'saberThrow'] },
   },
   powers: {
+    arsenal: {
+      id: 'arsenal', effect: 'arsenal', self: true, pose: 'cast', interaction: 'throw',
+      cost: 40, startup: 0.35, active: SELF_BUFF_PHASES.active, recovery: 0.25, duration: 6, guard: { staminaCost: 10 },
+      objectsByTier: [{ minLevel: 1, objects: 2 }, { minLevel: 3, objects: 2 }, { minLevel: 8, objects: 3 }, { minLevel: 10, objects: 4 }],
+      orbit: { radiusX: 45, radiusY: 32, period: 1.2, initialAngle: 0 }, launchInterval: 0.35,
+      launch: { id: 'arsenal', effect: 'arsenal', pose: 'cast', arsenalLaunch: true, startup: 0, active: 0, recovery: 0.15 },
+    },
     flowCleave: {
       id: 'flowCleave', effect: 'flowCleave', projectile: true, wave: true, channel: false, pose: 'cast', interaction: 'throw',
       cost: 30, startup: 0.2, active: 0.08, recovery: 0.3, range: 520, guard: { staminaCost: 10 },

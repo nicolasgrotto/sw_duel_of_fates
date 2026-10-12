@@ -209,6 +209,7 @@ export class StatusSystem {
   }
 
   onDeath(fighter) {
+    fighter.combat.arsenal = null;
     fighter.combat.fracture = null;
     fighter.combat.fractures.length = 0;
     fighter.combat.stormWaveHits.length = 0;

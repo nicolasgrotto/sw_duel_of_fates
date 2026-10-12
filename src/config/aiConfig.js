@@ -431,6 +431,7 @@ export const aiConfig = {
     barrierVsSaberChance: 0.15,
     stormEscapeMargin: 8,
     powerUse: {
+      arsenal: { minGap: 150, maxGap: 500, reserveObjects: 1 },
       flowCleave: { minGap: 200, maxGap: 520 },
       mindTwist: { minGap: 120, maxGap: 320 },
       drain: { minGap: 120, maxGap: 300, targetMeterAbove: 25 },

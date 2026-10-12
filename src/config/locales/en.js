@@ -312,6 +312,7 @@ export const en = {
     },
     dialogue: { hint: '{confirm}  continue  ·  {back}  skip', touchHint: 'Tap to continue' },
     powers: {
+      arsenal: 'Telekinetic Arsenal',
       flowCleave: 'Flow Cleave',
       absorb: 'Absorption',
       drain: 'Drain',

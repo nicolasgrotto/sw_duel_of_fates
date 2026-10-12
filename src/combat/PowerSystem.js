@@ -9,6 +9,7 @@ import { getMoveX } from '../entities/fighterIntent.js';
 import { isStormShieldUp, StormSystem } from './StormSystem.js';
 import { ChokeSystem } from './ChokeSystem.js';
 import { FractureSystem } from './FractureSystem.js';
+import { ArsenalSystem } from './ArsenalSystem.js';
 
 const POWER_STATES = new Set([FighterState.CASTING, FighterState.CHANNELING]);
 const GROUNDED = Object.freeze({ scale: 1, duration: 1, stagger: 1 });
@@ -74,6 +75,7 @@ export class PowerSystem {
     this.storms = new StormSystem(this);
     this.chokes = new ChokeSystem(this);
     this.fractures = new FractureSystem(this);
+    this.arsenals = new ArsenalSystem(this);
     this.context = { system: this, combat, caster: null, target: null, power: null, interaction: null, air: GROUNDED, scale: 1, remainder: 1, guarded: false, projectile: null };
   }
 
@@ -82,6 +84,7 @@ export class PowerSystem {
       return;
     }
     for (const fighter of fighters) {
+      this.arsenals.update(fighter, dt);
       fighter.combat.powerCooldown = Math.max(0, fighter.combat.powerCooldown - dt);
       fighter.combat.absorbTime = Math.max(0, fighter.combat.absorbTime - dt);
       if (fighter.isAlive) {
@@ -125,6 +128,7 @@ export class PowerSystem {
 
   tryCast(fighter) {
     let power = selectPower(fighter);
+    if (power?.effect === 'arsenal' && fighter.combat.arsenal?.objects.length) return this.arsenals.tryLaunch(fighter);
     if (!this.canCast(fighter, power)) {
       return false;
     }
@@ -181,6 +185,10 @@ export class PowerSystem {
   updateInstant(caster, target) {
     const { combat } = caster;
     const { power } = combat;
+    if (power.arsenalLaunch) {
+      if (caster.stateTime >= power.recovery) this.finish(caster);
+      return;
+    }
     if (!combat.powerTargeted && caster.stateTime >= power.startup) {
       combat.powerTargeted = true;
       if (power.rainPhases) {
@@ -345,7 +353,7 @@ export class PowerSystem {
     const power = caster.combat.power;
     const variant = this.getVariant(caster, power);
     caster.clearPower();
-    caster.combat.powerCooldown = variant?.cooldown ?? power.cooldown ?? this.config.cooldown;
+    if (!power.arsenalLaunch) caster.combat.powerCooldown = variant?.cooldown ?? power.cooldown ?? this.config.cooldown;
     caster.setState(FighterState.IDLE);
   }
 }

@@ -20,6 +20,7 @@ export function captureFighter(fighter) {
     stateTime: fighter.stateTime,
     combat: {
       ...fighter.combat,
+      arsenal: fighter.combat.arsenal ? { ...fighter.combat.arsenal, objects: fighter.combat.arsenal.objects.map(object => ({ ...object })) } : null,
       fracture: fighter.combat.fracture ? { ...fighter.combat.fracture, segments: fighter.combat.fracture.segments.map(segment => ({ ...segment })) } : null,
       fractures: fighter.combat.fractures.map(wave => ({ ...wave, segments: wave.segments.map(segment => ({ ...segment })) })),
       stormWaveHits: [...fighter.combat.stormWaveHits],
@@ -35,6 +36,7 @@ export function restoreFighter(fighter, snapshot) {
   const { combat, animation, ...scalars } = snapshot;
   Object.assign(fighter, scalars);
   Object.assign(fighter.combat, combat);
+  fighter.combat.arsenal = combat.arsenal ? { ...combat.arsenal, objects: combat.arsenal.objects.map(object => ({ ...object })) } : null;
   fighter.combat.fracture = combat.fracture ? { ...combat.fracture, segments: combat.fracture.segments.map(segment => ({ ...segment })) } : null;
   fighter.combat.fractures = combat.fractures.map(wave => ({ ...wave, segments: wave.segments.map(segment => ({ ...segment })) }));
   fighter.combat.stormWaveHits = [...combat.stormWaveHits];

@@ -181,6 +181,7 @@ export const powerEffects = Object.freeze({
   pull: { active: pull },
   lightning: { tick: lightning },
   barrier: {},
+  arsenal: { self: ({ system, caster, power }) => system.arsenals.start(caster, power), impact: throwImpact },
   throw: { impact: throwImpact },
   flowCleave: { impact: context => {
     if (context.guarded) { applyGuarded(context, 0); return; }

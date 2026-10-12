@@ -104,6 +104,20 @@ export class ProjectileSystem {
     projectile.stagger = size.stagger;
   }
 
+  spawnArsenal(caster, power, x, y) {
+    const projectile = this.acquire(caster, ProjectileKind.THROW, power.id);
+    if (!projectile) return null;
+    const data = this.config.arsenal;
+    projectile.x = x;
+    projectile.y = y;
+    projectile.vx = caster.facing * data.speed;
+    projectile.radius = data.radius;
+    projectile.damage = data.damage;
+    projectile.knockback = data.knockback;
+    projectile.stagger = data.stagger;
+    return projectile;
+  }
+
   spawnWave(caster, power) {
     const projectile = this.acquire(caster, ProjectileKind.WAVE, power.id);
     if (!projectile) return null;
@@ -215,6 +229,7 @@ export class ProjectileSystem {
       if (target === owner || !target.isAlive || isInvulnerable(target) || projectile.kind === ProjectileKind.SABER && isBladeInvulnerable(target) || !boxesOverlap(box, getHurtbox(target, this.hurtbox))) {
         continue;
       }
+      if (this.combat.powers.arsenals.block(target, projectile, owner)) return;
       if (projectile.kind === ProjectileKind.WAVE && this.reflectWave(projectile, owner, target)) return;
       projectile.hit = true;
       if (projectile.kind !== ProjectileKind.SABER) {
