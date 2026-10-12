@@ -778,10 +778,12 @@ Especificação aprovada pelo autor. Números marcados como **inicial** são pon
 
 **Calibrado na 2.18:** Estrangular com custo 45, dreno de 10/s e 3 de dano por segundo (canal completo ≈ 7,4); Telecinese em Massa com custo 80 e dano 7 por meteoro; Santuário com escudo de 20 × potência; Repulsão Suprema com custo 60 e 14 de dano no ataque (4 na fuga). Fratura e Ira ficam com os números iniciais até um personagem do elenco equipá-los. Santuário com o domo mais justo que a Barreira (decisão do autor), para distinguir os dois.
 
-### Corte da Força e Arsenal (2.19)
+### Tempestade revista, Corte de Fluxo e Arsenal (2.19)
 
-- **Corte da Força** (Aurora, custo médio): um golpe de sabre solta uma onda de energia em arco que viaja em linha reta por uma distância considerável. Preparação curta. Pode ser esquivada, bloqueada pela guarda e **devolvida por um parry perfeito** (regra nova: o projétil volta contra quem lançou). Visual: o arco luminoso acompanha o movimento da lâmina.
-- **Arsenal Telecinético** (Eclipse, custo médio): quem lança ergue de 2 a 4 objetos (pelo tier) que orbitam o corpo por alguns segundos. **Repetir o mesmo comando** lança um objeto no oponente; cada objeto em órbita **segura sozinho um projétil** que chega (Arremesso, lâmina arremessada, Corte da Força). O jogador escolhe entre manter a defesa e gastar os objetos atacando. Visual: pedras, fragmentos metálicos e destroços girando (reaproveita as pedras do Arremesso).
+- **Tempestade revista** (decisão do autor: estava fácil de esquivar): cada onda derruba vários raios ao mesmo tempo — 2 no Firme, 3 no Profundo e 4 no Ápice —, um na posição do oponente e os outros em colunas vizinhas, cobrindo as rotas de fuga; no máximo um acerto por onda. **No Ápice** (o tier do Predestinado), cada raio abre uma fratura curta que corre pelo chão para os dois lados, com as regras da Fratura (só pulando). Menos ondas que antes, para o dano total não explodir.
+
+- **Corte de Fluxo** (Aurora, custo médio; "Força" fica fora do nome pela regra de propriedade intelectual): um golpe de sabre solta uma onda de energia em arco que viaja em linha reta por uma distância considerável. Preparação curta. Pode ser esquivada, bloqueada pela guarda e **devolvida por um parry perfeito** (regra nova: o projétil volta contra quem lançou). Visual: o arco luminoso acompanha o movimento da lâmina.
+- **Arsenal Telecinético** (Eclipse, custo médio): quem lança ergue de 2 a 4 objetos (pelo tier) que orbitam o corpo por alguns segundos. **Repetir o mesmo comando** lança um objeto no oponente; cada objeto em órbita **segura sozinho um projétil** que chega (Arremesso, lâmina arremessada, Corte de Fluxo, objeto de outro Arsenal). O jogador escolhe entre manter a defesa e gastar os objetos atacando. Visual: pedras, fragmentos metálicos e destroços girando (reaproveita as pedras do Arremesso).
 
 Fora do ciclo: Cataclismo e Redemoinho (repetem a chuva de impactos); Suspensão Suprema no backlog (repete o Congelar e levaria a combo garantido entre jogadores).
 
