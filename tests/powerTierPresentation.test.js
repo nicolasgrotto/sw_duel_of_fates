@@ -169,13 +169,17 @@ describe('frozen and choked targets', () => {
     assert.equal(idle.calls.length, 0);
   });
 
-  it('lifts the choked victim with the hands at the neck, feet together and the blade hanging', () => {
+  it('lifts the choked victim higher through the hold with the hands at the neck, feet together and the blade hanging', () => {
     const fighter = spawnFighter(400, 1, 'guardian');
     fighter.restartState(FighterState.STUNNED);
     fighter.combat.chokeTime = 0.5;
     fighter.stateTime = 0.3;
     const pose = computePose(fighter, createPose());
-    assert.ok(Math.abs(pose.bodyLift - fighter.height * 0.1) < 1e-9);
+    assert.ok(pose.bodyLift > fighter.height * 0.1 && pose.bodyLift < fighter.height * 0.18);
+    fighter.stateTime = 1.8;
+    const held = computePose(fighter, createPose());
+    assert.ok(Math.abs(held.bodyLift - fighter.height * 0.18) < 1e-9);
+    fighter.stateTime = 0.3;
     assert.equal(pose.offHand, 1);
     assert.ok(Math.abs(pose.handY - pose.headY) < pose.headRadius * 2);
     assert.ok(Math.abs(pose.freeHandY - pose.headY) < pose.headRadius * 2);

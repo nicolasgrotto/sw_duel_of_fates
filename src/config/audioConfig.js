@@ -194,6 +194,10 @@ export const audioConfig = {
       { type: 'tone', wave: 'sine', from: 547, to: 322, duration: 0.45, attack: 0.03, gain: 0.07, filter: null },
       { type: 'tone', wave: 'triangle', from: 130, to: 120, duration: 0.4, attack: 0.05, gain: 0.06, filter: null },
     ],
+    wrathArmor: [
+      { type: 'tone', wave: 'sawtooth', from: 90, to: 60, duration: 0.25, attack: 0.002, gain: 0.12, filter: { type: 'lowpass', from: 900, to: 300, q: 1.2 } },
+      { type: 'noise', duration: 0.12, attack: 0.002, gain: 0.25, filter: { type: 'bandpass', from: 900, to: 400, q: 1 } },
+    ],
     stormInvoke: [
       { type: 'noise', duration: 0.5, attack: 0.3, gain: 0.28, filter: { type: 'bandpass', from: 400, to: 3000, q: 1 } },
       { type: 'tone', wave: 'sawtooth', from: 60, to: 180, duration: 0.5, attack: 0.25, gain: 0.06, filter: { type: 'lowpass', from: 400, to: 1400, q: 1 } },

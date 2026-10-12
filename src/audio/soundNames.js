@@ -33,6 +33,7 @@ export const SoundName = Object.freeze({
   ABSORB: 'absorb',
   DRAIN: 'drain',
   MIND_TWIST: 'mindTwist',
+  WRATH_ARMOR: 'wrathArmor',
   STORM_INVOKE: 'stormInvoke',
   STORM_CALL: 'stormCall',
   STORM_MARK: 'stormMark',

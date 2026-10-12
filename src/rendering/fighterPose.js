@@ -328,17 +328,25 @@ function getChokeRise(fighter) {
   return easeOutCubic(clamp(fighter.stateTime / combatPoses.choked.riseTime, 0, 1));
 }
 
+function getChokeLift(fighter) {
+  const style = combatPoses.choked;
+  const hold = clamp(fighter.stateTime / style.holdTime, 0, 1);
+  return getChokeRise(fighter) * lerp(style.lift, style.maxLift, easeInOutSine(hold));
+}
+
 function applyChokedPose(fighter) {
   const style = combatPoses.choked;
   combatPose.leanDegrees = style.lean;
   combatPose.bladeDegrees = style.bladeDegrees;
-  combatPose.bodyLift = getChokeRise(fighter) * style.lift * fighter.height;
+  combatPose.bodyLift = getChokeLift(fighter) * fighter.height;
 }
 
 function hangFeet(pose, fighter, rise) {
-  const spread = fighter.height * combatPoses.choked.footSpread;
-  pose.frontFootX = lerp(pose.frontFootX, spread, rise);
-  pose.backFootX = lerp(pose.backFootX, -spread, rise);
+  const style = combatPoses.choked;
+  const spread = fighter.height * style.footSpread;
+  const swing = Math.sin(fighter.animation.time * style.legSwingSpeed * TAU) * fighter.height * style.legSwing;
+  pose.frontFootX = lerp(pose.frontFootX, spread + swing, rise);
+  pose.backFootX = lerp(pose.backFootX, -spread + swing * 0.6, rise);
   pose.frontFootY = lerp(pose.frontFootY, 0, rise);
   pose.backFootY = lerp(pose.backFootY, 0, rise);
 }

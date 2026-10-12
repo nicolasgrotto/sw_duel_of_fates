@@ -68,6 +68,8 @@ function getSoundForEvent(event) {
       return SoundName.BLOCK;
     case CombatEvent.POWER_RESISTED:
       return SoundName.POWER_RESISTED;
+    case CombatEvent.WRATH_ARMOR:
+      return SoundName.WRATH_ARMOR;
     case CombatEvent.STORM_MARK:
       return SoundName.STORM_MARK;
     case CombatEvent.STORM_STRIKE:

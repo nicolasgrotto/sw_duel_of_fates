@@ -301,3 +301,25 @@ describe('focus and wrath auras', () => {
     assert.equal(behind.length, 0);
   });
 });
+
+describe('choke caster and wrath armor', () => {
+  it('reaches the free hand forward and trembles while choking', () => {
+    const fighter = spawnFighter(400, 1, 'shadow');
+    channel(fighter, 'choke', 0.6);
+    const pose = computePose(fighter, createPose());
+    assert.equal(pose.offHand, 1);
+    assert.ok(pose.freeHandX > pose.shoulderX + fighter.height * 0.2);
+  });
+
+  it('rings and lights the wrathful fighter in the tier color when armor absorbs a blade', () => {
+    const effects = createEffects();
+    const attacker = spawnFighter(400, 1, 'guardian');
+    const defender = spawnFighter(560, -1, 'shadow');
+    defender.combat.statusLevel = 10;
+    effects.handleEvents([event(CombatEvent.WRATH_ARMOR, attacker, defender, 'heavy')]);
+    const ring = effects.rings.find((candidate) => candidate.active);
+    assert.equal(ring.color, powersConfig.tiers[3].color);
+    assert.equal(ring.x, defender.x);
+    assert.deepEqual(playedSounds([event(CombatEvent.WRATH_ARMOR, attacker, defender, 'heavy')]), [SoundName.WRATH_ARMOR]);
+  });
+});

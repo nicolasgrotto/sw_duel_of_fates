@@ -209,6 +209,9 @@ export class EffectsSystem {
         this.startTremor(attacker);
         this.spawnParry(EffectType.PERFECT_PARRY, defender, params);
         break;
+      case CombatEvent.WRATH_ARMOR:
+        this.spawnWrathArmor(defender);
+        break;
       case CombatEvent.STORM_STRIKE:
         this.spawnStormStrike(attacker, x, y, params);
         break;
@@ -473,6 +476,14 @@ export class EffectsSystem {
       strike.time += dt;
       if (strike.time >= duration) strike.active = false;
     }
+  }
+
+  spawnWrathArmor(fighter) {
+    const color = getPowerTier(fighter.combat.statusLevel, powersConfig.tiers).color;
+    const x = fighter.x;
+    const y = fighter.y - fighter.height / 2;
+    this.spawnRing(this.config.wrathArmorRing, x, y, color);
+    this.spawnLight(this.config.wrathArmorLight, x, y, color);
   }
 
   spawnMindTwist(caster, target) {

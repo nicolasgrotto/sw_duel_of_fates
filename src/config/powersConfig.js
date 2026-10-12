@@ -104,7 +104,7 @@ export const powersConfig = {
       guard: { staminaCost: 10 },
     },
     choke: {
-      id: 'choke', effect: 'choke', control: true, channel: true, requiresHold: true, boundChannel: true, pose: 'cast', interaction: 'choke',
+      id: 'choke', effect: 'choke', control: true, channel: true, requiresHold: true, boundChannel: true, pose: 'grip', interaction: 'choke',
       cost: 45, drainPerSecond: 20, startup: 0.3, maxChannel: 1.8, recovery: 0.25, range: 240,
       damage: 2, damagePerSecond: 2,
       guard: { staminaCost: 14 },
