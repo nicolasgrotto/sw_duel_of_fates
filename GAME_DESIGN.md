@@ -609,8 +609,8 @@ Alcance do Puxão por tier do Fluxo de quem lança (v2.16): Tênue 330 px, Firme
 | Categoria | Alinhamento | Habilidades |
 | --- | --- | --- |
 | Fluxo comum | os dois | Repulsão, Puxão, Arremesso, Truque Mental, Repulsão Suprema, Fratura |
-| Aurora | Aurora | Barreira, Cura, Foco, Absorção, Santuário, Telecinese em Massa |
-| Eclipse | Eclipse | Raio, Estrangular, Congelar, Tempestade, Ira, Dreno |
+| Aurora | Aurora | Barreira, Cura, Foco, Absorção, Santuário, Telecinese em Massa, Corte de Fluxo |
+| Eclipse | Eclipse | Raio, Estrangular, Congelar, Tempestade, Ira, Dreno, Arsenal Telecinético |
 | Técnicas de lâmina | os dois | Giro, Avanço com corte, Arremesso da lâmina; custam stamina e escalam com a Lâmina |
 
 **Comandos.** Nenhum botão novo. `Poder` + direção (neutro, frente, trás) escolhe entre até três habilidades do Fluxo; `Habilidade` + direção escolhe entre a habilidade própria (neutro) e até duas técnicas de lâmina (frente, trás). Espaço vazio cai no neutro. Técnicas só valem com a opção Poderes (os modos clássicos não mudam). O Eco e o Predestinado não têm técnicas: o avanço deles já segue a direção.
