@@ -341,9 +341,11 @@ function getChokeLift(fighter) {
 
 function applyChokedPose(fighter) {
   const style = combatPoses.choked;
-  combatPose.leanDegrees = style.lean;
+  const shake = Math.sin(fighter.animation.time * style.trembleSpeed * TAU);
+  const rise = getChokeRise(fighter);
+  combatPose.leanDegrees = style.lean + shake * style.trembleDegrees * rise;
   combatPose.bladeDegrees = style.bladeDegrees;
-  combatPose.bodyLift = getChokeLift(fighter) * fighter.height;
+  combatPose.bodyLift = getChokeLift(fighter) * fighter.height + shake * style.trembleLift * rise;
 }
 
 function hangFeet(pose, fighter, rise) {

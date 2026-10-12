@@ -107,3 +107,28 @@ describe('gallery sides', () => {
     }
   });
 });
+
+describe('choke tremble', () => {
+  it('shakes the choked victim and keeps the choking caster steady', async () => {
+    const { FighterState } = await import('../src/entities/fighterStates.js');
+    const victim = spawnFighter(600, -1, 'guardian');
+    victim.restartState(FighterState.STUNNED);
+    victim.combat.chokeTime = 1;
+    victim.stateTime = 0.5;
+    const leans = [0, 0.02, 0.04].map((time) => {
+      victim.animation.time = time;
+      return computePose(victim, createPose()).shoulderX;
+    });
+    assert.ok(new Set(leans.map((value) => value.toFixed(3))).size > 1);
+    const caster = spawnFighter(300, 1, 'shadow');
+    caster.combat.power = powersConfig.powers.choke;
+    caster.combat.powerEndTime = 0;
+    caster.state = FighterState.CHANNELING;
+    caster.stateTime = 0.8;
+    const steady = [0, 0.02, 0.04].map((time) => {
+      caster.stateTime = 0.8 + time;
+      return computePose(caster, createPose()).shoulderX.toFixed(4);
+    });
+    assert.equal(new Set(steady).size, 1);
+  });
+});
