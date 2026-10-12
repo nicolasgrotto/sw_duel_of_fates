@@ -20,6 +20,27 @@ export class Camera {
     this.shakeTime = 0;
     this.offsetX = 0;
     this.offsetY = 0;
+    this.cinematicLift = 0;
+    this.cinematicZoom = 1;
+    this.cinematicDuration = 0;
+    this.cinematicTime = 0;
+  }
+
+  cinematic(lift, zoom, duration) {
+    this.cinematicLift = lift;
+    this.cinematicZoom = zoom;
+    this.cinematicDuration = duration;
+    this.cinematicTime = 0;
+  }
+
+  get cinematicAmount() {
+    if (this.cinematicDuration <= 0 || this.cinematicTime >= this.cinematicDuration) {
+      return 0;
+    }
+    const progress = this.cinematicTime / this.cinematicDuration;
+    const edge = Math.min(progress, 1 - progress) / 0.25;
+    const amount = Math.min(1, edge);
+    return amount * amount * (3 - 2 * amount);
   }
 
   get shakeStrength() {
@@ -53,7 +74,8 @@ export class Camera {
   }
 
   applyTransform(renderer) {
-    renderer.translate(this.offsetX, this.offsetY);
+    const cinematic = this.cinematicAmount;
+    renderer.translate(this.offsetX, this.offsetY + this.cinematicLift * cinematic);
     if (this.isFramed) {
       const zoom = this.framingZoom * (renderer.viewScale ?? 1);
       renderer.translate(renderer.width / 2, this.anchorY);
@@ -61,7 +83,8 @@ export class Camera {
       renderer.translate(-this.centerX, -this.anchorY);
     }
     renderer.translate(this.focusX, this.focusY);
-    renderer.scale(this.zoom, this.zoom);
+    const zoom = this.zoom * (1 + (this.cinematicZoom - 1) * cinematic);
+    renderer.scale(zoom, zoom);
     renderer.translate(-this.focusX, -this.focusY);
   }
 
@@ -87,6 +110,7 @@ export class Camera {
 
   update(dt) {
     this.punchTime = Math.min(this.punchTime + dt, this.punchDuration);
+    this.cinematicTime = Math.min(this.cinematicTime + dt, this.cinematicDuration);
     this.shakeTime = Math.min(this.shakeTime + dt, this.shakeDuration);
     const strength = this.shakeStrength;
 

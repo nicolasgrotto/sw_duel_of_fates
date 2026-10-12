@@ -48,6 +48,7 @@ export function getStormDarkness(fighters) {
 }
 
 const arcEnds = new Float32Array(4);
+const asteroidPoint = { x: 0, y: 0, progress: 0 };
 
 function setArcEnds(fromX, fromY, toX, toY) {
   arcEnds[0] = fromX;
@@ -82,7 +83,12 @@ export class PowerRenderer {
     renderer.save();
     renderer.setBlendMode('lighter');
     for (const fighter of fighters) {
-      if (isUsingPower(fighter) && fighter.combat.power.stormPhases) {
+      if (fighter.combat.rain) {
+        this.drawRain(renderer, fighter, floorY ?? fighter.y);
+      }
+      if (isUsingPower(fighter) && fighter.combat.power.rainPhases && fighter.stateTime < fighter.combat.power.startup) {
+        this.drawAsteroid(renderer, fighter);
+      } else if (isUsingPower(fighter) && fighter.combat.power.stormPhases) {
         this.drawStorm(renderer, fighter, poses?.get(fighter) ?? null, floorY ?? fighter.y);
       } else if (isUsingPower(fighter)) {
         this.drawFighter(renderer, fighter, poses?.get(fighter) ?? null);
@@ -449,12 +455,15 @@ export class PowerRenderer {
   }
 
   drawStormMarks(renderer, fighter, tier, floorY) {
+    this.drawMarks(renderer, fighter.combat.stormMarks, fighter.combat.power, fighter.stateTime, tier, floorY);
+  }
+
+  drawMarks(renderer, marks, power, time, tier, floorY) {
     const storm = style.storm;
-    const { stormMarks, power } = fighter.combat;
-    if (!stormMarks) return;
-    for (const mark of stormMarks) {
+    if (!marks) return;
+    for (const mark of marks) {
       if (!mark.active) continue;
-      const progress = easeOutCubic(clamp((fighter.stateTime - mark.markTime) / (mark.impactTime - mark.markTime), 0, 1));
+      const progress = easeOutCubic(clamp((time - mark.markTime) / (mark.impactTime - mark.markTime), 0, 1));
       const radiusX = power.strikeWidth * lerp(storm.markWidthScale[0], storm.markWidthScale[1], progress);
       const alpha = lerp(storm.markAlpha[0], storm.markAlpha[1], progress);
       renderer.setAlpha(alpha * storm.markFillAlpha);
@@ -465,6 +474,57 @@ export class PowerRenderer {
       renderer.line(mark.x, floorY, mark.x, floorY - storm.columnHeight, tier.color, power.strikeWidth * 0.5);
     }
     renderer.setAlpha(1);
+  }
+
+  getAsteroidPoint(fighter, out) {
+    const meteor = style.meteor;
+    const progress = clamp(fighter.stateTime / fighter.combat.power.startup, 0, 1);
+    out.x = fighter.x + fighter.facing * meteor.asteroidOffsetX;
+    out.y = lerp(meteor.asteroidFromY, meteor.asteroidToY, easeOutCubic(progress));
+    out.progress = progress;
+    return out;
+  }
+
+  drawAsteroid(renderer, fighter) {
+    const meteor = style.meteor;
+    const tier = getPowerTier(fighter.flowLevel, powersConfig.tiers);
+    const point = this.getAsteroidPoint(fighter, asteroidPoint);
+    const radius = lerp(meteor.asteroidRadius[0], meteor.asteroidRadius[1], point.progress);
+    const broken = clamp((point.progress - meteor.breakAt) / (1 - meteor.breakAt), 0, 1);
+    renderer.drawGlow(point.x, point.y, radius * 1.6, tier.color, tier.glowAlpha * 0.5);
+    renderer.save();
+    renderer.setBlendMode('source-over');
+    const spin = fighter.stateTime * meteor.asteroidSpin * fighter.facing;
+    if (broken > 0) {
+      drawRockCluster(renderer, point.x, point.y, radius * (0.75 + broken * meteor.breakSpread * 0.5), spin, 4, tier.color);
+    } else {
+      drawRockCluster(renderer, point.x, point.y, radius, spin, 1, tier.color);
+    }
+    renderer.restore();
+  }
+
+  drawRain(renderer, fighter, floorY) {
+    const { rain } = fighter.combat;
+    const meteor = style.meteor;
+    const tier = getPowerTier(fighter.flowLevel, powersConfig.tiers);
+    this.drawMarks(renderer, rain.marks, rain.power, rain.time, tier, floorY);
+    const radius = rain.power.strikeWidth * meteor.rockScale;
+    for (const mark of rain.marks) {
+      if (!mark.active) continue;
+      const progress = clamp((rain.time - mark.markTime) / (mark.impactTime - mark.markTime), 0, 1);
+      const fall = progress * progress;
+      const x = mark.x - fighter.facing * meteor.fallDriftX * (1 - fall);
+      const y = lerp(style.storm.skyY, floorY - radius, fall);
+      const tail = Math.max(0, progress - meteor.trailLength);
+      const tailFall = tail * tail;
+      renderer.setAlpha(meteor.trailAlpha * progress);
+      renderer.line(mark.x - fighter.facing * meteor.fallDriftX * (1 - tailFall), lerp(style.storm.skyY, floorY - radius, tailFall), x, y, tier.color, meteor.trailWidth);
+      renderer.setAlpha(1);
+      renderer.save();
+      renderer.setBlendMode('source-over');
+      drawRockCluster(renderer, x, y, radius, rain.time * 3, 1, tier.color);
+      renderer.restore();
+    }
   }
 
   drawStormArcs(renderer, fighter, pose, tier) {

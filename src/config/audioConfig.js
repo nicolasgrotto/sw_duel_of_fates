@@ -215,6 +215,22 @@ export const audioConfig = {
       { type: 'tone', wave: 'sine', from: 70, to: 30, duration: 0.45, attack: 0.002, gain: 0.4, filter: null },
       { type: 'noise', duration: 0.35, attack: 0.002, gain: 0.4, filter: { type: 'lowpass', from: 900, to: 150, q: 0.8 } },
     ],
+    meteorCall: [
+      { type: 'noise', duration: 0.8, attack: 0.5, gain: 0.3, filter: { type: 'lowpass', from: 200, to: 900, q: 0.9 } },
+      { type: 'tone', wave: 'sine', from: 45, to: 70, duration: 0.8, attack: 0.4, gain: 0.2, filter: null },
+    ],
+    meteorBreak: [
+      { type: 'noise', duration: 0.4, attack: 0.002, gain: 0.4, filter: { type: 'bandpass', from: 1200, to: 300, q: 0.9 } },
+      { type: 'tone', wave: 'triangle', from: 160, to: 60, duration: 0.35, attack: 0.002, gain: 0.15, filter: null },
+    ],
+    meteorFall: [
+      { type: 'tone', wave: 'sine', from: 1400, to: 500, duration: 0.55, attack: 0.05, gain: 0.05, filter: null },
+      { type: 'noise', duration: 0.55, attack: 0.2, gain: 0.08, filter: { type: 'bandpass', from: 3000, to: 900, q: 2 } },
+    ],
+    meteorImpact: [
+      { type: 'tone', wave: 'sine', from: 85, to: 35, duration: 0.45, attack: 0.002, gain: 0.35, filter: null },
+      { type: 'noise', duration: 0.4, attack: 0.002, gain: 0.38, filter: { type: 'lowpass', from: 1400, to: 200, q: 0.8 } },
+    ],
     stormInvoke: [
       { type: 'noise', duration: 0.5, attack: 0.3, gain: 0.28, filter: { type: 'bandpass', from: 400, to: 3000, q: 1 } },
       { type: 'tone', wave: 'sawtooth', from: 60, to: 180, duration: 0.5, attack: 0.25, gain: 0.06, filter: { type: 'lowpass', from: 400, to: 1400, q: 1 } },

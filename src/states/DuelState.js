@@ -523,6 +523,9 @@ export class DuelState extends GameState {
       if (event.type === CombatEvent.PERFECT_PARRY) {
         this.letterbox.pulse(layout.letterbox.perfectParryAmount, layout.letterbox.perfectParryDuration);
       }
+      if (event.type === CombatEvent.POWER_START && event.attackType === 'meteorRain') {
+        this.letterbox.pulse(layout.letterbox.cinematicAmount, layout.letterbox.cinematicDuration);
+      }
     }
     this.hud.handleEvents(this.simulation.events);
     if (this.director) {

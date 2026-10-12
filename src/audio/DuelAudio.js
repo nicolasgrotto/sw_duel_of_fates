@@ -55,22 +55,31 @@ function getSoundForEvent(event) {
       if (event.attackType === 'drain') return SoundName.DRAIN;
       if (event.attackType === 'storm') return SoundName.STORM_INVOKE;
       if (event.attackType === 'sanctuary') return SoundName.SANCTUARY;
+      if (event.attackType === 'meteorRain') return SoundName.METEOR_CALL;
       return event.attackType === 'barrier' ? SoundName.BARRIER : SoundName.POWER_CHARGE;
     case CombatEvent.POWER_ACTIVE:
       if (event.attackType === 'wrath') return SoundName.WRATH;
       if (event.attackType === 'storm') return SoundName.STORM_CALL;
       if (event.attackType === 'supremePush') return SoundName.SUPREME_PUSH;
+      if (event.attackType === 'meteorRain') return null;
       return event.attackType === 'pull' ? SoundName.POWER_PULL : SoundName.POWER_WAVE;
     case CombatEvent.POWER_HIT:
       if (event.attackType === 'drain') return null;
       if (event.attackType === 'mindTwist') return SoundName.MIND_TWIST;
       if (event.attackType === 'storm') return null;
       if (event.attackType === 'crush') return SoundName.CRUSH;
+      if (event.attackType === 'meteorRain') return null;
       return event.attackType === 'lightning' ? SoundName.LIGHTNING : SoundName.POWER_IMPACT;
     case CombatEvent.POWER_BLOCKED:
       return SoundName.BLOCK;
     case CombatEvent.POWER_RESISTED:
       return SoundName.POWER_RESISTED;
+    case CombatEvent.RAIN_CALL:
+      return SoundName.METEOR_BREAK;
+    case CombatEvent.RAIN_MARK:
+      return SoundName.METEOR_FALL;
+    case CombatEvent.RAIN_STRIKE:
+      return SoundName.METEOR_IMPACT;
     case CombatEvent.SANCTUARY_BREAK:
       return SoundName.SANCTUARY_BREAK;
     case CombatEvent.WRATH_ARMOR:

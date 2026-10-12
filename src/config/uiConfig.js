@@ -190,6 +190,8 @@ export const layout = {
     speed: 3.5,
     perfectParryAmount: 0.5,
     perfectParryDuration: 0.35,
+    cinematicAmount: 0.7,
+    cinematicDuration: 1,
   },
   ignition: {
     delay: 0.25,

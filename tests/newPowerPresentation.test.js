@@ -387,3 +387,59 @@ describe('supreme push, sanctuary and crush presentation', () => {
     assert.deepEqual(playedSounds([event(CombatEvent.POWER_HIT, caster, fighter, 'crush')]), [SoundName.CRUSH]);
   });
 });
+
+describe('mass telekinesis presentation', () => {
+  it('lifts and widens the camera in a short cinematic that eases in and out', () => {
+    const camera = new Camera(effectsConfig, createRandom(1));
+    camera.cinematic(70, 0.95, 1.2);
+    assert.equal(camera.cinematicAmount, 0);
+    camera.update(0.6);
+    assert.equal(camera.cinematicAmount, 1);
+    camera.update(0.55);
+    assert.ok(camera.cinematicAmount > 0 && camera.cinematicAmount < 1);
+    camera.update(0.1);
+    assert.equal(camera.cinematicAmount, 0);
+  });
+
+  it('starts the cinematic on the call, pulls a single asteroid down and breaks it near the end', () => {
+    const effects = createEffects();
+    const caster = spawnFighter(400, 1, 'guardian');
+    effects.handleEvents([event(CombatEvent.POWER_START, caster, null, 'meteorRain')]);
+    assert.ok(effects.camera.cinematicDuration > powersConfig.powers.meteorRain.startup);
+    const early = recordingRenderer();
+    channel(caster, 'meteorRain', 0.1);
+    new PowerRenderer().draw(early, [caster]);
+    const late = recordingRenderer();
+    caster.stateTime = powersConfig.powers.meteorRain.startup * 0.95;
+    new PowerRenderer().draw(late, [caster]);
+    const stones = (calls) => calls.filter((call) => call.name === 'fillPolygon').length;
+    assert.equal(stones(early.calls), 1);
+    assert.equal(stones(late.calls), 4);
+  });
+
+  it('drops a stone over each pending mark and bursts it on impact', () => {
+    const caster = spawnFighter(400, 1, 'guardian');
+    const power = powersConfig.powers.meteorRain;
+    caster.combat.rain = { power, time: 1.2, marks: [
+      { active: true, marked: true, x: 700, markTime: 1, impactTime: 1.6 },
+      { active: false, marked: false, x: 0, markTime: 2, impactTime: 2.6 },
+    ] };
+    const renderer = recordingRenderer();
+    new PowerRenderer().draw(renderer, [caster], null, 600);
+    assert.equal(renderer.calls.filter((call) => call.name === 'strokeEllipse').length, 1);
+    const stone = renderer.calls.find((call) => call.name === 'fillPolygon').args[0];
+    const stoneY = stone.filter((_, index) => index % 2 === 1);
+    assert.ok(Math.max(...stoneY) < 600);
+    const effects = createEffects();
+    effects.handleEvents([{ type: CombatEvent.RAIN_STRIKE, attacker: caster, defender: null, attackType: 'meteorRain', x: 700, y: 600, hit: false }]);
+    assert.ok(effects.debris.particles.some((piece) => piece.active));
+    assert.ok(effects.particles.particles.some((particle) => particle.active));
+    assert.deepEqual(playedSounds([
+      event(CombatEvent.POWER_START, caster, null, 'meteorRain'),
+      event(CombatEvent.RAIN_CALL, caster, null, 'meteorRain'),
+      event(CombatEvent.RAIN_MARK, caster, null, 'meteorRain'),
+      event(CombatEvent.RAIN_STRIKE, caster, null, 'meteorRain'),
+      event(CombatEvent.POWER_ACTIVE, caster, null, 'meteorRain'),
+    ]), [SoundName.METEOR_CALL, SoundName.METEOR_BREAK, SoundName.METEOR_FALL, SoundName.METEOR_IMPACT]);
+  });
+});

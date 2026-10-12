@@ -29,6 +29,7 @@ export const EffectType = Object.freeze({
   COUNTER_FLOURISH: 'counterFlourish',
   STORM_STRIKE: 'stormStrike',
   CRUSH_SLAM: 'crushSlam',
+  METEOR_IMPACT: 'meteorImpact',
   SANCTUARY_SHATTER: 'sanctuaryShatter',
   STORM_CALL: 'stormCall',
   POWER_WAVE: 'powerWave',
@@ -214,6 +215,18 @@ export class EffectsSystem {
         this.startTremor(attacker);
         this.spawnParry(EffectType.PERFECT_PARRY, defender, params);
         break;
+      case CombatEvent.POWER_START:
+        if (event.attackType === 'meteorRain' && this.camera) {
+          const cinematic = this.config.meteorCinematic;
+          this.camera.cinematic(cinematic.lift, cinematic.zoom, powersConfig.powers.meteorRain.startup + cinematic.extra);
+        }
+        break;
+      case CombatEvent.RAIN_CALL:
+        this.spawnMeteorBreak(attacker, params);
+        break;
+      case CombatEvent.RAIN_STRIKE:
+        this.spawnMeteorImpact(attacker, x, y, params);
+        break;
       case CombatEvent.SANCTUARY_BREAK:
         this.spawnSanctuaryBreak(defender, params);
         break;
@@ -228,6 +241,8 @@ export class EffectsSystem {
           this.spawnStormCall(attacker, params);
         } else if (event.attackType === 'push') {
           this.spawnShockwave(attacker);
+        } else if (event.attackType === 'meteorRain') {
+          break;
         } else if (event.attackType === 'supremePush') {
           this.spawnSupremePush(attacker);
         } else {
@@ -490,6 +505,30 @@ export class EffectsSystem {
       strike.time += dt;
       if (strike.time >= duration) strike.active = false;
     }
+  }
+
+  spawnMeteorBreak(caster, params) {
+    const meteor = powersConfig.render.meteor;
+    const color = getTierColor(caster);
+    const x = caster.x + caster.facing * meteor.asteroidOffsetX;
+    const y = meteor.asteroidToY;
+    this.spawnLight(this.config.meteorBreak.light, x, y, color);
+    this.spawnDebris(x, y, caster.facing);
+    this.spawnDebris(x, y, -caster.facing);
+    params.x = x;
+    params.y = y;
+  }
+
+  spawnMeteorImpact(caster, x, floorY, params) {
+    const tier = getPowerTier(caster.flowLevel, powersConfig.tiers);
+    params.x = x;
+    params.y = floorY;
+    params.direction = caster.facing;
+    params.color = tier.color;
+    params.particleScale = tier.particleScale;
+    this.spawn(EffectType.METEOR_IMPACT, params);
+    this.spawnDebris(x, floorY, 1);
+    this.spawnDebris(x, floorY, -1);
   }
 
   spawnSupremePush(caster) {

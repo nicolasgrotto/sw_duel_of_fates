@@ -249,6 +249,10 @@ export const powersConfig = {
       markRadiusY: 7, markWidthScale: [1.1, 0.5], markAlpha: [0.3, 0.85], markFillAlpha: 0.2, markLineWidth: 2, columnHeight: 260, columnAlpha: 0.14,
       darkAlpha: 0.4,
     },
+    meteor: {
+      asteroidOffsetX: 260, asteroidFromY: -160, asteroidToY: 70, asteroidRadius: [30, 60], asteroidSpin: 0.6,
+      breakAt: 0.72, breakSpread: 2.2, fallDriftX: 140, rockScale: 0.24, trailAlpha: 0.4, trailLength: 0.12, trailWidth: 5,
+    },
     seed: 7,
     handOffset: 8,
     chargeMinScale: 0.4,
