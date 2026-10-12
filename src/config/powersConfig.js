@@ -37,6 +37,8 @@ export const powersConfig = {
     flowCleave: {
       id: 'flowCleave', effect: 'flowCleave', projectile: true, wave: true, channel: false, pose: 'cleave', interaction: 'throw',
       cost: 20, startup: 0.2, active: 0.08, recovery: 0.3, range: 520, guard: { staminaCost: 10 },
+      waveByTier: [{ minLevel: 1, radius: 28 }, { minLevel: 3, radius: 34 }, { minLevel: 8, radius: 42 }, { minLevel: 10, radius: 48 }],
+      apex: { minLevel: 10, pose: 'cleaveDouble', active: 0.32, recovery: 0.3, secondAt: 0.22 },
     },
     fracture: {
       id: 'fracture', effect: 'fracture', channel: false, pose: 'slam', interaction: 'fracture', fracture: true,

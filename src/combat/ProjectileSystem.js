@@ -123,7 +123,7 @@ export class ProjectileSystem {
     if (!projectile) return null;
     const data = this.config.wave;
     projectile.vx = caster.facing * data.speed;
-    projectile.radius = data.radius;
+    projectile.radius = power.waveByTier ? resolveLevelBand(caster.flowLevel, power.waveByTier).radius : data.radius;
     projectile.damage = data.damage;
     projectile.knockback = data.knockback;
     projectile.stagger = data.stagger;

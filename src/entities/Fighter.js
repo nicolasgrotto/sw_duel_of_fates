@@ -92,6 +92,7 @@ function createCombat() {
     stormWaveHits: [],
     stormFractureHits: [],
     rainActive: false,
+    waveFollowUp: false,
     rain: null,
     stormPhase: null,
     stormMarks: [],
@@ -244,6 +245,7 @@ export class Fighter {
     this.combat.chokeAttempted = false;
     this.combat.chokeMaxChannel = 0;
     this.combat.absorbTime = 0;
+    this.combat.waveFollowUp = false;
     this.combat.stormPhase = null;
     this.combat.stormMarks.length = 0;
     this.combat.stormNextStrike = 0;

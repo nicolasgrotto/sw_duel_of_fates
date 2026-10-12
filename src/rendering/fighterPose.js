@@ -1,7 +1,7 @@
 import { AttackPhase, getAttackPhase, getPhaseProgress } from '../combat/attackPhases.js';
 import { combatRulesConfig } from '../config/combatRulesConfig.js';
 import { effectsConfig } from '../config/effectsConfig.js';
-import { animation as animationStyle, combatPoses, motionStyles, proportions, techniqueKeyframes } from '../config/fighterVisualConfig.js';
+import { animation as animationStyle, combatPoses, motionStyles, powerKeyframes, proportions, techniqueKeyframes } from '../config/fighterVisualConfig.js';
 import { FighterState } from '../entities/fighterStates.js';
 import { easeInOutSine, easeInQuad, easeOutCubic, easeOutQuad } from '../utils/easing.js';
 import { TAU, clamp, degreesToRadians, lerp } from '../utils/math.js';
@@ -210,6 +210,8 @@ const techniqueTracks = {
   dashSlash: Object.fromEntries(Object.entries(techniqueKeyframes.dashSlash).map(([variant, keys]) => [variant, resolveTrack(keys)])),
 };
 
+const powerTracks = Object.fromEntries(Object.entries(powerKeyframes).map(([id, keys]) => [id, resolveTrack(keys)]));
+
 const resolvedMotionStyles = Object.fromEntries(
   Object.entries(motionStyles).map(([id, style]) => [id, resolveMotionStyle(style)]),
 );
@@ -227,8 +229,7 @@ function getTrackChannel(key, channel, guardDegrees) {
   return (key.values.bladeDegrees ?? guardDegrees) + key.values.twirl;
 }
 
-function applyTrackPose(track, fighter, guardDegrees) {
-  const { attack } = fighter.combat;
+function applyTrackPose(track, fighter, guardDegrees, attack = fighter.combat.attack) {
   const phase = PHASE_OFFSET[getAttackPhase(attack, fighter.stateTime)];
   const time = phase === undefined ? TRACK_END : phase + clamp(getPhaseProgress(attack, fighter.stateTime), 0, 1);
   let index = 1;
@@ -304,6 +305,10 @@ function getPowerPoseAmount(fighter, power) {
 function applyPowerPose(fighter, guardDegrees) {
   const { power } = fighter.combat;
   if (!power) {
+    return;
+  }
+  if (powerTracks[power.pose]) {
+    applyTrackPose(powerTracks[power.pose], fighter, guardDegrees, power);
     return;
   }
   const style = combatPoses.powers[power.pose];

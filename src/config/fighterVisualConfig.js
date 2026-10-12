@@ -163,7 +163,6 @@ export const combatPoses = {
     channel: { bladeDegrees: 125, lean: 8, crouch: 8, reach: 0.04, lift: 0, tremble: 2.5, trembleSpeed: 9 },
     barrier: { bladeDegrees: -100, lean: -2, crouch: 12, reach: 0, lift: 0.04, tremble: 0, trembleSpeed: 0 },
     absorb: { bladeDegrees: 110, lean: -4, crouch: 8, reach: 0.04, lift: 0, tremble: 0.8, trembleSpeed: 7, offHand: 1, offHandDegrees: 2 },
-    cleave: { bladeDegrees: 50, lean: 14, crouch: 6, reach: 0.14, lift: 0, tremble: 0, trembleSpeed: 0 },
     slam: { bladeDegrees: 120, lean: 20, crouch: 26, reach: -0.02, lift: -0.04, tremble: 0, trembleSpeed: 0, offHand: 1, offHandDegrees: 95 },
     grip: { bladeDegrees: 110, lean: 6, crouch: 4, reach: 0, lift: 0, tremble: 1.2, trembleSpeed: 11, offHand: 1, offHandDegrees: -12 },
     invoke: { bladeDegrees: 100, lean: -8, crouch: 6, reach: -0.02, lift: 0, tremble: 1.5, trembleSpeed: 9, offHand: 1, offHandDegrees: -100 },
@@ -257,6 +256,25 @@ const guardianKeyframes = {
     { phase: STARTUP, at: 1, ease: 'out', blade: -40, lean: -6, lift: 0.02, slide: 0.02, hip: -0.01, offHand: 0.6, offHandDegrees: 40 },
     { phase: ACTIVE, at: 1, ease: 'outQuad', blade: -75, lean: 16, reach: 0.12, step: 0.06, hip: 0.03, offHand: 1, offHandDegrees: 5 },
     { phase: RECOVERY, at: 0.4, ease: 'inOut', blade: -70, lean: 12, reach: 0.08, step: 0.05, hip: 0.02, offHand: 0.7, offHandDegrees: 20 },
+  ],
+};
+
+export const powerKeyframes = {
+  cleave: [
+    { phase: STARTUP, at: 0.5, ease: 'out', blade: -110, lean: -4, lift: 0.1, slide: 0.02 },
+    { phase: STARTUP, at: 1, ease: 'inOut', blade: -160, lean: -6, lift: 0.16, slide: 0.03, hip: -0.015 },
+    { phase: ACTIVE, at: 0.5, ease: 'in', blade: -40, lean: 6, reach: 0.08, lift: 0.08, step: 0.04 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 70, lean: 16, crouch: 8, reach: 0.16, step: 0.07, hip: 0.03 },
+    { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: 75, lean: 15, crouch: 8, reach: 0.14, step: 0.07, hip: 0.03 },
+  ],
+  cleaveDouble: [
+    { phase: STARTUP, at: 0.5, ease: 'out', blade: -110, lean: -4, lift: 0.1, slide: 0.02 },
+    { phase: STARTUP, at: 1, ease: 'inOut', blade: -160, lean: -6, lift: 0.16, slide: 0.03, hip: -0.015 },
+    { phase: ACTIVE, at: 0.25, ease: 'in', blade: 70, lean: 16, crouch: 10, reach: 0.16, step: 0.07, hip: 0.03 },
+    { phase: ACTIVE, at: 0.45, ease: 'outQuad', blade: 85, lean: 12, crouch: 16, reach: 0.1, step: 0.07, hip: 0.02 },
+    { phase: ACTIVE, at: 0.75, ease: 'in', blade: -60, lean: 8, crouch: 4, reach: 0.18, lift: 0.1, step: 0.09, hip: 0.035 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: -115, lean: 4, lift: 0.14, reach: 0.12, step: 0.09, hip: 0.03 },
+    { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: -110, lean: 3, lift: 0.12, reach: 0.1, step: 0.08, hip: 0.025 },
   ],
 };
 

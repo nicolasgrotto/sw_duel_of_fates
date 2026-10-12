@@ -135,6 +135,7 @@ export class PowerSystem {
     const mode = getPowerMode(fighter, power);
     fighter.flowMeter -= this.getCost(fighter, power);
     if (mode === 'escape') power = { ...power, ...power.escape };
+    if (power.apex && fighter.flowLevel >= power.apex.minLevel) power = { ...power, ...power.apex };
     fighter.clearAttack();
     fighter.combat.power = power;
     fighter.combat.powerMode = mode;
@@ -206,6 +207,12 @@ export class PowerSystem {
       } else {
         this.affect(caster, target, power, 'active');
       }
+      this.combat.emitAction(CombatEvent.POWER_ACTIVE, caster, power.id);
+    }
+    if (power.secondAt !== undefined && !combat.waveFollowUp && caster.stateTime >= power.startup + power.secondAt) {
+      combat.waveFollowUp = true;
+      this.aim(caster, null, power);
+      this.combat.projectiles.spawnWave(caster, power);
       this.combat.emitAction(CombatEvent.POWER_ACTIVE, caster, power.id);
     }
     if (caster.stateTime >= power.startup + power.active + power.recovery) {
