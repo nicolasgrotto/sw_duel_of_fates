@@ -11,6 +11,13 @@ export function isStormShieldUp(fighter) {
     && fighter.stateTime >= phases.invocation && fighter.stateTime < phases.invocation + phases.storm;
 }
 
+function scatterFraction(wave, bolt, x) {
+  let hash = Math.imul(wave + 1, 0x9e3779b1) ^ Math.imul(bolt + 1, 0x85ebca6b) ^ Math.imul(x, 0xc2b2ae35);
+  hash = Math.imul(hash ^ (hash >>> 16), 0x7feb352d);
+  hash = Math.imul(hash ^ (hash >>> 15), 0x846ca68b);
+  return ((hash ^ (hash >>> 16)) >>> 0) / 4294967296;
+}
+
 export class StormSystem {
   constructor(powers) {
     this.powers = powers;
@@ -105,8 +112,7 @@ export class StormSystem {
         if (mark.active) {
           const wave = mark.wave ?? index;
           const mirror = wave % 2 === 0 ? 1 : -1;
-          const offset = power.columnPatterns ? power.columnPatterns[resolveLevelBand(caster.flowLevel, power.boltsByTier).bolts][mark.bolt] * mirror : 0;
-          mark.x = opponent.x + power.strikeOffsets[wave % power.strikeOffsets.length] + offset;
+          mark.x = this.placeMark(power, opponent, wave, mark.bolt ?? 0, mirror);
           this.emit(power.markEvent, caster, opponent, mark, false, power);
         }
       }
@@ -128,6 +134,14 @@ export class StormSystem {
         this.emit(power.strikeEvent, caster, opponent, mark, contact, power);
       }
     }
+  }
+
+  placeMark(power, opponent, wave, bolt, mirror) {
+    const near = power.nearColumns ?? [0];
+    if (bolt < near.length) return opponent.x + power.strikeOffsets[wave % power.strikeOffsets.length] + near[bolt] * mirror;
+    const { left, right } = this.combat.arena;
+    const span = right - left - power.scatterMargin * 2;
+    return left + power.scatterMargin + scatterFraction(wave, bolt, Math.round(opponent.x)) * span;
   }
 
   emit(type, caster, target, mark, hit, power = caster.combat.power) {

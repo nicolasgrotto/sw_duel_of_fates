@@ -115,7 +115,7 @@ it('shields all incoming powers, body shove and both projectile kinds without re
 
 for (const reversed of [false, true]) {
   for (const level of [6, 7, 8, 9, 10]) {
-    it('marks mirrored waves from config at level '+level+', reversed '+reversed, () => {
+    it('marks two mirrored near columns and scattered columns from config at level '+level+', reversed '+reversed, () => {
       const s = setup(level, reversed); cast(s, 0);
       const waves = power.strikesByTier.filter(band => level >= band.minLevel).at(-1).strikes;
       const bolts = power.boltsByTier.filter(band => level >= band.minLevel).at(-1).bolts;
@@ -128,7 +128,11 @@ for (const reversed of [false, true]) {
         for (let bolt = 0; bolt < bolts; bolt++) {
           const mark = marks[wave * bolts + bolt];
           const mirror = wave % 2 === 0 ? 1 : -1;
-          assert.equal(mark.x, s.target.x + power.strikeOffsets[wave % power.strikeOffsets.length] + power.columnPatterns[bolts][bolt] * mirror);
+          if (bolt < power.nearColumns.length) {
+            assert.equal(mark.x, s.target.x + power.strikeOffsets[wave % power.strikeOffsets.length] + power.nearColumns[bolt] * mirror);
+          } else {
+            assert.ok(mark.x >= s.simulation.arena.left + power.scatterMargin && mark.x <= s.simulation.arena.right - power.scatterMargin);
+          }
           assert.equal(mark.marked, true);
           assert.ok(Math.abs(mark.impactTime - power.startup - power.strikeWarning - wave * interval) < 1e-12);
         }
@@ -245,4 +249,21 @@ it('AI casts only within 600px without pressure and flees marked columns after r
   assert.equal(defender.tryEscapeStorm(), AiDecision.DODGE);
   s.target.x = 1100;
   assert.equal(defender.tryEscapeStorm(), null);
+});
+
+it('scatters the extra apex bolts across the arena and repeats them exactly for the same state', () => {
+  const positions = () => {
+    const s = setup(10); cast(s, 0);
+    const waves = power.strikesByTier.at(-1).strikes;
+    const interval = (power.stormPhases.storm - power.strikeWarning) / (waves - 1);
+    for (let wave = 0; wave < waves; wave++) {
+      s.target.x = 800;
+      s.caster.stateTime = power.startup + wave * interval; s.powers.resolve(s.fighters, STEP);
+    }
+    return s.caster.combat.stormMarks.filter((mark) => mark.bolt >= power.nearColumns.length).map((mark) => mark.x);
+  };
+  const first = positions();
+  assert.deepEqual(positions(), first);
+  assert.ok(new Set(first.map((x) => Math.round(x / 40))).size >= first.length / 2);
+  assert.ok(Math.max(...first) - Math.min(...first) > 400);
 });

@@ -78,7 +78,7 @@ export const powersConfig = {
       stormPhases: STORM_PHASES, range: 600, damage: 4, stun: 0.12, strikeWarning: 0.5, strikeWidth: 80, barrierDrainPerStrike: 30,
       strikesByTier: [{ minLevel: 3, strikes: 6 }, { minLevel: 8, strikes: 7 }, { minLevel: 10, strikes: 8 }],
       boltsByTier: [{ minLevel: 3, bolts: 2 }, { minLevel: 8, bolts: 3 }, { minLevel: 10, bolts: 4 }],
-      columnPatterns: { 2: [0, 140], 3: [0, -140, 140], 4: [0, -140, 140, 280] },
+      nearColumns: [0, 140], scatterMargin: 60,
       fractureByLevel: { minLevel: 10, id: 'storm', interaction: 'fracture', range: 180, speed: 600,
         segmentLength: 60, fractureWarning: 0.2, damage: 4, stagger: 0.25, launchSpeed: 650 },
       strikeOffsets: [0, -24, 18, -12, 30, -30, 12, -18, 24, 0, -6, 6], hudMark: 'powerCostStorm',
