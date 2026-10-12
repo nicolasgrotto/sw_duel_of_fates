@@ -192,7 +192,8 @@ export class PowerSystem {
         this.applySelf(caster, power);
       } else if (power.projectile) {
         this.aim(caster, null, power);
-        this.combat.projectiles.spawnThrow(caster, power);
+        if (power.wave) this.combat.projectiles.spawnWave(caster, power);
+        else this.combat.projectiles.spawnThrow(caster, power);
       } else {
         this.affect(caster, target, power, 'active');
       }
@@ -285,8 +286,9 @@ export class PowerSystem {
     context.interaction = interaction;
     context.air = target.grounded ? GROUNDED : table.air;
     context.remainder = remainder;
-    context.scale = interaction.scale * caster.stats.power.potency * context.air.scale * remainder;
-    context.guarded = !power.markedRain && interaction.blockable && isGuardingAgainst(target, caster);
+    context.scale = interaction.scale * (projectile?.potency ?? caster.stats.power.potency) * context.air.scale * remainder;
+    context.guarded = !power.markedRain && interaction.blockable && (power.wave ? target.state === FighterState.BLOCKING
+      && !target.combat.saberThrown && Math.sign(projectile.vx) === -target.facing : isGuardingAgainst(target, caster));
     context.projectile = projectile;
     context.impactX = impactX;
     powerEffects[power.effect][phase](context);

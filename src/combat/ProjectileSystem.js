@@ -23,6 +23,10 @@ function createProjectile() {
     age: 0,
     returning: false,
     hit: false,
+    reflected: false,
+    distance: 0,
+    range: Infinity,
+    potency: null,
   };
 }
 
@@ -80,6 +84,10 @@ export class ProjectileSystem {
     projectile.age = 0;
     projectile.returning = false;
     projectile.hit = false;
+    projectile.reflected = false;
+    projectile.distance = 0;
+    projectile.range = Infinity;
+    projectile.potency = null;
     return projectile;
   }
 
@@ -94,6 +102,20 @@ export class ProjectileSystem {
     projectile.damage = size.damage;
     projectile.knockback = size.knockback;
     projectile.stagger = size.stagger;
+  }
+
+  spawnWave(caster, power) {
+    const projectile = this.acquire(caster, ProjectileKind.WAVE, power.id);
+    if (!projectile) return null;
+    const data = this.config.wave;
+    projectile.vx = caster.facing * data.speed;
+    projectile.radius = data.radius;
+    projectile.damage = data.damage;
+    projectile.knockback = data.knockback;
+    projectile.stagger = data.stagger;
+    projectile.range = power.range;
+    projectile.potency = caster.stats.power.potency;
+    return projectile;
   }
 
   spawnSaber(owner, attackType) {
@@ -121,11 +143,13 @@ export class ProjectileSystem {
     if (projectile.kind === ProjectileKind.SABER) {
       this.steerSaber(projectile, dt);
     }
-    projectile.x += projectile.vx * dt;
+    const travel = projectile.kind === ProjectileKind.WAVE ? Math.min(Math.abs(projectile.vx * dt), projectile.range - projectile.distance) : Math.abs(projectile.vx * dt);
+    projectile.x += Math.sign(projectile.vx) * travel;
+    projectile.distance += travel;
     if (!projectile.active) {
       return;
     }
-    if (projectile.kind === ProjectileKind.THROW && this.isOutside(projectile)) {
+    if (projectile.kind !== ProjectileKind.SABER && this.isOutside(projectile)) {
       this.release(projectile);
       return;
     }
@@ -134,6 +158,7 @@ export class ProjectileSystem {
       return;
     }
     this.checkHit(projectile);
+    if (projectile.kind === ProjectileKind.WAVE && projectile.distance >= projectile.range) this.release(projectile);
   }
 
   isOutside(projectile) {
@@ -187,11 +212,12 @@ export class ProjectileSystem {
     box.top = projectile.y - projectile.radius;
     box.bottom = projectile.y + projectile.radius;
     for (const target of this.fighters) {
-      if (target === owner || !target.isAlive || isInvulnerable(target) || projectile.kind !== ProjectileKind.THROW && isBladeInvulnerable(target) || !boxesOverlap(box, getHurtbox(target, this.hurtbox))) {
+      if (target === owner || !target.isAlive || isInvulnerable(target) || projectile.kind === ProjectileKind.SABER && isBladeInvulnerable(target) || !boxesOverlap(box, getHurtbox(target, this.hurtbox))) {
         continue;
       }
+      if (projectile.kind === ProjectileKind.WAVE && this.reflectWave(projectile, owner, target)) return;
       projectile.hit = true;
-      if (projectile.kind === ProjectileKind.THROW) {
+      if (projectile.kind !== ProjectileKind.SABER) {
         this.combat.powers.strike(owner, target, this.combat.powers.config.powers[projectile.source], 'impact', projectile);
         this.release(projectile);
       } else {
@@ -199,6 +225,19 @@ export class ProjectileSystem {
       }
       return;
     }
+  }
+
+  reflectWave(projectile, owner, target) {
+    if (projectile.reflected || target.combat.absorbTime > 0 || isBarrierUp(target) || isStormShieldUp(target)
+      || target.state !== FighterState.BLOCKING || target.combat.saberThrown || !target.combat.parryArmed
+      || target.combat.parryTime >= target.stats.parry.perfectWindow || Math.sign(projectile.vx) !== -target.facing) return false;
+    projectile.owner = this.fighters.indexOf(target);
+    projectile.vx = -projectile.vx;
+    projectile.reflected = true;
+    target.combat.parryArmed = false;
+    target.combat.parryLockout = target.stats.parry.lockout;
+    this.combat.emit(CombatEvent.WAVE_REFLECT, { attacker: target, defender: owner, attackType: projectile.source, x: projectile.x, y: projectile.y });
+    return true;
   }
 
   strikeWithSaber(projectile, owner, target) {

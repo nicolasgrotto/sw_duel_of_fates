@@ -312,6 +312,7 @@ export const en = {
     },
     dialogue: { hint: '{confirm}  continue  ·  {back}  skip', touchHint: 'Tap to continue' },
     powers: {
+      flowCleave: 'Flow Cleave',
       absorb: 'Absorption',
       drain: 'Drain',
       sanctuary: 'Sanctuary',

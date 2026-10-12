@@ -22,11 +22,15 @@ export const powersConfig = {
   airReach: 320,
   categories: {
     flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull', 'throw', 'mindTwist', 'supremePush', 'fracture'] },
-    aurora: { alignments: ['light'], abilities: ['barrier', 'heal', 'focus', 'absorb', 'sanctuary', 'meteorRain'] },
+    aurora: { alignments: ['light'], abilities: ['barrier', 'heal', 'focus', 'absorb', 'sanctuary', 'meteorRain', 'flowCleave'] },
     eclipse: { alignments: ['dark'], abilities: ['lightning', 'choke', 'freeze', 'storm', 'wrath', 'drain'] },
     blade: { alignments: ['light', 'dark'], abilities: ['spin', 'dashSlash', 'saberThrow'] },
   },
   powers: {
+    flowCleave: {
+      id: 'flowCleave', effect: 'flowCleave', projectile: true, wave: true, channel: false, pose: 'cast', interaction: 'throw',
+      cost: 30, startup: 0.2, active: 0.08, recovery: 0.3, range: 520, guard: { staminaCost: 10 },
+    },
     fracture: {
       id: 'fracture', effect: 'fracture', channel: false, pose: 'slam', interaction: 'fracture', fracture: true,
       cost: 70, startup: 0.45, active: 0.08, recovery: 0.5, range: Infinity,

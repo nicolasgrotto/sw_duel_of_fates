@@ -2,7 +2,7 @@ import { AttackPhase, AttackType, getAttackDuration, getAttackPhase, isHeavyAtta
 import { getPowerMode, isBarrierUp, isChannelOpen, isInPowerRange, isUsingPower } from '../combat/PowerSystem.js';
 import { isStormShieldUp } from '../combat/StormSystem.js';
 import { getFlowDifference, resolveInteraction, resolveLevelBand } from '../combat/flowInteractions.js';
-import { projectilesConfig } from '../config/projectilesConfig.js';
+import { ProjectileKind, projectilesConfig } from '../config/projectilesConfig.js';
 import { evadeConfig } from '../config/evadeConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { combatRulesConfig, resolveCombatRules } from '../config/combatRulesConfig.js';
@@ -676,6 +676,15 @@ export class EnemyAI {
     const projectile = findIncomingProjectile(this.self, this.projectiles, this.perception.projectileHorizon);
     if (!projectile) return null;
     if (this.plan.powerHoldTime > 0) return AiDecision.POWER;
+    if (projectile.kind === ProjectileKind.WAVE && !projectile.reflected && this.self.canAct && !this.self.combat.saberThrown
+      && this.self.combat.parryLockout === 0 && Math.sign(projectile.vx) === -this.self.facing
+      && this.random() < this.difficulty.perfectParryChance) {
+      const travel = Math.max(0, (Math.abs(this.self.x - projectile.x) - this.self.width / 2 - projectile.radius) / Math.abs(projectile.vx));
+      this.plan.parryDelay = Math.max(0, travel - this.self.stats.parry.perfectWindow / 2);
+      this.plan.blockTime = 0;
+      this.plan.punishAfterBlock = false;
+      return AiDecision.PARRY;
+    }
     if (this.plan.blockTime > 0 && Math.sign(projectile.vx) === -this.self.facing && !this.self.combat.saberThrown) return AiDecision.BLOCK;
     if (this.random() >= this.profile.blockChance * this.difficulty.defenseMultiplier) return null;
     if (this.tryBarrier(this.perception.projectileHorizon)) return AiDecision.POWER;

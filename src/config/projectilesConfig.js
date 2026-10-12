@@ -1,10 +1,12 @@
 export const ProjectileKind = Object.freeze({
   THROW: 'throw',
   SABER: 'saber',
+  WAVE: 'wave',
 });
 
 export const projectilesConfig = {
   capacity: 6,
+  wave: { speed: 1000, radius: 28, damage: 9, knockback: 300, stagger: 0.25 },
   height: 0.55,
   saber: {
     speed: 900,

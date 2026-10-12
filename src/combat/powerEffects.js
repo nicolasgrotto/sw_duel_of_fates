@@ -182,6 +182,10 @@ export const powerEffects = Object.freeze({
   lightning: { tick: lightning },
   barrier: {},
   throw: { impact: throwImpact },
+  flowCleave: { impact: context => {
+    if (context.guarded) { applyGuarded(context, 0); return; }
+    throwImpact(context);
+  } },
   choke: { active: choke },
   freeze: { active: freeze },
   heal: { self: heal },

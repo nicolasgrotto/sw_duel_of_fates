@@ -312,6 +312,7 @@ export const ptBR = {
     },
     dialogue: { hint: '{confirm}  continuar  ·  {back}  pular', touchHint: 'Toque para continuar' },
     powers: {
+      flowCleave: 'Corte de Fluxo',
       absorb: 'Absorção',
       drain: 'Dreno',
       sanctuary: 'Santuário',
