@@ -11,7 +11,7 @@ import { Hud } from '../src/ui/Hud.js';
 import { colors } from '../src/config/themeConfig.js';
 import { getPowerDebugInfo } from '../src/states/powerDebugInfo.js';
 import { STEP,spawnFighter,createSimulation } from './helpers.js';
-const ids=['supremePush','meteorRain','sanctuary','crush','wrath','fracture'];
+const ids=['supremePush','meteorRain','sanctuary','wrath','fracture'];
 function scene(id,target='idle') {
   const simulation=createSimulation([spawnFighter(400),spawnFighter(700,-1,'shadow')],{powers:true});
   return new GalleryScene(new GalleryDirector({ability:id,tier:3,target,caster:'guardian',repeat:false}),simulation);
@@ -20,7 +20,7 @@ function step(s) {
   s.beforeStep();s.controllers.forEach((c,i)=>c.updateIntent(s.fighters[i].intent,STEP));s.simulation.step(STEP);s.afterStep(STEP);
   return s.simulation.events;
 }
-it('catalogs six high cost powers with configured tokens without assigning them to the roster',()=>{
+it('catalogs five high cost powers with configured tokens without assigning them to the roster',()=>{
   for(const id of ids){assert.ok(galleryCatalog.some(i=>i.id===id));assert.match(powersConfig.powers[id].hudMark,/^powerCost/);}
   for(const character of Object.values(characters))for(const id of ids)assert.ok(!Object.values(character.loadout.powers).includes(id));
 });
@@ -34,20 +34,20 @@ it('demonstrates supreme escape only after the attacking target actually lands a
   }
   assert.equal(start,true);assert.equal(active,true);
 });
-for(const id of ['meteorRain','fracture','sanctuary','crush'])it('keeps the gallery cycle active while '+id+' remains and cleans all state on reset',()=>{
+for(const id of ['meteorRain','fracture','sanctuary'])it('keeps the gallery cycle active while '+id+' remains and cleans all state on reset',()=>{
   const s=scene(id);s.requestCast();let observed=false;
   for(let i=0;i<400;i++){
-    step(s);const active=s.fighters.some(f=>f.combat.rainActive||f.combat.fracture||f.combat.sanctuaryTime>0||f.combat.crushTime>0);
+    step(s);const active=s.fighters.some(f=>f.combat.rainActive||f.combat.fracture||f.combat.sanctuaryTime>0);
     if(active){observed=true;assert.equal(s.hasEffects(),true);assert.equal(s.director.phase,'active');}
   }
   assert.equal(observed,true);s.reset();
-  for(const f of s.fighters){assert.equal(f.combat.rainActive,false);assert.equal(f.combat.rain,null);assert.equal(f.combat.fracture,null);assert.equal(f.combat.sanctuaryShield,0);assert.equal(f.combat.crushTime,0);}
+  for(const f of s.fighters){assert.equal(f.combat.rainActive,false);assert.equal(f.combat.rain,null);assert.equal(f.combat.fracture,null);assert.equal(f.combat.sanctuaryShield,0);}
 });
 it('keeps debug state reads pure and covers every new status',()=>{
-  const f=spawnFighter(500);f.combat.powerMode='escape';f.combat.chokeTime=1;f.combat.crushTime=0.6;f.combat.sanctuaryShield=30;f.combat.sanctuaryTime=6;f.combat.wrathArmorHits=2;
+  const f=spawnFighter(500);f.combat.powerMode='escape';f.combat.chokeTime=1;f.combat.sanctuaryShield=30;f.combat.sanctuaryTime=6;f.combat.wrathArmorHits=2;
   f.combat.rain={phase:'rain',time:1,marks:[{active:true}]};f.combat.fracture={time:0.1,segments:[{marked:true,burst:false}]};
   const before=captureFighter(f),line=getPowerDebugInfo(f);
-  for(const name of ['mode escape','choke 1.00','crush 0.60','sanctuary 30.0/6.00','wrath armor 2','rain rain/1.00','marks 1','fracture 0.10','cracks 1'])assert.ok(line.includes(name),name);
+  for(const name of ['mode escape','choke 1.00','sanctuary 30.0/6.00','wrath armor 2','rain rain/1.00','marks 1','fracture 0.10','cracks 1'])assert.ok(line.includes(name),name);
   assert.deepEqual(captureFighter(f),before);
 });
 it('keeps unimplemented cost mark colors out of the renderer while retaining the existing storm mark',()=>{

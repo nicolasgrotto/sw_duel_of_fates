@@ -28,7 +28,6 @@ export const EffectType = Object.freeze({
   BLADE_LOCK_BREAK: 'bladeLockBreak',
   COUNTER_FLOURISH: 'counterFlourish',
   STORM_STRIKE: 'stormStrike',
-  CRUSH_SLAM: 'crushSlam',
   METEOR_IMPACT: 'meteorImpact',
   FRACTURE_SLAM: 'fractureSlam',
   FRACTURE_BURST: 'fractureBurst',
@@ -258,10 +257,6 @@ export class EffectsSystem {
         break;
       case CombatEvent.POWER_HIT:
         if (event.attackType === 'drain') {
-          break;
-        }
-        if (event.attackType === 'crush') {
-          this.spawnCrushSlam(attacker, defender, params);
           break;
         }
         if (event.attackType === 'mindTwist') {
@@ -607,29 +602,6 @@ export class EffectsSystem {
     this.spawn(EffectType.SANCTUARY_SHATTER, params);
     this.spawnRing(style.ring, params.x, params.y, color);
     this.spawnLight(style.light, params.x, params.y, color);
-  }
-
-  spawnCrushSlam(caster, target, params) {
-    const dust = this.config.crushSlam.dust;
-    params.x = target.x;
-    params.y = target.y;
-    params.color = getTierColor(caster);
-    params.direction = caster.facing;
-    if (this.flashScale > 0) this.hitFlashes.set(target, this.config.hitFlashDuration);
-    this.spawn(EffectType.CRUSH_SLAM, params);
-    const count = this.reduced ? dust.reducedCount : dust.count;
-    for (let i = 0; i < count; i += 1) {
-      const particle = this.particles.acquire();
-      if (!particle) return;
-      particle.x = target.x + (this.random() * 2 - 1) * dust.spread;
-      particle.y = target.y;
-      particle.vx = (this.random() * 2 - 1) * randomRange(this.random, dust.speed);
-      particle.vy = -randomRange(this.random, dust.lift);
-      particle.life = randomRange(this.random, dust.life);
-      particle.maxLife = particle.life;
-      particle.size = randomRange(this.random, dust.size);
-      particle.color = colors.shockwaveDust;
-    }
   }
 
   spawnWrathArmor(fighter) {

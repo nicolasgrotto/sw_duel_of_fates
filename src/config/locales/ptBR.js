@@ -318,7 +318,6 @@ export const ptBR = {
       supremePush: 'Repulsão Suprema',
       fracture: 'Fratura',
       meteorRain: 'Telecinese em Massa',
-      crush: 'Esmagamento',
       mindTwist: 'Truque Mental',
       storm: 'Tempestade',
       push: 'Repulsão',

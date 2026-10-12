@@ -45,7 +45,6 @@ export const colors = {
   powerCostFracture: '#a6ff6a',
   powerCostMeteor: '#ff9a4a',
   powerCostSanctuary: '#f4f1d0',
-  powerCostCrush: '#ff6fae',
   powerCostWrath: '#ff8c1a',
   hudMarkIdle: 'rgba(255, 255, 255, 0.25)',
   hitFlash: '#ffffff',

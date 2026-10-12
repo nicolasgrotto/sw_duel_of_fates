@@ -211,10 +211,6 @@ export const audioConfig = {
       { type: 'noise', duration: 0.3, attack: 0.002, gain: 0.35, filter: { type: 'highpass', from: 2500, to: 1500, q: 0.8 } },
       { type: 'tone', wave: 'triangle', from: 900, to: 300, duration: 0.3, attack: 0.002, gain: 0.1, filter: null },
     ],
-    crush: [
-      { type: 'tone', wave: 'sine', from: 70, to: 30, duration: 0.45, attack: 0.002, gain: 0.4, filter: null },
-      { type: 'noise', duration: 0.35, attack: 0.002, gain: 0.4, filter: { type: 'lowpass', from: 900, to: 150, q: 0.8 } },
-    ],
     fractureRun: [
       { type: 'noise', duration: 0.9, attack: 0.02, gain: 0.32, filter: { type: 'lowpass', from: 500, to: 1400, q: 1.2 } },
       { type: 'tone', wave: 'sawtooth', from: 55, to: 45, duration: 0.9, attack: 0.02, gain: 0.08, filter: { type: 'lowpass', from: 300, to: 200, q: 1 } },

@@ -23,7 +23,7 @@ export const powersConfig = {
   categories: {
     flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull', 'throw', 'mindTwist', 'supremePush', 'fracture'] },
     aurora: { alignments: ['light'], abilities: ['barrier', 'heal', 'focus', 'absorb', 'sanctuary', 'meteorRain'] },
-    eclipse: { alignments: ['dark'], abilities: ['lightning', 'choke', 'freeze', 'storm', 'wrath', 'drain', 'crush'] },
+    eclipse: { alignments: ['dark'], abilities: ['lightning', 'choke', 'freeze', 'storm', 'wrath', 'drain'] },
     blade: { alignments: ['light', 'dark'], abilities: ['spin', 'dashSlash', 'saberThrow'] },
   },
   powers: {
@@ -40,11 +40,6 @@ export const powersConfig = {
       damage: 7, knockback: 500, stagger: 0.3, strikeWarning: 0.6, strikeWidth: 120, barrierDrainPerStrike: 30,
       strikesByTier: [{ minLevel: 3, strikes: 5 }, { minLevel: 8, strikes: 6 }, { minLevel: 10, strikes: 7 }],
       strikeOffsets: [0, -40, 30, -20, 50, -50, 20], markEvent: 'rainMark', strikeEvent: 'rainStrike', hudMark: 'powerCostMeteor',
-    },
-    crush: {
-      id: 'crush', effect: 'crush', channel: false, pose: 'grip', interaction: 'crush', control: true,
-      cost: 65, startup: 0.6, active: 0.08, recovery: 0.5, range: 260,
-      duration: 0.6, damage: 16, stagger: 0.6, liftHeight: 60, guard: { staminaCost: 14 }, hudMark: 'powerCostCrush',
     },
     sanctuary: {
       id: 'sanctuary', effect: 'sanctuary', channel: false, pose: 'barrier', self: true,
@@ -150,16 +145,6 @@ export const powersConfig = {
     fracture: {
       air: { scale: 1, duration: 1, stagger: 1 },
       bands: [{ ...NORMAL_BAND, ...STRIKE_GUARD, blockable: false }, { ...REDUCED_BAND, ...STRIKE_GUARD, blockable: false }, { ...RESISTED_BAND, ...STRIKE_GUARD, blockable: false }],
-    },
-    crush: {
-      air: { scale: 1, duration: 1, stagger: 1 },
-      bands: [
-        { ...NORMAL_BAND, ...STRIKE_GUARD, atLeast: 3, blockable: false },
-        { ...NORMAL_BAND, ...STRIKE_GUARD, atLeast: 0, guardDamage: 0.25 },
-        { ...NORMAL_BAND, ...STRIKE_GUARD, atLeast: -1, scale: 0.75, guardDamage: 0.25 },
-        { ...REDUCED_BAND, ...STRIKE_GUARD, guardDamage: 0.25 },
-        { ...RESISTED_BAND, ...STRIKE_GUARD },
-      ],
     },
     mindTwist: {
       air: { scale: 1, duration: 1, stagger: 1 },
@@ -311,8 +296,8 @@ export const powersConfig = {
       wrathOutline: { offset: [3, 5.5], alpha: [0.3, 0.6], flicker: [17, 23], rise: 1.5 },
       wrathEmbers: { count: 7, rate: 1.4, rise: 70, length: 9, width: 2, alpha: 0.75, spread: 1.3, height: 0.72 },
       sanctuaryCenter: 0.5,
-      sanctuaryRadiusX: 0.5,
-      sanctuaryRadiusY: 0.7,
+      sanctuaryRadiusX: 0.3,
+      sanctuaryRadiusY: 0.5,
       sanctuaryAlpha: [0.3, 0.6],
       sanctuaryGlowAlpha: 0.14,
       sanctuaryLineWidth: 2.5,

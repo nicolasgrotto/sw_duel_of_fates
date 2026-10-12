@@ -325,7 +325,7 @@ describe('choke caster and wrath armor', () => {
   });
 });
 
-describe('supreme push, sanctuary and crush presentation', () => {
+describe('supreme push and sanctuary presentation', () => {
   it('sends chevrons both ways with a full ring in attack mode and a short burst in escape mode', () => {
     const effects = createEffects();
     const caster = spawnFighter(500, 1, 'mirror');
@@ -371,21 +371,6 @@ describe('supreme push, sanctuary and crush presentation', () => {
     assert.ok(guarded.rings.some((ring) => ring.active && ring.maxRadius === effectsConfig.sanctuaryHitRing.radius));
   });
 
-  it('squeezes the crushed target and slams it with dust and a heavy shake', () => {
-    const fighter = spawnFighter(500, 1, 'guardian');
-    fighter.restartState(FighterState.STUNNED);
-    fighter.combat.crushTime = powersConfig.powers.crush.duration * 0.1;
-    const squeezed = computePose(fighter, createPose());
-    assert.ok(squeezed.turnScale < 0.85);
-    fighter.combat.crushTime = 0;
-    assert.equal(computePose(fighter, createPose()).turnScale, 1);
-    const effects = createEffects();
-    const caster = spawnFighter(300, 1, 'shadow');
-    effects.handleEvents([event(CombatEvent.POWER_HIT, caster, fighter, 'crush')]);
-    assert.ok(effects.particles.particles.some((particle) => particle.active && particle.color === colors.shockwaveDust));
-    assert.equal(effects.hasHitFlash(fighter), true);
-    assert.deepEqual(playedSounds([event(CombatEvent.POWER_HIT, caster, fighter, 'crush')]), [SoundName.CRUSH]);
-  });
 });
 
 describe('mass telekinesis presentation', () => {
@@ -498,5 +483,14 @@ describe('power names', () => {
         if (!arenas[id]) assert.equal(locale.ui.arenas[id], undefined, `${locale.id}/${id}`);
       }
     }
+  });
+});
+
+describe('sanctuary and barrier shapes', () => {
+  it('keeps the sanctuary dome tighter than the smallest barrier', () => {
+    const render = powersConfig.render;
+    const smallest = Math.min(...powersConfig.tiers.map((tier) => tier.barrierScale));
+    assert.ok(render.status.sanctuaryRadiusX < render.barrierRadiusX * smallest);
+    assert.ok(render.status.sanctuaryRadiusY < render.barrierRadiusY * smallest);
   });
 });

@@ -1,5 +1,5 @@
 import { AttackPhase, AttackType, getAttackDuration, getAttackPhase, isHeavyAttack } from '../combat/attackPhases.js';
-import { getPowerMode, isBarrierUp, isChannelOpen, isInPowerRange, isPowerRecovering, isUsingPower } from '../combat/PowerSystem.js';
+import { getPowerMode, isBarrierUp, isChannelOpen, isInPowerRange, isUsingPower } from '../combat/PowerSystem.js';
 import { isStormShieldUp } from '../combat/StormSystem.js';
 import { getFlowDifference, resolveInteraction, resolveLevelBand } from '../combat/flowInteractions.js';
 import { projectilesConfig } from '../config/projectilesConfig.js';
@@ -582,7 +582,6 @@ export class EnemyAI {
     const gap = getGap(this.self, this.opponent);
     return Boolean(use) && (use.minGapStrict ? gap > use.minGap : gap >= use.minGap) && gap <= use.maxGap && !this.isPowerBlocked(power)
       && (!use.requireGrounded || this.opponent.grounded)
-      && (!use.requireVulnerable || isPunishable(this.opponent) || isPowerRecovering(this.opponent))
       && (use.targetMeterAbove === undefined || this.opponent.flowMeter > use.targetMeterAbove)
       && (!use.avoidPressure || !isThreatening(this.opponent, this.self, this.perception.threatMargin))
       && isInPowerRange(this.self, this.opponent, power) && this.getPowerScale(power) > 0;

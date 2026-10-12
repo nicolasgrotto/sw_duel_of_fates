@@ -442,7 +442,6 @@ export const aiConfig = {
       pull: { minGap: 250, maxGap: Infinity },
       lightning: { minGap: 110, maxGap: Infinity },
       throw: { minGap: 140, maxGap: Infinity },
-      crush: { minGap: 0, maxGap: 260, requireVulnerable: true },
       choke: { minGap: 0, maxGap: 200, holdToLimit: true },
       freeze: { minGap: 80, maxGap: Infinity },
     },

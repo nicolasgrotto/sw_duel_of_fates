@@ -318,7 +318,6 @@ export const en = {
       supremePush: 'Supreme Push',
       fracture: 'Fracture',
       meteorRain: 'Mass Telekinesis',
-      crush: 'Crush',
       mindTwist: 'Mind Twist',
       storm: 'Storm',
       push: 'Repulse',

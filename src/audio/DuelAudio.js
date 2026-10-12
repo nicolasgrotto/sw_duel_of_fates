@@ -68,7 +68,6 @@ function getSoundForEvent(event) {
       if (event.attackType === 'drain') return null;
       if (event.attackType === 'mindTwist') return SoundName.MIND_TWIST;
       if (event.attackType === 'storm') return null;
-      if (event.attackType === 'crush') return SoundName.CRUSH;
       if (event.attackType === 'fracture') return SoundName.FRACTURE_HIT;
       if (event.attackType === 'meteorRain') return null;
       return event.attackType === 'lightning' ? SoundName.LIGHTNING : SoundName.POWER_IMPACT;

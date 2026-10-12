@@ -26,7 +26,7 @@ export function isNeutralForFocus(fighter) {
 
 export function hasStatus(fighter) {
   const { combat } = fighter;
-  return combat.chokeTime > 0 || combat.crushTime > 0 || combat.freezeTime > 0 || combat.focusTime > 0 || combat.healTime > 0 || combat.wrathTime > 0 || combat.confuseTime > 0 || combat.sanctuaryTime > 0;
+  return combat.chokeTime > 0 || combat.freezeTime > 0 || combat.focusTime > 0 || combat.healTime > 0 || combat.wrathTime > 0 || combat.confuseTime > 0 || combat.sanctuaryTime > 0;
 }
 
 export class StatusSystem {
@@ -54,7 +54,6 @@ export class StatusSystem {
       if (combat.chokeTime > 0) {
         this.choke(fighter, findOpponent(fighter, fighters), dt);
       }
-      if (combat.crushTime > 0) this.crush(fighter, fighters, dt);
       if (combat.healTime > 0) {
         this.heal(fighter, dt);
       }
@@ -159,30 +158,6 @@ export class StatusSystem {
     }
   }
 
-  crush(fighter, fighters, dt) {
-    const { combat } = fighter;
-    combat.crushTime = Math.max(0, combat.crushTime - dt);
-    fighter.y = combat.crushY;
-    fighter.vx = fighter.vy = 0;
-    fighter.grounded = false;
-    if (combat.crushTime > 0) {
-      if (fighter.state !== FighterState.STUNNED) {
-        fighter.clearAttack();
-        fighter.restartState(FighterState.STUNNED);
-      }
-      return;
-    }
-    const source = fighters[combat.crushSource] ?? findOpponent(fighter, fighters);
-    const alive = this.combat.dealPowerDamage(source, fighter, this.combat.powers.config.powers.crush, combat.crushDamage, CombatEvent.POWER_HIT);
-    combat.crushDamage = 0;
-    combat.crushSource = -1;
-    if (alive) {
-      fighter.clearAttack();
-      combat.stunDuration = combat.crushStagger;
-      fighter.restartState(FighterState.STAGGERED);
-    }
-  }
-
   absorbShieldDamage(contact, amount) {
     const { defender } = contact;
     const { combat } = defender;
@@ -237,9 +212,6 @@ export class StatusSystem {
     fighter.combat.fracture = null;
     fighter.combat.rainActive = false;
     fighter.combat.rain = null;
-    fighter.combat.crushTime = 0;
-    fighter.combat.crushDamage = 0;
-    fighter.combat.crushSource = -1;
     fighter.combat.chokeTime = 0;
     fighter.combat.chokeSource = -1;
     fighter.combat.confuseTime = 0;

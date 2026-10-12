@@ -182,21 +182,6 @@ export const powerEffects = Object.freeze({
   lightning: { tick: lightning },
   barrier: {},
   throw: { impact: throwImpact },
-  crush: { active: (context) => {
-    const { combat, caster, target, power, guarded, scale } = context;
-    if (guarded) { applyGuarded(context); return; }
-    holdTarget(target, power.duration);
-    target.combat.crushTime = power.duration;
-    target.combat.crushSource = combat.projectiles.fighters.indexOf(caster);
-    target.combat.crushDamage = power.damage * scale;
-    target.combat.crushStagger = power.stagger;
-    target.combat.crushY = target.floorY - power.liftHeight;
-    target.y = target.combat.crushY;
-    target.grounded = false;
-    target.vy = 0;
-    target.combat.statusLevel = caster.flowLevel;
-    combat.emit(CombatEvent.POWER_HIT, combat.createPowerContact(caster, target, power, 0));
-  } },
   choke: { active: choke },
   freeze: { active: freeze },
   heal: { self: heal },

@@ -198,7 +198,7 @@ describe('Hud cost mark colors', () => {
   it('has a color for every high-cost power mark', async () => {
     const { powersConfig } = await import('../src/config/powersConfig.js');
     const marks = Object.values(powersConfig.powers).filter((power) => power.hudMark);
-    assert.ok(marks.length >= 7);
+    assert.ok(marks.length >= 6);
     for (const power of marks) assert.equal(typeof colors[power.hudMark], 'string', power.id);
   });
 });

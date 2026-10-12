@@ -130,7 +130,7 @@ export class GalleryScene {
     if (this.simulation.projectiles.activeCount > 0) return true;
     for (const { combat } of this.fighters) {
       if (combat.power || combat.attack || combat.chokeTime > 0 || combat.freezeTime > 0
-        || combat.rainActive || combat.fracture || combat.crushTime > 0 || combat.sanctuaryTime > 0
+        || combat.rainActive || combat.fracture || combat.sanctuaryTime > 0
         || combat.focusTime > 0 || combat.healTime > 0 || combat.wrathTime > 0 || combat.absorbTime > 0 || combat.confuseTime > 0) return true;
     }
     return false;
