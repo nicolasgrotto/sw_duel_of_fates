@@ -33,7 +33,7 @@ function createCostMarks(fighter) {
   const loadout = fighter.stats.power?.loadout ?? null;
   const marks = [];
   for (const power of Object.values(loadout ?? {})) {
-    if (power?.hudMark && !marks.some((mark) => mark.power === power)) {
+    if (power?.hudMark && colors[power.hudMark] && !marks.some((mark) => mark.power === power)) {
       marks.push({ power, ratio: power.cost / fighter.stats.power.max, color: colors[power.hudMark], offset: 0, lit: false, pulse: 0 });
     }
   }

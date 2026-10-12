@@ -113,8 +113,9 @@ src/
     PowerSystem.js          ✅ medidor, recarga, escolha e fases dos poderes, alvo, resistência e Barreira; desligado sem `rules.powers`
     powerEffects.js         ✅ registro de efeitos por poder (`push`, `pull`, `lightning`, `barrier`, `throw`)
     StatusSystem.js         ✅ duração, motivos de término e Foco automático (Estrangular, Congelar, Foco, Cura, Ira) em `fighter.combat`
-    StormSystem.js          ✅ fases automáticas da Tempestade, marcas e impactos determinísticos em combat
+    StormSystem.js          ✅ chuva marcada compartilhada: Tempestade e Telecinese com relógios e fases próprios
     ChokeSystem.js          ✅ canal do Estrangular e vínculo determinístico com a vítima
+    FractureSystem.js       ✅ trajetória no chão, trechos e impactos determinísticos
     ProjectileSystem.js     ✅ pool fixo de projéteis (Arremesso e lâmina arremessada), voo, retorno, impacto e snapshot
     flowInteractions.js     ✅ diferença de Fluxo, `resolveInteraction` (faixas por habilidade em dados) e tier visual (puros)
   simulation/               ✅
@@ -1361,7 +1362,7 @@ Todas as janelas dentro de update ≤ 2 ms e render ≤ 10 ms; sem erros JavaScr
 
 ### Repulsão Suprema (2.18)
 
-`getPowerMode` centraliza os estados permitidos: ataque neutro ou guarda livre; fuga em HIT, STAGGERED e blockstun. O buffer consulta esse contrato antes de exigir canAct. A variante da fuga é criada apenas no lançamento; powerMode entra no snapshot e nos eventos POWER_START/POWER_ACTIVE. isBladeInvulnerable protege somente sua preparação contra lâmina corpo a corpo e arremessada; não protege contra poderes ou empurrão. A área usa distância entre centros e o impulso aponta para longe do lançador. finish lê cooldown do poder antes da recarga geral. A IA observa bladeHitSequence, sem alterar combate, e solicita fuga após a sequência e janela definidas em aiConfig. Nenhum loadout do elenco recebe o poder.
+`getPowerMode` centraliza os estados permitidos: ataque neutro ou guarda livre; fuga em HIT, STAGGERED e blockstun. O buffer consulta esse contrato antes de exigir canAct. A lista de estados prevalece também para Raio: seu HIT existente permite fuga, conforme o autor; STUNNED permanece proibido. A variante da fuga é criada apenas no lançamento; powerMode entra no snapshot e nos eventos POWER_START/POWER_ACTIVE. isBladeInvulnerable protege somente sua preparação contra lâmina corpo a corpo e arremessada; não protege contra poderes ou empurrão. A área usa distância entre centros e o impulso aponta para longe do lançador. finish lê cooldown do poder antes da recarga geral. A IA observa bladeHitSequence, sem alterar combate, e solicita fuga após a sequência e janela definidas em aiConfig. Nenhum loadout do elenco recebe o poder.
 
 ### Santuário (2.18)
 
@@ -1378,3 +1379,7 @@ StormSystem compartilha createMarks/updateMarks: quantidade por faixa, avisos, c
 ### FractureSystem (2.18)
 
 PowerSystem compõe FractureSystem. Ao terminar a preparação, a trajetória captura a frente do lançador e cria segmentos até a parede; combat.fracture guarda power, direction, time, target, hit e segments (limites, marca e explosão). O relógio continua independente do estado de ataque; clearPower não remove a trajetória, morte/reset removem. Cada trecho emite FRACTURE_CRACK e FRACTURE_BURST com posição e instante. Somente pés grounded dentro do trecho resolvem contato, uma vez por lançamento. A resolução própria consulta Fluxo e chama o pipeline de dano, passando por guarda, Absorção, Barreira, esquiva e escudo da Tempestade (decisão do autor); Santuário continua absorvendo dano e impedindo interrupção enquanto há pontos. No acerto, impulso vertical e STAGGERED. Snapshot clona segmentos na captura/restauração. A IA solicita pulo após perceber o trecho marcado conforme reactionTime; o uso ofensivo exige alvo grounded e distância estritamente maior que minGap em aiConfig.
+
+### Integração das regras de custo alto (2.18)
+
+GalleryScene mantém o ciclo enquanto há Santuário, Esmagamento, rainActive ou trajetória da Fratura. Com Repulsão Suprema e alvo atacando, posiciona os corpos no alcance da lâmina; GalleryTargetController solicita um golpe real, e GalleryController espera o estado elegível para fuga antes de solicitar o poder. powerDebugInfo fornece a leitura pura dos campos novos para F3 no duelo e na galeria. ReplayBuffer registra a intenção original e clona as estruturas de chuva/Fratura na captura e restauração. Hud ignora hudMark cujo token ainda não exista em themeConfig, preservando o render até a apresentação do Claude; nenhum desenho ou cor foi introduzido. O deslizamento da Barreira usa o centro do lançador para poderes radiais ou o centro marcado para a chuva. Nenhum poder novo foi atribuído ao elenco.

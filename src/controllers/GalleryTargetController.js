@@ -25,6 +25,11 @@ export class GalleryTargetController {
     const behavior = director.selection.target;
     if (behavior === 'blocking') intent.block = true;
     if (behavior === 'airborne') intent.jump = target.grounded && director.phase === 'active';
+    if (behavior === 'attacking' && this.scene.demonstratesEscape) {
+      intent.lightAttack = director.phase === 'active' && !this.responded;
+      this.responded ||= intent.lightAttack;
+      return;
+    }
     if (behavior === 'attacking') {
       intent.power = director.phase === 'active' && !this.responded;
       this.responded ||= intent.power;

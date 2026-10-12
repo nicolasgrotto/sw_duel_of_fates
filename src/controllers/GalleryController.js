@@ -1,3 +1,4 @@
+import { getPowerMode } from '../combat/PowerSystem.js';
 import { galleryConfig } from '../config/galleryConfig.js';
 
 export class GalleryController {
@@ -7,6 +8,7 @@ export class GalleryController {
   }
 
   isReady(dt) {
+    if (this.scene.demonstratesEscape) return getPowerMode(this.scene.fighters[0], this.scene.director.item.data) === 'escape';
     if (!this.scene.waitsForIncoming) return true;
     const incoming = this.scene.fighters[1];
     const power = incoming.combat.power;

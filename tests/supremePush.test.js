@@ -97,3 +97,13 @@ it('uses the attack mode without blade immunity and rejects ordinary powers duri
   s.caster.stats.power.loadout = { neutral: powersConfig.powers.push }; s.caster.intent.power = true;
   s.caster.combat.stunDuration = 1; s.simulation.step(STEP); assert.equal(s.caster.state, FighterState.HIT);
 });
+
+it('allows escape from lightning HIT while freeze remains ineligible by the closed state list', () => {
+  const s=setup();
+  s.combat.powers.strike(s.target,s.caster,powersConfig.powers.lightning,'tick',null);
+  assert.equal(s.caster.state,FighterState.HIT);assert.equal(s.combat.powers.tryCast(s.caster),true);
+  assert.equal(s.caster.combat.powerMode,'escape');
+  s.combat.powers.strike(s.target,s.caster,powersConfig.powers.freeze,'active',null);
+  assert.equal(s.caster.state,FighterState.STUNNED);s.caster.flowMeter=100;
+  assert.equal(s.combat.powers.tryCast(s.caster),false);
+});

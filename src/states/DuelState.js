@@ -29,6 +29,7 @@ import { ParryChallenge } from '../modes/ParryChallenge.js';
 import { TutorialDirector } from '../modes/TutorialDirector.js';
 import { GalleryDirector } from '../modes/GalleryDirector.js';
 import { GalleryScene } from '../modes/GalleryScene.js';
+import { getPowerDebugInfo } from './powerDebugInfo.js';
 import { GalleryPanel } from '../ui/GalleryPanel.js';
 import { BannerKind, ModeBanner } from '../ui/ModeBanner.js';
 import { getArcadeStage } from '../modes/arcade.js';
@@ -777,7 +778,7 @@ export class DuelState extends GameState {
     if (this.gallery) {
       const item = this.gallery.item;
       const { combat, stateTime } = this.player;
-      const phase = combat.stormPhase ?? (combat.attack ? getAttackPhase(combat.attack, stateTime) : combat.power
+      const phase = combat.rain?.phase ?? combat.stormPhase ?? (combat.attack ? getAttackPhase(combat.attack, stateTime) : combat.power
         ? stateTime < combat.power.startup ? 'startup' : combat.power.channel
           ? combat.powerEndTime > 0 ? 'recovery' : 'channel'
           : stateTime < combat.power.startup + combat.power.active ? 'active' : 'recovery'
@@ -788,6 +789,7 @@ export class DuelState extends GameState {
         `level: ${this.gallery.level}  potency: ${this.player.stats.power.potency.toFixed(2)}  range: ${this.galleryScene.range}  cost: ${cost}`,
         `state: ${this.player.state} ${this.player.stateTime.toFixed(2)}s  projectiles: ${this.simulation.projectiles.activeCount}`,
         `events: ${this.gallery.lastEvents || '-'}`,
+        ...this.fighters.map(getPowerDebugInfo),
         ...this.fighters.map((fighter) => `${fighter.id}: ${fighter.state}  pos ${fighter.x.toFixed(0)},${fighter.y.toFixed(0)}  vel ${fighter.vx.toFixed(0)},${fighter.vy.toFixed(0)}  absorb ${fighter.combat.absorbTime.toFixed(2)}  confuse ${fighter.combat.confuseTime.toFixed(2)}  storm ${fighter.combat.stormPhase ?? '-'}  marks ${fighter.combat.stormMarks.filter(mark => mark.active).length}`),
       ];
     }
@@ -803,6 +805,7 @@ export class DuelState extends GameState {
 
     for (const fighter of this.fighters) {
       lines.push(
+        getPowerDebugInfo(fighter),
         `${fighter.id}: ${fighter.state}  hp ${fighter.health.toFixed(0)}  st ${fighter.stamina.toFixed(0)}  flow ${this.rules.powers ? fighter.flowMeter.toFixed(0) : 'off'}`,
         `  ratings ${Object.values(fighter.stats.attributes).join("/")}  flow ${fighter.flowLevel}`,
         `  power ${fighter.combat.power?.id ?? '-'}  absorb ${fighter.combat.absorbTime.toFixed(2)}`,

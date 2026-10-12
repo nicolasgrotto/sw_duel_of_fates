@@ -272,7 +272,7 @@ export class PowerSystem {
         target.flowMeter = Math.max(0, target.flowMeter - power.barrierDrainPerStrike);
         if (target.flowMeter === 0) target.combat.powerEndTime = target.stateTime;
       }
-      this.barrierBlock(caster, target, power);
+      this.barrierBlock(caster, target, power, impactX);
       return;
     }
     const remainder = target.combat.absorbTime > 0 && !power.markedRain ? this.absorb(caster, target, power) : 1;
@@ -323,9 +323,11 @@ export class PowerSystem {
     return 1 - band.absorb;
   }
 
-  barrierBlock(caster, target, power) {
+  barrierBlock(caster, target, power, impactX) {
     if (power.knockback) {
-      target.vx = caster.facing * power.knockback * target.combat.power.pushSlide;
+      const origin = power.markedRain && Number.isFinite(impactX) ? impactX : caster.x;
+      const direction = power.around ? Math.sign(target.x - origin) || caster.facing : caster.facing;
+      target.vx = direction * power.knockback * target.combat.power.pushSlide;
     }
     this.combat.emit(CombatEvent.POWER_ABSORBED, this.combat.createPowerContact(caster, target, power, 0));
   }
