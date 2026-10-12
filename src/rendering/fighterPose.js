@@ -252,7 +252,8 @@ function getTechniqueTrack(motion, key) {
 function getAttackTrack(motion, attack, attackType, flourish) {
   if (flourish && attackType === 'riposte') return techniqueTracks.counterRiposte;
   const key = attack.pose ?? attackType;
-  return motion.tracks?.[attackType] ?? motion.tracks?.[key] ?? getTechniqueTrack(motion, key);
+  const ownTrack = attackType === attack.attack ? null : motion.tracks?.[attackType];
+  return ownTrack ?? motion.tracks?.[key] ?? getTechniqueTrack(motion, key);
 }
 
 function applyAttackPose(fighter, guardDegrees, motion, flourish) {

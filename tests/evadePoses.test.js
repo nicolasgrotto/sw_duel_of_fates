@@ -3,10 +3,10 @@ import assert from 'node:assert/strict';
 import { CombatSystem } from '../src/combat/CombatSystem.js';
 import { motionStyles } from '../src/config/fighterVisualConfig.js';
 import { computePose, createPose, getEvadeVariant } from '../src/rendering/fighterPose.js';
-import { arena, combatConfig, spawnFighter } from './helpers.js';
+import { arena, combatConfig, spawnStandardFighter } from './helpers.js';
 
 it('alternates the evade pose with the streak and shows the evading variant on success', () => {
-  const fighter = spawnFighter(500, 1, 'shadow');
+  const fighter = spawnStandardFighter(500, 1);
   const combat = new CombatSystem(arena, combatConfig);
   const variants = motionStyles.standard.evade;
   combat.tryEvade(fighter);

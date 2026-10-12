@@ -4,7 +4,7 @@ import { combatPoses, motionStyles, proportions } from '../src/config/fighterVis
 import { FighterState } from '../src/entities/fighterStates.js';
 import { computePose, createPose, getMotionStyle } from '../src/rendering/fighterPose.js';
 import { degreesToRadians } from '../src/utils/math.js';
-import { spawnFighter } from './helpers.js';
+import { spawnFighter, spawnStandardFighter } from './helpers.js';
 
 function attackAt(fighter, moveId, phase, at) {
   const move = fighter.moves[moveId];
@@ -22,7 +22,7 @@ function attackAt(fighter, moveId, phase, at) {
 it('uses key pose tracks only for styles that declare them', () => {
   assert.ok(getMotionStyle(spawnFighter(0, 1, 'guardian')).tracks.heavy);
   assert.ok(getMotionStyle(spawnFighter(0, 1, 'wasp')).tracks.light5);
-  assert.equal(getMotionStyle(spawnFighter(0, 1, 'shadow')).tracks, null);
+  assert.equal(getMotionStyle(spawnStandardFighter(0, 1)).tracks, null);
   assert.equal(motionStyles.standard.keyframes, undefined);
 });
 

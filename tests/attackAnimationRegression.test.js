@@ -24,6 +24,11 @@ function attackAt(fighter, moveId, time) {
   return move;
 }
 
+function asStandard(fighter) {
+  fighter.appearance = { ...fighter.appearance, motion: 'standard' };
+  return fighter;
+}
+
 function angularDistance(a, b) {
   return Math.abs(Math.atan2(Math.sin(a - b), Math.cos(a - b)));
 }
@@ -79,15 +84,18 @@ function checkBufferedHeavy(fighter, fromId, toId) {
 }
 
 describe('historical attack animation contract (198525b)', () => {
-  it('covers exactly every character without keyframe tracks', () => {
-    const ids = Object.keys(characters).filter((id) => !getMotionStyle(spawnFighter(500, 1, id)).tracks);
-    assert.deepEqual(Object.keys(baseline.poses).sort(), ids.sort());
+  it('covers every character, either through the v2 baseline or through keyframe tracks', () => {
+    for (const id of Object.keys(baseline.poses)) assert.ok(characters[id], id);
+    for (const id of Object.keys(characters)) {
+      assert.ok(baseline.poses[id] || baseline.moves[id], `${id} has no historical contract`);
+      assert.ok(getMotionStyle(spawnFighter(500, 1, id)).tracks, `${id} has no keyframe tracks`);
+    }
   });
 
   for (const [id, moves] of Object.entries(baseline.poses)) {
     it(`${id}: preserves every v2 pose channel in every move and phase`, () => {
       for (const facing of [-1, 1]) {
-        const fighter = spawnFighter(500, facing, id);
+        const fighter = asStandard(spawnFighter(500, facing, id));
         assertHistoricalPoses(fighter, moves, id);
       }
     });
@@ -96,7 +104,7 @@ describe('historical attack animation contract (198525b)', () => {
   for (const [style, { profile, poses }] of Object.entries(baseline.protagonists)) {
     it(`protagonist/${style}: preserves every v2 pose channel in every move and phase`, () => {
       for (const facing of [-1, 1]) {
-        const fighter = createFighterFromCharacter(createProtagonistCharacter(profile, storyConfig), { x: 500, y: 600, facing });
+        const fighter = asStandard(createFighterFromCharacter(createProtagonistCharacter(profile, storyConfig), { x: 500, y: 600, facing }));
         assert.equal(getMotionStyle(fighter).tracks, null);
         assertHistoricalPoses(fighter, poses, `protagonist/${style}`);
       }
@@ -129,7 +137,7 @@ describe('historical attack animation contract (198525b)', () => {
 });
 
 describe('keyframe blade geometry and chain continuity', () => {
-  for (const id of ['guardian', 'wasp']) {
+  for (const id of Object.keys(characters)) {
     const template = spawnFighter(500, 1, id);
     const tracks = getMotionStyle(template).tracks;
     for (const [moveId, move] of Object.entries(template.moves)) {

@@ -6,7 +6,7 @@ import { combatPoses, motionStyles } from '../src/config/fighterVisualConfig.js'
 import { FighterState } from '../src/entities/fighterStates.js';
 import { computePose, createPose, getMotionStyle } from '../src/rendering/fighterPose.js';
 import { TAU, degreesToRadians } from '../src/utils/math.js';
-import { spawnFighter } from './helpers.js';
+import { spawnFighter, spawnStandardFighter } from './helpers.js';
 
 function attackPose(fighter, attackType, time) {
   const attack = fighter.stats.attacks[attackType];
@@ -23,7 +23,7 @@ function angleDistance(a, b) {
 }
 
 it('keeps the standard style identical to the v2 poses', () => {
-  const standard = getMotionStyle(spawnFighter(400, 1, 'shadow'));
+  const standard = getMotionStyle(spawnStandardFighter(400, 1));
   assert.deepEqual(motionStyles.standard.stance, { crouch: 0, lean: 0, guardOffset: 0, breathScale: 1, swayScale: 1, bobScale: 1 });
   for (const [key, pose] of Object.entries(combatPoses.attacks)) {
     assert.deepEqual(standard.attacks[key], { ...pose, followThrough: 0, recoveryTwirl: 0 });

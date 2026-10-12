@@ -66,6 +66,7 @@ export const characters = {
       humFrequency: 62,
     },
     appearance: {
+      motion: 'aggressor',
       cloakColor: '#1f2029',
       bodyColor: '#121319',
       trimColor: '#2c2e3a',
@@ -106,6 +107,7 @@ export const characters = {
       humFrequency: 52,
     },
     appearance: {
+      motion: 'juggernaut',
       cloakColor: '#3d4636',
       bodyColor: '#1f231c',
       trimColor: '#5a6650',
@@ -187,6 +189,7 @@ export const characters = {
       humFrequency: 84,
     },
     appearance: {
+      motion: 'fencer',
       cloakColor: '#b9bcc7',
       bodyColor: '#3a3d47',
       trimColor: '#e3e6ee',
@@ -227,6 +230,7 @@ export const characters = {
       humFrequency: 68,
     },
     appearance: {
+      motion: 'fencer',
       cloakColor: '#3b3348',
       bodyColor: '#1c1924',
       trimColor: '#564a68',
@@ -267,6 +271,7 @@ export const characters = {
       humFrequency: 80,
     },
     appearance: {
+      motion: 'striker',
       cloakColor: '#5a2c1e',
       bodyColor: '#24140f',
       trimColor: '#7a3e2a',
@@ -307,6 +312,7 @@ export const characters = {
       humFrequency: 58,
     },
     appearance: {
+      motion: 'juggernaut',
       cloakColor: '#4a3a30',
       bodyColor: '#211a15',
       trimColor: '#6b5444',
@@ -347,6 +353,7 @@ export const characters = {
       humFrequency: 90,
     },
     appearance: {
+      motion: 'dancer',
       cloakColor: '#2f4a52',
       bodyColor: '#16232a',
       trimColor: '#7fa8b4',
@@ -387,6 +394,7 @@ export const characters = {
       humFrequency: 88,
     },
     appearance: {
+      motion: 'striker',
       cloakColor: '#23202b',
       bodyColor: '#121017',
       trimColor: '#c8c2d6',
@@ -419,6 +427,7 @@ export const characters = {
       humFrequency: 55,
     },
     appearance: {
+      motion: 'aggressor',
       cloakColor: '#14141c',
       bodyColor: '#0a0a0f',
       trimColor: '#3a1030',
@@ -457,6 +466,7 @@ export const characters = {
       humFrequency: 58,
     },
     appearance: {
+      motion: 'fencer',
       cloakColor: '#1c1622',
       bodyColor: '#0e0b12',
       trimColor: '#a8893a',
@@ -495,6 +505,7 @@ export const characters = {
       humFrequency: 80,
     },
     appearance: {
+      motion: 'guardian',
       cloakColor: '#c9c3b5',
       bodyColor: '#2a2f3a',
       trimColor: '#6fb2ff',
@@ -533,6 +544,7 @@ export const characters = {
       humFrequency: 88,
     },
     appearance: {
+      motion: 'guardian',
       cloakColor: '#8a7c5c',
       bodyColor: '#3c3a2c',
       trimColor: '#c9b98a',

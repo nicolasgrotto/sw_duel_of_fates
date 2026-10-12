@@ -30,6 +30,12 @@ export function spawnFighter(x, facing = 1, characterId = 'guardian') {
   return createFighter(characterId, { x, y: arena.floorY, facing });
 }
 
+export function spawnStandardFighter(x, facing = 1, characterId = 'shadow') {
+  const fighter = spawnFighter(x, facing, characterId);
+  fighter.appearance = { ...fighter.appearance, motion: 'standard' };
+  return fighter;
+}
+
 export function segmentEntersBox(blade, box) {
   let near = 0;
   let far = 1;
