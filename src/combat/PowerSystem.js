@@ -8,6 +8,7 @@ import { projectilesConfig } from '../config/projectilesConfig.js';
 import { getMoveX } from '../entities/fighterIntent.js';
 import { isStormShieldUp, StormSystem } from './StormSystem.js';
 import { ChokeSystem } from './ChokeSystem.js';
+import { FractureSystem } from './FractureSystem.js';
 
 const POWER_STATES = new Set([FighterState.CASTING, FighterState.CHANNELING]);
 const GROUNDED = Object.freeze({ scale: 1, duration: 1, stagger: 1 });
@@ -78,6 +79,7 @@ export class PowerSystem {
     this.friction = friction;
     this.storms = new StormSystem(this);
     this.chokes = new ChokeSystem(this);
+    this.fractures = new FractureSystem(this);
     this.context = { system: this, combat, caster: null, target: null, power: null, interaction: null, air: GROUNDED, scale: 1, remainder: 1, guarded: false, projectile: null };
   }
 
@@ -150,6 +152,7 @@ export class PowerSystem {
       return;
     }
     for (const caster of fighters) {
+      if (caster.combat.fracture) this.fractures.update(caster, fighters, dt);
       if (caster.combat.rainActive) this.storms.updateRain(caster, fighters, dt);
       if (isUsingPower(caster) && caster.combat.power.reaction) {
         this.updateInstant(caster, null);
@@ -189,6 +192,8 @@ export class PowerSystem {
       if (power.rainPhases) {
         this.storms.callRain(caster, target);
         return;
+      } else if (power.fracture) {
+        this.fractures.launch(caster, target);
       } else if (power.self) {
         this.applySelf(caster, power);
       } else if (power.projectile) {

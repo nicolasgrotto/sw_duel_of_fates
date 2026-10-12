@@ -282,6 +282,8 @@ export class EnemyAI {
       this.plan.parryDelay = -1;
       return AiDecision.WAIT;
     }
+    const fractureAnswer = this.tryJumpFracture();
+    if (fractureAnswer) return fractureAnswer;
     const escapeAnswer = this.trySupremeEscape();
     if (escapeAnswer) return escapeAnswer;
     const stormAnswer = this.tryEscapeStorm();
@@ -536,6 +538,7 @@ export class EnemyAI {
   }
 
   isPowerBlocked(power) {
+    if (power.fracture) return false;
     if (this.difficulty.powerAware && isStormShieldUp(this.opponent)) return true;
     if (power.markedRain) return false;
     if (this.difficulty.powerAware && isBarrierUp(this.opponent)) return true;
@@ -577,11 +580,28 @@ export class EnemyAI {
   wantsPower(power) {
     const use = this.perception.powerUse[power.effect];
     const gap = getGap(this.self, this.opponent);
-    return Boolean(use) && gap >= use.minGap && gap <= use.maxGap && !this.isPowerBlocked(power)
+    return Boolean(use) && (use.minGapStrict ? gap > use.minGap : gap >= use.minGap) && gap <= use.maxGap && !this.isPowerBlocked(power)
+      && (!use.requireGrounded || this.opponent.grounded)
       && (!use.requireVulnerable || isPunishable(this.opponent) || isPowerRecovering(this.opponent))
       && (use.targetMeterAbove === undefined || this.opponent.flowMeter > use.targetMeterAbove)
       && (!use.avoidPressure || !isThreatening(this.opponent, this.self, this.perception.threatMargin))
       && isInPowerRange(this.self, this.opponent, power) && this.getPowerScale(power) > 0;
+  }
+
+  tryJumpFracture() {
+    const { self, opponent } = this;
+    const wave = opponent.combat.fracture;
+    if (!this.powersEnabled || !this.difficulty.powerAware || !wave || wave.hit || !self.grounded
+      || !self.canMove && !(self.state === FighterState.BLOCKING && self.combat.blockstun === 0)) return null;
+    for (const segment of wave.segments) {
+      if (!segment.marked || segment.burst || wave.time < segment.markTime + this.difficulty.reactionTime
+        || wave.time >= segment.impactTime || self.x < segment.left || self.x > segment.right) continue;
+      this.plan.blockTime = 0;
+      this.plan.moveX = 0;
+      this.plan.pendingAction = PendingAction.JUMP;
+      return AiDecision.JUMP;
+    }
+    return null;
   }
 
   trySupremeEscape() {

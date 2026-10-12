@@ -18,7 +18,7 @@ export function captureFighter(fighter) {
     flowMeter: fighter.flowMeter,
     state: fighter.state,
     stateTime: fighter.stateTime,
-    combat: { ...fighter.combat, rain: fighter.combat.rain ? { ...fighter.combat.rain, marks: fighter.combat.rain.marks.map(mark => ({ ...mark })) } : null, stormMarks: fighter.combat.stormMarks.map(mark => ({ ...mark })) },
+    combat: { ...fighter.combat, fracture: fighter.combat.fracture ? { ...fighter.combat.fracture, segments: fighter.combat.fracture.segments.map(segment => ({ ...segment })) } : null, rain: fighter.combat.rain ? { ...fighter.combat.rain, marks: fighter.combat.rain.marks.map(mark => ({ ...mark })) } : null, stormMarks: fighter.combat.stormMarks.map(mark => ({ ...mark })) },
     animation: { ...fighter.animation },
   };
 }
@@ -27,6 +27,7 @@ export function restoreFighter(fighter, snapshot) {
   const { combat, animation, ...scalars } = snapshot;
   Object.assign(fighter, scalars);
   Object.assign(fighter.combat, combat);
+  fighter.combat.fracture = combat.fracture ? { ...combat.fracture, segments: combat.fracture.segments.map(segment => ({ ...segment })) } : null;
   fighter.combat.rain = combat.rain ? { ...combat.rain, marks: combat.rain.marks.map(mark => ({ ...mark })) } : null;
   fighter.combat.stormMarks = combat.stormMarks.map(mark => ({ ...mark }));
   Object.assign(fighter.animation, animation);

@@ -86,6 +86,7 @@ function createCombat() {
     statusLevel: 0,
     confuseTime: 0,
     confuseElapsed: 0,
+    fracture: null,
     rainActive: false,
     rain: null,
     stormPhase: null,

@@ -32,6 +32,7 @@ export const en = {
     },
     arenas: {
       refinery: 'Refinery Platform',
+      fracture: 'Fracture',
       meteorRain: 'Mass Telekinesis',
       crush: 'Crush',
       sanctuary: 'Flooded Sanctuary',

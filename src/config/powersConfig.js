@@ -21,12 +21,18 @@ export const powersConfig = {
   castHeight: 0.6,
   airReach: 320,
   categories: {
-    flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull', 'throw', 'mindTwist', 'supremePush'] },
+    flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull', 'throw', 'mindTwist', 'supremePush', 'fracture'] },
     aurora: { alignments: ['light'], abilities: ['barrier', 'heal', 'focus', 'absorb', 'sanctuary', 'meteorRain'] },
     eclipse: { alignments: ['dark'], abilities: ['lightning', 'choke', 'freeze', 'storm', 'wrath', 'drain', 'crush'] },
     blade: { alignments: ['light', 'dark'], abilities: ['spin', 'dashSlash', 'saberThrow'] },
   },
   powers: {
+    fracture: {
+      id: 'fracture', effect: 'fracture', channel: false, pose: 'cast', interaction: 'fracture', fracture: true,
+      cost: 70, startup: 0.45, active: 0.08, recovery: 0.5, range: Infinity,
+      speed: 900, segmentLength: 60, fractureWarning: 0.25, damage: 12, launchSpeed: 650, stagger: 0.4,
+      hudMark: 'powerCostFracture',
+    },
     meteorRain: {
       id: 'meteorRain', effect: 'meteorRain', channel: false, pose: 'invoke', interaction: 'storm', around: true,
       minFlowLevel: 6, cost: 70, startup: 0.8, active: 4, recovery: 0.5, range: Infinity,
@@ -141,6 +147,10 @@ export const powersConfig = {
     potencyPerLevel: 0.03,
   },
   interactions: {
+    fracture: {
+      air: { scale: 1, duration: 1, stagger: 1 },
+      bands: [{ ...NORMAL_BAND, ...STRIKE_GUARD, blockable: false }, { ...REDUCED_BAND, ...STRIKE_GUARD, blockable: false }, { ...RESISTED_BAND, ...STRIKE_GUARD, blockable: false }],
+    },
     crush: {
       air: { scale: 1, duration: 1, stagger: 1 },
       bands: [

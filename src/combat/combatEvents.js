@@ -30,6 +30,8 @@ export const CombatEvent = Object.freeze({
   POWER_BLOCKED: 'powerBlocked',
   POWER_RESISTED: 'powerResisted',
   POWER_ABSORBED: 'powerAbsorbed',
+  FRACTURE_CRACK: 'fractureCrack',
+  FRACTURE_BURST: 'fractureBurst',
   RAIN_CALL: 'rainCall',
   RAIN_MARK: 'rainMark',
   RAIN_STRIKE: 'rainStrike',

@@ -32,6 +32,7 @@ export const ptBR = {
     },
     arenas: {
       refinery: 'Plataforma de Refino',
+      fracture: 'Fratura',
       meteorRain: 'Telecinese em Massa',
       crush: 'Esmagamento',
       sanctuary: 'Santuário Alagado',
