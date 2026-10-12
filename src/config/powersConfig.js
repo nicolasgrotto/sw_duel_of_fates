@@ -70,14 +70,14 @@ export const powersConfig = {
     },
     absorb: {
       id: 'absorb', effect: 'absorb', channel: true, requiresHold: true, holdAbsorb: true, pose: 'absorb', self: true, reaction: true, interaction: 'absorb',
-      cost: 10, drainPerSecond: 30, startup: 0.08, maxChannel: 1.5, recovery: 0.25, window: 0.05,
+      cost: 10, drainPerSecond: 20, startup: 0.08, maxChannel: 1.5, recovery: 0.25, window: 0.05,
       absorbGain: 0.5,
     },
     storm: {
       id: 'storm', effect: 'storm', channel: true, automatic: true, pose: 'invoke', interaction: 'storm', around: true,
       minFlowLevel: 6, cost: 70, startup: STORM_PHASES.invocation, maxChannel: STORM_PHASES.storm, recovery: STORM_PHASES.recovery,
       markedRain: true, markEvent: 'stormMark', strikeEvent: 'stormStrike',
-      stormPhases: STORM_PHASES, range: 600, damage: 4, stun: 0.12, strikeWarning: 0.5, strikeWidth: 80, barrierDrainPerStrike: 30,
+      stormPhases: STORM_PHASES, range: 600, damage: 5, stun: 0.12, strikeWarning: 0.5, strikeWidth: 80, barrierDrainPerStrike: 30,
       strikesByTier: [{ minLevel: 3, strikes: 6 }, { minLevel: 8, strikes: 7 }, { minLevel: 10, strikes: 8 }],
       boltsByTier: [{ minLevel: 3, bolts: 2 }, { minLevel: 8, bolts: 3 }, { minLevel: 10, bolts: 4 }],
       nearColumns: [0, 140], scatterMargin: 60,
