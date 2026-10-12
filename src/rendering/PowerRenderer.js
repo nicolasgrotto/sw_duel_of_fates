@@ -302,6 +302,8 @@ export class PowerRenderer {
       this.drawLightning(renderer, fighter, tier, originX, originY);
     } else if (isChannelOpen(fighter) && power.effect === 'drain') {
       this.drawDrain(renderer, fighter, tier, originX, originY);
+    } else if (isChannelOpen(fighter) && power.holdAbsorb) {
+      this.drawAbsorbChannel(renderer, fighter, tier, originX, originY);
     } else if (fighter.combat.absorbTime > 0) {
       renderer.drawGlow(originX, originY, tier.glowRadius * style.absorbGlowScale, tier.color, tier.glowAlpha);
     }
@@ -377,6 +379,18 @@ export class PowerRenderer {
       renderer.polyline(bolt.points, colors.saberCore, tier.boltWidth * style.coreWidthScale);
     }
     renderer.drawGlow(targetX, targetY, tier.glowRadius * style.impactGlowScale, tier.color, tier.glowAlpha);
+  }
+
+  drawAbsorbChannel(renderer, fighter, tier, originX, originY) {
+    const swirl = style.absorbChannel;
+    const time = fighter.animation.time;
+    renderer.drawGlow(originX, originY, tier.glowRadius * style.absorbGlowScale, tier.color, tier.glowAlpha);
+    for (let index = 0; index < swirl.motes; index += 1) {
+      const t = (time * swirl.cyclesPerSecond + index / swirl.motes) % 1;
+      const angle = (index / swirl.motes) * TAU + time * swirl.spin;
+      const radius = lerp(swirl.radius[0], swirl.radius[1], t);
+      renderer.drawGlow(originX + Math.cos(angle) * radius, originY + Math.sin(angle) * radius, lerp(swirl.size[0], swirl.size[1], t), tier.color, swirl.alpha * t);
+    }
   }
 
   drawDrain(renderer, fighter, tier, originX, originY) {

@@ -153,7 +153,8 @@ export class PowerSystem {
       if (caster.combat.fracture || caster.combat.fractures.length) this.fractures.update(caster, fighters, dt);
       if (caster.combat.rainActive) this.storms.updateRain(caster, fighters, dt);
       if (isUsingPower(caster) && caster.combat.power.reaction) {
-        this.updateInstant(caster, null);
+        if (caster.combat.power.channel) this.updateChannel(caster, null, dt);
+        else this.updateInstant(caster, null);
       }
     }
     for (const caster of fighters) {
@@ -224,6 +225,7 @@ export class PowerSystem {
       if (holding || !combat.powerTargeted && !power.requiresHold) {
         combat.powerTargeted = true;
         caster.flowMeter = Math.max(0, caster.flowMeter - power.drainPerSecond * dt);
+        if (power.holdAbsorb) combat.absorbTime = power.window;
         this.tick(caster, target, power, dt);
         return;
       }

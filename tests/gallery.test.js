@@ -62,7 +62,7 @@ for (const item of galleryCatalog) {
       assert.equal(starts[0].attackType, item.id);
       if (item.kind === 'technique') assert.ok(events.some((event) => event.type === 'hit'), item.id);
       else if (item.data.channel) {
-        if (item.id !== 'barrier') assert.ok(events.some((event) => event.type === 'powerHit'), item.id);
+        if (item.id !== 'barrier' && item.id !== 'absorb') assert.ok(events.some((event) => event.type === 'powerHit'), item.id);
       } else assert.ok(events.some((event) => event.type === 'powerActive'), item.id);
       assert.equal(scene.director.phase, 'ready');
       assert.equal(scene.simulation.projectiles.activeCount, 0);

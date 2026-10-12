@@ -67,8 +67,8 @@ export const powersConfig = {
       tickInterval: 0.15, drainFlow: 4.5, drainStamina: 1.2, flowReturn: 0.5,
     },
     absorb: {
-      id: 'absorb', effect: 'absorb', channel: false, pose: 'barrier', self: true, reaction: true, interaction: 'absorb',
-      cost: 18, startup: 0.05, active: 0.3, recovery: 0.2, window: 0.4,
+      id: 'absorb', effect: 'absorb', channel: true, requiresHold: true, holdAbsorb: true, pose: 'absorb', self: true, reaction: true, interaction: 'absorb',
+      cost: 10, drainPerSecond: 30, startup: 0.08, maxChannel: 1.5, recovery: 0.25, window: 0.05,
       absorbGain: 0.5,
     },
     storm: {
@@ -240,6 +240,7 @@ export const powersConfig = {
   },
   render: {
     absorbGlowScale: 0.65,
+    absorbChannel: { motes: 8, cyclesPerSecond: 1.8, spin: 2, radius: [70, 6], size: [4, 8], alpha: 0.75 },
     absorb: { ringRadius: 70, particles: 8, reducedParticles: 4, radius: 70, life: 0.22, size: 2 },
     drain: { motes: 10, cyclesPerSecond: 1.6, wobble: 6, moteRadius: 9, moteAlpha: 0.65, lineAlpha: 0.22, lineWidth: 1.5, thinFrom: 0.7, thinAlpha: 0.35 },
     storm: {

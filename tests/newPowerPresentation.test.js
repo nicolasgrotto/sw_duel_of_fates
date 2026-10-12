@@ -560,3 +560,14 @@ describe('stage 2.19 presentation', () => {
     ]), [SoundName.ARSENAL, SoundName.FLOW_CLEAVE, SoundName.WAVE_REFLECT, SoundName.ARSENAL_LAUNCH, SoundName.ARSENAL_BLOCK]);
   });
 });
+
+describe('held absorb presentation', () => {
+  it('swirls motes into the hand while the absorb channel is held', () => {
+    const fighter = spawnFighter(400, 1, 'bastion');
+    channel(fighter, 'absorb', 0.5);
+    fighter.combat.absorbTime = powersConfig.powers.absorb.window;
+    const renderer = recordingRenderer();
+    new PowerRenderer().draw(renderer, [fighter]);
+    assert.equal(renderer.calls.filter((call) => call.name === 'drawGlow').length, 1 + powersConfig.render.absorbChannel.motes);
+  });
+});

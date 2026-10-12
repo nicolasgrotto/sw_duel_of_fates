@@ -719,7 +719,9 @@ export class EnemyAI {
       const reaction = self.stats.power.loadout?.[slot];
       if (reaction?.effect === 'absorb' && this.canUsePower(reaction) && this.wantsSelfPower(reaction)
         && (self.canAct || (self.state === FighterState.BLOCKING && self.combat.blockstun === 0))) {
-        return this.startPower(slot, 0);
+        const incoming = opponent.combat.power;
+        const remaining = Math.max(0, incoming.startup - opponent.stateTime) + (incoming.channel ? incoming.maxChannel : incoming.active) + this.getProjectileTravelTime(incoming);
+        return this.startPower(slot, Math.min(reaction.maxChannel, remaining + this.perception.absorbHoldMargin));
       }
     }
     const { power } = opponent.combat;

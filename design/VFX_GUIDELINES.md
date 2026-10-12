@@ -233,3 +233,4 @@ Decisões da implementação (v2.19):
 Decisões da implementação (v2.20):
 
 - **Pedras maiores nos tiers altos (pedido do autor):** escala do desenho das faixas muito grande e máxima sobe para 1,45× e 1,55× (eram 1,12× e 1×). Cada pedra dessas faixas fica com raio de cerca de 18–21 px, contra ~12 px na faixa grande e ~15 px da pedra única da pequena; antes, com mais pedras, cada uma ficava do mesmo tamanho em todos os tiers.
+- **Absorção segurada:** pose `absorb` (mão livre estendida à frente, lâmina baixa, tremor leve) e, enquanto o canal está aberto, brilho na mão com 8 luzes que giram e entram nela, crescendo ao chegar; cada poder absorvido continua com o anel que fecha e as partículas puxadas da 2.17.

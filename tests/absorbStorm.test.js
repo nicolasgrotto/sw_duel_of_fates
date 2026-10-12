@@ -36,8 +36,9 @@ function openLightning(target) {
 }
 
 function arm(s) {
+  s.caster.intent.powerHeld = true;
   assert.equal(s.simulation.combat.powers.tryCast(s.caster), true);
-  advance(s, 4);
+  advance(s, Math.ceil(absorb.startup / STEP) + 1);
   assert.ok(s.caster.combat.absorbTime > 0);
 }
 
@@ -95,6 +96,7 @@ describe('absorb', () => {
   it('arms before other powers on the startup boundary in either order', () => {
     for (const reversed of [false, true]) {
       const s = setup('absorb', reversed);
+      s.caster.intent.powerHeld = true;
       s.simulation.combat.powers.tryCast(s.caster);
       s.caster.stateTime = absorb.startup - STEP;
       openLightning(s.target);
@@ -114,6 +116,7 @@ describe('absorb', () => {
     s.caster.flowMeter = 99;
     s.simulation.combat.powers.strike(s.target, s.caster, lightning, 'tick', null);
     assert.equal(s.caster.flowMeter, 100);
+    s.caster.intent.powerHeld = false;
     advance(s, 40);
     assert.equal(s.caster.combat.absorbTime, 0);
     assert.ok(s.caster.combat.powerCooldown > 0);
@@ -195,4 +198,37 @@ describe('new power integration', () => {
     }
   });
 
+});
+
+describe('held absorb', () => {
+  it('keeps absorbing every lightning pulse while held and stops on release', () => {
+    const s = setup();
+    arm(s);
+    openLightning(s.target);
+    let absorbed = 0;
+    for (let frame = 0; frame < 45; frame += 1) {
+      s.simulation.step(STEP);
+      absorbed += s.simulation.events.filter((event) => event.type === CombatEvent.POWER_ABSORBED && event.defender === s.caster).length;
+    }
+    assert.ok(absorbed >= Math.floor(0.7 / lightning.tickInterval));
+    assert.equal(s.caster.health, s.caster.stats.maxHealth);
+    assert.ok(s.caster.combat.absorbTime > 0);
+    s.caster.intent.powerHeld = false;
+    advance(s, 2);
+    assert.ok(s.caster.combat.powerEndTime > 0);
+    advance(s, 3);
+    assert.equal(s.caster.combat.absorbTime, 0);
+  });
+
+
+  it('lets the AI hold the channel for the remaining incoming power', () => {
+    const s = setup();
+    const ai = new EnemyAI({ self: s.caster, opponent: s.target, profile: aiConfig.profiles.balanced, difficulty: aiConfig.difficulties.hard, perception: aiConfig.perception, random: () => 0, rules: { powers: true } });
+    s.target.combat.power = lightning;
+    s.target.state = FighterState.CHANNELING;
+    s.target.stateTime = ai.difficulty.reactionTime;
+    assert.equal(ai.tryDefendPower(), AiDecision.POWER);
+    assert.ok(ai.plan.powerHoldTime > lightning.maxChannel * 0.5);
+    assert.ok(ai.plan.powerHoldTime <= absorb.maxChannel);
+  });
 });

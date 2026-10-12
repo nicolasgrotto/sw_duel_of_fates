@@ -48,7 +48,7 @@ export class GalleryTargetController {
       intent.power = true;
       this.responded = true;
     }
-    intent.powerHeld = behavior === 'barrier' && this.responded && director.phase === 'active';
+    intent.powerHeld = this.responded && director.phase === 'active';
   }
 
   getFlightTime(caster, target, incoming) {
