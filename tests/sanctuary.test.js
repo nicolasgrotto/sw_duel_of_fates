@@ -79,3 +79,11 @@ it('keeps startup interruptible and does not apply shield early', () => {
   s.combat.applyHit({ attacker:s.caster,defender:s.target,attack:s.caster.moves.light,attackType:'light' });
   s.simulation.step(STEP); assert.equal(s.target.combat.sanctuaryShield,0); assert.equal(s.target.state,FighterState.HIT);
 });
+
+it('preserves the previous lethal power impact displacement without an active shield', () => {
+  for (const id of ['push','pull','lightning']) {
+    const s=setup();s.combat.statuses.end(s.target,'sanctuary','reset');s.target.health=1;
+    s.combat.powers.strike(s.caster,s.target,powersConfig.powers[id],id==='lightning'?'tick':'active',null);
+    assert.equal(s.target.state,FighterState.DEAD);assert.notEqual(s.target.vx,0);
+  }
+});

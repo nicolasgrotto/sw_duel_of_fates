@@ -316,6 +316,7 @@ export class CombatSystem {
   }
 
   trySpecial(fighter) {
+    if (fighter.combat.rainActive) return false;
     const technique = this.powers.enabled ? selectTechnique(fighter) : null;
     if (technique) {
       return this.tryAttack(fighter, technique);
@@ -377,6 +378,7 @@ export class CombatSystem {
   }
 
   tryAttack(fighter, attackType) {
+    if (fighter.combat.rainActive) return false;
     const attack = fighter.moves[attackType];
     if (fighter.combat.saberThrown && isSaberAttack(attackType) || !canAfford(fighter, getStaminaCost(fighter, attack.staminaCost))) {
       return false;

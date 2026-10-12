@@ -234,6 +234,8 @@ export class StatusSystem {
   }
 
   onDeath(fighter) {
+    fighter.combat.rainActive = false;
+    fighter.combat.rain = null;
     fighter.combat.crushTime = 0;
     fighter.combat.crushDamage = 0;
     fighter.combat.crushSource = -1;

@@ -22,11 +22,19 @@ export const powersConfig = {
   airReach: 320,
   categories: {
     flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull', 'throw', 'mindTwist', 'supremePush'] },
-    aurora: { alignments: ['light'], abilities: ['barrier', 'heal', 'focus', 'absorb', 'sanctuary'] },
+    aurora: { alignments: ['light'], abilities: ['barrier', 'heal', 'focus', 'absorb', 'sanctuary', 'meteorRain'] },
     eclipse: { alignments: ['dark'], abilities: ['lightning', 'choke', 'freeze', 'storm', 'wrath', 'drain', 'crush'] },
     blade: { alignments: ['light', 'dark'], abilities: ['spin', 'dashSlash', 'saberThrow'] },
   },
   powers: {
+    meteorRain: {
+      id: 'meteorRain', effect: 'meteorRain', channel: false, pose: 'invoke', interaction: 'storm', around: true,
+      minFlowLevel: 6, cost: 70, startup: 0.8, active: 4, recovery: 0.5, range: Infinity,
+      rainPhases: { invocation: 0.8, rain: 4, recovery: 0.5 }, markedRain: true,
+      damage: 9, knockback: 500, stagger: 0.3, strikeWarning: 0.6, strikeWidth: 120, barrierDrainPerStrike: 30,
+      strikesByTier: [{ minLevel: 3, strikes: 5 }, { minLevel: 8, strikes: 6 }, { minLevel: 10, strikes: 7 }],
+      strikeOffsets: [0, -40, 30, -20, 50, -50, 20], markEvent: 'rainMark', strikeEvent: 'rainStrike', hudMark: 'powerCostMeteor',
+    },
     crush: {
       id: 'crush', effect: 'crush', channel: false, pose: 'cast', interaction: 'crush', control: true,
       cost: 65, startup: 0.6, active: 0.08, recovery: 0.5, range: 260,
@@ -54,6 +62,7 @@ export const powersConfig = {
     storm: {
       id: 'storm', effect: 'storm', channel: true, automatic: true, pose: 'invoke', interaction: 'storm', around: true,
       minFlowLevel: 6, cost: 70, startup: STORM_PHASES.invocation, maxChannel: STORM_PHASES.storm, recovery: STORM_PHASES.recovery,
+      markedRain: true, markEvent: 'stormMark', strikeEvent: 'stormStrike',
       stormPhases: STORM_PHASES, range: 600, damage: 5, stun: 0.12, strikeWarning: 0.5, strikeWidth: 80, barrierDrainPerStrike: 30,
       strikesByTier: [{ minLevel: 3, strikes: 8 }, { minLevel: 8, strikes: 10 }, { minLevel: 10, strikes: 12 }],
       strikeOffsets: [0, -24, 18, -12, 30, -30, 12, -18, 24, 0, -6, 6], hudMark: 'powerCostStorm',

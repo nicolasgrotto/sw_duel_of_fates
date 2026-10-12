@@ -54,7 +54,8 @@ export class GalleryScene {
   get range() {
     const { item } = this.director;
     const move = this.fighters[0].moves[item.id];
-    return item.kind === 'power' ? getPowerRange(this.fighters[0], item.data) ?? 0 : move.throwRange ?? move.hitbox.reach;
+    const range = item.kind === 'power' ? getPowerRange(this.fighters[0], item.data) ?? 0 : move.throwRange ?? move.hitbox.reach;
+    return Number.isFinite(range) ? range : this.simulation.arena.right - this.simulation.arena.left;
   }
 
   get gap() {

@@ -23,6 +23,13 @@ function getStagger(context) {
   return power.stagger * Math.min(1, scale / context.remainder) * interaction.stagger * air.stagger * context.remainder;
 }
 
+function dealImpact(context, damage, velocity) {
+  const { combat, caster, target, power } = context;
+  const interrupts = combat.dealPowerDamage(caster, target, power, damage, CombatEvent.POWER_HIT);
+  if (interrupts || !target.isAlive) target.vx = velocity;
+  return interrupts;
+}
+
 function push(context) {
   const { combat, caster, target, power, interaction, scale, guarded } = context;
   const direction = power.around ? Math.sign(target.x - caster.x) || caster.facing : caster.facing;
@@ -32,8 +39,7 @@ function push(context) {
     applyGuarded(context);
     return;
   }
-  if (combat.dealPowerDamage(caster, target, power, power.damage * scale, CombatEvent.POWER_HIT)) {
-    target.vx = knockback;
+  if (dealImpact(context, power.damage * scale, knockback)) {
     interrupt(target, FighterState.STAGGERED, getStagger(context));
   }
 }
@@ -47,8 +53,7 @@ function pull(context) {
     applyGuarded(context);
     return;
   }
-  if (combat.dealPowerDamage(caster, target, power, power.damage * scale, CombatEvent.POWER_HIT)) {
-    target.vx = -caster.facing * speed;
+  if (dealImpact(context, power.damage * scale, -caster.facing * speed)) {
     interrupt(target, FighterState.STAGGERED, getStagger(context));
   }
 }
@@ -60,8 +65,7 @@ function lightning(context) {
     applyGuarded(context);
     return;
   }
-  if (combat.dealPowerDamage(caster, target, power, power.damage * scale, CombatEvent.POWER_HIT)) {
-    target.vx = caster.facing * power.knockback * scale * interaction.knockback;
+  if (dealImpact(context, power.damage * scale, caster.facing * power.knockback * scale * interaction.knockback)) {
     interrupt(target, FighterState.HIT, power.stun * interaction.duration * air.duration * context.remainder);
   }
 }
@@ -74,8 +78,7 @@ function throwImpact(context) {
     applyGuarded(context, projectile.damage);
     return;
   }
-  if (combat.dealPowerDamage(caster, target, power, projectile.damage * scale, CombatEvent.POWER_HIT)) {
-    target.vx = knockback;
+  if (dealImpact(context, projectile.damage * scale, knockback)) {
     interrupt(target, FighterState.STAGGERED, projectile.stagger * Math.min(1, scale / context.remainder) * interaction.stagger * air.stagger * context.remainder);
   }
 }
@@ -160,6 +163,13 @@ export const powerEffects = Object.freeze({
   } },
   drain: { tick: drain },
   absorb: { self: ({ caster, power }) => { caster.combat.absorbTime = power.window; } },
+  meteorRain: { strike: (context) => {
+    const { combat, caster, target, power, scale, impactX } = context;
+    if (combat.dealPowerDamage(caster, target, power, power.damage * scale, CombatEvent.POWER_HIT)) {
+      target.vx = (Math.sign(target.x - impactX) || caster.facing) * power.knockback * scale;
+      interrupt(target, FighterState.STAGGERED, power.stagger);
+    }
+  } },
   storm: { strike: (context) => {
     const { combat, caster, target, power, scale, interaction } = context;
     if (combat.dealPowerDamage(caster, target, power, power.damage * scale, CombatEvent.POWER_HIT)) {

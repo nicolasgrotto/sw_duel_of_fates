@@ -304,6 +304,12 @@ export class EnemyAI {
       this.planRecoveryGuard();
       return AiDecision.BUSY;
     }
+    if (self.combat.rainActive) {
+      const defense = this.tryDefend();
+      if (defense) return defense;
+      this.plan.moveX = -getDirectionTo(self, opponent);
+      return AiDecision.BACK_OFF;
+    }
     if (this.random() < this.difficulty.mistakeChance) {
       return AiDecision.HESITATE;
     }
@@ -531,7 +537,7 @@ export class EnemyAI {
 
   isPowerBlocked(power) {
     if (this.difficulty.powerAware && isStormShieldUp(this.opponent)) return true;
-    if (power.stormPhases) return false;
+    if (power.markedRain) return false;
     if (this.difficulty.powerAware && isBarrierUp(this.opponent)) return true;
     if (power.effect === 'lightning' && this.difficulty.powerAware && this.opponent.combat.absorbTime > 0) return true;
     if (this.opponent.state !== FighterState.BLOCKING) {
@@ -547,7 +553,7 @@ export class EnemyAI {
   canUsePower(power) {
     const { self } = this;
     const reserve = power.channel ? (power.drainPerSecond ?? 0) * this.perception.powerChannelReserve : 0;
-    return self.flowLevel >= (power.minFlowLevel ?? 0) && self.combat.powerCooldown === 0 && self.flowMeter >= this.getPowerCost(power) + reserve;
+    return !self.combat.rainActive && self.flowLevel >= (power.minFlowLevel ?? 0) && self.combat.powerCooldown === 0 && self.flowMeter >= this.getPowerCost(power) + reserve;
   }
 
   wantsSelfPower(power) {

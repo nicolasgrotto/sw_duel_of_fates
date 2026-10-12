@@ -434,6 +434,7 @@ export const aiConfig = {
       mindTwist: { minGap: 120, maxGap: 320 },
       drain: { minGap: 120, maxGap: 300, targetMeterAbove: 25 },
       absorb: { minDifference: -1 },
+      meteorRain: { minGap: 0, maxGap: Infinity, avoidPressure: true },
       storm: { minGap: 0, maxGap: 600, avoidPressure: true },
       supremePush: { minGap: 0, maxGap: 100, comboHits: 2, comboWindow: 1 },
       push: { minGap: 0, maxGap: 100 },

@@ -124,7 +124,7 @@ export class PowerSystem {
   }
 
   canCast(fighter, power) {
-    return this.enabled && power !== null && (!power.escape || getPowerMode(fighter, power) !== null) && fighter.flowLevel >= (power.minFlowLevel ?? 0) && fighter.combat.powerCooldown === 0 && fighter.flowMeter >= this.getCost(fighter, power);
+    return this.enabled && !fighter.combat.rainActive && power !== null && (!power.escape || getPowerMode(fighter, power) !== null) && fighter.flowLevel >= (power.minFlowLevel ?? 0) && fighter.combat.powerCooldown === 0 && fighter.flowMeter >= this.getCost(fighter, power);
   }
 
   tryCast(fighter) {
@@ -150,6 +150,7 @@ export class PowerSystem {
       return;
     }
     for (const caster of fighters) {
+      if (caster.combat.rainActive) this.storms.updateRain(caster, fighters, dt);
       if (isUsingPower(caster) && caster.combat.power.reaction) {
         this.updateInstant(caster, null);
       }
@@ -185,7 +186,10 @@ export class PowerSystem {
     const { power } = combat;
     if (!combat.powerTargeted && caster.stateTime >= power.startup) {
       combat.powerTargeted = true;
-      if (power.self) {
+      if (power.rainPhases) {
+        this.storms.callRain(caster, target);
+        return;
+      } else if (power.self) {
         this.applySelf(caster, power);
       } else if (power.projectile) {
         this.aim(caster, null, power);
@@ -250,7 +254,7 @@ export class PowerSystem {
     return inRange;
   }
 
-  strike(caster, target, power, phase, projectile) {
+  strike(caster, target, power, phase, projectile, impactX) {
     if (isInvulnerable(target)) {
       return;
     }
@@ -259,14 +263,14 @@ export class PowerSystem {
       return;
     }
     if (isBarrierUp(target)) {
-      if (power.stormPhases) {
+      if (power.markedRain) {
         target.flowMeter = Math.max(0, target.flowMeter - power.barrierDrainPerStrike);
         if (target.flowMeter === 0) target.combat.powerEndTime = target.stateTime;
       }
       this.barrierBlock(caster, target, power);
       return;
     }
-    const remainder = target.combat.absorbTime > 0 && power.effect !== 'storm' ? this.absorb(caster, target, power) : 1;
+    const remainder = target.combat.absorbTime > 0 && !power.markedRain ? this.absorb(caster, target, power) : 1;
     if (remainder === 0) return;
     const table = this.config.interactions[power.interaction];
     const interaction = resolveInteraction(table, getFlowDifference(caster, target));
@@ -283,8 +287,9 @@ export class PowerSystem {
     context.air = target.grounded ? GROUNDED : table.air;
     context.remainder = remainder;
     context.scale = interaction.scale * caster.stats.power.potency * context.air.scale * remainder;
-    context.guarded = !power.stormPhases && interaction.blockable && isGuardingAgainst(target, caster);
+    context.guarded = !power.markedRain && interaction.blockable && isGuardingAgainst(target, caster);
     context.projectile = projectile;
+    context.impactX = impactX;
     powerEffects[power.effect][phase](context);
   }
 
@@ -327,7 +332,9 @@ export class PowerSystem {
       combat.powerTargetY = target.y - target.height * this.config.impactHeight;
       return;
     }
-    combat.powerTargetX = caster.x + caster.facing * (caster.width / 2 + (getPowerRange(caster, power) ?? 0));
+    const range = getPowerRange(caster, power) ?? 0;
+    combat.powerTargetX = Number.isFinite(range) ? caster.x + caster.facing * (caster.width / 2 + range)
+      : caster.facing > 0 ? this.combat.arena.right : this.combat.arena.left;
     combat.powerTargetY = caster.y - caster.height * this.config.castHeight;
   }
 
