@@ -30,26 +30,38 @@ function feedAll(system, tokens) {
 }
 
 describe('SecretUnlockSystem', () => {
-  it('matches the key phrase, restarts on a wrong letter and keeps kinds apart', () => {
+  it('matches directional actions, restarts after mistakes and ignores other token kinds', () => {
     const system = new SecretUnlockSystem(secretsConfig);
-    assert.equal(feedAll(system, keys('EQUILIBRI')), null);
-    assert.equal(system.feed(SecretToken.action(Action.MENU_UP)), null);
-    assert.equal(system.feed(SecretToken.key('KeyO')).reward, 'balance');
-    assert.equal(feedAll(system, keys('EQUXEQUILIBRIO')).id, 'balanceKeys');
+    const pad = secretsConfig.sequences.find(sequence => sequence.id === 'balancePad');
+    assert.equal(feedAll(system, pad.tokens.slice(0, -1)), null);
+    assert.equal(system.feed(SecretToken.key('KeyO')), null);
+    assert.equal(system.feed(pad.tokens.at(-1)).reward, 'balance');
+    system.feed(pad.tokens[0]);
+    system.feed(SecretToken.action(Action.MENU_DOWN));
+    assert.equal(feedAll(system, pad.tokens).id, 'balancePad');
   });
 
-  it('forgets a half-typed sequence after the timeout', () => {
+  it('forgets an unfinished directional sequence after the timeout', () => {
     const system = new SecretUnlockSystem(secretsConfig);
-    feedAll(system, keys('EQUIL'));
-    system.update(secretsConfig.timeout + 0.1);
-    assert.equal(feedAll(system, keys('IBRIO')), null);
+    const tokens = secretsConfig.sequences.find(sequence => sequence.id === 'balancePad').tokens;
+    feedAll(system, tokens.slice(0, tokens.length / 2));
+    system.update(secretsConfig.timeout + STEP);
+    assert.equal(feedAll(system, tokens.slice(tokens.length / 2)), null);
   });
 
-  it('matches the pad and touch sequences', () => {
-    const pad = secretsConfig.sequences.find((sequence) => sequence.id === 'balancePad');
-    const touch = secretsConfig.sequences.find((sequence) => sequence.id === 'balanceTouch');
-    assert.equal(feedAll(new SecretUnlockSystem(secretsConfig), pad.tokens).id, 'balancePad');
-    assert.equal(feedAll(new SecretUnlockSystem(secretsConfig), touch.tokens).id, 'balanceTouch');
+  it('preserves both directional rewards and the wardrobe tagline taps', () => {
+    for (const id of ['balancePad', 'wardrobePad', 'wardrobeTouch']) {
+      const sequence = secretsConfig.sequences.find(sequence => sequence.id === id);
+      assert.equal(feedAll(new SecretUnlockSystem(secretsConfig), sequence.tokens).id, id);
+    }
+  });
+
+  it('rejects both removed keyboard phrases and title taps', () => {
+    for (const phrase of ['EQUILIBRIO', 'GUARDAROUPA']) {
+      assert.equal(feedAll(new SecretUnlockSystem(secretsConfig), keys(phrase)), null);
+    }
+    const system = new SecretUnlockSystem(secretsConfig);
+    for (let tap = 0; tap < 7; tap++) assert.equal(system.feed(SecretToken.tap('title')), null);
   });
 });
 
@@ -92,6 +104,20 @@ function createFakeGame() {
 }
 
 describe('IntroState', () => {
+  it('ignores the removed phrases without changing saved unlocks', () => {
+    const game = createFakeGame();
+    game.settings.unlockedCharacters = ['elder'];
+    game.settings.unlocks = { guardian: ['skin-arcade'] };
+    game.changeState(StateId.INTRO);
+    for (const phrase of ['EQUILIBRIO', 'GUARDAROUPA']) {
+      for (const token of keys(phrase)) game.type(token.slice('key:'.length));
+    }
+    assert.deepEqual(game.settings.unlockedCharacters, ['elder']);
+    assert.deepEqual(game.settings.unlocks, { guardian: ['skin-arcade'] });
+    assert.equal(game.saved, 0);
+    assert.equal(game.states.current.messageTime, 0);
+  });
+
   it('skips to the title, then opens the menu', () => {
     const game = createFakeGame();
     game.changeState(StateId.INTRO);
@@ -101,25 +127,27 @@ describe('IntroState', () => {
     assert.deepEqual(game.stateNames(), ['MenuState']);
   });
 
-  it('unlocks and saves both secret fighters when the phrase is typed', () => {
+  it('unlocks and saves the secret fighters through directional actions', () => {
     const game = createFakeGame();
     game.changeState(StateId.INTRO);
-    for (const letter of 'EQUILIBRIO') {
-      game.type(`Key${letter}`);
-    }
+    const sequence = secretsConfig.sequences.find(entry => entry.id === 'balancePad');
+    for (const token of sequence.tokens) game.step(token.slice('action:'.length));
     assert.deepEqual(game.settings.unlockedCharacters, ['elder', 'sovereign', 'foretold']);
     assert.equal(game.saved, 1);
     assert.ok(game.states.current.messageTime > 0);
     assert.deepEqual(game.stateNames(), ['IntroState']);
   });
 
-  it('unlocks with taps on the title and starts with a tap elsewhere', () => {
+  it('ignores title taps and starts with a tap elsewhere', () => {
     const game = createFakeGame();
     game.changeState(StateId.INTRO);
     for (let index = 0; index < 7; index += 1) {
       game.tap(640, layout.intro.titleY);
     }
-    assert.deepEqual(game.settings.unlockedCharacters, ['elder', 'sovereign', 'foretold']);
+    assert.equal(game.settings.unlockedCharacters, undefined);
+    assert.equal(game.saved, 0);
+    game.tap(640, 650);
+    assert.ok(game.states.current.isReady);
     game.tap(640, 650);
     assert.deepEqual(game.stateNames(), ['MenuState']);
     assert.ok(introConfig.prompt.start > 0);
@@ -142,12 +170,11 @@ describe('secret fighters', () => {
     assert.throws(() => createFighterFromCharacter(ordinary, { x: 0, y: 0, facing: 1 }), RangeError);
   });
 
-  it('unlocks every skin with the wardrobe phrase without touching blade colors', () => {
+  it('unlocks every skin with tagline taps without touching blade colors', () => {
     const game = createFakeGame();
     game.changeState(StateId.INTRO);
-    for (const letter of 'GUARDAROUPA') {
-      game.type(`Key${letter}`);
-    }
+    const sequence = secretsConfig.sequences.find(entry => entry.id === 'wardrobeTouch');
+    for (const token of sequence.tokens) game.tap(640, layout.intro.taglineY + introConfig.tapAreas.tagline.height / 4);
     for (const character of Object.values(characters)) {
       for (const skin of (character.skins ?? []).filter((entry) => entry.unlock)) {
         assert.ok(game.settings.unlocks[character.id].includes(skin.id), `${character.id} ${skin.id}`);
