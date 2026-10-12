@@ -32,6 +32,7 @@ export const en = {
     },
     arenas: {
       refinery: 'Refinery Platform',
+      crush: 'Crush',
       sanctuary: 'Flooded Sanctuary',
       crystalMine: 'Crystal Mine',
       rooftop: 'Neon Rooftop',

@@ -16,6 +16,12 @@ export function isUsingPower(fighter) {
   return POWER_STATES.has(fighter.state) && fighter.combat.power !== null;
 }
 
+export function isPowerRecovering(fighter) {
+  if (!isUsingPower(fighter)) return false;
+  const { power, powerEndTime } = fighter.combat;
+  return power.channel ? powerEndTime > 0 : fighter.stateTime >= power.startup + power.active;
+}
+
 export function getPowerMode(fighter, power) {
   if (!power?.escape || isUsingPower(fighter)) return null;
   if (fighter.state === FighterState.HIT || fighter.state === FighterState.STAGGERED

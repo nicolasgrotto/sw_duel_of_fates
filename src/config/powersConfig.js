@@ -23,10 +23,15 @@ export const powersConfig = {
   categories: {
     flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull', 'throw', 'mindTwist', 'supremePush'] },
     aurora: { alignments: ['light'], abilities: ['barrier', 'heal', 'focus', 'absorb', 'sanctuary'] },
-    eclipse: { alignments: ['dark'], abilities: ['lightning', 'choke', 'freeze', 'storm', 'wrath', 'drain'] },
+    eclipse: { alignments: ['dark'], abilities: ['lightning', 'choke', 'freeze', 'storm', 'wrath', 'drain', 'crush'] },
     blade: { alignments: ['light', 'dark'], abilities: ['spin', 'dashSlash', 'saberThrow'] },
   },
   powers: {
+    crush: {
+      id: 'crush', effect: 'crush', channel: false, pose: 'cast', interaction: 'crush', control: true,
+      cost: 65, startup: 0.6, active: 0.08, recovery: 0.5, range: 260,
+      duration: 0.6, damage: 16, stagger: 0.6, liftHeight: 60, guard: { staminaCost: 14 }, hudMark: 'powerCostCrush',
+    },
     sanctuary: {
       id: 'sanctuary', effect: 'sanctuary', channel: false, pose: 'barrier', self: true,
       cost: 65, startup: 0.3, active: 0.08, recovery: 0.3, duration: 6, shield: 30, controlCost: 10,
@@ -127,6 +132,16 @@ export const powersConfig = {
     potencyPerLevel: 0.03,
   },
   interactions: {
+    crush: {
+      air: { scale: 1, duration: 1, stagger: 1 },
+      bands: [
+        { ...NORMAL_BAND, ...STRIKE_GUARD, atLeast: 3, blockable: false },
+        { ...NORMAL_BAND, ...STRIKE_GUARD, atLeast: 0, guardDamage: 0.25 },
+        { ...NORMAL_BAND, ...STRIKE_GUARD, atLeast: -1, scale: 0.75, guardDamage: 0.25 },
+        { ...REDUCED_BAND, ...STRIKE_GUARD, guardDamage: 0.25 },
+        { ...RESISTED_BAND, ...STRIKE_GUARD },
+      ],
+    },
     mindTwist: {
       air: { scale: 1, duration: 1, stagger: 1 },
       bands: [

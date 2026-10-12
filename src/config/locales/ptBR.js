@@ -32,6 +32,7 @@ export const ptBR = {
     },
     arenas: {
       refinery: 'Plataforma de Refino',
+      crush: 'Esmagamento',
       sanctuary: 'Santuário Alagado',
       crystalMine: 'Mina de Cristal',
       rooftop: 'Telhado Neon',
