@@ -27,6 +27,7 @@ function createProjectile() {
     distance: 0,
     range: Infinity,
     potency: null,
+    level: 0,
   };
 }
 
@@ -99,6 +100,7 @@ export class ProjectileSystem {
     }
     projectile.vx = caster.facing * size.speed;
     projectile.radius = size.radius;
+    projectile.level = caster.flowLevel;
     projectile.damage = size.damage;
     projectile.knockback = size.knockback;
     projectile.stagger = size.stagger;

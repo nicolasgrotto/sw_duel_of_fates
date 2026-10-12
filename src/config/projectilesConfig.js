@@ -30,8 +30,7 @@ export const projectilesConfig = {
     fragmentSpin: 7,
     fragmentEdgeWidth: 1.5,
     rocks: {
-      bySize: { small: 1, medium: 2, large: 2, huge: 3, max: 4 },
-      drawScale: { small: 1.5, medium: 1.4, large: 1.25, huge: 1.45, max: 1.55 },
+      byTier: { faint: { count: 1, scale: 1.5 }, steady: { count: 2, scale: 1.6 }, deep: { count: 3, scale: 1.9 }, apex: { count: 4, scale: 1.75 } },
       layouts: [
         [0, 0, 1],
         [-0.68, 0.08, 0.5, 0.68, -0.1, 0.45],

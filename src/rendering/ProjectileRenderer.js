@@ -1,10 +1,10 @@
-import { getPowerTier, resolveLevelBand } from '../combat/flowInteractions.js';
+import { getPowerTier } from '../combat/flowInteractions.js';
 import { saberStyle } from '../config/fighterVisualConfig.js';
 import { ProjectileKind, projectilesConfig } from '../config/projectilesConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { colors } from '../config/themeConfig.js';
 import { drawEnergyBlade } from './energyBlade.js';
-import { drawRockCluster, getRockCount, getRockScale } from './rockCluster.js';
+import { drawRockCluster, getRockLook } from './rockCluster.js';
 
 const style = projectilesConfig.render;
 
@@ -35,11 +35,12 @@ export class ProjectileRenderer {
   }
 
   drawFragment(renderer, projectile, owner) {
-    const tier = getPowerTier(owner.flowLevel, powersConfig.tiers);
-    const size = resolveLevelBand(owner.flowLevel, projectilesConfig.throw.sizes);
+    const tier = getPowerTier(projectile.level || owner.flowLevel, powersConfig.tiers);
+    const look = getRockLook(tier.id);
     const angle = projectile.age * style.fragmentSpin * (Math.sign(projectile.vx) || 1);
-    drawRockCluster(renderer, projectile.x, projectile.y, projectile.radius * getRockScale(size.id), angle, getRockCount(size.id), tier.color);
+    drawRockCluster(renderer, projectile.x, projectile.y, projectile.radius * look.scale, angle, look.count, tier.color);
   }
+
 
   drawArsenalBlade(renderer, projectile, owner) {
     const tier = getPowerTier(owner.flowLevel, powersConfig.tiers);

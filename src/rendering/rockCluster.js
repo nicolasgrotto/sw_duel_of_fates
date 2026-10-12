@@ -4,12 +4,8 @@ import { colors } from '../config/themeConfig.js';
 const style = projectilesConfig.render;
 const points = new Float32Array(style.fragmentPoints.length);
 
-export function getRockCount(sizeId) {
-  return style.rocks.bySize[sizeId] ?? 1;
-}
-
-export function getRockScale(sizeId) {
-  return style.rocks.drawScale[sizeId] ?? 1;
+export function getRockLook(tierId) {
+  return style.rocks.byTier[tierId] ?? style.rocks.byTier.faint;
 }
 
 function drawRock(renderer, x, y, radius, angle, edgeColor) {

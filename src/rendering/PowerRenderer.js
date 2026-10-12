@@ -11,7 +11,7 @@ import { TAU, clamp, lerp } from '../utils/math.js';
 import { createRandom } from '../utils/random.js';
 import { drawFighterBody } from './fighterRenderer.js';
 import { drawEnergyBlade } from './energyBlade.js';
-import { drawRockCluster, getRockCount, getRockScale } from './rockCluster.js';
+import { drawRockCluster, getRockLook } from './rockCluster.js';
 
 const style = powersConfig.render;
 
@@ -318,7 +318,8 @@ export class PowerRenderer {
     const y = lerp(fighter.y - size.radius * rocks.riseStart, fighter.y - fighter.height * projectilesConfig.height, rise);
     renderer.save();
     renderer.setBlendMode('source-over');
-    drawRockCluster(renderer, x, y, size.radius * getRockScale(size.id), fighter.stateTime * rocks.riseSpin * fighter.facing, getRockCount(size.id), tier.color);
+    const look = getRockLook(tier.id);
+    drawRockCluster(renderer, x, y, size.radius * look.scale, fighter.stateTime * rocks.riseSpin * fighter.facing, look.count, tier.color);
     renderer.restore();
   }
 

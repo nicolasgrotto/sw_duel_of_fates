@@ -297,14 +297,27 @@ describe('stone cluster', () => {
 });
 
 describe('stone size', () => {
-  it('draws every size larger than its hitbox and the single stones of the top sizes larger', () => {
-    const { sizes } = projectilesConfig.throw;
-    const { drawScale } = projectilesConfig.render.rocks;
-    const drawn = sizes.map((size) => size.radius * drawScale[size.id]);
-    for (let index = 1; index < drawn.length; index += 1) assert.ok(drawn[index] > drawn[index - 1]);
-    assert.ok(sizes.every((size) => drawScale[size.id] > 1));
-    const stone = (size) => size.radius * drawScale[size.id] * Math.min(...projectilesConfig.render.rocks.layouts[projectilesConfig.render.rocks.bySize[size.id] - 1].filter((_, index) => index % 3 === 2));
-    const byId = Object.fromEntries(sizes.map((size) => [size.id, stone(size)]));
-    assert.ok(byId.huge > byId.large * 1.15 && byId.max > byId.large * 1.15);
+  it('grows the single stones at every gallery tier, including deep over steady', async () => {
+    const { galleryConfig } = await import('../src/config/galleryConfig.js');
+    const { getRockLook } = await import('../src/rendering/rockCluster.js');
+    const { getPowerTier, resolveLevelBand } = await import('../src/combat/flowInteractions.js');
+    const { layouts } = projectilesConfig.render.rocks;
+    const stones = galleryConfig.levels.map((level) => {
+      const look = getRockLook(getPowerTier(level, powersConfig.tiers).id);
+      const radius = resolveLevelBand(level, projectilesConfig.throw.sizes).radius * look.scale;
+      return radius * Math.min(...layouts[look.count - 1].filter((_, index) => index % 3 === 2));
+    });
+    for (let index = 1; index < stones.length; index += 1) assert.ok(stones[index] > stones[index - 1], `${index}`);
+  });
+
+  it('keeps the look of the tier that threw the stone while it flies', async () => {
+    const { ProjectileRenderer } = await import('../src/rendering/ProjectileRenderer.js');
+    const { ProjectileKind } = await import('../src/config/projectilesConfig.js');
+    const owner = spawnFighter(300, 1, 'shadow');
+    owner.stats.flowLevel = 1;
+    const stone = { active: true, kind: ProjectileKind.THROW, owner: 0, source: 'throw', x: 600, y: 500, vx: 500, radius: 38, age: 0.2, level: 10 };
+    const renderer = recordingRenderer();
+    new ProjectileRenderer().draw(renderer, [stone], [owner]);
+    assert.equal(renderer.calls.filter((call) => call.name === 'fillPolygon').length, projectilesConfig.render.rocks.byTier.apex.count);
   });
 });
