@@ -204,12 +204,9 @@ function placeLockedBlade(pose, fighter, motion, advantage) {
   pose.bladeAngle = lerp(pose.bladeAngle, contactAngle, getLockEntry(fighter));
 }
 
-const techniqueTracks = {
-  spin: resolveTrack(techniqueKeyframes.spin),
-  saberThrow: resolveTrack(techniqueKeyframes.saberThrow),
-  counterRiposte: resolveTrack(techniqueKeyframes.counterRiposte),
-  dashSlash: Object.fromEntries(Object.entries(techniqueKeyframes.dashSlash).map(([variant, keys]) => [variant, resolveTrack(keys)])),
-};
+const techniqueTracks = Object.fromEntries(Object.entries(techniqueKeyframes).map(([id, keys]) => [id, Array.isArray(keys)
+  ? resolveTrack(keys)
+  : Object.fromEntries(Object.entries(keys).map(([variant, variantKeys]) => [variant, resolveTrack(variantKeys)]))]));
 
 const powerTracks = Object.fromEntries(Object.entries(powerKeyframes).map(([id, keys]) => [id, resolveTrack(keys)]));
 

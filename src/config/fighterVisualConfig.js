@@ -346,6 +346,14 @@ export const techniqueKeyframes = {
     { phase: ACTIVE, at: 1, ease: 'outQuad', blade: -3, lean: 12, reach: 0.21, step: 0.04, slide: 0.02, hip: 0.025 },
     { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: 2, lean: 11, reach: 0.19, step: 0.04, slide: 0.02, hip: 0.025 },
   ],
+  twinWheel: [
+    { phase: STARTUP, at: 0.5, ease: 'out', blade: -60, lean: -2, crouch: 6, lift: 0.04, slide: 0.02 },
+    { phase: STARTUP, at: 1, ease: 'inOut', blade: -90, lean: 0, crouch: 10, lift: 0.06, slide: 0.03, twirl: -90 },
+    { phase: ACTIVE, at: 0.5, ease: 'linear', blade: -90, lean: 3, crouch: 12, reach: 0.04, lift: 0.06, step: 0.02, twirl: 270 },
+    { phase: ACTIVE, at: 1, ease: 'linear', blade: -90, lean: 4, crouch: 12, reach: 0.04, lift: 0.04, step: 0.02, twirl: 630 },
+    { phase: RECOVERY, at: 0.4, ease: 'outQuad', blade: -70, lean: 3, crouch: 8, reach: 0.02, step: 0.02, twirl: 720 },
+    { phase: RECOVERY, at: 1, ease: 'inOut', twirl: 720 },
+  ],
   saberThrow: [
     { phase: STARTUP, at: 0.7, ease: 'out', blade: -150, lean: -8, lift: 0.12, reach: -0.04, slide: 0.04, hip: -0.02 },
     { phase: STARTUP, at: 1, ease: 'inOut', blade: -165, lean: -10, lift: 0.13, reach: -0.05, slide: 0.05, hip: -0.025 },
@@ -602,6 +610,49 @@ const strikerKeyframes = {
   impetus: aggressorKeyframes.impetus,
 };
 
+const reaperKeyframes = {
+  light: [
+    { phase: STARTUP, at: 1, ease: 'out', blade: -115, lean: -2, lift: 0.08, slide: 0.02, hip: -0.015 },
+    { phase: ACTIVE, at: 0.5, ease: 'in', blade: -35, lean: 6, reach: 0.07, lift: 0.04, step: 0.05, hip: 0.015 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 45, lean: 13, reach: 0.11, step: 0.07, hip: 0.03 },
+    { phase: RECOVERY, at: 0.35, ease: 'outQuad', blade: 55, lean: 13, reach: 0.1, step: 0.07, hip: 0.03 },
+  ],
+  light2: [
+    { phase: STARTUP, at: 0, blade: 45 },
+    { phase: STARTUP, at: 1, ease: 'out', blade: 110, lean: 2, crouch: 6, slide: 0.02, hip: -0.015 },
+    { phase: ACTIVE, at: 0.5, ease: 'in', blade: 35, lean: 8, crouch: 5, reach: 0.08, step: 0.05, hip: 0.015 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: -55, lean: 14, reach: 0.13, lift: 0.04, step: 0.07, hip: 0.03 },
+    { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: -62, lean: 13, reach: 0.12, lift: 0.04, step: 0.07, hip: 0.03 },
+  ],
+  light3: [
+    { phase: STARTUP, at: 0, blade: -40 },
+    { phase: STARTUP, at: 1, ease: 'out', blade: -100, lean: -4, crouch: 4, lift: 0.06, slide: 0.03, hip: -0.02 },
+    { phase: ACTIVE, at: 0.5, ease: 'in', blade: -20, lean: 8, crouch: 6, reach: 0.1, step: 0.06, hip: 0.02, twirl: 90 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 20, lean: 16, crouch: 10, reach: 0.15, step: 0.1, hip: 0.04, twirl: 180 },
+    { phase: RECOVERY, at: 0.35, ease: 'outQuad', blade: 30, lean: 15, crouch: 10, reach: 0.13, step: 0.1, hip: 0.04, twirl: 180 },
+    { phase: RECOVERY, at: 1, ease: 'inOut', twirl: 180 },
+  ],
+  heavy: [
+    { phase: STARTUP, at: 0.5, ease: 'out', blade: -120, lean: -3, crouch: 3, lift: 0.08, slide: 0.03, hip: -0.02, twirl: 180 },
+    { phase: STARTUP, at: 1, ease: 'inOut', blade: -160, lean: -6, crouch: 5, lift: 0.14, slide: 0.04, hip: -0.025, twirl: 360 },
+    { phase: ACTIVE, at: 0.5, ease: 'in', blade: -50, lean: 8, crouch: 7, reach: 0.09, lift: 0.06, step: 0.07, hip: 0.015, twirl: 360 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 62, lean: 17, crouch: 10, reach: 0.15, step: 0.1, hip: 0.04, twirl: 360 },
+    { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: 75, lean: 17, crouch: 10, reach: 0.14, step: 0.1, hip: 0.04, twirl: 360 },
+    { phase: RECOVERY, at: 1, ease: 'inOut', twirl: 360 },
+  ],
+  riposte: [
+    { phase: STARTUP, at: 1, ease: 'out', blade: -70, lean: 0, lift: 0.05, slide: 0.02 },
+    { phase: ACTIVE, at: 0.5, ease: 'in', blade: -15, lean: 9, reach: 0.1, step: 0.05, hip: 0.02 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 40, lean: 15, reach: 0.17, step: 0.08, hip: 0.035 },
+    { phase: RECOVERY, at: 0.35, ease: 'outQuad', blade: 52, lean: 15, reach: 0.15, step: 0.08, hip: 0.035 },
+  ],
+  shove: [
+    { phase: STARTUP, at: 1, ease: 'out', blade: -40, lean: -6, lift: 0.03, slide: 0.03, hip: -0.015, offHand: 0.6, offHandDegrees: 40 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: -75, lean: 18, reach: 0.12, step: 0.09, hip: 0.04, offHand: 1, offHandDegrees: 5 },
+    { phase: RECOVERY, at: 0.4, ease: 'inOut', blade: -70, lean: 13, reach: 0.08, step: 0.06, hip: 0.025, offHand: 0.7, offHandDegrees: 20 },
+  ],
+};
+
 export const motionStyles = {
   standard: {
     stance: { crouch: 0, lean: 0, guardOffset: 0, breathScale: 1, swayScale: 1, bobScale: 1 },
@@ -736,6 +787,22 @@ export const motionStyles = {
     lock: { lean: 11, crouch: 12, reach: -0.07, lift: 0.11, advantageLean: 10, advantageCrouch: 8, tremor: [1, 2.4], pressPush: 0.035 },
     lockVictory: { fromDegrees: -55, sweepDegrees: 40, lean: 12, twirl: 0, sweepShare: 0.4 },
     keyframes: strikerKeyframes,
+    attacks: {},
+    attackTypes: {},
+  },
+  reaper: {
+    stance: { crouch: 4, lean: 5, guardOffset: 0, breathScale: 1.15, swayScale: 1.3, bobScale: 1.2 },
+    followThrough: 0.1,
+    dashSlash: 'rising',
+    block: { bladeDegrees: -90, reach: 0.06, crouch: 8 },
+    evade: [
+      { lean: -26, crouch: 10, bladeOffset: 12 },
+      { lean: -10, crouch: 20, bladeOffset: -16 },
+      { lean: -32, crouch: 6, bladeOffset: 20 },
+    ],
+    lock: { lean: 12, crouch: 9, reach: -0.08, lift: 0.12, advantageLean: 11, advantageCrouch: 8, tremor: [1.2, 2.8], pressPush: 0.04 },
+    lockVictory: { fromDegrees: -55, sweepDegrees: 50, lean: 13, twirl: 180, sweepShare: 0.4 },
+    keyframes: reaperKeyframes,
     attacks: {},
     attackTypes: {},
   },
