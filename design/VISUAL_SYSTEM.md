@@ -171,6 +171,7 @@ Cores compartilhadas (em `themeConfig`):
 | `hudExhausted` | `#8c3b3e` | barra e contorno do Vigor de quem está exausto |
 | `hudWound` | `rgba(229, 72, 77, 0.8)` | marca "Braço/Perna ferida" ao lado do nome |
 | `woundShade` | `rgba(0, 0, 0, 0.32)` | sombra sobre o membro ferido |
+| `finisherEmber` | `#ff9a4a` | ponta cauterizada do membro cortado na finalização |
 | `shockwaveCore` | `#eef2fb` | núcleo claro dos arcos da onda de choque da Repulsão |
 | `shockwaveDust` | `#8b8272` | poeira levantada do chão pela onda de choque |
 | `hudTrack` | `rgba(255, 255, 255, 0.08)` | fundo das barras |

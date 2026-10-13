@@ -138,6 +138,7 @@ Consequências da v2.4:
 
 - **Entrada na exaustão:** sem efeito de tela. O lutador exausto respira mais fundo (respiração 2× mais ampla, só no render) e a guarda pende 6°. Som curto `exhausted`: sopro grave descendente, baixo volume.
 - **Ferimento:** no contato que fere, o `heavy-impact` normal mais 4–6 faíscas extras saindo baixas na direção do golpe, na cor das faíscas de impacto. Sem sangue. O membro ferido (perna da frente ou braço da frente) recebe uma sombra `woundShade` por cima até a Cura terminar ou o round acabar. Som `wound`: o impacto forte com uma camada grave curta.
+- **Finalização (2.9):** no K.O. por lâmina com finalização, 10–14 faíscas na cor da lâmina de quem cortou saem do ponto do corte, na direção do golpe, mais um brilho curto (0,25 s). O coto e a ponta cortada da peça têm um ponto em brasa (`finisherEmber`) que esfria em 1,2 s. Sem sangue nem rastro no chão. Usa a câmera lenta do K.O.; nenhum momento novo. Com a opção Finalizações desligada, nada disso aparece.
 - **Cura que limpa ferimento:** no fim da Cura, uma luz suave (0,3 s) na cor do tier do Fluxo sobre o corpo, e a sombra do membro some.
 - **Ira:** enquanto ativa, brilho fraco e irregular na cor do tier do Fluxo em volta do tronco (sprite de glow em cache, alpha 0,15–0,3) que oscila com duas frequências. Sem partículas contínuas. Som `wrath` na ativação: tom grave crescente.
 - **Esquiva automática do Foco:** reaproveita `evade-glow` e o som `evadeSuccess`, com a pose da variação 0. O medidor de Fluxo mostra o gasto.

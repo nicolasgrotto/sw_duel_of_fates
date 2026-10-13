@@ -285,6 +285,16 @@ Traje do Predestinado, nas duas variantes, sem vantagem e com a cor da lâmina i
 - **Paleta (do personagem, como os outros trajes):** manto `#1c1a20`, corpo `#26222b`, acabamento bronze fosco `#7a6650`. Nenhum brilho, glow ou partícula própria.
 - **Id e nome:** id `skin-dusk`; nome de tela Ocaso / Dusk nas tabelas de texto.
 
+### Finalização (v2.9)
+
+Separação estilizada de braço ou perna só no K.O. por lâmina, sem sangue, órgãos ou decapitação (DESIGN → finalização estilizada). O corte que justifica a separação é o próprio golpe letal, visto na câmera lenta do K.O.
+
+- **Braço:** fica o coto do ombro ao cotovelo; o antebraço com a mão sai girando. No braço da lâmina (golpe pela frente) o cabo, já apagado, cai junto com a mão.
+- **Perna:** fica a coxa do quadril ao joelho; canela e pé saem girando.
+- **Peça:** mesma cor e espessura do membro (manga `cloakColor` no braço da frente, `bodyColor` no de trás e nas pernas, mão na cor da luva). Sai para longe de quem cortou, sobe pouco, gira, pousa e fica deitada no chão até o round acabar. Sem quique, sem física de corpo.
+- **Ponta cortada:** um ponto em brasa (`finisherEmber`) no coto e na peça, que esfria em 1,2 s, lendo como corte cauterizado.
+- **Opção:** desligada, o K.O. continua igual ao de antes.
+
 ## Camadas de arena como dados
 
 Cada arena descreve camadas estáticas de geometria em tokens da paleta existente. O renderer pré-renderiza essas camadas em canvases internos e as reutiliza. Partículas ambientes são poucas, lentas e pouco opacas, atrás dos corpos; não geram eventos nem colisão. A plataforma provisória mantém o desenho atual até a implementação da Plataforma de Refino.
