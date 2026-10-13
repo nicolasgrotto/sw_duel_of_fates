@@ -100,6 +100,7 @@ export class EffectsSystem {
     this.punchScale = 1;
     this.reduced = false;
     this.showFinishers = true;
+    this.arenaDust = null;
     this.eventParams = { x: 0, y: 0, direction: 1, color: '', secondaryColor: null, particleScale: 1 };
     this.evadeAfterimages = new Map();
     this.hitFlashes = new Map();
@@ -183,6 +184,7 @@ export class EffectsSystem {
           this.hitFlashes.set(defender, this.config.hitFlashDuration);
         }
         this.startTremor(defender);
+        if (this.arenaDust && defender.grounded) this.spawnArenaDust(defender, attacker.facing);
         this.spawn(isStrongAttack(event.attackType) ? EffectType.HEAVY_IMPACT : EffectType.HIT_SPARK, params);
         if (defender.combat.sanctuaryShield > 0) {
           this.spawnRing(this.config.sanctuaryHitRing, x, y, getTierColor(defender));
@@ -686,6 +688,23 @@ export class EffectsSystem {
       particle.maxLife = style.life;
       particle.size = style.size;
       particle.color = tier.color;
+    }
+  }
+
+  spawnArenaDust(defender, direction) {
+    const dust = this.arenaDust;
+    const count = Math.round(dust.count * (this.reduced ? dust.reducedScale : 1));
+    for (let i = 0; i < count; i += 1) {
+      const particle = this.particles.acquire();
+      if (!particle) return;
+      particle.x = defender.x + (this.random() * 2 - 1) * dust.spread;
+      particle.y = defender.y;
+      particle.vx = direction * randomRange(this.random, dust.speed);
+      particle.vy = -randomRange(this.random, dust.lift);
+      particle.life = randomRange(this.random, dust.life);
+      particle.maxLife = particle.life;
+      particle.size = randomRange(this.random, dust.size);
+      particle.color = colors[dust.color];
     }
   }
 

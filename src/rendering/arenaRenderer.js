@@ -6,13 +6,43 @@ const AmbientLayer = Object.freeze({
   FLOOR: 'floor',
 });
 
+const SHIMMER_FREQUENCY = 7;
+const SHIMMER_AMPLITUDE = 1.5;
+
 const crystalPoints = [0, 0, 0, 0, 0, 0, 0, 0];
+
+function drawShapes(renderer, layer) {
+  renderer.save();
+  renderer.setAlpha(layer.alpha ?? 1);
+  for (const [x, y, width, height, color] of layer.rectangles ?? []) {
+    renderer.fillRect(x, y, width, height, colors[color]);
+  }
+  for (const [x1, y1, x2, y2, color, width] of layer.lines ?? []) {
+    renderer.line(x1, y1, x2, y2, colors[color], width);
+  }
+  for (const [color, ...points] of layer.polygons ?? []) {
+    renderer.fillPolygon(points, colors[color]);
+  }
+  for (const [x, y, radius, color] of layer.circles ?? []) {
+    renderer.fillCircle(x, y, radius, colors[color]);
+  }
+  for (const [x, y, radius, color, alpha] of layer.glows ?? []) {
+    renderer.drawGlow(x, y, radius, colors[color], alpha);
+  }
+  for (const [x, y, radius, startAngle, endAngle, color, width] of layer.arcs ?? []) {
+    renderer.strokeArc(x, y, radius, startAngle, endAngle, colors[color], width);
+  }
+  renderer.restore();
+}
 
 export function drawArena(renderer, arena, definition) {
   const { left, right, floorY, overscan } = arena;
   const fullWidth = renderer.width + overscan * 2;
 
   renderer.fillRect(-overscan, floorY, fullWidth, definition.floorHeight, colors[definition.floorColor]);
+  if (definition.floorDetail) {
+    drawShapes(renderer, definition.floorDetail);
+  }
   renderer.line(-overscan, floorY, renderer.width + overscan, floorY, colors[definition.floorEdgeColor], 2);
   if (!definition.showWalls) {
     return;
@@ -58,7 +88,7 @@ export class ArenaRenderer {
       return;
     }
     const { layers, crystals } = this.definition;
-    this.layers = layers.map((layer) => renderer.createLayer((target) => this.drawLayer(target, layer), arena.overscan));
+    this.layers = layers.map((layer) => renderer.createLayer((target) => drawShapes(target, layer), arena.overscan));
     if (crystals.length > 0) {
       this.layers.push(renderer.createLayer((target) => this.drawCrystalBodies(target), arena.overscan));
     }
@@ -84,6 +114,17 @@ export class ArenaRenderer {
     renderer.save();
     renderer.setAlpha(reflection.coverAlpha);
     renderer.fillRect(-arena.overscan, arena.floorY + 1, renderer.width + arena.overscan * 2, floorHeight, colors[reflection.cover]);
+    renderer.restore();
+  }
+
+  renderShade(renderer, arena) {
+    const { shade } = this.definition;
+    if (!shade) {
+      return;
+    }
+    renderer.save();
+    renderer.setAlpha(shade.alpha);
+    renderer.fillRect(-arena.overscan, -arena.overscan, renderer.width + arena.overscan * 2, renderer.height + arena.overscan * 2, colors[shade.color]);
     renderer.restore();
   }
 
@@ -128,10 +169,15 @@ export class ArenaRenderer {
       } else if (kind === 'ripple') {
         const size = radius * progress;
         renderer.strokeEllipse(particle.x, particle.y, size, size * 0.22, colors[color], 1.5);
-      } else if (kind === 'rain') {
+      } else if (kind === 'cloud') {
+        renderer.drawGlow(particle.x, particle.y, radius, colors[color], alpha * fade);
+      } else if (kind === 'rain' || kind === 'gust') {
         const { driftSpeed, riseSpeed, streak } = ambient.config;
-        renderer.setAlpha(alpha);
+        if (kind === 'rain') renderer.setAlpha(alpha);
         renderer.line(particle.x, particle.y, particle.x + driftSpeed * streak, particle.y - riseSpeed * streak, colors[color], radius);
+      } else if (kind === 'shimmer') {
+        const y = particle.y + Math.sin(particle.time * SHIMMER_FREQUENCY + particle.x) * SHIMMER_AMPLITUDE;
+        renderer.line(particle.x - radius, y, particle.x + radius, y, colors[color], 1);
       } else {
         renderer.fillCircle(particle.x, particle.y, radius, colors[color]);
       }
@@ -151,29 +197,5 @@ export class ArenaRenderer {
       renderer.fillPolygon(points, colors.arenaCrystal);
       renderer.polyline(points, colors.arenaCrystalEdge, 1.5);
     }
-  }
-
-  drawLayer(renderer, layer) {
-    renderer.save();
-    renderer.setAlpha(layer.alpha ?? 1);
-    for (const [x, y, width, height, color] of layer.rectangles ?? []) {
-      renderer.fillRect(x, y, width, height, colors[color]);
-    }
-    for (const [x1, y1, x2, y2, color, width] of layer.lines ?? []) {
-      renderer.line(x1, y1, x2, y2, colors[color], width);
-    }
-    for (const [color, ...points] of layer.polygons ?? []) {
-      renderer.fillPolygon(points, colors[color]);
-    }
-    for (const [x, y, radius, color] of layer.circles ?? []) {
-      renderer.fillCircle(x, y, radius, colors[color]);
-    }
-    for (const [x, y, radius, color, alpha] of layer.glows ?? []) {
-      renderer.drawGlow(x, y, radius, colors[color], alpha);
-    }
-    for (const [x, y, radius, startAngle, endAngle, color, width] of layer.arcs ?? []) {
-      renderer.strokeArc(x, y, radius, startAngle, endAngle, colors[color], width);
-    }
-    renderer.restore();
   }
 }

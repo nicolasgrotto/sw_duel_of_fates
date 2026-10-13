@@ -589,3 +589,9 @@ export function computePose(fighter, pose, forceEvade = false, lockContext = noL
 
   return pose;
 }
+
+export function applyWind(pose, fighter, wind) {
+  const gust = wind.sway + wind.flutter * Math.sin(fighter.animation.time * wind.frequency);
+  pose.clothSway = clamp(pose.clothSway - wind.direction * fighter.facing * gust, -wind.maxSway, wind.maxSway);
+  return pose;
+}

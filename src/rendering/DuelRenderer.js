@@ -7,7 +7,7 @@ import { DodgeAfterimage } from './DodgeAfterimage.js';
 import { PowerRenderer, getStormDarkness } from './PowerRenderer.js';
 import { ProjectileRenderer } from './ProjectileRenderer.js';
 import { drawDebris, drawDesaturation, drawFlash, drawStormDarkness, drawStormStrikes, drawImpactLights, drawParticles, drawRings, drawShockwaves } from './effectsRenderer.js';
-import { computePose, createPose, getBladeLockAdvantage } from './fighterPose.js';
+import { applyWind, computePose, createPose, getBladeLockAdvantage } from './fighterPose.js';
 import { drawFighterBody } from './fighterRenderer.js';
 import { drawFinisherPiece, getSeveredLimb } from './finisherRenderer.js';
 import { SaberTrail } from './SaberTrail.js';
@@ -90,6 +90,7 @@ export class DuelRenderer {
       this.powerView.drawFrozenEchoes(renderer, fighter, this.getPose(fighter), arena.floorY);
       renderer.restore();
     }
+    this.arenaView.renderShade(renderer, arena);
     for (const fighter of fighters) {
       renderer.save();
       renderer.translate(effects.getTremor(fighter), 0);
@@ -160,12 +161,14 @@ export class DuelRenderer {
   }
 
   preparePoses(fighters, bladeExtension, effects) {
+    const { wind } = this.arenaView.definition;
     for (const fighter of fighters) {
       this.lockContext.advantage = getBladeLockAdvantage(fighter, fighters);
       this.lockContext.victory = effects?.isLockWinner?.(fighter) ?? false;
       this.lockContext.flourish = effects?.isCounterFlourish?.(fighter) ?? false;
       const pose = computePose(fighter, this.getPose(fighter), false, this.lockContext);
       pose.bladeExtension = bladeExtension;
+      if (wind) applyWind(pose, fighter, wind);
       this.getAfterimage(fighter).record(fighter, pose, effects?.hasEvadeAfterimage?.(fighter) ?? false);
 
       if (isSaberStrikeActive(fighter)) {

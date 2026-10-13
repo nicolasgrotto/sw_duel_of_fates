@@ -438,6 +438,7 @@ export class CharacterSelectState extends GameState {
     renderer.scale(arenaPreviewScale, arenaPreviewScale);
     this.arenaViews.get(id).renderBackground(renderer, this.arenaBounds, [], []);
     this.arenaViews.get(id).renderFloor(renderer, this.arenaBounds);
+    this.arenaViews.get(id).renderShade(renderer, this.arenaBounds);
     renderer.restore();
     renderer.strokeRect(left, arenaPreviewY, width, height, colors.accent, 1);
   }

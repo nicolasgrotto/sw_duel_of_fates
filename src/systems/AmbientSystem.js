@@ -20,14 +20,31 @@ export class AmbientSystem {
   }
 
   update(dt) {
-    const { riseSpeed, driftSpeed, life, area } = this.config;
+    const { riseSpeed, driftSpeed, life, area, wrapMargin } = this.config;
     for (const particle of this.particles) {
       particle.time += dt;
       particle.x += driftSpeed * dt;
       particle.y -= riseSpeed * dt;
-      if (particle.time >= life || particle.y < area[0] || particle.y > area[1] || particle.x > this.bounds.right) {
+      if (wrapMargin !== undefined) {
+        this.wrap(particle, wrapMargin);
+      }
+      if (particle.time >= life || particle.y < area[0] || particle.y > area[1] || this.isOutside(particle.x, wrapMargin)) {
         this.reset(particle);
       }
     }
+  }
+
+  wrap(particle, margin) {
+    const { left, right } = this.bounds;
+    const span = right - left + margin * 2;
+    if (particle.x < left - margin) {
+      particle.x += span;
+    } else if (particle.x > right + margin) {
+      particle.x -= span;
+    }
+  }
+
+  isOutside(x, wrapMargin) {
+    return wrapMargin === undefined && x > this.bounds.right;
   }
 }

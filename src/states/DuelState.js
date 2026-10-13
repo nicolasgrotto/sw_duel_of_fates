@@ -121,6 +121,7 @@ export class DuelState extends GameState {
     this.timeControl = new TimeControl();
     this.effects = new EffectsSystem(effectsConfig, this.camera, this.random, this.timeControl);
     this.effects.setReduced(this.game.settings.reducedEffects);
+    this.effects.arenaDust = this.arenaDefinition.impactDust ?? null;
     this.view = new DuelRenderer(this.arenaDefinition);
     this.view.showFinishers = this.effects.showFinishers = this.game.settings.finishers !== false;
     this.duelAudio = new DuelAudio(this.game.audio, {
@@ -193,6 +194,7 @@ export class DuelState extends GameState {
     this.timeControl = new TimeControl();
     this.effects = new EffectsSystem(effectsConfig, this.camera, this.random, this.timeControl);
     this.effects.setReduced(this.game.settings.reducedEffects);
+    this.effects.arenaDust = this.arenaDefinition.impactDust ?? null;
     this.view = new DuelRenderer(this.arenaDefinition);
     this.view.showFinishers = this.effects.showFinishers = this.game.settings.finishers !== false;
     this.replayBuffer.clear();
@@ -348,6 +350,7 @@ export class DuelState extends GameState {
     this.timeControl = new TimeControl();
     this.effects = new EffectsSystem(effectsConfig, this.camera, this.random, this.timeControl);
     this.effects.setReduced(this.game.settings.reducedEffects);
+    this.effects.arenaDust = this.arenaDefinition.impactDust ?? null;
     this.view = new DuelRenderer(this.arenaDefinition);
     this.view.showFinishers = this.effects.showFinishers = this.game.settings.finishers !== false;
     this.hud = this.createHud();
