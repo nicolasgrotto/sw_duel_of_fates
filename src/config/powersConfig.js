@@ -95,6 +95,7 @@ export const powersConfig = {
       id: 'push', effect: 'push', channel: false, pose: 'cast', interaction: 'push',
       cost: 40, startup: 0.22, active: 0.08, recovery: 0.34, range: 320,
       damage: 5, knockback: 950, stagger: 0.45,
+      knockbackByLevel: [{ minLevel: 1, knockback: 950 }, { minLevel: 3, knockback: 1150 }, { minLevel: 8, knockback: 1400 }, { minLevel: 10, knockback: 1650 }],
       guard: { staminaCost: 12 },
     },
     pull: {
@@ -106,7 +107,7 @@ export const powersConfig = {
     },
     lightning: {
       id: 'lightning', effect: 'lightning', channel: true, pose: 'channel', interaction: 'lightning',
-      cost: 15, drainPerSecond: 55, startup: 0.3, maxChannel: 1, recovery: 0.35, range: 300,
+      cost: 15, drainPerSecond: 55, startup: 0.3, maxChannel: 1, recovery: 0.35, range: 480,
       tickInterval: 0.15, damage: 3, knockback: 70, stun: 0.12, barrierDrainPerStrike: 5,
       guard: { staminaCost: 5 },
     },

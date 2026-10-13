@@ -170,7 +170,7 @@ export class EnemyAI {
     const interval = Math.max(combatRulesConfig.bladeLock.minPressInterval,
       (1 + this.perception.reactionJitter * this.random()) / difficulty.bladeLockRate);
     const { combat } = self;
-    if (!combat.lockPressHeld && combat.lockTime + dt - combat.lockLastPress + Number.EPSILON * Math.max(1, combat.lockTime) >= interval
+    if (combat.lockTime + dt >= difficulty.bladeLockDelay && !combat.lockPressHeld && combat.lockTime + dt - combat.lockLastPress + Number.EPSILON * Math.max(1, combat.lockTime) >= interval
       && this.random() >= difficulty.mistakeChance) intent.lightAttack = true;
   }
 

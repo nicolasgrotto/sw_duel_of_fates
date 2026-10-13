@@ -18,6 +18,7 @@ export const aiConfig = {
     [Difficulty.EASY]: {
       confusionCompensation: null,
       bladeLockRate: 5,
+      bladeLockDelay: 0.6,
       reactionTime: 0.45,
       evadeChance: 0.005,
       powerMultiplier: 0.5,
@@ -45,6 +46,7 @@ export const aiConfig = {
     [Difficulty.NORMAL]: {
       confusionCompensation: 0.35,
       bladeLockRate: 7,
+      bladeLockDelay: 0.45,
       reactionTime: 0.28,
       evadeChance: 0.015,
       powerMultiplier: 1,
@@ -72,6 +74,7 @@ export const aiConfig = {
     [Difficulty.HARD]: {
       confusionCompensation: 0.12,
       bladeLockRate: 9,
+      bladeLockDelay: 0.3,
       reactionTime: 0.15,
       evadeChance: 0.04,
       powerMultiplier: 1.2,
@@ -99,6 +102,7 @@ export const aiConfig = {
     boss: {
       confusionCompensation: 0.12,
       bladeLockRate: 9,
+      bladeLockDelay: 0.3,
       reactionTime: 0.15,
       evadeChance: 0.04,
       powerMultiplier: 1.2,

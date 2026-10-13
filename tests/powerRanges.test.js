@@ -29,9 +29,9 @@ function createAI(self, opponent) {
 
 it('derives saber throw range for all ratings, clamps at both limits and preserves base data', () => {
   const before = structuredClone(characters.guardian);
-  assert.deepEqual(attributesConfig.saberThrow, { baseRange: 380, rangePerRating: 20, minRange: 320, maxRange: 460 });
+  assert.deepEqual(attributesConfig.saberThrow, { baseRange: 480, rangePerRating: 20, minRange: 400, maxRange: 580 });
   assert.deepEqual(Array.from({ length: 10 }, (_, index) => ratedFighter(index + 1).moves.saberThrow.throwRange),
-    [320, 340, 360, 380, 400, 420, 440, 460, 460, 460]);
+    [420, 440, 460, 480, 500, 520, 540, 560, 580, 580]);
   assert.deepEqual(characters.guardian, before);
   assert.equal('range' in projectilesConfig.saber, false);
   assert.equal('reach' in ratedFighter(4).moves.saberThrow.hitbox, false);
@@ -148,7 +148,7 @@ it('shows and places gallery demonstrations using the real tier and caster range
       const scene = new GalleryScene(director, simulation);
       for (let tier = 0; tier < galleryConfig.levels.length; tier += 1) {
         scene.changeSelection('tier', tier);
-        const expected = ability === 'pull' ? [330, 380, 430, 480][tier] : 380 + (characters[caster].attributes.blade - 4) * 20;
+        const expected = ability === 'pull' ? [330, 380, 430, 480][tier] : 480 + (characters[caster].attributes.blade - 4) * 20;
         assert.equal(scene.range, expected);
         assert.equal(scene.gap, expected * galleryConfig.distanceRatio);
         scene.reset();

@@ -592,6 +592,8 @@ Na guarda, o Puxão não causa dano e puxa pela metade; o Raio causa um quarto d
 
 Alcance do Puxão por tier do Fluxo de quem lança (v2.16): Tênue 330 px, Firme 380 px, Profundo 430 px, Ápice 480 px. A força da puxada não muda.
 
+**Ajustes do autor na 2.7.** O Raio alcança 480 px (era 300). A Repulsão empurra mais longe pelo tier de quem lança: Tênue 950, Firme 1150, Profundo 1400, Ápice 1650 (velocidade inicial, antes da potência e da tabela de interação); a Repulsão Suprema não muda. Na disputa de lâminas, vence quem abrir 5 pressões de vantagem (era 4), o limite de tempo sobe para 3 s e a IA só começa a apertar depois de um tempo de reação (Fácil 0,6 s, Normal 0,45 s, Difícil e chefe 0,3 s), para o jogador ter tempo de perceber a disputa.
+
 **Repulsão pela diferença (v1.14).** A Repulsão tem faixas próprias, simétricas: quem lança acima fura a guarda; quem lança abaixo empurra menos.
 
 | Diferença | Sem guarda | Com guarda |
@@ -628,7 +630,7 @@ Alcance do Puxão por tier do Fluxo de quem lança (v2.16): Tênue 330 px, Firme
 | 10 | máximo | 17 | 520 | 48 | 1,5 s |
 
   No impacto valem a tabela de interação (resistido a −3 ou menos), a guarda de frente (um quarto do dano passa), a Barreira (absorve) e a invulnerabilidade da esquiva (passa através). Some ao bater na parede.
-- **Arremesso da lâmina** (técnica, v1.16): a lâmina sai girando para a frente, vai até um alcance que cresce com a Lâmina (380 px na Lâmina 4; 20 px por ponto, entre 320 e 460 px, v2.16) e volta para a mão. Acerta uma vez (na ida ou, se errou, na volta); a guarda de frente bloqueia e a Barreira absorve, e a lâmina volta mesmo assim. Enquanto ela não volta, o lutador não ataca, não bloqueia e não apara com a lâmina (empurrão, esquiva e poderes continuam valendo).
+- **Arremesso da lâmina** (técnica, v1.16): a lâmina sai girando para a frente, vai até um alcance que cresce com a Lâmina (480 px na Lâmina 4; 20 px por ponto, entre 400 e 580 px; era 380, entre 320 e 460, até a 2.7) e volta para a mão. Acerta uma vez (na ida ou, se errou, na volta); a guarda de frente bloqueia e a Barreira absorve, e a lâmina volta mesmo assim. Enquanto ela não volta, o lutador não ataca, não bloqueia e não apara com a lâmina (empurrão, esquiva e poderes continuam valendo).
 
 **Efeitos de estado (v1.17).** Duram um tempo e ficam no lutador.
 - **Estrangular** (Eclipse, 240 px): custa 45, prende o alvo (não age) e drena vida enquanto dura (0,5 s, 4 de dano por segundo). +3 ou mais fura a guarda; −2 dura metade e drena metade; −3 ou menos falha. Janela reduzida na v1.19 para limitar a punição garantida.

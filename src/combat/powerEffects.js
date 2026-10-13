@@ -1,6 +1,7 @@
 import { FighterState } from '../entities/fighterStates.js';
 import { getStaminaCost } from '../systems/StaminaSystem.js';
 import { CombatEvent } from './combatEvents.js';
+import { resolveLevelBand } from './flowInteractions.js';
 
 function interrupt(target, state, duration) {
   target.clearAttack();
@@ -30,10 +31,14 @@ function dealImpact(context, damage, velocity) {
   return interrupts;
 }
 
+function getPushKnockback(caster, power) {
+  return power.knockbackByLevel ? resolveLevelBand(caster.flowLevel, power.knockbackByLevel).knockback : power.knockback;
+}
+
 function push(context) {
   const { combat, caster, target, power, interaction, scale, guarded } = context;
   const direction = power.around ? Math.sign(target.x - caster.x) || caster.facing : caster.facing;
-  const knockback = direction * power.knockback * scale * interaction.knockback;
+  const knockback = direction * getPushKnockback(caster, power) * scale * interaction.knockback;
   if (guarded) {
     target.vx = knockback * interaction.guardSlide;
     applyGuarded(context);

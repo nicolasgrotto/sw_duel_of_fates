@@ -17,7 +17,7 @@ function fixture(name = 'hard', { random = () => 0, jitter = 0, mistake = 0, rat
   const [self, opponent] = result.fighters;
   result.ai = new EnemyAI({ self, opponent, rules: result.simulation.rules,
     profile: { ...aiConfig.profiles.balanced, priorities: [] },
-    difficulty: { ...aiConfig.difficulties[name], bladeLockRate: rate, mistakeChance: mistake },
+    difficulty: { ...aiConfig.difficulties[name], bladeLockRate: rate, mistakeChance: mistake, bladeLockDelay: 0 },
     perception: { ...aiConfig.perception, reactionJitter: jitter }, random });
   return result;
 }
@@ -42,6 +42,20 @@ it('requests only light edges at the proof rate for each difficulty', () => {
       }
     }
     assert.equal(current.fighters[0].combat.lockPresses, rate, name);
+  }
+});
+
+it('waits the difficulty reaction delay before the first lock press', () => {
+  for (const name of Object.keys(proofRates)) {
+    const current = fixture(name);
+    current.ai.difficulty.bladeLockDelay = aiConfig.difficulties[name].bladeLockDelay;
+    combatRulesConfig.bladeLock.winMargin = 100;
+    let firstPress = null;
+    for (let step = 0; step < 90 && firstPress === null; step += 1) {
+      requestAndStep(current);
+      if (current.fighters[0].combat.lockPresses > 0) firstPress = current.fighters[0].combat.lockLastPress;
+    }
+    assert.ok(firstPress + STEP >= aiConfig.difficulties[name].bladeLockDelay, name);
   }
 });
 
