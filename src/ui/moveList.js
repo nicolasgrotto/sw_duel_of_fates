@@ -26,7 +26,7 @@ function slotKeys(bindings, slot, action) {
 }
 
 function buildPowerRows(character, bindings) {
-  const slots = Object.entries(character.loadout?.powers ?? {}).filter(([slot]) => !character.powerSlots || character.powerSlots.includes(slot));
+  const slots = Object.entries(character.loadout?.powers ?? {}).filter(([slot]) => !character.unlockedPowerSlots || character.unlockedPowerSlots.includes(slot));
   const powerRows = slots.map(([slot, id]) => {
     const power = powersConfig.powers[id];
     const label = formatText(power.channel ? texts.moveList.powerHeld : texts.moveList.power, { name: texts.powers[id] });

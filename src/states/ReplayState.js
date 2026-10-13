@@ -25,6 +25,7 @@ import { GameState } from './GameState.js';
 function cloneFighter(original, snapshot) {
   const clone = new Fighter({
     id: original.id,
+    variant: original.variant,
     name: original.name,
     stats: original.stats,
     appearance: original.appearance,

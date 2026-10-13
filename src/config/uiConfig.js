@@ -69,6 +69,7 @@ export const layout = {
     previewY: 590,
     previewScale: 1.3,
     infoY: 200,
+    variantY: 342,
     skinY: 366,
     skinRequirementY: 390,
     skinControlsY: 638,

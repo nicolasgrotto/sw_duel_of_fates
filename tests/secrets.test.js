@@ -217,3 +217,17 @@ describe('story content', () => {
     assert.ok(ids.has(storyConfig.start));
   });
 });
+
+
+it('balance unlocks both variants once even when the character was already owned', () => {
+  const game = createFakeGame();
+  game.settings.unlockedCharacters = ['elder', 'sovereign', 'foretold'];
+  game.settings.unlockedVariants = { foretold: ['aurora'] };
+  game.changeState(StateId.INTRO);
+  const state = game.states.current;
+  state.reward(secretsConfig.rewards.balance);
+  assert.deepEqual(game.settings.unlockedVariants.foretold, ['aurora', 'eclipse']);
+  const saved = game.saved;
+  state.reward(secretsConfig.rewards.balance);
+  assert.equal(game.saved, saved);
+});

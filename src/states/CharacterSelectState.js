@@ -2,6 +2,7 @@ import { drawAttributeBars } from '../ui/attributeBars.js';
 import { containsTouch } from '../core/TouchInput.js';
 import { touchLayoutConfig } from '../config/touchLayoutConfig.js';
 import { arenas } from '../arenas/arenaData.js';
+import { getUnlockedVariants } from '../characters/variants.js';
 import { characters } from '../characters/characterData.js';
 import { createFighter } from '../characters/characterFactory.js';
 import { Action, keyBindings } from '../config/controlsConfig.js';
@@ -44,9 +45,12 @@ export class CharacterSelectState extends GameState {
     this.menu = this.characterMenu;
     this.arenaBounds = createArenaBounds(gameConfig);
     this.arenaViews = new Map(gameConfig.duel.arenaOrder.map((id) => [id, new ArenaRenderer(arenas[id])]));
-    this.previews = new Map(this.characterIds.map((id) => [id, createFighter(id, { x: 0, y: 0, facing: -1 })]));
+    this.previews = new Map(this.characterIds.map((id) => [id, createFighter(id, { x: 0, y: 0, facing: -1 }, { variant: getUnlockedVariants(characters[id], this.game.settings)[0] })]));
     this.colorChoices = new Map();
     this.skinChoices = new Map();
+    this.variantChoices = new Map();
+    this.playerVariant = null;
+    this.opponentVariant = null;
     this.playerSaberColor = null;
     this.pose = createPose();
     const bindings = this.game.input.bindings ?? keyBindings;
@@ -87,6 +91,7 @@ export class CharacterSelectState extends GameState {
     if (this.step !== SelectStep.ARENA) {
       this.updateColorChoice(input);
       this.updateSkinChoice(input);
+      this.updateVariantChoice(input);
     }
     if (this.step !== SelectStep.ARENA) {
       this.previews.get(this.menu.selected.id).animation.time += dt;
@@ -108,9 +113,26 @@ export class CharacterSelectState extends GameState {
   }
 
   refreshPreview(id) {
-    const preview = createFighter(id, { x: 0, y: 0, facing: -1 }, { saberColor: this.getChosenColor(id), skin: this.getChosenSkin(id) });
+    const preview = createFighter(id, { x: 0, y: 0, facing: -1 }, { saberColor: this.getChosenColor(id), skin: this.getChosenSkin(id), variant: this.getChosenVariant(id) });
     preview.animation.time = this.previews.get(id).animation.time;
     this.previews.set(id, preview);
+  }
+
+  getChosenVariant(id) {
+    return this.variantChoices.get(id) ?? getUnlockedVariants(characters[id], this.game.settings)[0] ?? null;
+  }
+
+  updateVariantChoice(input) {
+    const character = characters[this.menu.selected.id];
+    const options = getUnlockedVariants(character, this.game.settings);
+    if (options.length < 2) return;
+    const taps = input.touchTaps ?? [];
+    const step = (input.wasPressed(Action.POWER) || taps.some(tap => containsTouch(tap, touchLayoutConfig.variantRight)) ? 1 : 0)
+      - (taps.some(tap => containsTouch(tap, touchLayoutConfig.variantLeft)) ? 1 : 0);
+    if (!step) return;
+    const current = options.indexOf(this.getChosenVariant(character.id));
+    this.variantChoices.set(character.id, options[(Math.max(0, current) + step + options.length) % options.length]);
+    this.refreshPreview(character.id);
   }
 
   getChosenSkin(id) {
@@ -144,19 +166,20 @@ export class CharacterSelectState extends GameState {
       this.step = SelectStep.OPPONENT;
       this.menu = this.characterMenu;
       this.menu.selectedIndex = this.characterIds.indexOf(this.opponentChoice);
-      this.restoreChoice(this.opponentChoice, this.opponentSkin, this.opponentSaberColor);
+      this.restoreChoice(this.opponentChoice, this.opponentSkin, this.opponentSaberColor, this.opponentVariant);
       return;
     }
     if (this.step === SelectStep.OPPONENT) {
       this.step = SelectStep.PLAYER;
       this.menu.selectedIndex = this.characterIds.indexOf(this.playerChoice);
-      this.restoreChoice(this.playerChoice, this.playerSkin, this.playerSaberColor);
+      this.restoreChoice(this.playerChoice, this.playerSkin, this.playerSaberColor, this.playerVariant);
       return;
     }
     this.game.changeState(StateId.MENU);
   }
 
-  restoreChoice(id, skin, saberColor) {
+  restoreChoice(id, skin, saberColor, variant) {
+    this.variantChoices.set(id, variant ?? characters[id].defaultVariant ?? null);
     this.skinChoices.set(id, skin ?? 'base');
     this.colorChoices.set(id, saberColor ?? characters[id].appearance.saberColor);
     this.refreshPreview(id);
@@ -165,15 +188,16 @@ export class CharacterSelectState extends GameState {
   choose(choice) {
     if (this.step === SelectStep.PLAYER && this.params.mode === DuelMode.ARCADE) {
       const run = createArcadeRun(choice, this.rosterIds, gameConfig.arcade);
-      this.game.changeState(StateId.DUEL, { mode: DuelMode.ARCADE, arcade: { ...run, playerSaberColor: this.getChosenColorParam(choice), playerSkin: this.getChosenSkin(choice) } });
+      this.game.changeState(StateId.DUEL, { mode: DuelMode.ARCADE, arcade: { ...run, playerVariant: this.getChosenVariant(choice), playerSaberColor: this.getChosenColorParam(choice), playerSkin: this.getChosenSkin(choice) } });
       return;
     }
     if (this.step === SelectStep.PLAYER && this.params.mode === DuelMode.SURVIVAL) {
       const run = createSurvivalRun(choice, this.getChosenColorParam(choice), createRandomSeed());
-      this.game.changeState(StateId.DUEL, { mode: DuelMode.SURVIVAL, survival: { ...run, playerSkin: this.getChosenSkin(choice) } });
+      this.game.changeState(StateId.DUEL, { mode: DuelMode.SURVIVAL, survival: { ...run, playerVariant: this.getChosenVariant(choice), playerSkin: this.getChosenSkin(choice) } });
       return;
     }
     if (this.step === SelectStep.PLAYER) {
+      this.playerVariant = this.getChosenVariant(choice);
       this.playerSkin = this.getChosenSkin(choice);
       this.playerChoice = choice;
       this.playerSaberColor = this.getChosenColorParam(choice);
@@ -182,6 +206,7 @@ export class CharacterSelectState extends GameState {
       return;
     }
     if (this.step === SelectStep.OPPONENT) {
+      this.opponentVariant = this.getChosenVariant(choice);
       this.opponentSkin = this.getChosenSkin(choice);
       this.opponentChoice = choice;
       this.opponentSaberColor = this.getChosenColorParam(choice);
@@ -193,6 +218,8 @@ export class CharacterSelectState extends GameState {
       ...this.params,
       playerCharacter: this.playerChoice,
       opponentCharacter: this.opponentChoice,
+      playerVariant: this.playerVariant,
+      opponentVariant: this.opponentVariant,
       playerSkin: this.playerSkin,
       opponentSkin: this.opponentSkin,
       playerSaberColor: this.playerSaberColor,

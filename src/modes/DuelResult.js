@@ -5,6 +5,7 @@ export function createDuelResult({ fighters, winner, stats, duration, mode }) {
     duration,
     fighters: fighters.map((fighter) => ({
       id: fighter.id,
+      variant: fighter.variant ?? null,
       name: fighter.name,
       health: fighter.health,
       maxHealth: fighter.stats.maxHealth,

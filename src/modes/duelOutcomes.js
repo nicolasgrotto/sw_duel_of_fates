@@ -2,6 +2,7 @@ import { isLastStage, nextArcadeRun } from './arcade.js';
 import { nextSurvivalRun } from './survival.js';
 import { resolveDialogue } from './story/dialogue.js';
 import { resolveStoryResult } from './story/storyRun.js';
+import { addVariantUnlocks } from '../characters/variants.js';
 import { characters } from '../characters/characterData.js';
 import { unlockProgressSkins, ARCADE_UNLOCK, addUnlocks, findChallengeUnlocks } from './unlocks.js';
 import { DuelMode } from '../states/duelModes.js';
@@ -32,6 +33,13 @@ function resolveStoryOutcome(result, { params, settings, story }) {
         menuState: StateId.STORY,
       },
     };
+  }
+  const defeated = result.fighters[1];
+  const defeatedCharacter = characters[defeated?.id];
+  if (defeatedCharacter?.variants) {
+    progress.unlockedVariants = addVariantUnlocks(settings.unlockedVariants,
+      { [defeated.id]: [defeated.variant ?? outcome.encounter.opponentVariant ?? defeatedCharacter.defaultVariant] }, characters);
+    if (!outcome.unlocks.includes(defeated.id)) outcome.unlocks.push(defeated.id);
   }
   if (outcome.ending) {
     progress.unlocks = unlockProgressSkins(settings.unlocks, Object.values(characters), 'story');

@@ -3,6 +3,7 @@ import { airDashConfig } from '../config/airDashConfig.js';
 import { evadeConfig } from '../config/evadeConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { applyAttributes } from './attributes.js';
+import { resolveCharacterVariant } from './variants.js';
 import { resolvePowerStats } from './powers.js';
 import { fighterArchetypes } from '../config/fightersConfig.js';
 import { bladeTechniques } from '../config/movesConfig.js';
@@ -18,7 +19,9 @@ export function createFighter(characterId, spawn, options) {
   return createFighterFromCharacter(character, spawn, options);
 }
 
-export function createFighterFromCharacter(character, { x, y, facing }, { saberColor = null, skin = null } = {}) {
+export function createFighterFromCharacter(character, { x, y, facing }, { saberColor = null, skin = null, variant = undefined } = {}) {
+  const resolved = resolveCharacterVariant(character, variant ?? character.defaultVariant ?? null);
+  character = resolved.character;
   const stats = fighterArchetypes[character.archetype];
   if (!stats) {
     throw new Error(`Unknown archetype: ${character.archetype}`);
@@ -54,6 +57,7 @@ export function createFighterFromCharacter(character, { x, y, facing }, { saberC
 
   return new Fighter({
     id: character.id,
+    variant: resolved.variant,
     name: character.name,
     stats: { ...derived, alignment: character.alignment, techniques, power: resolvePowerStats(derived.flowLevel, powersConfig, character.loadout?.powers ?? null, character.unlockedPowerSlots ?? null) },
     appearance,

@@ -86,6 +86,7 @@ function readOptions(argv) {
     seed: 1,
     maxSeconds: 120,
     overrides: [],
+    variant: '',
   };
 
   for (let i = 0; i < argv.length; i += 2) {
@@ -130,8 +131,8 @@ function runDuel(leftSetup, rightSetup, random, rules, maxSeconds) {
   const arena = createArenaBounds(gameConfig);
   const centerX = (arena.left + arena.right) / 2;
   const half = gameConfig.duel.spawnDistance / 2;
-  const left = createFighterFromCharacter(resolveCharacter(leftId), { x: centerX - half, y: arena.floorY, facing: 1 });
-  const right = createFighterFromCharacter(resolveCharacter(rightId), { x: centerX + half, y: arena.floorY, facing: -1 });
+  const left = createFighterFromCharacter(resolveCharacter(leftId), { x: centerX - half, y: arena.floorY, facing: 1 }, { variant: leftSetup.variant });
+  const right = createFighterFromCharacter(resolveCharacter(rightId), { x: centerX + half, y: arena.floorY, facing: -1 }, { variant: rightSetup.variant });
   const fighters = [left, right];
   const controllers = [
     createController(left, right, leftSetup, random, rules, arena),
@@ -209,9 +210,14 @@ function main() {
   const rules = readRules(options.rules);
   const results = [];
 
+  const variants = Object.fromEntries(options.variant.split(',').filter(Boolean).map(entry => {
+    const [id, variant] = entry.split('=');
+    if (!characters[id]?.variants?.[variant]) throw new Error(`Unknown variant: ${entry}`);
+    return [id, variant];
+  }));
   const sides = [
-    { side: 'A', characterId: options.left, difficulty: options.leftDifficulty, profile: options.profile },
-    { side: 'B', characterId: options.right, difficulty: options.rightDifficulty, profile: options.profile },
+    { side: 'A', characterId: options.left, variant: variants[options.left], difficulty: options.leftDifficulty, profile: options.profile },
+    { side: 'B', characterId: options.right, variant: variants[options.right], difficulty: options.rightDifficulty, profile: options.profile },
   ];
 
   for (let i = 0; i < options.duels; i += 1) {
@@ -228,8 +234,8 @@ function main() {
   const timeouts = results.filter((result) => result.ending === 'timeout').length;
   const doubleKnockouts = results.filter((result) => result.ending === 'doubleKnockout').length;
   const percent = (value) => `${((value / results.length) * 100).toFixed(1)}%`;
-  const describe = ({ characterId, difficulty, profile }) =>
-    `${characterId} (${difficulty}, ${profile || resolveCharacter(characterId).aiProfile})`.padEnd(36);
+  const describe = ({ characterId, variant, difficulty, profile }) =>
+    `${characterId}${variant ? `=${variant}` : ''} (${difficulty}, ${profile || resolveCharacter(characterId).aiProfile})`.padEnd(36);
 
   console.log(`Duels: ${results.length}  seed: ${options.seed}${options.rules ? `  rules: ${options.rules}` : ''}${options.overrides.length ? `  set: ${options.overrides.join(', ')}` : ''}`);
   console.log(`A ${describe(sides[0])} wins: ${String(wins.A).padStart(4)}  (${percent(wins.A)})`);

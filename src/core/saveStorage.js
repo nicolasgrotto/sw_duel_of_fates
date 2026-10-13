@@ -2,7 +2,12 @@ import { attributesConfig } from '../config/attributesConfig.js';
 import { storyConfig } from '../config/storyConfig.js';
 import { convertLegacyPoints, convertLegacyRatings } from '../utils/legacyRatings.js';
 
-export const SAVE_VERSION = 5;
+export const SAVE_VERSION = 6;
+
+function migrateVariantUnlocks(save) {
+  if (!Array.isArray(save.settings?.unlockedCharacters) || !save.settings.unlockedCharacters.includes('foretold')) return save;
+  return { ...save, settings: { ...save.settings, unlockedVariants: { ...save.settings.unlockedVariants, foretold: ['aurora', 'eclipse'] } } };
+}
 
 function migrateStoryRatings(story) {
   const attributes = story?.protagonist?.attributes;
@@ -22,6 +27,7 @@ export const saveMigrations = [
   { from: 2, to: 3, migrate: (save) => ({ ...save, version: 3, story: null }) },
   { from: 3, to: 4, migrate: (save) => ({ ...save, version: 4, story: save.story ? { ...save.story, protagonist: { ...save.story.protagonist, skin: save.story.protagonist?.skin ?? 'base' } } : null }) },
   { from: 4, to: 5, migrate: (save) => ({ ...save, version: 5, story: migrateStoryRatings(save.story) }) },
+  { from: 5, to: 6, migrate: (save) => ({ ...migrateVariantUnlocks(save), version: 6 }) },
 ];
 
 export function loadSave(storage, key) {
@@ -44,6 +50,12 @@ export function loadSave(storage, key) {
 
 export function saveSave(settings, storage, key, story = null) {
   try {
+    const existing = storage?.getItem(key);
+    if (existing) {
+      let saved;
+      try { saved = JSON.parse(existing); } catch {}
+      if (Number.isInteger(saved?.version) && saved.version > SAVE_VERSION) return false;
+    }
     storage?.setItem(key, JSON.stringify({ version: SAVE_VERSION, settings, story }));
     return true;
   } catch {

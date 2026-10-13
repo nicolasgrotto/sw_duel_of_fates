@@ -491,7 +491,13 @@ export const characters = {
     potential: 3,
     archetype: 'echo',
     alignment: 'light',
-    loadout: { powers: { neutral: 'push', back: 'barrier', forward: 'throw' }, techniques: {} },
+    powerSlots: 4,
+    defaultVariant: 'aurora',
+    loadout: { powers: { neutral: 'push', forward: 'throw', back: 'barrier', fourth: 'meteorRain' }, techniques: {} },
+    variants: {
+      aurora: { alignment: 'light', loadout: { powers: { neutral: 'push', forward: 'throw', back: 'barrier', fourth: 'meteorRain' }, techniques: {} } },
+      eclipse: { alignment: 'dark', loadout: { powers: { neutral: 'lightning', forward: 'pull', back: 'choke', fourth: 'arsenal' }, techniques: {} } },
+    },
     selectable: false,
     secret: true,
     moves: movesByCharacter.echo,
@@ -564,5 +570,8 @@ export const characters = {
     },
   },
 };
+
+for (const character of Object.values(characters)) character.powerSlots ??= 3;
+characters.foretold.loadout = characters.foretold.variants.aurora.loadout;
 
 applyCharacterTexts(characters, ptBR.characters);

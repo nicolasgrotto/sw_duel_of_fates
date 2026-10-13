@@ -7,6 +7,7 @@ const ABSOLUTE_FACING = 1;
 
 export function captureFighter(fighter) {
   return {
+    variant: fighter.variant,
     x: fighter.x,
     y: fighter.y,
     vx: fighter.vx,

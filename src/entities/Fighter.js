@@ -135,8 +135,9 @@ function createCombat() {
 }
 
 export class Fighter {
-  constructor({ id, name, stats, appearance, sound = null, x, y, facing }) {
+  constructor({ id, variant = null, name, stats, appearance, sound = null, x, y, facing }) {
     this.id = id;
+    this.variant = variant;
     this.name = name;
     this.stats = stats;
     this.appearance = appearance;

@@ -14,6 +14,8 @@ export const touchLayoutConfig = {
     { action: Action.PAUSE, x: 640, y: 44, radius: 34 },
   ],
   back: { action: Action.BACK, x: 90, y: 55, radius: 42, anchor: 'left' },
+  variantLeft: { x: 590, y: 342, radius: 24 },
+  variantRight: { x: 1170, y: 342, radius: 24 },
   colorLeft: { x: 590, y: 308, radius: 32 },
   colorRight: { x: 1170, y: 308, radius: 32 },
   skinLeft: { x: 590, y: 366, radius: 24 },

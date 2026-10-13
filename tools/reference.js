@@ -23,7 +23,7 @@ function readOptions(argv) {
   for (let i = 0; i < argv.length; i += 2) {
     const name = argv[i].replace(/^--/, '');
     if (name in options) {
-      options[name] = argv[i + 1];
+      options[name] = argv[i + 1] ?? (name === 'check' ? 'tools/reference-v2.json' : '');
     }
   }
   return options;

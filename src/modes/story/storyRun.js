@@ -36,6 +36,7 @@ export function getStoryStage(run, config, difficultyOrder) {
     encounterId: encounter.id,
     number: run.completed.length + 1,
     opponentCharacter: encounter.opponent,
+    opponentVariant: encounter.opponentVariant ?? null,
     arena: encounter.arena,
     difficulty: getEncounterDifficulty(run, encounter, difficultyOrder),
     isBoss: false,

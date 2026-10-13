@@ -1,3 +1,5 @@
+import { characters } from '../characters/characterData.js';
+import { sanitizeVariantUnlocks } from '../characters/variants.js';
 import { loadSave, saveSave } from './saveStorage.js';
 import { sanitizeGallery } from '../modes/galleryCatalog.js';
 
@@ -13,6 +15,7 @@ function isValid(value, defaultValue, allowedValues) {
 
 export function loadSettings(defaults, storage, key, allowed = {}) {
   const settings = { ...defaults };
+  if (defaults.unlockedVariants) settings.unlockedVariants = sanitizeVariantUnlocks(defaults.unlockedVariants, characters);
   if (defaults.gallery) settings.gallery = sanitizeGallery(defaults.gallery);
   if (Array.isArray(defaults.bladeLockHold)) settings.bladeLockHold = [...defaults.bladeLockHold];
 
@@ -22,6 +25,10 @@ export function loadSettings(defaults, storage, key, allowed = {}) {
       return settings;
     }
     for (const name of Object.keys(defaults)) {
+      if (name === 'unlockedVariants') {
+        settings.unlockedVariants = sanitizeVariantUnlocks(saved.unlockedVariants, characters);
+        continue;
+      }
       if (name === 'gallery') {
         settings.gallery = sanitizeGallery(saved.gallery);
         continue;

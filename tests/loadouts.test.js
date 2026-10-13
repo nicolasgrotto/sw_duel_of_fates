@@ -36,7 +36,7 @@ describe('ability catalog', () => {
 
   it('gives every character a loadout its alignment allows', () => {
     for (const character of Object.values(characters)) {
-      assert.deepEqual(findLoadoutProblems(character.loadout, character.alignment, powersConfig, bladeTechniques), [], character.id);
+      assert.deepEqual(findLoadoutProblems(character.loadout, character.alignment, powersConfig, bladeTechniques, character.powerSlots), [], character.id);
       assert.ok(character.loadout.powers.neutral, character.id);
     }
     assert.deepEqual(findLoadoutProblems({ powers: { neutral: 'lightning' } }, 'light', powersConfig, bladeTechniques), ['powers.neutral: lightning needs another alignment']);

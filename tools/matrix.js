@@ -6,7 +6,7 @@ const SIMULATOR = fileURLToPath(new URL('./simulate.js', import.meta.url));
 const WIN_RATE = /\(([\d.]+)%\)/;
 
 function readOptions(argv) {
-  const options = { difficulties: 'normal,hard', duels: '60', characters: '', rules: '', seed: '1' };
+  const options = { difficulties: 'normal,hard', duels: '60', characters: '', rules: '', seed: '1', variant: '' };
   for (let i = 0; i < argv.length; i += 2) {
     const name = argv[i].replace(/^--/, '');
     if (name in options) {
@@ -16,20 +16,21 @@ function readOptions(argv) {
   return options;
 }
 
-function runPair(left, right, difficulty, duels, rules, seed) {
+function runPair(left, right, difficulty, duels, rules, seed, variant) {
   const args = [SIMULATOR, '--duels', duels, '--difficulty', difficulty, '--left', left, '--right', right, '--seed', seed];
   if (rules) {
     args.push('--rules', rules);
   }
+  if (variant) args.push('--variant', variant);
   const output = execFileSync(process.execPath, args, { encoding: 'utf8' });
   return Number(output.split('\n')[1].match(WIN_RATE)[1]);
 }
 
-function printMatrix(ids, difficulty, duels, rules, seed) {
+function printMatrix(ids, difficulty, duels, rules, seed, variant) {
   console.log(`== ${difficulty} (own profiles, ${duels} duels per pair, seed ${seed}${rules ? `, rules ${rules}` : ''})`);
   console.log(' '.repeat(10) + ids.map((id) => id.slice(0, 5).padStart(6)).join('') + '    avg');
   for (const left of ids) {
-    const row = ids.map((right) => (left === right ? null : runPair(left, right, difficulty, duels, rules, seed)));
+    const row = ids.map((right) => (left === right ? null : runPair(left, right, difficulty, duels, rules, seed, variant)));
     const values = row.filter((value) => value !== null);
     const average = values.reduce((sum, value) => sum + value, 0) / values.length;
     const cells = row.map((value) => (value === null ? '--' : value.toFixed(0)).padStart(6)).join('');
@@ -42,5 +43,5 @@ const ids = options.characters
   ? options.characters.split(',')
   : Object.keys(characters).filter((id) => characters[id].selectable);
 for (const difficulty of options.difficulties.split(',')) {
-  printMatrix(ids, difficulty, options.duels, options.rules, options.seed);
+  printMatrix(ids, difficulty, options.duels, options.rules, options.seed, options.variant);
 }

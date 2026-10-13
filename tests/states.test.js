@@ -1043,3 +1043,56 @@ describe('skin selection and duel persistence', () => {
     }
   });
 });
+
+
+it('keeps independent local variants through selection, back, restart and rematch params', () => {
+  const game = createFakeGame();
+  game.settings.unlockedCharacters = ['foretold'];
+  game.settings.unlockedVariants = { foretold: ['aurora', 'eclipse'] };
+  game.changeState(StateId.CHARACTER_SELECT, { mode: DuelMode.LOCAL });
+  const select = game.states.current;
+  const chooseForetold = () => { select.characterMenu.selectedIndex = select.characterIds.indexOf('foretold'); };
+  chooseForetold();
+  game.step(Action.POWER);
+  assert.equal(select.previews.get('foretold').stats.alignment, 'dark');
+  game.step(Action.CONFIRM);
+  chooseForetold();
+  game.stepSecond(Action.POWER);
+  assert.equal(select.getChosenVariant('foretold'), 'aurora');
+  game.stepSecond(Action.CONFIRM);
+  select.goBack();
+  assert.equal(select.getChosenVariant('foretold'), 'aurora');
+  select.goBack();
+  assert.equal(select.getChosenVariant('foretold'), 'eclipse');
+  game.step(Action.CONFIRM);
+  chooseForetold();
+  game.stepSecond(Action.POWER);
+  game.stepSecond(Action.CONFIRM);
+  game.step(Action.CONFIRM);
+  const duel = game.states.current;
+  assert.equal(duel.player.variant, 'eclipse');
+  assert.equal(duel.fighters[1].variant, 'aurora');
+  assert.equal(duel.params.playerVariant, 'eclipse');
+  assert.equal(duel.params.opponentVariant, 'aurora');
+  game.step(Action.PAUSE);
+  goToMenuItem(game, 'restart');
+  game.step(Action.CONFIRM);
+  assert.equal(game.states.current.player.variant, 'eclipse');
+  assert.equal(game.states.current.fighters[1].variant, 'aurora');
+});
+
+it('discards a pending local chord on pause and on K.O.', () => {
+  const game = createFakeGame();
+  game.changeState(StateId.DUEL, { mode: DuelMode.LOCAL, playerCharacter: 'foretold', opponentCharacter: 'foretold' });
+  skipIntro(game);
+  const duel = game.states.current;
+  game.step(Action.POWER);
+  assert.equal(duel.participants[0].controller.pendingAction, 'power');
+  game.step(Action.PAUSE);
+  assert.equal(duel.participants[0].controller.pendingAction, null);
+  game.step(Action.PAUSE);
+  game.stepSecond(Action.SPECIAL);
+  assert.equal(duel.participants[1].controller.pendingAction, 'special');
+  duel.clearAllIntents();
+  assert.equal(duel.participants[1].controller.pendingAction, null);
+});
