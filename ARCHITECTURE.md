@@ -46,8 +46,8 @@ src/
     duelModes.js            ✅ modos do duelo (versus, local, arcade, sobrevivência, tutorial, desafio, treino, galeria) e `createDuelRules`
     stateFactory.js         ✅ cria estados a partir do id
     IntroState.js           ✅ intro (lâmina, título), tela de título e segredo; primeira tela do jogo
-    MenuState.js            ✅ título + opções (MenuList)
-    CharacterSelectState.js ✅ escolhe jogador, adversário (ou J2), cor da lâmina, skin e arena; Arcade e Sobrevivência só pedem o jogador
+    MenuState.js            ✅ título + menu em dois níveis por intenção (MENU_GROUPS), memória do grupo na sessão
+    CharacterSelectState.js ✅ escolhe jogador, adversário (ou J2), variante, cor, skin, conjunto de poderes e arena, com Aleatório e última escolha; Arcade, Sobrevivência e Treino só pedem o jogador
     ControlsState.js        ✅ tabela de controles gerada do controlsConfig
     DuelState.js            ✅ duelo: intro, simulação, efeitos, HUD, fim do duelo
     PauseState.js           ✅ continuar, reiniciar, sair
@@ -432,11 +432,14 @@ Fluxo de telas:
 
 ```
 IntroState ──Confirmar──▶ MenuState
-MenuState ─┬─ História ──▶ StoryState ──▶ ProtagonistState / DialogueState ──▶ DuelState({ mode: story })
-           ├─ Duelar / Arcade / Sobrevivência / 2 Jogadores ──▶ CharacterSelectState ──▶ DuelState({ mode, ... })
-           ├─ Tutorial / Desafio de parry / Treino ─────────────────────────────────────▶ DuelState({ mode })
-           ├─ Opções ──▶ OptionsState (push) ──Configurar teclas──▶ KeyRemapState (push)
-           └─ Controles ──▶ ControlsState (push)
+MenuState (raiz: Jogar · Aprender · Extras · Opções; os grupos abrem no lugar)
+  Jogar ─────┬─ História ──▶ StoryState ──▶ ProtagonistState / DialogueState ──▶ DuelState({ mode: story })
+             └─ Duelar / Arcade / Sobrevivência / 2 Jogadores ──▶ CharacterSelectState ──▶ DuelState({ mode, ... })
+  Aprender ──┬─ Treino ──▶ CharacterSelectState (só o jogador) ──▶ DuelState({ mode: training })
+             ├─ Tutorial / Desafio de parry ──▶ DuelState({ mode })
+             └─ Controles ──▶ ControlsState (push)
+  Extras ────── Galeria de poderes ──▶ DuelState({ mode: gallery })
+  Opções ────── OptionsState (push) ──Configurar teclas──▶ KeyRemapState (push)
 
 DuelState ──Esc──▶ PauseState (push) ─┬─ Continuar ──▶ volta
                                       ├─ Lista de golpes ──▶ MoveListState (push)
@@ -1445,6 +1448,12 @@ Habilidades com `hitbox.around` no alcance precedem técnicas direcionais em `tr
 Seleção, Sobrevivência, lançadores da Galeria e matriz leem personagens `selectable`; simulador e referência leem os ids cadastrados. Cadastrar Ceifador integra esses consumidores sem listas paralelas. Arcade mantém `maxOpponents` e o chefe final: quando o elenco excede o limite, rotaciona os candidatos pelo índice do jogador no roster antes do corte, permitindo que todos os personagens apareçam como adversários através das escadas. Elencos menores mantêm a ordem anterior. Não usa RNG nem altera dificuldade ou arena.
 
 A referência acrescenta os pares do Ceifador nas duas ordens, em clássico/poderes e Normal/Difícil: 112 adições, total 846; os 734 cenários anteriores permanecem idênticos. Lista exata e falhas de regressão de animação delegadas ao Claude em versions/v3.md → 2.21. Testes da etapa cobrem dados, contato frontal/traseiro, independência da aparência, ações de IA em Fighters congelados, combo, seleção, escadas, Galeria e execução dos instrumentos de balanceamento.
+
+### Menu e seleção (2.13)
+
+`MenuState` lê `MENU_GROUPS` (raiz e grupos) e mapas de destino (`STATE_TARGETS` para `changeState`, `OVERLAYS` para `pushState`); abrir um grupo só troca a `MenuList`, e `game.menuMemory` guarda grupo e índice durante a sessão (não vai para o save). `MenuList` ganhou janela de rolagem opcional (`visibleRows`, setas `▲`/`▼`), que só a seleção usa; o toque soma `scrollOffset` ao índice tocado.
+
+`CharacterSelectState` tem `RANDOM_CHOICE` como primeira linha das listas de lutadores e arenas; o sorteio usa `createRandom(seed)` do próprio estado e a seed vai em `params.selectionSeed`. `settings.lastSelection[modo]` guarda `player`, `opponent` e `arena` (ids ou `random`); id desconhecido abre no primeiro lutador. Conjunto personalizado: `getCustomPowerCatalog` (Fluxo comum + categoria do lado do personagem ou da variante, filtrado por `minFlowLevel` ≤ Fluxo) e `isValidCustomPowers` (mesmos espaços do base, sem repetir, todos no catálogo) em `characters/powers.js`; `createFighterFromCharacter(…, { powers })` troca `loadout.powers` só se válido. A seleção guarda `settings.loadoutModes[chave]` e `settings.customLoadouts[chave]` (chave `id` ou `id.variante`) e passa `playerPowers`/`opponentPowers` ao duelo em Duelar, 2 Jogadores (adversário) e Treino; Arcade, Sobrevivência, História e a IA não recebem conjunto. O editor é um modo da própria seleção (Ataque forte), com uma `MenuList` de linhas (modo e espaços) e troca de lugar quando o poder já está em outro espaço.
 
 ### Finalizações (2.9)
 
