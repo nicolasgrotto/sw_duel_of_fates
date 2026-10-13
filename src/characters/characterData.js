@@ -375,7 +375,7 @@ export const characters = {
   },
   reaper: {
     id: 'reaper',
-    attributes: { health: 5, stamina: 6, blade: 6, defense: 3, agility: 6, flow: 4 },
+    attributes: { health: 4, stamina: 5, blade: 4, defense: 2, agility: 6, flow: 4 },
     archetype: 'reaper',
     alignment: 'dark',
     loadout: { powers: { neutral: 'push', forward: 'pull', back: 'wrath' }, techniques: { forward: 'dashSlash' } },

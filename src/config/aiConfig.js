@@ -226,7 +226,6 @@ export const aiConfig = {
       chargeHold: 0.4,
       feintChance: 0,
       aerialWeight: 1.2,
-      chainWeight: 1.25,
       powerChance: 0.65,
       powerPriority: ['back', 'forward', 'neutral', 'fourth'],
       priorities: ['defend', 'counter', 'selfPower', 'special', 'power', 'shove', 'attack', 'recover', 'guard', 'position'],

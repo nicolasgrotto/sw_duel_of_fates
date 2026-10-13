@@ -227,7 +227,7 @@ export class EnemyAI {
     if (this.rules.exhaustion && !this.canSpend(this.self.moves[attack.cancelsInto[0]].staminaCost, this.self.moves[attack.cancelsInto[0]])) {
       return;
     }
-    if (this.random() < this.difficulty.chainChance * (this.profile.chainWeight ?? 1)) {
+    if (this.random() < this.difficulty.chainChance) {
       this.plan.pendingAction = PendingAction.LIGHT_ATTACK;
     }
   }

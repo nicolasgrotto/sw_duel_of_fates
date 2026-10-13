@@ -15,7 +15,7 @@ it('creates the common Eclipse reaper from the heron archetype and the specified
   const fighter = spawnFighter(500, 1, 'reaper');
   assert.deepEqual(fighterArchetypes.reaper, fighterArchetypes.heron);
   assert.notEqual(fighterArchetypes.reaper, fighterArchetypes.heron);
-  assert.deepEqual(data.attributes, { health: 5, stamina: 6, blade: 6, defense: 3, agility: 6, flow: 4 });
+  assert.deepEqual(data.attributes, { health: 4, stamina: 5, blade: 4, defense: 2, agility: 6, flow: 4 });
   assert.equal(data.selectable, true);
   assert.equal(data.secret, undefined);
   assert.equal(data.alignment, 'dark');
@@ -38,7 +38,7 @@ it('keeps the heron moves except the three light poses, finisher and Twin Wheel'
     staminaCost: 24, startup: 0.24, active: 0.16, recovery: 0.44, lunge: 60, knockback: 280,
     hitbox: { reach: 66, top: 0.85, bottom: 0.3, around: true } };
   assert.deepEqual(movesByCharacter.reaper, expected);
-  assert.equal(spawnFighter(500, 1, 'reaper').moves.special.damage, 16.24);
+  assert.equal(spawnFighter(500, 1, 'reaper').moves.special.damage, 14);
 });
 
 it('uses the existing palette and twin blade data and keeps skins cosmetic', () => {
