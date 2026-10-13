@@ -1,3 +1,5 @@
+import { colors } from './themeConfig.js';
+
 export const proportions = {
   legLength: 0.45,
   torsoLength: 0.33,
@@ -17,6 +19,16 @@ export const proportions = {
   freeArmLength: 0.28,
   tunicLayerStart: 0.6,
   tunicLayerThickness: 6,
+};
+
+export const faceDetails = {
+  eyes: {
+    dark: { iris: colors.eclipseEyeIris, pupil: colors.eclipseEyePupil, forward: 0.62, lift: -0.08, irisRadius: 0.16, pupilRadius: 0.07, haloRadius: 0.45, haloAlpha: 0.35 },
+  },
+  hair: [
+    [0.55, -0.7], [0.1, -1.08], [-0.55, -0.98], [-1.02, -0.45], [-1.12, 0.35], [-0.95, 1.05],
+    [-0.78, 0.82], [-0.62, 1.15], [-0.45, 0.88], [-0.3, 1.1], [-0.22, 0.55], [-0.5, 0.1], [-0.2, -0.45], [0.45, -0.5], [0.72, -0.38],
+  ],
 };
 
 export const animation = {

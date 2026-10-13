@@ -1,4 +1,4 @@
-import { groundShadow, proportions } from '../config/fighterVisualConfig.js';
+import { faceDetails, groundShadow, proportions } from '../config/fighterVisualConfig.js';
 import { colors } from '../config/themeConfig.js';
 import { clamp, lerp } from '../utils/math.js';
 
@@ -7,6 +7,7 @@ const torsoPoints = [0, 0, 0, 0, 0, 0, 0, 0];
 const capePoints = [0, 0, 0, 0, 0, 0, 0, 0];
 const hoodTipPoints = [0, 0, 0, 0, 0, 0];
 const tunicLayerPoints = [0, 0, 0, 0, 0, 0, 0, 0];
+const hairPoints = new Array(faceDetails.hair.length * 2).fill(0);
 
 function setThreePoints(points, x0, y0, x1, y1, x2, y2) {
   points[0] = x0;
@@ -103,13 +104,37 @@ function drawMask(renderer, pose, trimColor, bodyColor) {
   renderer.line(headX - radius * 0.1, headY, headX + radius * 0.8, headY, bodyColor, radius * 0.1);
 }
 
-function drawHead(renderer, fighter, pose, cloakColor, bodyColor, trimColor) {
+function drawHair(renderer, pose, hairColor) {
   const { headX, headY, headRadius: radius } = pose;
-  const { hoodUp, masked } = fighter.appearance;
+  for (let index = 0; index < faceDetails.hair.length; index += 1) {
+    hairPoints[index * 2] = headX + faceDetails.hair[index][0] * radius;
+    hairPoints[index * 2 + 1] = headY + faceDetails.hair[index][1] * radius;
+  }
+  renderer.fillPolygon(hairPoints, hairColor);
+}
+
+function drawEyes(renderer, fighter, pose) {
+  const eyes = faceDetails.eyes[fighter.stats?.alignment];
+  if (!eyes || fighter.appearance.masked) return;
+  const { headX, headY, headRadius: radius } = pose;
+  const x = headX + radius * eyes.forward;
+  const y = headY + radius * eyes.lift;
+  renderer.drawGlow(x, y, radius * eyes.haloRadius, eyes.iris, eyes.haloAlpha);
+  renderer.setAlpha(1);
+  renderer.fillCircle(x, y, radius * eyes.irisRadius, eyes.iris);
+  renderer.fillCircle(x, y, radius * eyes.pupilRadius, eyes.pupil);
+}
+
+function drawHead(renderer, fighter, pose, cloakColor, bodyColor, trimColor, withFace) {
+  const { headX, headY, headRadius: radius } = pose;
+  const { hoodUp, masked, hairColor } = fighter.appearance;
+  const faceColor = withFace ? fighter.appearance.faceColor ?? bodyColor : bodyColor;
 
   if (!hoodUp) {
     renderer.fillEllipse(headX - radius * 0.7, headY + radius * 0.9, radius, radius * 0.55, cloakColor);
-    renderer.fillCircle(headX, headY, radius, bodyColor);
+    renderer.fillCircle(headX, headY, radius, faceColor);
+    if (hairColor && withFace) drawHair(renderer, pose, hairColor);
+    if (withFace) drawEyes(renderer, fighter, pose);
     return;
   }
 
@@ -126,7 +151,8 @@ function drawHead(renderer, fighter, pose, cloakColor, bodyColor, trimColor) {
     drawMask(renderer, pose, trimColor, bodyColor);
     return;
   }
-  renderer.fillCircle(headX + radius * 0.3, headY + radius * 0.1, radius * 0.75, bodyColor);
+  renderer.fillCircle(headX + radius * 0.3, headY + radius * 0.1, radius * 0.75, faceColor);
+  if (withFace) drawEyes(renderer, fighter, pose);
 }
 
 function drawArms(renderer, fighter, pose, cloakColor, bodyColor, handColor) {
@@ -182,7 +208,7 @@ export function drawFighterBody(renderer, fighter, pose, floorY, withShadow = tr
   if (appearance.pauldrons) {
     drawPauldrons(renderer, pose, shoulderWidth, trimColor);
   }
-  drawHead(renderer, fighter, pose, cloakColor, bodyColor, trimColor);
+  drawHead(renderer, fighter, pose, cloakColor, bodyColor, trimColor, !overrideColor);
   drawArms(renderer, fighter, pose, cloakColor, bodyColor, handColor);
   if (wound === 'arm') {
     renderer.line(pose.shoulderX + 3, pose.shoulderY + 3, pose.handX, pose.handY, colors.woundShade, height * proportions.armWidth);

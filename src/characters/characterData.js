@@ -510,7 +510,7 @@ export const characters = {
       { id: 'base', appearance: {}, unlock: null },
       { id: 'skin-dusk', appearance: { cloakColor: colors.duskCloak, bodyColor: colors.duskBody, trimColor: colors.duskTrim, hoodUp: true, longCape: true, masked: false, pauldrons: false, scarf: false, layeredTunic: true, gloveColor: colors.duskGlove }, unlock: 'secret' },
       { id: 'skin-fallen', appearance: { cloakColor: colors.fallenCloak, bodyColor: colors.fallenBody, trimColor: colors.fallenTrim, hoodUp: true, longCape: true, masked: true, pauldrons: true, scarf: false, layeredTunic: false, gloveColor: colors.blackGlove }, unlock: 'story' },
-      { id: 'skin-duel', appearance: { cloakColor: colors.duelCloak, bodyColor: colors.duelBody, trimColor: colors.duelTrim, hoodUp: false, longCape: false, masked: false, pauldrons: false, scarf: false, layeredTunic: true, gloveColor: colors.blackGlove }, unlock: 'arcade' },
+      { id: 'skin-duel', appearance: { cloakColor: colors.duelCloak, bodyColor: colors.duelBody, trimColor: colors.duelTrim, hoodUp: false, longCape: false, masked: false, pauldrons: false, scarf: false, layeredTunic: true, gloveColor: colors.blackGlove, hairColor: colors.duelHair, faceColor: colors.duelFace }, unlock: 'arcade' },
       { id: 'skin-secret', appearance: { cloakColor: '#34394a', bodyColor: '#191e29', trimColor: '#8795b1', longCape: true, masked: true }, unlock: 'secret' },
     ],
     altSaberColors: [],
