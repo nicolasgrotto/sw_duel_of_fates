@@ -88,7 +88,9 @@ for (const facing of [-1, 1]) {
     const attacker = spawnFighter(500, facing, 'reaper');
     const target = spawnFighter(500 - facing * 75, facing);
     const simulation = createSimulation([attacker, target]);
+    const dualBlade = attacker.appearance.dualBlade;
     for (const id of ['light', 'light2', 'light3', 'heavy']) {
+      attacker.appearance.dualBlade = dualBlade;
       attacker.stamina = attacker.stats.maxStamina;
       simulation.combat.tryAttack(attacker, id);
       attacker.stateTime = attacker.moves[id].startup;

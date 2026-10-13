@@ -1,5 +1,7 @@
 export function createArcadeRun(playerCharacter, roster, { maxOpponents, boss }) {
-  const opponents = roster.filter((id) => id !== playerCharacter).slice(0, maxOpponents);
+  const candidates = roster.filter((id) => id !== playerCharacter);
+  const offset = candidates.length > maxOpponents ? Math.max(0, roster.indexOf(playerCharacter)) % candidates.length : 0;
+  const opponents = [...candidates.slice(offset), ...candidates.slice(0, offset)].slice(0, maxOpponents);
   return { playerCharacter, ladder: [...opponents, boss], stage: 0 };
 }
 

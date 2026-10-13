@@ -19,11 +19,11 @@ function setup() {
   return { attacker, defender, simulation, combat: simulation.combat };
 }
 
-it('catalogs wrath in Eclipse without assigning it to any character', () => {
+it('catalogs wrath in Eclipse and equips it only on the reaper', () => {
   assert.equal(getAbilityCategory('wrath', powersConfig), 'eclipse');
   assert.deepEqual(findLoadoutProblems({ powers: { neutral: 'wrath' } }, 'dark', powersConfig, bladeTechniques), []);
   assert.ok(findLoadoutProblems({ powers: { neutral: 'wrath' } }, 'light', powersConfig, bladeTechniques).length > 0);
-  for (const character of Object.values(characters)) assert.ok(!Object.values(character.loadout.powers).includes('wrath'));
+  assert.deepEqual(Object.values(characters).filter(character => Object.values(character.loadout.powers).includes('wrath')).map(character => character.id), ['reaper']);
   const output = execFileSync(process.execPath, ['tools/simulate.js', '--duels', '1', '--maxSeconds', '0.1', '--rules', 'powers', '--set', 'loadouts.shadow.powers.forward=wrath'], { encoding: 'utf8' });
   assert.match(output, /loadouts.shadow.powers.forward=wrath/);
 });

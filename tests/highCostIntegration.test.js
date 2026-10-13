@@ -20,9 +20,9 @@ function step(s) {
   s.beforeStep();s.controllers.forEach((c,i)=>c.updateIntent(s.fighters[i].intent,STEP));s.simulation.step(STEP);s.afterStep(STEP);
   return s.simulation.events;
 }
-it('catalogs five high cost powers with configured tokens with the mass telekinesis exception on foretold',()=>{
+it('catalogs five high cost powers with the equipped exceptions on foretold and reaper',()=>{
   for(const id of ids){assert.ok(galleryCatalog.some(i=>i.id===id));assert.match(powersConfig.powers[id].hudMark,/^powerCost/);}
-  for(const character of Object.values(characters))for(const id of ids)assert.equal(Object.values(character.loadout.powers).includes(id), character.id === 'foretold' && id === 'meteorRain');
+  for(const character of Object.values(characters))for(const id of ids)assert.equal(Object.values(character.loadout.powers).includes(id), character.id === 'foretold' && id === 'meteorRain' || character.id === 'reaper' && id === 'wrath');
 });
 it('demonstrates supreme escape only after the attacking target actually lands a blade hit',()=>{
   const s=scene('supremePush','attacking');s.requestCast();let hit=false,start=false,active=false;
