@@ -169,9 +169,9 @@ export class CombatSystem {
   }
 
   startActions(fighter) {
-    if (fighter.combat.bufferedAction === CombatAction.POWER && selectPower(fighter)?.escape
+    if ([CombatAction.POWER, CombatAction.FOURTH_POWER].includes(fighter.combat.bufferedAction) && selectPower(fighter)?.escape
       && this.powers.canCast(fighter, selectPower(fighter)) && !fighter.canAct
-      && this.tryBufferedAction(fighter, CombatAction.POWER)) return;
+      && this.tryBufferedAction(fighter, fighter.combat.bufferedAction)) return;
     if (this.tryFeint(fighter) || this.tryAttackChain(fighter)) {
       return;
     }
@@ -274,25 +274,26 @@ export class CombatSystem {
       this.armParry(fighter);
       return false;
     }
-    if ((bufferedAction === CombatAction.SHOVE || bufferedAction === CombatAction.EVADE || bufferedAction === CombatAction.POWER) && blockstun === 0 && fighter.grounded) {
+    if ((bufferedAction === CombatAction.SHOVE || bufferedAction === CombatAction.EVADE || [CombatAction.POWER, CombatAction.FOURTH_POWER].includes(bufferedAction)) && blockstun === 0 && fighter.grounded) {
       return this.tryBufferedAction(fighter, bufferedAction);
     }
     return false;
   }
 
   tryBufferedAction(fighter, action) {
+    const moveX = fighter.combat.bufferedMoveX;
     clearActionBuffer(fighter);
-    if (action === CombatAction.POWER && !this.powers.enabled) {
+    if ([CombatAction.POWER, CombatAction.FOURTH_POWER].includes(action) && !this.powers.enabled) {
       return false;
     }
-    const started = this.tryAction(fighter, action);
+    const started = this.tryAction(fighter, action, moveX ?? fighter.intent.moveX);
     if (!started) {
-      this.emitAction(CombatEvent.ACTION_REJECTED, fighter, action === CombatAction.POWER ? CombatAction.POWER : null);
+      this.emitAction(CombatEvent.ACTION_REJECTED, fighter, [CombatAction.POWER, CombatAction.FOURTH_POWER].includes(action) ? CombatAction.POWER : null);
     }
     return started;
   }
 
-  tryAction(fighter, action) {
+  tryAction(fighter, action, moveX) {
     switch (action) {
       case CombatAction.EVADE:
         return this.tryEvade(fighter);
@@ -301,9 +302,11 @@ export class CombatSystem {
       case CombatAction.SHOVE:
         return this.tryAttack(fighter, AttackType.SHOVE);
       case CombatAction.POWER:
-        return this.powers.tryCast(fighter);
+        return this.powers.tryCast(fighter, false, moveX);
+      case CombatAction.FOURTH_POWER:
+        return this.powers.tryCast(fighter, true);
       case CombatAction.SPECIAL:
-        return this.trySpecial(fighter);
+        return this.trySpecial(fighter, moveX);
       case CombatAction.HEAVY_ATTACK:
         return this.tryAttack(fighter, fighter.intent.moveX === fighter.facing ? AttackType.FORWARD_HEAVY : AttackType.HEAVY);
       case CombatAction.LIGHT_ATTACK:
@@ -315,9 +318,9 @@ export class CombatSystem {
     }
   }
 
-  trySpecial(fighter) {
+  trySpecial(fighter, moveX) {
     if (fighter.combat.rainActive) return false;
-    const technique = this.powers.enabled ? selectTechnique(fighter) : null;
+    const technique = this.powers.enabled ? selectTechnique(fighter, moveX) : null;
     if (technique) {
       return this.tryAttack(fighter, technique);
     }

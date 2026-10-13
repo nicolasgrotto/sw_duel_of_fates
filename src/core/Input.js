@@ -5,6 +5,7 @@ export class Input {
   constructor({ bindings, target, getGamepads = () => [], gamepadSlot = 0 }) {
     this.target = target;
     this.focused = true;
+    this.resetGeneration = 0;
     this.lastInputKind = 'keyboard';
     this.pressedActions = new Set();
     this.polledActions = new Set();
@@ -50,6 +51,7 @@ export class Input {
   handleFocus() { this.focused = true; }
 
   handleBlur() {
+    this.resetGeneration += 1;
     this.focused = false;
     for (const source of this.sources) source.reset?.();
     this.polledActions.clear();

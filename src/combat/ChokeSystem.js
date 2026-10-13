@@ -32,7 +32,7 @@ export class ChokeSystem {
     }
     const victim = fighters[combat.chokeTarget];
     const maxChannel = combat.chokeMaxChannel || power.maxChannel;
-    if (!caster.intent.powerHeld || caster.flowMeter <= 0 || stateTime >= power.startup + maxChannel
+    if (!this.powers.isHeld(caster) || caster.flowMeter <= 0 || stateTime >= power.startup + maxChannel
       || target === null || victim && !victim.isAlive) {
       this.end(caster, fighters);
       return;

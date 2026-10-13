@@ -14,6 +14,10 @@ function createIntent() {
     specialHeld: false,
     power: false,
     powerHeld: false,
+    fourthPower: false,
+    fourthPowerHeld: false,
+    resolvedAction: null,
+    actionMoveX: null,
   };
 }
 
@@ -69,12 +73,17 @@ function createCombat() {
     lockDurationTotal: 0,
     bufferedAction: null,
     bufferTime: 0,
+    bufferedMoveX: null,
+    queuedAction: null,
+    queuedMoveX: null,
+    queuedTime: 0,
     parryArmed: false,
     parryTime: 0,
     parryLockout: 0,
     riposteTime: 0,
     power: null,
     powerMode: null,
+    powerSlot: null,
     bladeHitSequence: 0,
     powerEndTime: 0,
     powerTick: 0,
@@ -252,6 +261,7 @@ export class Fighter {
     this.combat.stormTarget = -1;
     this.combat.power = null;
     this.combat.powerMode = null;
+    this.combat.powerSlot = null;
     this.combat.powerEndTime = 0;
     this.combat.powerTick = 0;
     this.combat.powerTargeted = false;
@@ -275,5 +285,9 @@ export class Fighter {
     intent.specialHeld = false;
     intent.power = false;
     intent.powerHeld = false;
+    intent.fourthPower = false;
+    intent.fourthPowerHeld = false;
+    intent.resolvedAction = null;
+    intent.actionMoveX = null;
   }
 }

@@ -40,7 +40,7 @@ export const AiDecision = Object.freeze({
 
 const STUN_STATES = new Set([FighterState.HIT, FighterState.STAGGERED]);
 
-const POWER_SLOTS = ['forward', 'neutral', 'back'];
+const POWER_SLOTS = ['forward', 'neutral', 'back', 'fourth'];
 
 export const SpecialKind = Object.freeze({
   COUNTER: 'counter',
@@ -68,6 +68,7 @@ export function getSpecialKind(move) {
 }
 
 const PendingAction = Object.freeze({
+  FOURTH_POWER: 'fourthPower',
   NONE: null,
   LIGHT_ATTACK: 'lightAttack',
   HEAVY_ATTACK: 'heavyAttack',
@@ -109,6 +110,7 @@ export class EnemyAI {
       punishAfterBlock: false,
       chargeHoldTime: 0,
       powerHoldTime: 0,
+      powerHoldSlot: null,
       feintDelay: -1,
       pendingAction: PendingAction.NONE,
       delayedAction: PendingAction.NONE,
@@ -260,7 +262,11 @@ export class EnemyAI {
     intent.dodge = plan.pendingAction === PendingAction.DODGE;
     intent.evade = plan.pendingAction === PendingAction.EVADE;
     intent.power = plan.pendingAction === PendingAction.POWER;
-    intent.powerHeld = plan.powerHoldTime > 0;
+    intent.powerHeld = plan.powerHoldTime > 0 && plan.powerHoldSlot !== 'fourth';
+    intent.fourthPower = plan.pendingAction === PendingAction.FOURTH_POWER;
+    intent.fourthPowerHeld = plan.powerHoldTime > 0 && plan.powerHoldSlot === 'fourth';
+    intent.resolvedAction = null;
+    intent.actionMoveX = null;
     plan.pendingAction = PendingAction.NONE;
   }
 
@@ -658,6 +664,8 @@ export class EnemyAI {
     this.plan.blockTime = 0;
     this.plan.moveX = slot === 'forward' ? direction : slot === 'back' ? -direction : 0;
     this.plan.pendingAction = PendingAction.POWER;
+    this.plan.pendingAction = slot === 'fourth' ? PendingAction.FOURTH_POWER : PendingAction.POWER;
+    this.plan.powerHoldSlot = slot;
     this.plan.powerHoldTime = holdTime;
     this.attackCooldown = this.difficulty.attackCooldown;
     return AiDecision.POWER;

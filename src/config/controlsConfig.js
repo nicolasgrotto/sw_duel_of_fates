@@ -9,6 +9,7 @@ export const Action = Object.freeze({
   EVADE: 'evade',
   SPECIAL: 'special',
   POWER: 'power',
+  FOURTH_POWER: 'fourthPower',
   CONFIRM: 'confirm',
   BACK: 'back',
   MENU_UP: 'menuUp',
@@ -155,3 +156,5 @@ export const keyboardPresets = {
     [Action.MENU_DOWN]: ['ArrowDown'],
   },
 };
+
+export const controlsConfig = { fourthPower: { chordWindow: 0.1 } };

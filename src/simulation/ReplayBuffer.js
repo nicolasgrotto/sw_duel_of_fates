@@ -51,7 +51,7 @@ export class ReplayBuffer {
   constructor({ frames, snapshotInterval }, fighterCount = 2) {
     this.frames = frames;
     this.snapshotInterval = snapshotInterval;
-    this.intents = Array.from({ length: fighterCount }, () => new Uint16Array(frames));
+    this.intents = Array.from({ length: fighterCount }, () => new Uint32Array(frames));
     this.steps = new Float64Array(frames);
     this.snapshots = Array.from({ length: Math.ceil(frames / snapshotInterval) + 1 }, () => null);
     this.count = 0;

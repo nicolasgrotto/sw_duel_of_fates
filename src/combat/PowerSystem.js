@@ -5,7 +5,6 @@ import { isGuardingAgainst, isInvulnerable } from './hitboxes.js';
 import { powerEffects } from './powerEffects.js';
 import { getFlowDifference, resolveInteraction, resolveLevelBand } from './flowInteractions.js';
 import { projectilesConfig } from '../config/projectilesConfig.js';
-import { getMoveX } from '../entities/fighterIntent.js';
 import { isStormShieldUp, StormSystem } from './StormSystem.js';
 import { ChokeSystem } from './ChokeSystem.js';
 import { FractureSystem } from './FractureSystem.js';
@@ -34,21 +33,22 @@ export function isBarrierUp(fighter) {
   return isChannelOpen(fighter) && fighter.combat.power.effect === 'barrier';
 }
 
-export function getIntentSlot(fighter) {
-  const direction = Math.sign(getMoveX(fighter)) * fighter.facing;
+export function getIntentSlot(fighter, moveX = fighter.combat.bufferedMoveX ?? fighter.intent.actionMoveX ?? fighter.intent.moveX) {
+  const direction = Math.sign(fighter.combat.confuseTime > 0 ? -moveX : moveX) * fighter.facing;
   return direction > 0 ? 'forward' : direction < 0 ? 'back' : 'neutral';
 }
 
-export function selectPower(fighter) {
+export function selectPower(fighter, fourth = fighter.intent.fourthPower || fighter.combat.bufferedAction === 'fourthPower', moveX) {
   const { loadout } = fighter.stats.power;
   if (!loadout) {
     return null;
   }
-  return loadout[getIntentSlot(fighter)] ?? loadout.neutral;
+  if (fourth) return loadout.fourth ?? null;
+  return loadout[getIntentSlot(fighter, moveX)] ?? loadout.neutral;
 }
 
-export function selectTechnique(fighter) {
-  return fighter.stats.techniques?.[getIntentSlot(fighter)] ?? null;
+export function selectTechnique(fighter, moveX) {
+  return fighter.stats.techniques?.[getIntentSlot(fighter, moveX)] ?? null;
 }
 
 export function getPowerRange(fighter, power) {
@@ -126,8 +126,8 @@ export class PowerSystem {
     return this.enabled && !fighter.combat.rainActive && power !== null && (!power.escape || getPowerMode(fighter, power) !== null) && fighter.flowLevel >= (power.minFlowLevel ?? 0) && fighter.combat.powerCooldown === 0 && fighter.flowMeter >= this.getCost(fighter, power);
   }
 
-  tryCast(fighter) {
-    let power = selectPower(fighter);
+  tryCast(fighter, fourth = false, moveX) {
+    let power = selectPower(fighter, fourth, moveX);
     if (power?.effect === 'arsenal' && fighter.combat.arsenal?.objects.length) return this.arsenals.tryLaunch(fighter);
     if (!this.canCast(fighter, power)) {
       return false;
@@ -139,6 +139,7 @@ export class PowerSystem {
     fighter.clearAttack();
     fighter.combat.power = power;
     fighter.combat.powerMode = mode;
+    fighter.combat.powerSlot = fourth ? 'fourth' : getIntentSlot(fighter, moveX);
     fighter.restartState(power.channel ? FighterState.CHANNELING : FighterState.CASTING);
     if (power.stormPhases) this.storms.start(fighter);
     this.aim(fighter, null, power);
@@ -220,6 +221,10 @@ export class PowerSystem {
     }
   }
 
+  isHeld(caster) {
+    return caster.combat.powerSlot === 'fourth' ? caster.intent.fourthPowerHeld : caster.intent.powerHeld;
+  }
+
   updateChannel(caster, target, dt) {
     const { combat } = caster;
     const { power } = combat;
@@ -228,7 +233,7 @@ export class PowerSystem {
     }
     if (combat.powerEndTime === 0) {
       const channelTime = caster.stateTime - power.startup;
-      const holding = caster.intent.powerHeld && caster.flowMeter > 0 && channelTime < power.maxChannel;
+      const holding = this.isHeld(caster) && caster.flowMeter > 0 && channelTime < power.maxChannel;
       if (holding || !combat.powerTargeted && !power.requiresHold) {
         combat.powerTargeted = true;
         caster.flowMeter = Math.max(0, caster.flowMeter - power.drainPerSecond * dt);

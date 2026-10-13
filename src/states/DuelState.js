@@ -284,6 +284,7 @@ export class DuelState extends GameState {
   }
 
   finishRound() {
+    this.clearCapturedInputs();
     if (this.hasRoundLimit && this.outcome.winner && this.roundWins.some((wins) => wins >= this.roundsToWin)) {
       if (this.shouldShowReplay()) {
         this.replayShown = true;
@@ -326,7 +327,7 @@ export class DuelState extends GameState {
     if (this.survivalStage) {
       this.applySurvivalHealth();
     }
-    this.participants[0].controller.clearCapturedInput();
+    this.clearCapturedInputs();
     if (this.usesDummy) {
       this.opponentController.attackTimer = 0;
     } else {
@@ -367,14 +368,14 @@ export class DuelState extends GameState {
     const opponent = createFighter(opponentCharacter, { x: centerX + spawnDistance / 2, y: floorY, facing: -1 }, { saberColor: this.params.opponentSaberColor, skin: this.params.opponentSkin });
 
     return [
-      { fighter: player, controller: new PlayerController(this.game.input, { fighter: player, settings: this.game.settings }) },
+      { fighter: player, controller: new PlayerController(this.game.input, { fighter: player, settings: this.game.settings, powersEnabled: this.rules.powers }) },
       { fighter: opponent, controller: this.createOpponentController(opponent, player, opponentCharacter) },
     ];
   }
 
   createOpponentController(opponent, player, characterId) {
     if (this.isLocal) {
-      return new PlayerController(this.game.secondInput, { fighter: opponent, settings: this.game.settings, playerIndex: 1 });
+      return new PlayerController(this.game.secondInput, { fighter: opponent, settings: this.game.settings, playerIndex: 1, powersEnabled: this.rules.powers });
     }
     if (this.usesDummy) {
       const dummy = new DummyController(gameConfig.duel.dummy, this.random);
@@ -408,6 +409,7 @@ export class DuelState extends GameState {
       this.galleryPanel.update();
     }
     if (this.isPausePressed()) {
+      this.clearCapturedInputs();
       this.duelAudio.stopGrind();
       this.game.pushState(StateId.PAUSE, { duelParams: this.params, rules: this.rules, character: this.playerCharacterData, quitState: this.storyStage ? StateId.STORY : StateId.MENU });
       return;
@@ -489,6 +491,10 @@ export class DuelState extends GameState {
 
   isPausePressed() {
     return this.game.input.wasPressed(Action.PAUSE) || (this.isLocal && this.game.secondInput.wasPressed(Action.PAUSE));
+  }
+
+  clearCapturedInputs() {
+    for (const { controller } of this.participants) controller.clearCapturedInput?.();
   }
 
   captureInputs() {
@@ -709,6 +715,7 @@ export class DuelState extends GameState {
   }
 
   clearAllIntents() {
+    this.clearCapturedInputs();
     for (const fighter of this.fighters) {
       fighter.clearIntent();
     }
@@ -809,6 +816,7 @@ export class DuelState extends GameState {
     for (const fighter of this.fighters) {
       lines.push(
         getPowerDebugInfo(fighter),
+        this.participants[this.fighters.indexOf(fighter)]?.controller?.getDebugInfo?.() ?? '',
         `${fighter.id}: ${fighter.state}  hp ${fighter.health.toFixed(0)}  st ${fighter.stamina.toFixed(0)}  flow ${this.rules.powers ? fighter.flowMeter.toFixed(0) : 'off'}`,
         `  ratings ${Object.values(fighter.stats.attributes).join("/")}  flow ${fighter.flowLevel}`,
         `  power ${fighter.combat.power?.id ?? '-'}  absorb ${fighter.combat.absorbTime.toFixed(2)}`,

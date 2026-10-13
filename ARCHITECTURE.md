@@ -1401,3 +1401,9 @@ GalleryScene mantém o ciclo enquanto há Santuário, rainActive ou trajetória 
 ### Capacidade de poderes (2.7)
 
 `powerSlots` ? a capacidade num?rica do personagem (padr?o 3; 4 nas variantes do Predestinado). `unlockedPowerSlots` restringe os espa?os dispon?veis na campanha, antes representados pelo array `powerSlots`; n?o confundir progress?o com capacidade. `findLoadoutProblems` recebe a capacidade e valida quantidade, ids, alinhamento e nomes: poderes neutral/forward/back/fourth, t?cnicas forward/back. F3 exp?e os quatro espa?os, inclusive vazios.
+
+### Acorde e inten??o do quarto poder (2.7)
+
+`PlayerController` arbitra Poder/Habilidade s? com Poderes ligados e `stats.power.loadout.fourth`. O primeiro aperto guarda dire??o na captura e espera `controlsConfig.fourthPower.chordWindow` em tempo l?gico; o segundo at? o limite inclusive emite apenas `fourthPower`. Comandos isolados saem com `resolvedAction` e `actionMoveX`, preservando dire??o sem mudar movimento; outro bot?o de combate encerra a espera e emite ambos os pedidos no mesmo passo. `actionBuffer` d? prioridade ao comando resolvido e conserva a segunda a??o em uma posi??o adicional, com expira??o normal. N?o interrompe uma a??o v?lida para executar a seguinte: ela aguarda disponibilidade no buffer. `getIntentSlot` aplica confus?o uma ?nica vez sobre a dire??o guardada.
+
+`fourthPowerHeld` mant?m canais enquanto qualquer bot?o do acorde permanece segurado. `combat.powerSlot` escolhe a inten??o de segurar no PowerSystem e ChokeSystem. IA solicita diretamente quarto espa?o pelos mesmos perfis de poder, sem arbitragem. `IntentRecorder` e `ReplayBuffer` passam a Uint32: bits legados preservados; acrescentam quarto poder, segurar, dire??o do comando e ordem resolvida. `Input.resetGeneration` permite descartar pend?ncia mesmo ap?s blur/focus entre passos; pausa, introdu??o e K.O. limpam controllers. F3 mostra a??o e tempo restante do acorde.
