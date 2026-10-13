@@ -258,7 +258,7 @@ Traje do Predestinado, nas duas variantes, sem vantagem e com a cor da lâmina i
 - **Peças existentes:** capuz levantado (`hoodUp: true`), manto longo (`longCape: true`), sem máscara e sem ombreiras, para o rosto ficar na sombra do capuz e não atrás de uma peça.
 - **Peças novas (desenhadas aqui antes de implementar):**
   - `layeredTunic`: uma segunda barra de túnica abaixo da cintura, na `trimColor`, com 6 px de altura lógica e começando a 60% da altura do tronco, acompanhando a inclinação do tronco e o balanço do manto. Lê como túnica em camadas sem novo contorno.
-  - `gloves`: mãos desenhadas na `trimColor` escurecida (o mesmo fator de sombra que o corpo já usa), nas duas mãos e na mão livre das trilhas; sem detalhe interno.
+  - Luvas (`gloveColor`): mãos na cor `duskGlove`, o bronze do acabamento escurecido, na mão da lâmina e na mão livre das trilhas; sem detalhe interno. Implementado como cor de mão opcional do traje (sem cor, a mão usa a do corpo), para não exigir cálculo de cor no render.
 - **Paleta (do personagem, como os outros trajes):** manto `#1c1a20`, corpo `#26222b`, acabamento bronze fosco `#7a6650`. Nenhum brilho, glow ou partícula própria.
 - **Id e nome:** id `skin-dusk`; nome de tela Ocaso / Dusk nas tabelas de texto.
 

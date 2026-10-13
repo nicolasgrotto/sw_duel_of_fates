@@ -15,6 +15,8 @@ export const proportions = {
   tunicFlare: 0.1,
   hiltLength: 0.09,
   freeArmLength: 0.28,
+  tunicLayerStart: 0.6,
+  tunicLayerThickness: 6,
 };
 
 export const animation = {

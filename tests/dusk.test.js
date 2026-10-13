@@ -30,7 +30,9 @@ it('declares dusk for both variants while preserving blade, moves, stats and bas
     assert.deepEqual(dusk.stats, base.stats);
     assert.equal(dusk.appearance.saberColor, colors.saberCore);
     assert.equal(base.appearance.hoodUp, false);
-    for (const field of ['hoodUp', 'longCape', 'layeredTunic', 'gloves']) assert.equal(dusk.appearance[field], true);
+    for (const field of ['hoodUp', 'longCape', 'layeredTunic']) assert.equal(dusk.appearance[field], true);
+    assert.equal(dusk.appearance.gloveColor, colors.duskGlove);
+    assert.equal(base.appearance.gloveColor, undefined);
     for (const field of ['masked', 'pauldrons', 'scarf']) assert.equal(dusk.appearance[field], false);
   }
 });
