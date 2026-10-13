@@ -227,7 +227,7 @@ export class EnemyAI {
     if (this.rules.exhaustion && !this.canSpend(this.self.moves[attack.cancelsInto[0]].staminaCost, this.self.moves[attack.cancelsInto[0]])) {
       return;
     }
-    if (this.random() < this.difficulty.chainChance) {
+    if (this.random() < this.difficulty.chainChance * (this.profile.chainWeight ?? 1)) {
       this.plan.pendingAction = PendingAction.LIGHT_ATTACK;
     }
   }
@@ -410,6 +410,8 @@ export class EnemyAI {
         return this.tryRecoverStamina();
       case 'special':
         return this.trySpecialAttack();
+      case 'selfPower':
+        return this.tryPower(true);
       case 'power':
         return this.tryPower();
       case 'attack':
@@ -446,11 +448,11 @@ export class EnemyAI {
   }
 
   trySpecialAttack() {
-    const technique = this.tryTechnique();
-    if (technique) {
-      return technique;
-    }
     const special = this.self.moves.special;
+    if (!special?.hitbox.around || !this.canReachWith(AttackType.SPECIAL)) {
+      const technique = this.tryTechnique();
+      if (technique) return technique;
+    }
     if (!special || this.attackCooldown > 0 || this.self.combat.attack || !this.canSpend(special.staminaCost, special, special.dash ? 'dash' : 'action')) {
       return null;
     }
@@ -630,7 +632,7 @@ export class EnemyAI {
     return null;
   }
 
-  tryPower() {
+  tryPower(selfOnly = false) {
     const { self } = this;
     const loadout = self.stats.power.loadout;
     if (!this.powersEnabled || !loadout || this.attackCooldown > 0 || !self.canAct) {
@@ -641,8 +643,9 @@ export class EnemyAI {
     if (this.random() >= chance) {
       return null;
     }
-    for (const slot of POWER_SLOTS) {
+    for (const slot of this.profile.powerPriority ?? POWER_SLOTS) {
       const power = loadout[slot];
+      if (selfOnly && !power?.self) continue;
       if (power?.effect === 'arsenal' && self.combat.arsenal?.objects.length) {
         const use = this.perception.powerUse.arsenal, gap = getGap(self, this.opponent);
         const reserve = this.difficulty.powerAware && Object.values(this.opponent.stats.power.loadout ?? {}).some(incoming => incoming?.projectile || incoming?.effect === 'arsenal') ? use.reserveObjects : 0;

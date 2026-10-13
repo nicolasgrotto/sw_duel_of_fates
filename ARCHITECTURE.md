@@ -1432,3 +1432,9 @@ Auditoria: storyRun persiste `ending`, `encounter` e `completed`; o resultado vi
 `characters.reaper` é um personagem comum selecionável do Eclipse, sem requisito de desbloqueio. Seu arquétipo e suas bases escalares copiam a Garça; os golpes herdam os mesmos contratos, com três poses de rápido `light`, fecho de combo com knockback 320/hitstun 0,4 e Roda Dupla (`special`, `pose: twinWheel`). A base escalar do dano da habilidade é 14, derivada normalmente por Lâmina (16,24 na nota 6). Loadout: Repulsão, Puxão, Ira e técnica Avanço com corte à frente. Dados cosméticos usam `motion: reaper`, tokens `reaper*` existentes e `dualBlade` a 180°.
 
 A Roda Dupla usa `hitbox.around` já suportada em hitboxes.js: retângulo simétrico à frente e atrás, um contato por execução. Aparência, comprimento e segunda lâmina desenhada não participam da detecção; os rápidos e fortes comuns continuam com hitbox à frente. Não há traço novo de simulação nem alteração das trilhas.
+
+### IA do Ceifador (2.21)
+
+`aiConfig.profiles.reaper` parte da Sombra e declara `chainWeight`, `powerPriority` e o passo `selfPower`. EnemyAI multiplica a chance da dificuldade pelo peso do perfil ao continuar um combo conectado; sem peso, mantém o comportamento anterior. `selfPower` reutiliza `tryPower(true)` com filtro de poderes próprios; os demais perfis não executam esse passo. A Ira é solicitada antes da aproximação a partir de distância segura, somente sem efeito ativo e com medidor/recarga suficientes. O mapa de prioridades consulta o espaço traseiro primeiro, sem mudar o padrão dos outros perfis.
+
+Habilidades com `hitbox.around` no alcance precedem técnicas direcionais em `trySpecialAttack`, evitando gastar o Avanço com corte contra um alvo colado ou atrás. A decisão pede Habilidade neutra, com o mesmo filtro de chance, custo e recarga. Fora do alcance, técnicas continuam disponíveis. IA não altera Fighters: testes congelam os lutadores e verificam apenas as ações produzidas.
