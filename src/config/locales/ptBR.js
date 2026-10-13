@@ -682,6 +682,18 @@ export const ptBR = {
       saberColors: { arcade: 'Azul-gelo', challenge: 'Coral' },
       challenges: { challenge: 'vença acertando 4 ataques aéreos' },
     },
+    reaper: {
+      name: 'Ceifador',
+      info: {
+        style: 'Acrobata · lâmina dupla',
+        saberName: 'Vermelho-sangue',
+        trait: 'O terceiro golpe rápido do combo empurra e atordoa mais',
+        ability: 'Roda Dupla: gira a lâmina dupla e acerta à frente e atrás',
+      },
+      skins: { base: 'Original', 'skin-arcade': 'Viajante', 'skin-story': 'Sentinela' },
+      saberColors: { arcade: 'Laranja-brasa', challenge: 'Violeta' },
+      challenges: { challenge: 'vença com uma sequência de 5 acertos' },
+    },
     echo: {
       name: 'Eco',
       info: {

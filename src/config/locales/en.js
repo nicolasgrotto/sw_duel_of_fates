@@ -673,6 +673,18 @@ export const en = {
       saberColors: { arcade: 'Ice blue', challenge: 'Coral' },
       challenges: { challenge: 'win landing 4 air attacks' },
     },
+    reaper: {
+      name: 'Reaper',
+      info: {
+        style: 'Acrobat · twin blade',
+        saberName: 'Blood red',
+        trait: 'The third light strike of the combo pushes and stuns harder',
+        ability: 'Twin Wheel: spins the twin blade and hits front and back',
+      },
+      skins: { base: 'Original', 'skin-arcade': 'Traveler', 'skin-story': 'Sentinel' },
+      saberColors: { arcade: 'Ember orange', challenge: 'Violet' },
+      challenges: { challenge: 'win with a 5-hit chain' },
+    },
     echo: {
       name: 'Echo',
       info: {

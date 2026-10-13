@@ -327,6 +327,40 @@ export const attributesConfig = {
         "special": 9.782608695652172
       }
     },
+    "reaper": {
+      "maxHealth": 97.22222222222221,
+      "maxStamina": 86.20689655172414,
+      "stamina": {
+        "regenPerSecond": 23.27586206896552
+      },
+      "movement": {
+        "walkSpeed": 249.99999999999997,
+        "jumpVelocity": 775.8620689655172
+      },
+      "dodge": {
+        "speed": 517.2413793103449
+      },
+      "parry": {
+        "perfectWindow": 0.0825
+      },
+      "guardCostScale": 0.92,
+      "guardPushbackScale": 0.92,
+      "guardBreakThreshold": -1,
+      "evadeWindowScale": 0.8620689655172414,
+      "abilityMobilityScale": 0.8620689655172414,
+      "damage": {
+        "light": 9.782608695652172,
+        "light2": 9.782608695652172,
+        "light3": 9.782608695652172,
+        "air": 13.043478260869565,
+        "airHeavy": 17.391304347826086,
+        "forwardHeavy": 21.739130434782606,
+        "heavy": 21.739130434782606,
+        "riposte": 16.304347826086957,
+        "shove": 0,
+        "special": 14
+      }
+    },
     "echo": {
       "maxHealth": 100,
       "maxStamina": 86.20689655172414,

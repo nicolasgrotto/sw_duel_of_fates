@@ -205,6 +205,33 @@ export const movesByCharacter = {
       leap: { speedX: 540, speedY: 1000 },
     },
   },
+  reaper: {
+    light: { attack: 'light', type: 'light', pose: 'light', cancelsInto: ['light2'] },
+    light2: { attack: 'light', type: 'light', pose: 'light', cancelsInto: ['light3'] },
+    light3: { attack: 'light', type: 'light', pose: 'light', cancelsInto: [], knockback: 320, hitstun: 0.4 },
+    air: {
+      attack: 'light', type: 'light', pose: 'light', airborne: true, cancelsInto: [],
+      staminaCost: 12, startup: 0.12, active: 0.12, recovery: 0.28,
+      lunge: 0, hitstun: 0.2, knockback: 180, blockStaminaCost: 10,
+    },
+    airHeavy: {
+      attack: 'heavy', type: 'heavy', pose: 'heavy', airborne: true, cancelsInto: [],
+      staminaCost: 16, startup: 0.14, active: 0.16, recovery: 0.3,
+      lunge: 120, dive: 900, hitstun: 0.4, knockback: 260, blockStaminaCost: 18,
+    },
+    forwardHeavy: {
+      attack: 'heavy', type: 'heavy', pose: 'heavy', cancelsInto: [],
+      staminaCost: 30, startup: 0.38, recovery: 0.55, lunge: 450,
+    },
+    heavy: { attack: 'heavy', type: 'heavy', pose: 'heavy', cancelsInto: [] },
+    riposte: { attack: 'riposte', type: 'riposte', pose: 'riposte', cancelsInto: [] },
+    shove: { attack: 'shove', type: 'shove', pose: 'shove', cancelsInto: [] },
+    special: {
+      attack: 'heavy', type: 'heavy', pose: 'twinWheel', cancelsInto: [], damage: 14,
+      staminaCost: 24, startup: 0.24, active: 0.16, recovery: 0.44, lunge: 60, knockback: 280,
+      hitbox: { reach: 66, top: 0.85, bottom: 0.3, around: true },
+    },
+  },
   echo: {
     light: { attack: 'light', type: 'light', pose: 'light', cancelsInto: ['light2'] },
     light2: { attack: 'light', type: 'light', pose: 'light', cancelsInto: [] },
