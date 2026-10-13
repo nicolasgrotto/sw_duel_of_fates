@@ -38,6 +38,10 @@ export const en = {
       rooftop: 'Neon Rooftop',
       orbital: 'Orbital Ring',
       forest: 'Luminous Forest',
+      saltFlats: 'Glass Salt Flats',
+      skyDeck: 'Skyborne Deck',
+      snowPeak: 'Snowbound Peak',
+      eclipseCitadel: 'Eclipse Citadel',
       platform: 'Training platform',
     },
     arenaDescriptions: {
@@ -47,6 +51,10 @@ export const en = {
       rooftop: 'Rooftop in the rain, between glyph signs',
       orbital: 'Platform fixed to a ring, above a planet',
       forest: 'Clearing where the fungi glow with the blades',
+      saltFlats: 'Salt desert at dusk, among mirages',
+      skyDeck: 'Deck of a freighter crossing the clouds',
+      snowPeak: 'Mountain monastery in a raging blizzard',
+      eclipseCitadel: 'Stone hall where the eclipse dims all but the blades',
     },
     menu: {
       tagline: 'A DUEL OF ENERGY BLADES',

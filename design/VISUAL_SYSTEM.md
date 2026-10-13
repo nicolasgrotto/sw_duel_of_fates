@@ -291,7 +291,7 @@ Controlado pela **Camera**, a pedido do `EffectsSystem`. Nunca diretamente pelo 
 
 ## Arenas
 
-Arenas são dados (`src/arenas/arenaData.js`) com cores sempre por token. Primitivas disponíveis nas camadas: retângulos, linhas, polígonos, círculos, arcos e glows. Partículas: vapor, poeira, ondulação e chuva (riscos com o comprimento de `streak`). Camadas estáticas são pré-renderizadas.
+Arenas são dados (`src/arenas/arenaData.js`) com cores sempre por token. Primitivas disponíveis nas camadas: retângulos, linhas, polígonos, círculos, arcos e glows; `floorDetail` usa as mesmas primitivas sobre o chão (juntas, rachaduras). Partículas: vapor, poeira, ondulação e chuva (riscos com o comprimento de `streak`). Camadas estáticas são pré-renderizadas.
 
 Partículas da 2.14: `cloud` (glow grande de tamanho fixo que entra e sai devagar), `gust` (risco como a chuva, mas que entra e sai devagar) e `shimmer` (linha horizontal curta com `radius` de meio comprimento, tremendo na vertical). Com `wrapMargin`, a partícula que sai pela lateral volta do outro lado, a essa distância das bordas, sem reiniciar: é o que mantém nuvens, vento e neve correndo pela tela inteira. Teto de 120 partículas ambientes por arena.
 

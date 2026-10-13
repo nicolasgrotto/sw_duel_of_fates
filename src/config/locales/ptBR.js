@@ -38,6 +38,10 @@ export const ptBR = {
       rooftop: 'Telhado Neon',
       orbital: 'Anel Orbital',
       forest: 'Floresta Lumínica',
+      saltFlats: 'Salinas de Vidro',
+      skyDeck: 'Convés em Voo',
+      snowPeak: 'Cume Nevado',
+      eclipseCitadel: 'Cidadela do Eclipse',
       platform: 'Plataforma de treino',
     },
     arenaDescriptions: {
@@ -47,6 +51,10 @@ export const ptBR = {
       rooftop: 'Topo de prédio na chuva, entre letreiros de glifos',
       orbital: 'Plataforma presa a um anel, acima de um planeta',
       forest: 'Clareira onde os fungos acendem com as lâminas',
+      saltFlats: 'Deserto de sal ao entardecer, entre miragens',
+      skyDeck: 'Convés de um cargueiro atravessando as nuvens',
+      snowPeak: 'Mosteiro no alto da montanha, em plena nevasca',
+      eclipseCitadel: 'Salão de pedra onde o eclipse apaga tudo menos as lâminas',
     },
     menu: {
       tagline: 'UM DUELO DE LÂMINAS DE ENERGIA',
