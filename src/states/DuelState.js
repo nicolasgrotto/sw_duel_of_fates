@@ -100,10 +100,10 @@ export class DuelState extends GameState {
     this.arenaId = this.ladderStage ? this.ladderStage.arena : (this.params.arena ?? gameConfig.duel.arena);
     this.arenaDefinition = arenas[this.arenaId];
     this.ambients = this.arenaDefinition.ambient.map((config) => new AmbientSystem(config, this.arena, createRandom(createRandomSeed())));
-    this.game.touch?.setFeatures(this.rules.powers ? ['powers'] : []);
     this.participants = this.createParticipants();
     this.opponentController = this.participants[1].controller;
     this.fighters = this.participants.map((participant) => participant.fighter);
+    this.game.touch?.setFeatures(this.rules.powers ? this.player.stats.power.loadout?.fourth ? ['powers', 'fourthPower'] : ['powers'] : []);
     if (this.survivalStage) {
       this.applySurvivalHealth();
     }

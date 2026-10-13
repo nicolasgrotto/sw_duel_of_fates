@@ -4,6 +4,7 @@ export const touchLayoutConfig = {
   width: 1280, height: 720,
   joystick: { top: 360, radius: 76, knobRadius: 28, deadzone: 18, evadeThreshold: 44, idleX: 150, idleY: 600 },
   buttons: [
+    { action: Action.FOURTH_POWER, x: 860, y: 450, radius: 42, feature: 'fourthPower', requires: 'powers', anchor: 'right' },
     { action: Action.SPECIAL, x: 980, y: 510, radius: 48, anchor: 'right' },
     { action: Action.POWER, x: 860, y: 570, radius: 48, feature: 'powers', anchor: 'right' },
     { action: Action.HEAVY_ATTACK, x: 1100, y: 510, radius: 48, anchor: 'right' },

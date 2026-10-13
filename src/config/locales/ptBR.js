@@ -20,6 +20,7 @@ export const ptBR = {
       colorLeft: '‹',
       colorRight: '›',
       buttons: {
+        fourthPower: 'Poder 4',
         lightAttack: 'Rápido',
         heavyAttack: 'Forte',
         block: 'Guarda',

@@ -90,6 +90,15 @@ export class PlayerController {
       intent.fourthPowerHeld = false;
       return;
     }
+    if (intent.fourthPower) {
+      this.pendingAction = null;
+      this.pendingTime = 0;
+      intent.power = false;
+      intent.special = false;
+      intent.powerHeld = false;
+      intent.specialHeld = false;
+      return;
+    }
     const power = intent.power;
     const special = intent.special;
     const holding = intent.powerHeld || intent.specialHeld;

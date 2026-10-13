@@ -20,6 +20,7 @@ export const en = {
       colorLeft: '‹',
       colorRight: '›',
       buttons: {
+        fourthPower: 'Power 4',
         lightAttack: 'Light',
         heavyAttack: 'Heavy',
         block: 'Guard',

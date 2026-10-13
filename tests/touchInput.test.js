@@ -2,7 +2,11 @@ import { it } from 'node:test';
 import assert from 'node:assert/strict';
 import { TouchInput } from '../src/core/TouchInput.js';
 import { Input } from '../src/core/Input.js';
-import { keyboardPresets } from '../src/config/controlsConfig.js';
+import { Action, keyboardPresets } from '../src/config/controlsConfig.js';
+import { createFighter } from '../src/characters/characterFactory.js';
+import { PlayerController } from '../src/controllers/PlayerController.js';
+import { TouchControls } from '../src/ui/TouchControls.js';
+import { texts } from '../src/config/uiConfig.js';
 
 function setup() {
   const target = new EventTarget();
@@ -113,4 +117,69 @@ it('anchors duel buttons to the screen edges and keeps menu taps in content spac
   touch.setContext('menu');
   pointer('pointerdown', 2, 780, 300);
   assert.deepEqual(touch.taps[0], { x: 640, y: 300 });
+});
+
+
+it('shows the fourth button only with both features, bypasses the chord window and follows fingers', () => {
+  const { input, touch, pointer } = setup();
+  const fourth = touch.config.buttons.find(button => button.action === Action.FOURTH_POWER);
+  const fighter = createFighter('foretold', { x: 400, y: 600, facing: 1 });
+  const controller = new PlayerController(input, { fighter });
+  const labels = [];
+  const renderer = { save() {}, restore() {}, setAlpha() {}, fillCircle() {}, strokeCircle() {}, text(label) { labels.push(label); } };
+  const view = new TouchControls(touch);
+  for (const features of [[], ['powers'], ['fourthPower']]) {
+    touch.setFeatures(features);
+    assert.equal(touch.hasButton(fourth), false);
+    view.render(renderer, true);
+    assert.ok(!labels.includes(texts.touch.buttons.fourthPower));
+    pointer('pointerdown', 1, 860, 450);
+    assert.equal(input.isDown(Action.FOURTH_POWER), false);
+    pointer('pointerup', 1, 860, 450);
+  }
+  touch.setFeatures(['powers', 'fourthPower']);
+  pointer('pointerdown', 2, 860, 450);
+  controller.updateIntent(fighter.intent, 1 / 60);
+  assert.equal(fighter.intent.fourthPower, true);
+  assert.equal(fighter.intent.fourthPowerHeld, true);
+  assert.equal(controller.pendingAction, null);
+  input.endFrame();
+  pointer('pointerdown', 3, 860, 450);
+  pointer('pointerup', 2, 860, 450);
+  controller.updateIntent(fighter.intent, 1 / 60);
+  assert.equal(fighter.intent.fourthPower, false);
+  assert.equal(fighter.intent.fourthPowerHeld, true);
+  view.render(renderer, true);
+  assert.ok(labels.includes(texts.touch.buttons.fourthPower));
+  pointer('pointercancel', 3, 860, 450);
+  controller.updateIntent(fighter.intent, 1 / 60);
+  assert.equal(fighter.intent.fourthPowerHeld, false);
+  pointer('pointerdown', 4, 860, 450);
+  touch.setFeatures([]);
+  assert.equal(input.isDown(Action.FOURTH_POWER), false);
+  labels.length = 0;
+  touch.setFeatures(['powers', 'fourthPower']);
+  touch.setContext('menu');
+  view.render(renderer, true);
+  assert.ok(!labels.includes(texts.touch.buttons.fourthPower));
+  input.destroy();
+});
+
+it('direct fourth power discards a pending keyboard chord instead of releasing it later', () => {
+  const fighter = createFighter('foretold', { x: 400, y: 600, facing: 1 });
+  const pressed = new Set([Action.POWER]);
+  const input = { wasPressed: action => pressed.has(action), isDown: action => pressed.has(action) };
+  const controller = new PlayerController(input, { fighter });
+  controller.updateIntent(fighter.intent, 1 / 60);
+  assert.equal(controller.pendingAction, 'power');
+  pressed.clear();
+  pressed.add(Action.FOURTH_POWER);
+  controller.updateIntent(fighter.intent, 1 / 60);
+  assert.equal(fighter.intent.fourthPower, true);
+  assert.equal(controller.pendingAction, null);
+  pressed.clear();
+  for (let i = 0; i < 8; i++) {
+    controller.updateIntent(fighter.intent, 1 / 60);
+    assert.equal(fighter.intent.power || fighter.intent.special, false);
+  }
 });

@@ -1096,3 +1096,19 @@ it('discards a pending local chord on pause and on K.O.', () => {
   duel.clearAllIntents();
   assert.equal(duel.participants[1].controller.pendingAction, null);
 });
+
+
+it('sets touch fourth-power availability from the local fighter and power rules', () => {
+  const game = createFakeGame();
+  let features;
+  game.touch = { setFeatures(next) { features = next; } };
+  for (const [playerCharacter, opponentCharacter, powers, expected] of [
+    ['foretold', 'guardian', true, ['powers', 'fourthPower']],
+    ['guardian', 'foretold', true, ['powers']],
+    ['foretold', 'guardian', false, []],
+  ]) {
+    game.settings.powers = powers;
+    game.changeState(StateId.DUEL, { playerCharacter, opponentCharacter });
+    assert.deepEqual(features, expected);
+  }
+});

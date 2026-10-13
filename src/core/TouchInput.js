@@ -38,10 +38,15 @@ export class TouchInput {
 
   setFeatures(features) {
     this.features = new Set(features);
+    for (const [id, action] of this.pointers) {
+      const button = this.config.buttons.find(item => item.action === action);
+      if (button && !this.hasButton(button)) this.pointers.set(id, null);
+    }
+    this.refreshActions();
   }
 
   hasButton(button) {
-    return !button.feature || this.features.has(button.feature);
+    return (!button.feature || this.features.has(button.feature)) && (!button.requires || this.features.has(button.requires));
   }
 
   point(event) {
