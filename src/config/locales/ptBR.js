@@ -718,7 +718,7 @@ export const ptBR = {
         trait: 'Finta: tocar a guarda cancela o forte',
         ability: 'Passo-reflexo: passo curto e invulnerável',
       },
-      skins: { base: 'Original', 'skin-secret': 'Legado' },
+      skins: { base: 'Original', 'skin-dusk': 'Ocaso', 'skin-secret': 'Legado' },
     },
     elder: {
       name: 'Ancião',

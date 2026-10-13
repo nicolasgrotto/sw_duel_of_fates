@@ -314,3 +314,7 @@ Skins alteram somente paleta e peças existentes. A base preserva a aparência a
 | Protagonista: Peregrino | `#51483c` | `#28231e` | `#a0957e` | capa longa, ombreiras, sem capuz, máscara ou lenço |
 
 A paleta baixa a saturação para conservar o contraste da lâmina. O desenho continua procedural e não exige assets novos.
+
+### Paleta Ocaso (v2.7)
+
+Dados conforme ART_DIRECTION → Ocaso, com tokens em themeConfig: duskCloak `#1c1a20`, duskBody `#26222b`, duskTrim `#7a6650`. `skin-dusk` declara layeredTunic/gloves; implementação do desenho dessas peças fica com Claude.

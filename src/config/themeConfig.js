@@ -3,6 +3,9 @@ const FONT_FAMILY = `${DISPLAY_FONT}, system-ui, sans-serif`;
 const MONO_FONT_FAMILY = 'ui-monospace, Consolas, monospace';
 
 export const colors = {
+  duskCloak: '#1c1a20',
+  duskBody: '#26222b',
+  duskTrim: '#7a6650',
   background: '#05070d',
   floor: '#0d1220',
   floorEdge: '#3a4a6b',

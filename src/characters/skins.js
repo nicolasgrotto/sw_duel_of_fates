@@ -1,4 +1,4 @@
-const APPEARANCE_FIELDS = ['cloakColor', 'bodyColor', 'trimColor', 'hoodUp', 'longCape', 'masked', 'pauldrons', 'scarf', 'shoulderScale'];
+const APPEARANCE_FIELDS = ['cloakColor', 'bodyColor', 'trimColor', 'hoodUp', 'longCape', 'masked', 'pauldrons', 'scarf', 'shoulderScale', 'layeredTunic', 'gloves'];
 
 export function resolveAppearance(character, skinId) {
   const appearance = { ...character.appearance };

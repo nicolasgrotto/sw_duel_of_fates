@@ -709,7 +709,7 @@ export const en = {
         trait: 'Feint: tapping guard cancels the heavy',
         ability: 'Reflex Step: short, invulnerable step',
       },
-      skins: { base: 'Original', 'skin-secret': 'Legacy' },
+      skins: { base: 'Original', 'skin-dusk': 'Dusk', 'skin-secret': 'Legacy' },
     },
     elder: {
       name: 'Elder',

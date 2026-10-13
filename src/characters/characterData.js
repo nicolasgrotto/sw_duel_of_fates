@@ -1,3 +1,4 @@
+import { colors } from '../config/themeConfig.js';
 import { ptBR } from '../config/locales/ptBR.js';
 import { movesByCharacter } from '../config/movesConfig.js';
 import { applyCharacterTexts } from './characterTexts.js';
@@ -504,6 +505,7 @@ export const characters = {
     aiProfile: 'foretold',
     skins: [
       { id: 'base', appearance: {}, unlock: null },
+      { id: 'skin-dusk', appearance: { cloakColor: colors.duskCloak, bodyColor: colors.duskBody, trimColor: colors.duskTrim, hoodUp: true, longCape: true, masked: false, pauldrons: false, scarf: false, layeredTunic: true, gloves: true }, unlock: 'secret' },
       { id: 'skin-secret', appearance: { cloakColor: '#34394a', bodyColor: '#191e29', trimColor: '#8795b1', longCape: true, masked: true }, unlock: 'secret' },
     ],
     altSaberColors: [],
