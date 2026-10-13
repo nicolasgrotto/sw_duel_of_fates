@@ -251,6 +251,16 @@ Pose `BLADE_LOCK`, com números por estilo em `motionStyles[motion].lock` e `loc
 
 O perdedor usa a pose de desequilíbrio existente.
 
+### Ceifador (v2.21)
+
+Lutador do Eclipse com lâmina dupla de cabo único: uma lâmina sai de cada ponta do cabo. Desenho original; a referência é o arquétipo do duelista acrobático de arma dupla, sem rosto, marcas, chifres ou traje copiados de franquia.
+
+- **Silhueta:** sem capuz, cabeça à mostra na cor do corpo (com os olhos do Eclipse), túnica curta escura, faixa vermelha no pescoço (`scarf`), ombros estreitos, tronco à frente. A arma é a assinatura: `dualBlade` com 180°, deslocamento zero e o mesmo comprimento, de modo que os dois cabos se juntam na mão e formam um bastão; lâminas de 70 px (mais curtas que as do elenco, porque são duas) e cabo 1,4×.
+- **Paleta (tokens):** manto `reaperCloak` `#1c1517`, corpo `reaperBody` `#0f0c0d`, acabamento `reaperTrim` `#7a1f24`; lâmina `reaperSaber` `#ff2a2a` (Vermelho-sangue); alternativas `reaperSaberArcade` `#ff7a2e` (Laranja-brasa) e `reaperSaberChallenge` `#c43bff` (Violeta).
+- **Família de movimento `reaper`:** guarda em −20° (o bastão atravessado à frente), base um pouco baixa, tronco à frente, balanço solto. Combo de três: 1º de cima, 2º de baixo para cima com a outra ponta, 3º estocada que fecha com meia volta da arma (`twirl` 180°, as pontas trocam de lugar). O forte gira o bastão uma volta inteira na preparação antes de descer. Disputa inclinada e vitória larga com meia volta. Trilhas validadas contra a lâmina na hitbox real e contra a continuidade ≤ 60° por frame (pior transição 44,7°).
+- **Habilidade Roda Dupla (`twinWheel`):** o corpo fica firme e agachado enquanto o bastão gira duas voltas na frente do corpo (`twirl` −90 → 630 no ativo, 720 no fim), as duas pontas varrendo à frente e atrás. A hitbox é a do `around` (à frente e atrás), nunca o desenho da segunda lâmina.
+- **Trajes:** base; Viajante (`skin-arcade`, Arcade): manto `#3a3f47`, corpo `#1d2026`, acabamento `#8a919c`, capuz; Sentinela (`skin-story`, História): manto `#2e2422`, corpo `#171211`, acabamento `#9a6b4a`, ombreiras. Os nomes seguem o padrão dos trajes do elenco comum.
+
 ### Secretos revistos (v2.7, pedido do autor)
 
 Desenhos originais, sem nome, peça ou silhueta copiada de franquia; a referência é o arquétipo (o imperador sombrio, o cavaleiro caído), não um personagem.
