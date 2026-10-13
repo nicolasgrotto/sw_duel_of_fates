@@ -31,6 +31,8 @@ export const SelectStep = Object.freeze({
   ARENA: 'arena',
 });
 
+const VARIANT_STYLES = { light: textStyles.galleryCategoryAurora, dark: textStyles.galleryCategoryEclipse };
+
 export class CharacterSelectState extends GameState {
   enter() {
     this.rosterIds = Object.keys(characters).filter((id) => characters[id].selectable);
@@ -301,7 +303,20 @@ export class CharacterSelectState extends GameState {
       this.renderColorArrow(renderer, touchLayoutConfig.skinRight, texts.touch.colorRight);
     } else {
       const bindings = this.activeInput.bindings ?? keyBindings;
-      renderer.text(formatText(texts.characterSelect.skinControls, { previous: formatActionKeys(bindings, Action.BLOCK), next: formatActionKeys(bindings, Action.SPECIAL) }), previewX, skinControlsY, textStyles.hint);
+      const controls = getUnlockedVariants(character, this.game.settings).length > 1 ? texts.characterSelect.variantControls : texts.characterSelect.skinControls;
+      renderer.text(formatText(controls, { previous: formatActionKeys(bindings, Action.BLOCK), next: formatActionKeys(bindings, Action.SPECIAL), power: formatActionKeys(bindings, Action.POWER) }), previewX, skinControlsY, textStyles.hint);
+    }
+  }
+
+  renderVariantInfo(renderer, character) {
+    const variant = this.getChosenVariant(character.id);
+    if (!variant) return;
+    const { previewX, variantY } = layout.characterSelect;
+    const style = VARIANT_STYLES[character.variants[variant].alignment];
+    renderer.text(formatText(texts.characterSelect.variant, { name: texts.characterSelect.variantNames[variant] }), previewX, variantY, style);
+    if (this.activeInput.lastInputKind === 'touch' && getUnlockedVariants(character, this.game.settings).length > 1) {
+      this.renderColorArrow(renderer, touchLayoutConfig.variantLeft, texts.touch.colorLeft);
+      this.renderColorArrow(renderer, touchLayoutConfig.variantRight, texts.touch.colorRight);
     }
   }
 
@@ -314,6 +329,7 @@ export class CharacterSelectState extends GameState {
     renderer.text(character.info.ability, previewX, infoY + infoLineSpacing * 2, textStyles.hint);
     this.renderColorInfo(renderer, character, previewX, infoY + infoLineSpacing * 3);
 
+    this.renderVariantInfo(renderer, character);
     this.renderSkinInfo(renderer, character);
     const fighter = this.previews.get(character.id);
     computePose(fighter, this.pose);

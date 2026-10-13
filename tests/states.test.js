@@ -1045,6 +1045,32 @@ describe('skin selection and duel persistence', () => {
 });
 
 
+it('draws the variant line in the side color and switches it with Power', () => {
+  const game = createFakeGame();
+  game.settings.unlockedCharacters = ['foretold'];
+  game.settings.unlockedVariants = { foretold: ['aurora', 'eclipse'] };
+  game.changeState(StateId.CHARACTER_SELECT, { mode: DuelMode.LOCAL });
+  const select = game.states.current;
+  select.characterMenu.selectedIndex = select.characterIds.indexOf('foretold');
+  const variantLine = () => {
+    const lines = [];
+    const renderer = new Proxy({}, { get: (target, name) => {
+      if (name === 'width' || name === 'height' || name === 'viewWidth') return 1280;
+      if (name === 'text') return (text, x, y, style) => lines.push({ text, y, style });
+      return () => {};
+    } });
+    select.render(renderer);
+    return lines.find((line) => line.y === layout.characterSelect.variantY);
+  };
+  const aurora = variantLine();
+  assert.match(aurora.text, /Aurora/);
+  assert.equal(aurora.style.color, colors.sideLight);
+  game.step(Action.POWER);
+  const eclipse = variantLine();
+  assert.match(eclipse.text, /Eclipse/);
+  assert.equal(eclipse.style.color, colors.sideDark);
+});
+
 it('keeps independent local variants through selection, back, restart and rematch params', () => {
   const game = createFakeGame();
   game.settings.unlockedCharacters = ['foretold'];

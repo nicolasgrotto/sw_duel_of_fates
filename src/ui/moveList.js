@@ -20,7 +20,10 @@ function keys(bindings, ...actions) {
 
 const SLOT_DIRECTIONS = { neutral: null, forward: Action.MOVE_RIGHT, back: Action.MOVE_LEFT };
 
+const SLOT_CHORDS = { fourth: [Action.POWER, Action.SPECIAL] };
+
 function slotKeys(bindings, slot, action) {
+  if (SLOT_CHORDS[slot]) return keys(bindings, ...SLOT_CHORDS[slot]);
   const direction = SLOT_DIRECTIONS[slot];
   return direction ? keys(bindings, direction, action) : keys(bindings, action);
 }
