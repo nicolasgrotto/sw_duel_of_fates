@@ -339,6 +339,14 @@ export const techniqueKeyframes = {
       { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 60, lean: 20, crouch: 14, reach: 0.2, step: 0.08, hip: 0.03 },
       { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: 68, lean: 18, crouch: 14, reach: 0.18, step: 0.08, hip: 0.03 },
     ],
+    whirl: [
+      { phase: STARTUP, at: 0.6, ease: 'out', blade: 120, lean: 10, crouch: 14, slide: 0.03, hip: -0.01 },
+      { phase: STARTUP, at: 1, ease: 'linear', blade: 140, lean: 16, crouch: 18, slide: 0.04, hip: -0.015, step: 0.02, twirl: -200 },
+      { phase: ACTIVE, at: 0.5, ease: 'linear', blade: 45, lean: 20, crouch: 12, reach: 0.12, step: 0.06, hip: 0.02, twirl: -300 },
+      { phase: ACTIVE, at: 1, ease: 'outQuad', blade: -75, lean: 18, crouch: 6, reach: 0.2, lift: 0.04, step: 0.08, hip: 0.03, twirl: -360 },
+      { phase: RECOVERY, at: 0.3, ease: 'outQuad', blade: -85, lean: 16, crouch: 6, reach: 0.18, lift: 0.04, step: 0.08, hip: 0.03, twirl: -360 },
+      { phase: RECOVERY, at: 1, ease: 'inOut', twirl: -360 },
+    ],
   },
   counterRiposte: [
     { phase: STARTUP, at: 0.35, ease: 'out', blade: -115, lean: -6, lift: 0.08, slide: 0.05, hip: -0.02 },
@@ -793,7 +801,7 @@ export const motionStyles = {
   reaper: {
     stance: { crouch: 4, lean: 5, guardOffset: 0, breathScale: 1.15, swayScale: 1.3, bobScale: 1.2 },
     followThrough: 0.1,
-    dashSlash: 'rising',
+    dashSlash: 'whirl',
     block: { bladeDegrees: -90, reach: 0.06, crouch: 8 },
     evade: [
       { lean: -26, crouch: 10, bladeOffset: 12 },

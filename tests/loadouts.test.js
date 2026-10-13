@@ -149,3 +149,31 @@ describe('power slot capacity', () => {
     assert.ok(findLoadoutProblems(loadout, 'light', powersConfig, bladeTechniques, 5).includes('powers: invalid capacity 5'));
   });
 });
+
+describe('dash slash frame advantage', () => {
+  const users = Object.keys(characters).filter((id) => Object.values(characters[id].loadout?.techniques ?? {}).includes('dashSlash'));
+  const recovering = new Set([FighterState.HIT, FighterState.STAGGERED, FighterState.STUNNED]);
+
+  for (const id of users) {
+    it(`${id}: recovers first after landing the dash slash, without a free light follow-up`, () => {
+      const attacker = spawnFighter(400, 1, id);
+      const defender = spawnFighter(640, -1, 'guardian');
+      const simulation = createSimulation([attacker, defender]);
+      assert.ok(simulation.combat.tryAttack(attacker, 'dashSlash'));
+      let hitFrame = null;
+      let attackerFree = null;
+      let defenderFree = null;
+      for (let frame = 0; frame < 240 && (attackerFree === null || defenderFree === null); frame += 1) {
+        simulation.step(STEP);
+        if (hitFrame === null && simulation.events.some((event) => event.type === CombatEvent.HIT)) hitFrame = frame;
+        if (hitFrame === null) continue;
+        if (attackerFree === null && attacker.state !== FighterState.HEAVY_ATTACK && attacker.state !== FighterState.ATTACKING) attackerFree = frame;
+        if (defenderFree === null && frame > hitFrame && !recovering.has(defender.state)) defenderFree = frame;
+      }
+      assert.notEqual(hitFrame, null);
+      const advantage = defenderFree - attackerFree;
+      assert.ok(advantage >= 0, `${id} is punishable on hit by ${-advantage} frames`);
+      assert.ok(advantage <= Math.round(attacker.moves.light.startup / STEP), `${id} gets a free follow-up (${advantage} frames)`);
+    });
+  }
+});

@@ -262,7 +262,7 @@ export const bladeTechniques = {
   },
   dashSlash: {
     attack: 'heavy', type: 'heavy', pose: 'dashSlash', cancelsInto: [], damage: 13,
-    staminaCost: 34, startup: 0.3, active: 0.14, recovery: 0.62, lunge: 900,
+    staminaCost: 34, startup: 0.3, active: 0.14, recovery: 0.62, lunge: 900, hitstun: 0.72,
   },
   saberThrow: {
     attack: 'heavy', type: 'heavy', pose: 'saberThrow', cancelsInto: [], damage: 9, projectile: true,
