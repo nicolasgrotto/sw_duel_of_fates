@@ -16,7 +16,7 @@ function addUnlockedCharacters(settings, ids) {
 }
 
 function resolveStoryOutcome(result, { params, settings, story }) {
-  const outcome = resolveStoryResult(params.story, result, story.config, story.loadouts);
+  const outcome = resolveStoryResult(params.story, result, story.config);
   const progress = {};
   if (!outcome.won) {
     return {
@@ -43,7 +43,7 @@ function resolveStoryOutcome(result, { params, settings, story }) {
   }
   if (outcome.ending) {
     progress.unlocks = unlockProgressSkins(settings.unlocks, Object.values(characters), 'story');
-    if (outcome.ending === 'secret') progress.unlocks = unlockProgressSkins(progress.unlocks, Object.values(characters), 'secret');
+    if (story.config.endings[outcome.ending].secret) progress.unlocks = unlockProgressSkins(progress.unlocks, Object.values(characters), 'secret');
   }
   const { protagonist } = params.story;
   const lines = resolveDialogue(story.texts.encounters[outcome.encounter.id].after, protagonist, story.names);

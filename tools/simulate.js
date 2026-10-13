@@ -3,6 +3,7 @@ import { EnemyAI } from '../src/ai/EnemyAI.js';
 import { characters } from '../src/characters/characterData.js';
 import { createFighterFromCharacter } from '../src/characters/characterFactory.js';
 import { createProtagonistCharacter } from '../src/characters/protagonist.js';
+import { getCampaignBuild } from '../src/modes/story/storyRun.js';
 import { storyConfig } from '../src/config/storyConfig.js';
 import { CombatEvent } from '../src/combat/combatEvents.js';
 import { evadeConfig } from '../src/config/evadeConfig.js';
@@ -36,7 +37,7 @@ function buildProtagonist(spec) {
     }
   }
   const profile = { name: 'Protagonista', alignment, style, saberColor: storyConfig.protagonist.saberColors[0], attributes };
-  return createProtagonistCharacter(profile, storyConfig);
+  return createProtagonistCharacter(profile, storyConfig, getCampaignBuild(alignment, storyConfig).loadout);
 }
 
 function resolveCharacter(id) {

@@ -3,12 +3,12 @@ import { attributesConfig } from '../config/attributesConfig.js';
 import { storyConfig } from '../config/storyConfig.js';
 import { convertLegacyPoints, convertLegacyRatings } from '../utils/legacyRatings.js';
 
-export const SAVE_VERSION = 6;
+export const SAVE_VERSION = 7;
 
 function migrateDuskUnlock(save) {
-  const story = sanitizeStoryRun(save.story, storyConfig);
-  const finishedSecret = story?.ending === 'secret' && story.encounter === null
-    && storyConfig.encounters.some(encounter => encounter.ending === 'secret' && story.completed.includes(encounter.id));
+  const { story } = save;
+  const finishedSecret = story?.ending === 'secret' && story.encounter === null && typeof story.protagonist?.name === 'string'
+    && Array.isArray(story.completed) && story.completed.includes('foretold');
   if (!finishedSecret) return save;
   const owned = Array.isArray(save.settings?.unlocks?.foretold) ? save.settings.unlocks.foretold : [];
   return { ...save, settings: { ...save.settings, unlocks: { ...save.settings?.unlocks, foretold: [...new Set([...owned, 'skin-dusk'])] } } };
@@ -38,6 +38,7 @@ export const saveMigrations = [
   { from: 3, to: 4, migrate: (save) => ({ ...save, version: 4, story: save.story ? { ...save.story, protagonist: { ...save.story.protagonist, skin: save.story.protagonist?.skin ?? 'base' } } : null }) },
   { from: 4, to: 5, migrate: (save) => ({ ...save, version: 5, story: migrateStoryRatings(save.story) }) },
   { from: 5, to: 6, migrate: (save) => ({ ...migrateDuskUnlock(migrateVariantUnlocks(save)), version: 6 }) },
+  { from: 6, to: 7, migrate: (save) => ({ ...save, version: 7, story: sanitizeStoryRun(save.story, storyConfig) }) },
 ];
 
 export function loadSave(storage, key) {

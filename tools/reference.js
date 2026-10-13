@@ -16,7 +16,8 @@ const RULE_SETS = [
 ];
 const STORY_DIFFICULTIES = ['easy', 'normal', 'hard'];
 const STORY_ALIGNMENTS = ['light', 'dark'];
-const STORY_BOSS = 'sovereign';
+const STORY_BOSSES = { light: 'sovereign', dark: 'elder' };
+const STORY_RULES = 'powers,exhaustion,wounds,focusEvade,bladeLock';
 
 function readOptions(argv) {
   const options = { write: '', check: '', out: '', only: '' };
@@ -46,7 +47,8 @@ function createScenarios() {
   for (const difficulty of STORY_DIFFICULTIES) {
     for (const alignment of STORY_ALIGNMENTS) {
       const left = `protagonist:${difficulty}:${alignment}:technique`;
-      scenarios.push({ key: `story/${difficulty}/${alignment}-${STORY_BOSS}`, args: { duels: 60, difficulty, left, right: STORY_BOSS, rules: 'powers' } });
+      const boss = STORY_BOSSES[alignment];
+      scenarios.push({ key: `story/${difficulty}/${alignment}-${boss}`, args: { duels: 60, difficulty, left, right: boss, rules: STORY_RULES } });
     }
   }
   return scenarios;

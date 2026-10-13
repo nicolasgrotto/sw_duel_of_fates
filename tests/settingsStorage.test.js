@@ -1,4 +1,4 @@
-import { SAVE_VERSION, loadSave } from '../src/core/saveStorage.js';
+import { SAVE_VERSION, loadSave, saveMigrations } from '../src/core/saveStorage.js';
 import { readFileSync } from 'node:fs';
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
@@ -102,15 +102,24 @@ it('uses coarse defaults only without a valid saved effects preference, includin
   assert.equal(loadSettings(coarse, createStorage({ [KEY]: JSON.stringify({ reducedEffects: 'invalid' }) }), KEY).reducedEffects, true);
 });
 
+function migrateUntil(save, target) {
+  let migrated = save;
+  for (const migration of saveMigrations) {
+    if (migrated.version === migration.from && migration.to <= target) migrated = migration.migrate(migrated);
+  }
+  return migrated;
+}
+
 it('migrates v3 story appearance without losing settings, progress or an existing skin', () => {
   for (const skin of [undefined, 'watcher']) {
     const story = { encounter: 'mine', points: 3, protagonist: { name: 'Iria', skin } };
     const settings = { unlocks: { guardian: ['challenge'] }, arcadeCleared: ['guardian'] };
-    const storage = createStorage({ [KEY]: JSON.stringify({ version: 3, settings, story }) });
-    const save = loadSave(storage, KEY);
+    const migrated = migrateUntil({ version: 3, settings, story }, 4);
+    assert.deepEqual(migrated.story, { ...story, protagonist: { ...story.protagonist, skin: skin ?? 'base' } });
+    const save = loadSave(createStorage({ [KEY]: JSON.stringify({ version: 3, settings, story }) }), KEY);
     assert.equal(save.version, SAVE_VERSION);
     assert.deepEqual(save.settings, settings);
-    assert.deepEqual(save.story, { ...story, protagonist: { ...story.protagonist, skin: skin ?? 'base' } });
+    assert.equal(save.story, null);
   }
 });
 
@@ -118,15 +127,15 @@ it('migrates v4 protagonist ratings to the 1-7 scale with the shared rule and th
   const settings = { unlockedCharacters: ['sovereign'], unlocks: { guardian: ['skin-story'] } };
   const protagonist = { name: 'Kael', alignment: 'light', style: 'technique', saberColor: '#7fe4ff', skin: 'watcher', attributes: { health: 8, stamina: 4, blade: 7, defense: 3, agility: 5, flow: 8 } };
   const story = { difficulty: 'easy', encounter: 'sovereign', points: 3, slots: ['neutral', 'back'], completed: ['trial', 'forest'], ending: null, protagonist };
-  const save = loadSave(createStorage({ [KEY]: JSON.stringify({ version: 4, settings, story }) }), KEY);
-  assert.equal(save.version, SAVE_VERSION);
+  const save = migrateUntil({ version: 4, settings, story }, 6);
+  assert.equal(loadSave(createStorage({ [KEY]: JSON.stringify({ version: 4, settings, story }) }), KEY).story, null);
   assert.deepEqual(save.settings, settings);
   assert.deepEqual(save.story.protagonist.attributes, { health: 6, stamina: 3, blade: 6, defense: 3, agility: 4, flow: 7 });
   assert.equal(save.story.points, 2);
   assert.deepEqual({ ...save.story, protagonist: null, points: null }, { ...story, protagonist: null, points: null });
   assert.equal(save.story.protagonist.skin, 'watcher');
 
-  const hard = loadSave(createStorage({ [KEY]: JSON.stringify({ version: 4, settings, story: { ...story, difficulty: 'hard' } }) }), KEY);
+  const hard = migrateUntil({ version: 4, settings, story: { ...story, difficulty: 'hard' } }, 6);
   assert.deepEqual(hard.story.protagonist.attributes, { health: 6, stamina: 3, blade: 6, defense: 3, agility: 4, flow: 7 });
   assert.equal(loadSave(createStorage({ [KEY]: JSON.stringify({ version: 4, settings, story: null }) }), KEY).story, null);
 });

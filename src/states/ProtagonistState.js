@@ -6,7 +6,9 @@ import { storyConfig } from '../config/storyConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
 import { difficultyNames, layout, texts } from '../config/uiConfig.js';
 import { attributeOrder } from '../config/attributesConfig.js';
-import { canRaiseAttribute, createStoryRun, getAttributeTotal, isAttributeBudgetFull, raiseAttribute } from '../modes/story/storyRun.js';
+import { canRaiseAttribute, createStoryRun, cycleLoadoutPower, getAttributeTotal, getSlotOpeningEncounter, getStartLoadout, isAttributeBudgetFull, raiseAttribute } from '../modes/story/storyRun.js';
+import { powersConfig } from '../config/powersConfig.js';
+import { storyTexts } from '../config/storyTexts.js';
 import { createPose } from '../rendering/fighterPose.js';
 import { drawFighterPreview } from '../rendering/fighterPreview.js';
 import { drawAttributeBars } from '../ui/attributeBars.js';
@@ -18,6 +20,7 @@ import { StateId } from './stateIds.js';
 export const ProtagonistMode = Object.freeze({
   CREATE: 'create',
   UPGRADE: 'upgrade',
+  POWERS: 'powers',
 });
 
 export const CreationStep = Object.freeze({
@@ -29,8 +32,8 @@ export const CreationStep = Object.freeze({
   DIFFICULTY: 'difficulty',
 });
 
-export function getPowerNames(alignment) {
-  return Object.values(storyConfig.protagonist.loadouts[alignment]).map((id) => texts.powers[id]).join(' · ');
+export function getPowerNames(loadout) {
+  return storyConfig.slotOrder.filter((slot) => loadout[slot]).map((slot) => texts.powers[loadout[slot]]).join(' · ');
 }
 
 const STEPS = [CreationStep.NAME, CreationStep.ALIGNMENT, CreationStep.STYLE, CreationStep.SKIN, CreationStep.COLOR, CreationStep.DIFFICULTY];
@@ -68,6 +71,11 @@ export class ProtagonistState extends GameState {
       this.profile = this.run.protagonist;
       this.menu = new MenuList(attributeOrder.map((id) => ({ id, label: '' })), layout.story.list, this.game.audio);
       this.refreshUpgradeLabels();
+    } else if (this.mode === ProtagonistMode.POWERS) {
+      this.run = this.game.story;
+      this.profile = this.run.protagonist;
+      this.menu = new MenuList(storyConfig.slotOrder.map((id) => ({ id, label: '' })), layout.story.list, this.game.audio);
+      this.refreshPowerLabels();
     } else {
       const { protagonist, startAttributes, difficulties } = storyConfig;
       this.profile = {
@@ -118,8 +126,34 @@ export class ProtagonistState extends GameState {
     });
   }
 
+  refreshPowerLabels() {
+    const { loadout, slots } = this.run;
+    for (const item of this.menu.items) {
+      const power = slots.includes(item.id) ? texts.powers[loadout[item.id]] : texts.story.slotClosed;
+      item.label = formatText(texts.story.slotOption, { slot: texts.story.slotNames[item.id], power });
+    }
+    this.refreshPowerDetail();
+  }
+
+  refreshPowerDetail() {
+    const slot = this.menu.selected.id;
+    const power = this.run.slots.includes(slot) ? this.run.loadout[slot] : null;
+    if (power) {
+      this.budgetLine = formatText(texts.story.powerDetail, { power: texts.powers[power], cost: powersConfig.powers[power].cost });
+      this.noteLine = texts.gallery.descriptions[power] ?? '';
+      return;
+    }
+    const opening = getSlotOpeningEncounter(slot, this.run.protagonist.alignment, storyConfig);
+    this.budgetLine = this.menu.selected.label;
+    this.noteLine = opening ? formatText(texts.story.slotOpens, { title: storyTexts.encounters[opening.id].title }) : '';
+  }
+
+  get loadout() {
+    return this.run?.loadout ?? getStartLoadout(this.profile.alignment, storyConfig).loadout;
+  }
+
   refreshPreview() {
-    const character = createProtagonistCharacter(this.profile, storyConfig);
+    const character = createProtagonistCharacter(this.profile, storyConfig, this.loadout);
     this.preview = createFighterFromCharacter(character, { x: 0, y: 0, facing: 1 });
   }
 
@@ -128,6 +162,8 @@ export class ProtagonistState extends GameState {
     this.preview.animation.time = this.previewTime;
     if (this.mode === ProtagonistMode.UPGRADE) {
       this.updateUpgrade();
+    } else if (this.mode === ProtagonistMode.POWERS) {
+      this.updatePowers();
     } else {
       this.updateCreation();
     }
@@ -151,6 +187,32 @@ export class ProtagonistState extends GameState {
     this.game.story = this.run;
     this.game.saveSettings();
     this.refreshUpgradeLabels();
+    this.refreshPreview();
+  }
+
+  updatePowers() {
+    const { input } = this.game;
+    if (input.wasPressed(Action.BACK)) {
+      this.game.changeState(StateId.STORY);
+      return;
+    }
+    const before = this.menu.selected.id;
+    const confirmed = this.menu.update(input);
+    const step = confirmed || input.wasPressed(Action.MOVE_RIGHT) ? 1 : input.wasPressed(Action.MOVE_LEFT) ? -1 : 0;
+    if (step === 0) {
+      if (this.menu.selected.id !== before) this.refreshPowerDetail();
+      return;
+    }
+    const slot = this.menu.selected.id;
+    const next = cycleLoadoutPower(this.run, slot, step, storyConfig);
+    if (next === this.run) {
+      this.game.audio.play(SoundName.DENIED);
+      return;
+    }
+    this.run = next;
+    this.game.story = next;
+    this.game.saveSettings();
+    this.refreshPowerLabels();
     this.refreshPreview();
   }
 
@@ -213,20 +275,21 @@ export class ProtagonistState extends GameState {
   render(renderer) {
     const { titleY, stepY, infoY, infoSpacing, previewX, figureX, previewY, previewScale, attributes } = layout.story;
     renderer.clear(colors.background);
-    const isUpgrade = this.mode === ProtagonistMode.UPGRADE;
-    renderer.text(isUpgrade ? texts.story.upgradeTitle : texts.story.createTitle, renderer.width / 2, titleY, textStyles.heading);
+    const isUpgrade = this.mode !== ProtagonistMode.CREATE;
+    const title = { [ProtagonistMode.CREATE]: texts.story.createTitle, [ProtagonistMode.UPGRADE]: texts.story.upgradeTitle, [ProtagonistMode.POWERS]: texts.story.powersTitle }[this.mode];
+    renderer.text(title, renderer.width / 2, titleY, textStyles.heading);
     const stepLine = isUpgrade
       ? this.budgetLine
       : formatText(texts.story.step, { step: this.stepIndex + 1, total: STEPS.length, name: texts.story.steps[this.step] });
     renderer.text(stepLine, renderer.width / 2, stepY, textStyles.subtitle);
-    if (isUpgrade) renderer.text(texts.story.budgetNote, renderer.width / 2, layout.story.noteY, textStyles.hint);
+    if (isUpgrade) renderer.text(this.mode === ProtagonistMode.POWERS ? this.noteLine : texts.story.budgetNote, renderer.width / 2, layout.story.noteY, textStyles.hint);
     this.menu.render(renderer, layout.story.list.listX);
     renderer.text(this.profile.name, previewX, infoY, textStyles.subtitle);
     renderer.text(formatText(texts.story.summary, {
       alignment: texts.story.alignments[this.profile.alignment],
       style: texts.story.styles[this.profile.style],
     }), previewX, infoY + infoSpacing, textStyles.hint);
-    renderer.text(formatText(texts.story.powers, { list: getPowerNames(this.profile.alignment) }), previewX, infoY + infoSpacing * 2, textStyles.hint);
+    renderer.text(formatText(texts.story.powers, { list: getPowerNames(this.loadout) }), previewX, infoY + infoSpacing * 2, textStyles.hint);
     drawAttributeBars(renderer, this.profile.attributes, attributes);
     drawFighterPreview(renderer, this.preview, this.pose, figureX, previewY, previewScale);
     renderer.text(texts.story.footer, renderer.width / 2, layout.story.footerY, textStyles.hint);

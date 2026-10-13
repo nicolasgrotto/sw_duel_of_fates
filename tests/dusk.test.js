@@ -51,19 +51,25 @@ it('unlocks every skin and blade color through wardrobe idempotently, keeping ex
   }
 });
 
+const CAMPAIGNS = {
+  light: { secret: 'foretoldEclipse', variant: 'eclipse', ending: 'auroraSecret', boss: 'sovereign' },
+  dark: { secret: 'foretoldAurora', variant: 'aurora', ending: 'eclipseSecret', boss: 'elder' },
+};
+
 for (const alignment of ['light', 'dark']) {
   it(`grants dusk after the secret ending on ${alignment}, without granting it for normal endings or defeats`, () => {
+    const campaign = CAMPAIGNS[alignment];
     const profile = { name: 'Iria', alignment, style: 'technique', saberColor: '#7fe4ff' };
     const run = createStoryRun(profile, 'normal', storyConfig);
-    const context = { params: { story: { ...run, encounter: 'foretold' } }, settings: {}, story: { config: storyConfig, texts: storyTexts, loadouts: storyConfig.protagonist.loadouts, names: Object.fromEntries(Object.entries(characters).map(([id, c]) => [id, c.name])) } };
-    const result = { mode: DuelMode.STORY, winnerSide: 0, fighters: [{ healthRatio: 0.5 }, { id: 'foretold', variant: 'aurora' }] };
+    const context = { params: { story: { ...run, encounter: campaign.secret } }, settings: {}, story: { config: storyConfig, texts: storyTexts, names: Object.fromEntries(Object.entries(characters).map(([id, c]) => [id, c.name])) } };
+    const result = { mode: DuelMode.STORY, winnerSide: 0, fighters: [{ healthRatio: 0.5 }, { id: 'foretold', variant: campaign.variant }] };
     const win = resolveDuelOutcome(result, context);
     assert.ok(win.progress.unlocks.foretold.includes('skin-dusk'));
-    assert.equal(win.story.ending, 'secret');
+    assert.equal(win.story.ending, campaign.ending);
     assert.equal(win.story.encounter, null);
-    assert.ok(win.story.completed.includes('foretold'));
+    assert.ok(win.story.completed.includes(campaign.secret));
     assert.deepEqual(resolveDuelOutcome({ ...result, winnerSide: 1 }, context).progress, {});
-    const normal = resolveDuelOutcome({ ...result, fighters: [result.fighters[0], { id: 'sovereign' }] }, { ...context, params: { story: { ...run, encounter: 'sovereign' } } });
+    const normal = resolveDuelOutcome({ ...result, fighters: [result.fighters[0], { id: campaign.boss }] }, { ...context, params: { story: { ...run, encounter: campaign.boss } } });
     assert.ok(!normal.progress.unlocks.foretold?.includes('skin-dusk'));
   });
   it(`migrates reliable persisted evidence on ${alignment} exactly once`, () => {
@@ -73,7 +79,7 @@ for (const alignment of ['light', 'dark']) {
     assert.equal(migrated.version, SAVE_VERSION);
     assert.ok(migrated.settings.unlocks.foretold.includes('skin-dusk'));
     assert.equal(migrated.settings.unlocks.foretold.filter(id => id === 'skin-dusk').length, 1);
-    assert.deepEqual(migrated.story, completedFixture.story);
+    assert.equal(migrated.story, null);
     assert.deepEqual(migrated.settings.customBindings, completedFixture.settings.customBindings);
     saveSave(migrated.settings, storage, 'save', migrated.story);
     assert.deepEqual(loadSave(storage, 'save'), migrated);

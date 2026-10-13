@@ -275,6 +275,13 @@ export const ptBR = {
       continue: 'Continuar · Capítulo {number}: {title}',
       upgrade: 'Evoluir atributos ({points} pontos)',
       upgradeView: 'Ver atributos',
+      powersOption: 'Poderes',
+      powersTitle: 'PODERES',
+      slotNames: { neutral: 'Poder', forward: 'Frente + Poder', back: 'Trás + Poder' },
+      slotOption: '{slot} · {power}',
+      slotClosed: 'fechado',
+      slotOpens: 'Abre ao vencer: {title}',
+      powerDetail: '{power} · custo {cost}',
       back: 'Voltar',
       status: '{difficulty} · {done} duelos vencidos',
       finished: 'Campanha concluída · {ending}',
@@ -461,7 +468,7 @@ export const ptBR = {
         ],
         after: [
           { speaker: 'wasp', text: 'Rápido demais até para mim...' },
-          { speaker: 'narrator', text: 'Algo muda no Fluxo de {name}: um segundo poder despertou.' },
+          { speaker: 'narrator', text: 'Algo muda no Fluxo de {name}: agora cabe um segundo poder.' },
         ],
       },
       mine: {
@@ -472,7 +479,13 @@ export const ptBR = {
         ],
         after: [
           { speaker: 'ember', text: 'Você não tem um padrão. Isso me assusta.' },
-          { speaker: 'ember', text: 'O Bastião guarda o Santuário. Ele não deixa ninguém passar.' },
+          {
+            speaker: 'ember',
+            text: {
+              light: 'O Bastião guarda o Santuário. Ele não deixa ninguém passar.',
+              dark: 'O Soberano procura um novo aprendiz. Antes, vai mandar o Ceifador medir você no Anel.',
+            },
+          },
         ],
       },
       sanctuary: {
@@ -480,10 +493,7 @@ export const ptBR = {
         before: [
           { speaker: 'narrator', text: 'No Santuário Alagado, a água repete o duelo de cabeça para baixo.' },
           { speaker: 'bastion', text: 'Ninguém atravessa. Nem com o Fluxo.' },
-          {
-            speaker: 'protagonist',
-            text: { light: 'Não quero derrubar você. Só preciso chegar ao Soberano.', dark: 'Muros caem.' },
-          },
+          { speaker: 'protagonist', text: 'Não quero derrubar você. Só preciso chegar ao Soberano.' },
         ],
         after: [
           { speaker: 'bastion', text: '...Atravessou.' },
@@ -494,13 +504,11 @@ export const ptBR = {
         title: 'Sombra',
         before: [
           { speaker: 'shadow', text: 'O Soberano viu você chegando. Ele me mandou terminar o serviço.' },
-          {
-            speaker: 'protagonist',
-            text: { light: 'Ainda dá tempo de sair do lado dele.', dark: 'Ele mandou a pessoa errada.' },
-          },
+          { speaker: 'protagonist', text: 'Ainda dá tempo de sair do lado dele.' },
         ],
         after: [
           { speaker: 'shadow', text: 'Isso não acabou. O Fluxo dele me deu mais do que você imagina.' },
+          { speaker: 'narrator', text: 'O Fluxo de {name} se aprofunda: agora cabe um terceiro poder.' },
         ],
       },
       awakened: {
@@ -519,59 +527,110 @@ export const ptBR = {
         before: [
           { speaker: 'narrator', text: 'No Anel Orbital, o Fluxo gira em volta de um único duelista.' },
           { speaker: 'sovereign', text: 'Sete duelos. Você chegou mais longe do que todos.' },
-          {
-            speaker: 'protagonist',
-            text: { light: 'Vim devolver o Fluxo a quem ele pertence.', dark: 'Vim tomar o seu lugar.' },
-          },
+          { speaker: 'protagonist', text: 'Vim devolver o Fluxo a quem ele pertence.' },
           { speaker: 'sovereign', text: 'Então venha. Mostre que é digno do Anel.' },
         ],
         after: [
           { speaker: 'sovereign', text: 'Impossível... ninguém me tocava assim há anos.' },
         ],
       },
-      foretold: {
-        title: 'O Predestinado',
+      foretoldEclipse: {
+        title: 'O Predestinado do Eclipse',
         before: [
           { speaker: 'sovereign', text: 'Você venceu quase sem sangrar. Então ainda resta o meu herdeiro.' },
-          { speaker: 'foretold', text: 'Ele me criou para este duelo. Eu não escolhi o meu lado.' },
-          {
-            speaker: 'protagonist',
-            text: { light: 'Então escolha agora.', dark: 'Eu escolhi o meu. Veja aonde ele me trouxe.' },
-          },
+          { speaker: 'foretold', text: 'Ele me criou para este duelo. Disse que a Aurora tinha me abandonado.' },
+          { speaker: 'protagonist', text: 'A Aurora não abandona ninguém. Ainda dá tempo de escolher.' },
         ],
         after: [
           { speaker: 'foretold', text: 'O Fluxo... está quieto. Pela primeira vez.' },
         ],
       },
-    },
-    endings: {
-      normal: {
-        title: 'O Anel Silencia',
-        lines: [
-          {
-            speaker: 'narrator',
-            text: {
-              light: 'O Soberano cai. O Fluxo volta a correr livre pelas arenas.',
-              dark: 'O Soberano cai. O Anel agora gira em volta de {name}.',
-            },
-          },
-          {
-            speaker: 'narrator',
-            text: 'Dizem que ele guardava um herdeiro. Talvez um duelo mais limpo o tivesse revelado.',
-          },
+      reaperTrial: {
+        title: 'A Prova do Ceifador',
+        before: [
+          { speaker: 'narrator', text: 'No Anel Orbital, o Soberano observa de longe.' },
+          { speaker: 'reaper', text: 'Ele quer um novo aprendiz. Eu fui o último a pedir esse lugar.' },
+          { speaker: 'protagonist', text: 'Então hoje o lugar muda de dono.' },
+        ],
+        after: [
+          { speaker: 'reaper', text: 'Duas lâminas não bastaram...' },
+          { speaker: 'sovereign', text: '{name}. Um velho mestre da Aurora ainda se esconde. Traga-me o Ancião.' },
         ],
       },
-      secret: {
+      mirrorTemple: {
+        title: 'O Templo do Espelho',
+        before: [
+          { speaker: 'narrator', text: 'No Santuário Alagado, cada golpe volta refletido.' },
+          { speaker: 'mirror', text: 'O Ancião não quer guerra. Volte enquanto pode.' },
+          { speaker: 'protagonist', text: 'Ele esconde alguma coisa. Vou descobrir o quê.' },
+        ],
+        after: [
+          { speaker: 'mirror', text: 'Você não é o que o Soberano pensa.' },
+          { speaker: 'narrator', text: 'O Fluxo de {name} se aprofunda: agora cabe um terceiro poder.' },
+        ],
+      },
+      heronRooftop: {
+        title: 'A Garça do Telhado',
+        before: [
+          { speaker: 'narrator', text: 'No Telhado Neon, alguém salta entre as antenas.' },
+          { speaker: 'heron', text: 'O Ancião me treinou. Ele me pediu para não lutar com você.' },
+          { speaker: 'protagonist', text: 'Então ele devia ter vindo pessoalmente.' },
+        ],
+        after: [
+          { speaker: 'heron', text: 'Ele espera na Floresta Lumínica. E não está sozinho.' },
+        ],
+      },
+      elder: {
+        title: 'O Ancião',
+        before: [
+          { speaker: 'narrator', text: 'Na Floresta Lumínica, o Fluxo fica em silêncio.' },
+          { speaker: 'elder', text: 'O Soberano manda aprendizes e chama isso de força.' },
+          { speaker: 'protagonist', text: 'Ninguém me mandou. Vim porque quis.' },
+          { speaker: 'elder', text: 'Então mostre o que você quer de verdade.' },
+        ],
+        after: [
+          { speaker: 'elder', text: 'Forte... mais forte do que eu temia.' },
+        ],
+      },
+      foretoldAurora: {
+        title: 'O Predestinado da Aurora',
+        before: [
+          { speaker: 'elder', text: 'Você venceu quase sem sangrar. Então está na hora de conhecer quem eu escondi.' },
+          { speaker: 'foretold', text: 'O Ancião me escondeu dos dois lados. Dizem que eu nasci para equilibrar o Fluxo.' },
+          { speaker: 'protagonist', text: 'Então vamos ver para que lado ele pende.' },
+        ],
+        after: [
+          { speaker: 'foretold', text: 'Você luta pelo Eclipse... mas não como ele.' },
+        ],
+      },
+    },
+    endings: {
+      auroraNormal: {
+        title: 'O Anel Silencia',
+        lines: [
+          { speaker: 'narrator', text: 'O Soberano cai. O Fluxo volta a correr livre pelas arenas.' },
+          { speaker: 'narrator', text: 'Dizem que ele guardava um herdeiro. Talvez um duelo mais limpo o tivesse revelado.' },
+        ],
+      },
+      auroraSecret: {
+        title: 'O Herdeiro Volta',
+        lines: [
+          { speaker: 'narrator', text: 'O Predestinado baixa a lâmina vermelha.' },
+          { speaker: 'narrator', text: 'Sem o herdeiro, o Anel perde o centro. Aurora e Eclipse voltam a se medir de igual para igual.' },
+        ],
+      },
+      eclipseNormal: {
+        title: 'A Floresta Cede',
+        lines: [
+          { speaker: 'narrator', text: 'O Ancião cai. Nenhum mestre da Aurora resta para desafiar o Soberano.' },
+          { speaker: 'narrator', text: 'Mas {name} sente um Fluxo escondido em algum lugar. Talvez um duelo mais limpo o tivesse revelado.' },
+        ],
+      },
+      eclipseSecret: {
         title: 'O Equilíbrio',
         lines: [
           { speaker: 'narrator', text: 'O Predestinado baixa a lâmina.' },
-          {
-            speaker: 'narrator',
-            text: {
-              light: 'Aurora e Eclipse se encontram no Anel. O Fluxo, enfim, se equilibra.',
-              dark: '{name} poderia governar o Anel. Em vez disso, deixa o Fluxo em equilíbrio.',
-            },
-          },
+          { speaker: 'narrator', text: '{name} poderia entregar o Predestinado ao Soberano. Em vez disso, deixa o Fluxo em equilíbrio.' },
         ],
       },
     },

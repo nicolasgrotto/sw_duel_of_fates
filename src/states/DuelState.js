@@ -86,7 +86,7 @@ export class DuelState extends GameState {
     this.ladderStage = this.arcadeStage ?? this.survivalStage ?? this.storyStage;
     this.ladderRun = this.params.arcade ?? this.params.survival ?? this.params.story ?? null;
     this.roundsToWin = this.survivalStage ? 1 : this.storyStage ? storyConfig.roundsToWin : gameConfig.duel.roundsToWin;
-    this.playerCharacterData = this.storyStage ? createProtagonistCharacter(this.params.story.protagonist, storyConfig, this.params.story.slots) : null;
+    this.playerCharacterData = this.storyStage ? createProtagonistCharacter(this.params.story.protagonist, storyConfig, this.params.story.loadout) : null;
     this.playerCharacter = this.ladderStage ? this.ladderRun.playerCharacter : (this.params.playerCharacter ?? gameConfig.duel.playerCharacter);
     this.opponentCharacter = this.ladderStage ? this.ladderStage.opponentCharacter : (this.params.opponentCharacter ?? gameConfig.duel.opponentCharacter);
     this.difficultyId = this.ladderStage ? this.ladderStage.difficulty : this.game.settings.difficulty;
@@ -675,7 +675,7 @@ export class DuelState extends GameState {
     const outcome = resolveDuelOutcome(result, {
       params: this.params, settings: this.game.settings,
       character: this.playerCharacterData ?? characters[this.playerCharacter], survivalConfig: gameConfig.survival,
-      story: this.storyStage ? { config: storyConfig, texts: storyTexts, loadouts: storyConfig.protagonist.loadouts, names: getCharacterNames() } : null,
+      story: this.storyStage ? { config: storyConfig, texts: storyTexts, names: getCharacterNames() } : null,
     });
     if (outcome.story) {
       this.game.story = outcome.story;

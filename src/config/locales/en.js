@@ -275,6 +275,13 @@ export const en = {
       continue: 'Continue · Chapter {number}: {title}',
       upgrade: 'Raise attributes ({points} points)',
       upgradeView: 'View attributes',
+      powersOption: 'Powers',
+      powersTitle: 'POWERS',
+      slotNames: { neutral: 'Power', forward: 'Forward + Power', back: 'Back + Power' },
+      slotOption: '{slot} · {power}',
+      slotClosed: 'closed',
+      slotOpens: 'Opens after beating: {title}',
+      powerDetail: '{power} · cost {cost}',
       back: 'Back',
       status: '{difficulty} · {done} duels won',
       finished: 'Campaign complete · {ending}',
@@ -417,7 +424,10 @@ export const en = {
       trial: {
         title: 'The Trial',
         before: [
-          { speaker: 'narrator', text: 'On the Refinery Platform, the Flow runs stronger than anywhere else.' },
+          {
+            speaker: 'narrator',
+            text: 'On the Refinery Platform, the Flow runs stronger than anywhere else.',
+          },
           { speaker: 'guardian', text: '{name}. Before you leave the Platform, show me what you have learned.' },
           {
             speaker: 'protagonist',
@@ -428,8 +438,11 @@ export const en = {
           },
         ],
         after: [
-          { speaker: 'guardian', text: 'Good blade. But the Flow is not only strength: it is a choice.' },
-          { speaker: 'guardian', text: 'They say the Sovereign gathers duelists on the Orbital Ring. Follow his trail.' },
+          { speaker: 'guardian', text: 'A good blade. But the Flow is not only strength: it is a choice.' },
+          {
+            speaker: 'guardian',
+            text: 'They say the Sovereign gathers duelists on the Orbital Ring. Follow his trail.',
+          },
         ],
       },
       forest: {
@@ -447,26 +460,32 @@ export const en = {
         title: 'The Rooftop Wasp',
         before: [
           { speaker: 'narrator', text: 'On the Neon Rooftop, the rain never stops and nobody stands still.' },
-          { speaker: 'wasp', text: 'The Sovereign pays well for whoever beats me. Too bad nobody does.' },
+          { speaker: 'wasp', text: 'The Sovereign pays well for anyone who beats me. Too bad nobody does.' },
           {
             speaker: 'protagonist',
-            text: { light: 'I did not come for the pay.', dark: 'Then I will take the pay.' },
+            text: { light: 'I did not come for the money.', dark: 'Then I will take the money.' },
           },
         ],
         after: [
           { speaker: 'wasp', text: 'Too fast even for me...' },
-          { speaker: 'narrator', text: 'Something shifts in the Flow of {name}: a second power has awakened.' },
+          { speaker: 'narrator', text: 'Something shifts in the Flow of {name}: there is room for a second power now.' },
         ],
       },
       mine: {
         title: 'Ember in the Mine',
         before: [
           { speaker: 'narrator', text: 'The crystals of the mine keep the color of every blade that passes.' },
-          { speaker: 'ember', text: 'I read every blow before it is born. Show me yours.' },
+          { speaker: 'ember', text: 'I read every strike before it is born. Show me yours.' },
         ],
         after: [
           { speaker: 'ember', text: 'You have no pattern. That scares me.' },
-          { speaker: 'ember', text: 'The Bastion guards the Sanctuary. He lets no one through.' },
+          {
+            speaker: 'ember',
+            text: {
+              light: 'The Bastion guards the Sanctuary. He lets no one through.',
+              dark: 'The Sovereign is looking for a new apprentice. First, he will send the Reaper to test you on the Ring.',
+            },
+          },
         ],
       },
       sanctuary: {
@@ -474,10 +493,7 @@ export const en = {
         before: [
           { speaker: 'narrator', text: 'In the Flooded Sanctuary, the water repeats the duel upside down.' },
           { speaker: 'bastion', text: 'No one gets through. Not even with the Flow.' },
-          {
-            speaker: 'protagonist',
-            text: { light: 'I do not want to bring you down. I only need to reach the Sovereign.', dark: 'Walls fall.' },
-          },
+          { speaker: 'protagonist', text: 'I do not want to bring you down. I just need to reach the Sovereign.' },
         ],
         after: [
           { speaker: 'bastion', text: '...You got through.' },
@@ -488,13 +504,11 @@ export const en = {
         title: 'Shadow',
         before: [
           { speaker: 'shadow', text: 'The Sovereign saw you coming. He sent me to finish the job.' },
-          {
-            speaker: 'protagonist',
-            text: { light: 'There is still time to leave his side.', dark: 'He sent the wrong person.' },
-          },
+          { speaker: 'protagonist', text: 'There is still time to leave his side.' },
         ],
         after: [
-          { speaker: 'shadow', text: 'This is not over. His Flow gave me more than you can imagine.' },
+          { speaker: 'shadow', text: 'This is not over. His Flow gave me more than you think.' },
+          { speaker: 'narrator', text: 'The Flow of {name} grows deeper: there is room for a third power now.' },
         ],
       },
       awakened: {
@@ -513,56 +527,110 @@ export const en = {
         before: [
           { speaker: 'narrator', text: 'On the Orbital Ring, the Flow turns around a single duelist.' },
           { speaker: 'sovereign', text: 'Seven duels. You came further than anyone.' },
-          {
-            speaker: 'protagonist',
-            text: { light: 'I came to return the Flow to those it belongs to.', dark: 'I came to take your place.' },
-          },
+          { speaker: 'protagonist', text: 'I came to give the Flow back to those it belongs to.' },
           { speaker: 'sovereign', text: 'Then come. Show that you are worthy of the Ring.' },
         ],
         after: [
           { speaker: 'sovereign', text: 'Impossible... no one has touched me like that in years.' },
         ],
       },
-      foretold: {
-        title: 'The Foretold',
+      foretoldEclipse: {
+        title: 'The Eclipse Foretold',
         before: [
-          { speaker: 'sovereign', text: 'You won almost without bleeding. Then my heir still remains.' },
-          { speaker: 'foretold', text: 'He made me for this duel. I did not choose my side.' },
-          {
-            speaker: 'protagonist',
-            text: { light: 'Then choose now.', dark: 'I chose mine. See where it brought me.' },
-          },
+          { speaker: 'sovereign', text: 'You won almost without bleeding. Then my heir is still left.' },
+          { speaker: 'foretold', text: 'He made me for this duel. He said the Aurora had abandoned me.' },
+          { speaker: 'protagonist', text: 'The Aurora abandons no one. There is still time to choose.' },
         ],
         after: [
           { speaker: 'foretold', text: 'The Flow... is quiet. For the first time.' },
         ],
       },
+      reaperTrial: {
+        title: 'The Reaper Test',
+        before: [
+          { speaker: 'narrator', text: 'On the Orbital Ring, the Sovereign watches from afar.' },
+          { speaker: 'reaper', text: 'He wants a new apprentice. I was the last one to ask for that place.' },
+          { speaker: 'protagonist', text: 'Then today the place changes hands.' },
+        ],
+        after: [
+          { speaker: 'reaper', text: 'Two blades were not enough...' },
+          { speaker: 'sovereign', text: '{name}. An old Aurora master is still hiding. Bring me the Elder.' },
+        ],
+      },
+      mirrorTemple: {
+        title: 'The Mirror Temple',
+        before: [
+          { speaker: 'narrator', text: 'In the Flooded Sanctuary, every strike comes back reflected.' },
+          { speaker: 'mirror', text: 'The Elder does not want war. Turn back while you can.' },
+          { speaker: 'protagonist', text: 'He is hiding something. I will find out what.' },
+        ],
+        after: [
+          { speaker: 'mirror', text: 'You are not what the Sovereign thinks.' },
+          { speaker: 'narrator', text: 'The Flow of {name} grows deeper: there is room for a third power now.' },
+        ],
+      },
+      heronRooftop: {
+        title: 'The Rooftop Heron',
+        before: [
+          { speaker: 'narrator', text: 'On the Neon Rooftop, someone leaps between the antennas.' },
+          { speaker: 'heron', text: 'The Elder trained me. He asked me not to fight you.' },
+          { speaker: 'protagonist', text: 'Then he should have come himself.' },
+        ],
+        after: [
+          { speaker: 'heron', text: 'He waits in the Luminous Forest. And he is not alone.' },
+        ],
+      },
+      elder: {
+        title: 'The Elder',
+        before: [
+          { speaker: 'narrator', text: 'In the Luminous Forest, the Flow goes silent.' },
+          { speaker: 'elder', text: 'The Sovereign sends apprentices and calls it strength.' },
+          { speaker: 'protagonist', text: 'No one sent me. I came because I wanted to.' },
+          { speaker: 'elder', text: 'Then show me what you really want.' },
+        ],
+        after: [
+          { speaker: 'elder', text: 'Strong... stronger than I feared.' },
+        ],
+      },
+      foretoldAurora: {
+        title: 'The Aurora Foretold',
+        before: [
+          { speaker: 'elder', text: 'You won almost without bleeding. Then it is time to meet the one I hid.' },
+          { speaker: 'foretold', text: 'The Elder hid me from both sides. They say I was born to balance the Flow.' },
+          { speaker: 'protagonist', text: 'Then let us see which way it leans.' },
+        ],
+        after: [
+          { speaker: 'foretold', text: 'You fight for the Eclipse... but not like him.' },
+        ],
+      },
     },
     endings: {
-      normal: {
+      auroraNormal: {
         title: 'The Ring Falls Silent',
         lines: [
-          {
-            speaker: 'narrator',
-            text: {
-              light: 'The Sovereign falls. The Flow runs free across the arenas again.',
-              dark: 'The Sovereign falls. The Ring now turns around {name}.',
-            },
-          },
+          { speaker: 'narrator', text: 'The Sovereign falls. The Flow runs free through the arenas again.' },
           { speaker: 'narrator', text: 'They say he kept an heir. Perhaps a cleaner duel would have revealed him.' },
         ],
       },
-      secret: {
+      auroraSecret: {
+        title: 'The Heir Returns',
+        lines: [
+          { speaker: 'narrator', text: 'The Foretold lowers the red blade.' },
+          { speaker: 'narrator', text: 'Without the heir, the Ring loses its center. Aurora and Eclipse face each other as equals again.' },
+        ],
+      },
+      eclipseNormal: {
+        title: 'The Forest Yields',
+        lines: [
+          { speaker: 'narrator', text: 'The Elder falls. No Aurora master is left to challenge the Sovereign.' },
+          { speaker: 'narrator', text: 'But {name} feels a hidden Flow somewhere. Perhaps a cleaner duel would have revealed it.' },
+        ],
+      },
+      eclipseSecret: {
         title: 'Balance',
         lines: [
           { speaker: 'narrator', text: 'The Foretold lowers the blade.' },
-          {
-            speaker: 'narrator',
-            text: {
-              light: 'Aurora and Eclipse meet on the Ring. At last, the Flow finds its balance.',
-              dark: '{name} could rule the Ring. Instead, they leave the Flow in balance.',
-            },
-          },
+          { speaker: 'narrator', text: '{name} could deliver the Foretold to the Sovereign. Instead, they leave the Flow in balance.' },
         ],
       },
     },

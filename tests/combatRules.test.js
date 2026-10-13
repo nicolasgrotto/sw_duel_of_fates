@@ -16,10 +16,9 @@ it('enables combat capabilities only in their approved modes', () => {
     assert.equal(rules.focusEvade, enabled || mode === 'gallery');
     assert.equal(rules.bladeLock, taught);
   }
-  assert.equal(storyConfig.rules.exhaustion, false);
-  assert.equal(storyConfig.rules.wounds, false);
-  assert.equal(storyConfig.rules.focusEvade, false);
-  assert.equal(storyConfig.rules.bladeLock, false);
+  assert.deepEqual(resolveCombatRules(storyConfig.rules), {
+    powers: true, exhaustion: true, wounds: true, focusEvade: true, bladeLock: true,
+  });
 });
 
 it('requires powers only for automatic focus evasion', () => {

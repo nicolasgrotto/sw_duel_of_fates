@@ -22,6 +22,7 @@ import { aiConfig } from '../config/aiConfig.js';
 export const StoryOption = Object.freeze({
   CONTINUE: 'continue',
   UPGRADE: 'upgrade',
+  POWERS: 'powers',
   NEW: 'new',
   BACK: 'back',
 });
@@ -51,12 +52,13 @@ export class StoryState extends GameState {
     }
     if (this.run) {
       items.push({ id: StoryOption.UPGRADE, label: this.run.points > 0 ? formatText(texts.story.upgrade, { points: this.run.points }) : texts.story.upgradeView });
+      items.push({ id: StoryOption.POWERS, label: texts.story.powersOption });
     }
     items.push({ id: StoryOption.NEW, label: this.run ? texts.story.restart : texts.story.start });
     items.push({ id: StoryOption.BACK, label: texts.story.back });
     this.menu = new MenuList(items, layout.story.list, this.game.audio);
     this.preview = this.run
-      ? createFighterFromCharacter(createProtagonistCharacter(this.run.protagonist, storyConfig, this.run.slots), { x: 0, y: 0, facing: 1 })
+      ? createFighterFromCharacter(createProtagonistCharacter(this.run.protagonist, storyConfig, this.run.loadout), { x: 0, y: 0, facing: 1 })
       : null;
   }
 
@@ -75,6 +77,9 @@ export class StoryState extends GameState {
         break;
       case StoryOption.UPGRADE:
         this.game.changeState(StateId.PROTAGONIST, { mode: ProtagonistMode.UPGRADE });
+        break;
+      case StoryOption.POWERS:
+        this.game.changeState(StateId.PROTAGONIST, { mode: ProtagonistMode.POWERS });
         break;
       case StoryOption.NEW:
         this.game.changeState(StateId.PROTAGONIST, { mode: ProtagonistMode.CREATE });
@@ -126,7 +131,7 @@ export class StoryState extends GameState {
       alignment: texts.story.alignments[protagonist.alignment],
       style: texts.story.styles[protagonist.style],
     }), previewX, infoY + infoSpacing, textStyles.hint);
-    renderer.text(formatText(texts.story.powers, { list: getPowerNames(protagonist.alignment) }), previewX, infoY + infoSpacing * 2, textStyles.hint);
+    renderer.text(formatText(texts.story.powers, { list: getPowerNames(this.run.loadout) }), previewX, infoY + infoSpacing * 2, textStyles.hint);
     drawAttributeBars(renderer, protagonist.attributes, attributes);
     drawFighterPreview(renderer, this.preview, this.pose, figureX, previewY, previewScale);
     renderer.text(texts.story.footer, renderer.width / 2, layout.story.footerY, textStyles.hint);

@@ -4,6 +4,7 @@ import { createFighterFromCharacter } from '../src/characters/characterFactory.j
 import { createProtagonistCharacter } from '../src/characters/protagonist.js';
 import { Action } from '../src/config/controlsConfig.js';
 import { audioConfig } from '../src/config/audioConfig.js';
+import { powersConfig } from '../src/config/powersConfig.js';
 import { storyConfig } from '../src/config/storyConfig.js';
 import { storyTexts } from '../src/config/storyTexts.js';
 import { layout } from '../src/config/uiConfig.js';
@@ -12,7 +13,8 @@ import { StateMachine } from '../src/core/StateMachine.js';
 import { evaluateCondition } from '../src/modes/story/conditions.js';
 import { resolveDialogue } from '../src/modes/story/dialogue.js';
 import {
-  canRaiseAttribute, createStoryRun, getStoryStage, getUnearnedPoints, isAttributeBudgetFull, raiseAttribute, resolveStoryResult, sanitizeStoryRun,
+  canRaiseAttribute, createStoryRun, cycleLoadoutPower, getCampaignBuild, getRoutePoints, getStoryStage, getUnearnedPoints, isAttributeBudgetFull,
+  raiseAttribute, resolveStoryResult, sanitizeStoryRun, setLoadoutPower,
 } from '../src/modes/story/storyRun.js';
 import { DuelMode } from '../src/states/duelModes.js';
 import { createState } from '../src/states/stateFactory.js';
@@ -30,7 +32,7 @@ function testConfig() {
   return {
     ...storyConfig,
     encounters: [
-      { id: 'a', opponent: 'guardian', arena: 'refinery', aiOffset: -1, next: 'b', reward: { powers: true } },
+      { id: 'a', opponent: 'guardian', arena: 'refinery', aiOffset: -1, next: 'b', reward: { points: { easy: 3, normal: 2, hard: 1 }, slot: 'forward', powers: { dark: 'pull' } } },
       { id: 'b', opponent: 'shadow', arena: 'forest', outcomes: [
         { condition: { type: 'healthRatioAbove', threshold: 0.75 }, next: 'c' },
         { condition: { type: 'always' }, ending: 'normal' },
@@ -46,8 +48,10 @@ describe('story run', () => {
   it('starts with the base ratings, starting points and only the neutral power', () => {
     const run = createStoryRun(PROFILE, 'normal', storyConfig);
     assert.equal(run.encounter, storyConfig.start);
-    assert.equal(run.points, storyConfig.startPoints.normal);
+    assert.equal(run.points, storyConfig.startPoints);
     assert.deepEqual(run.slots, ['neutral']);
+    assert.deepEqual(run.catalog, ['lightning']);
+    assert.deepEqual(run.loadout, { neutral: 'lightning' });
     assert.deepEqual(run.protagonist.attributes, storyConfig.startAttributes);
   });
 
@@ -69,13 +73,93 @@ describe('story run', () => {
     assert.equal(raiseAttribute({ ...run, points: 0 }, 'health', config).points, 0);
   });
 
-  it('fills each difficulty budget exactly with the points of the duels before the last one', () => {
+  it('fills each difficulty budget exactly before the final boss on both campaigns', () => {
     const base = Object.values(storyConfig.startAttributes).reduce((sum, value) => sum + value, 0);
-    const victories = storyConfig.encounters.length - 1;
-    for (const difficulty of storyConfig.difficulties) {
-      assert.equal(base + storyConfig.startPoints[difficulty] + storyConfig.pointsPerVictory * victories, storyConfig.budgets[difficulty], difficulty);
+    assert.deepEqual(storyConfig.budgets, { easy: 42, normal: 36, hard: 30 });
+    for (const alignment of storyConfig.protagonist.alignments) {
+      for (const difficulty of storyConfig.difficulties) {
+        assert.equal(base + getRoutePoints(alignment, difficulty, storyConfig), storyConfig.budgets[difficulty], `${alignment}/${difficulty}`);
+      }
     }
-    assert.ok(storyConfig.startPoints.easy > storyConfig.startPoints.normal && storyConfig.startPoints.normal > storyConfig.startPoints.hard);
+    for (const encounter of storyConfig.encounters.filter((candidate) => candidate.unlocks || candidate.secret)) {
+      assert.deepEqual(encounter.reward.points, { easy: 0, normal: 0, hard: 0 }, encounter.id);
+    }
+  });
+
+  it('routes each path through its own encounters to its own boss and secret variant', () => {
+    const expected = {
+      light: ['trial', 'forest', 'rooftop', 'mine', 'sanctuary', 'shadowDuel', 'awakened', 'sovereign', 'foretoldEclipse'],
+      dark: ['trial', 'forest', 'rooftop', 'mine', 'reaperTrial', 'mirrorTemple', 'heronRooftop', 'elder', 'foretoldAurora'],
+    };
+    for (const [alignment, route] of Object.entries(expected)) {
+      let run = createStoryRun({ ...PROFILE, alignment }, 'normal', storyConfig);
+      const visited = [];
+      while (run.encounter) {
+        visited.push(run.encounter);
+        run = resolveStoryResult(run, result(0, 0.9), storyConfig).run;
+      }
+      assert.deepEqual(visited, route);
+      assert.equal(run.ending, alignment === 'light' ? 'auroraSecret' : 'eclipseSecret');
+    }
+    const variants = { foretoldEclipse: 'eclipse', foretoldAurora: 'aurora' };
+    for (const [id, variant] of Object.entries(variants)) {
+      const stage = getStoryStage({ ...createStoryRun(PROFILE, 'easy', storyConfig), encounter: id }, storyConfig, ORDER);
+      assert.equal(stage.opponentVariant, variant);
+      assert.equal(stage.difficulty, 'boss');
+    }
+  });
+
+  it('opens the secret duel only above 75 percent of health', () => {
+    for (const [alignment, boss, secret, ending] of [['light', 'sovereign', 'foretoldEclipse', 'auroraNormal'], ['dark', 'elder', 'foretoldAurora', 'eclipseNormal']]) {
+      const atBoss = { ...createStoryRun({ ...PROFILE, alignment }, 'normal', storyConfig), encounter: boss };
+      const exact = resolveStoryResult(atBoss, result(0, 0.75), storyConfig);
+      assert.equal(exact.ending, ending);
+      assert.equal(exact.run.encounter, null);
+      assert.equal(resolveStoryResult(atBoss, result(0, 0.7501), storyConfig).run.encounter, secret);
+    }
+  });
+
+  it('grants slots and powers once per encounter and keeps every open slot filled without repeats', () => {
+    for (const alignment of storyConfig.protagonist.alignments) {
+      const build = getCampaignBuild(alignment, storyConfig);
+      assert.deepEqual(build.slots, storyConfig.slotOrder);
+      assert.equal(build.catalog.length, 7);
+      assert.equal(new Set(Object.values(build.loadout)).size, 3);
+      assert.ok(build.catalog.every((power) => !powersConfig.powers[power].minFlowLevel), alignment);
+    }
+    let run = createStoryRun({ ...PROFILE, alignment: 'light' }, 'normal', storyConfig);
+    for (let index = 0; index < 3; index += 1) run = resolveStoryResult(run, result(0), storyConfig).run;
+    assert.deepEqual(run.slots, ['neutral', 'forward']);
+    assert.deepEqual(run.catalog, ['push', 'barrier', 'throw']);
+    assert.deepEqual(run.loadout, { neutral: 'push', forward: 'barrier' });
+    const retried = resolveStoryResult(run, result(1), storyConfig).run;
+    assert.equal(retried, run);
+  });
+
+  it('swaps powers between slots, cycles the catalog and never equips a missing power', () => {
+    let run = { ...createStoryRun({ ...PROFILE, alignment: 'light' }, 'normal', storyConfig), slots: ['neutral', 'forward'], catalog: ['push', 'barrier', 'throw'], loadout: { neutral: 'push', forward: 'barrier' } };
+    run = setLoadoutPower(run, 'neutral', 'barrier', storyConfig);
+    assert.deepEqual(run.loadout, { neutral: 'barrier', forward: 'push' });
+    assert.equal(setLoadoutPower(run, 'back', 'throw', storyConfig), run);
+    assert.equal(setLoadoutPower(run, 'neutral', 'lightning', storyConfig), run);
+    run = cycleLoadoutPower(run, 'forward', 1, storyConfig);
+    assert.deepEqual(run.loadout, { neutral: 'push', forward: 'barrier' });
+    run = cycleLoadoutPower(run, 'forward', 1, storyConfig);
+    assert.deepEqual(run.loadout, { neutral: 'push', forward: 'throw' });
+  });
+
+  it('rejects saved builds with foreign, repeated or closed-slot powers', () => {
+    const run = createStoryRun({ ...PROFILE, alignment: 'light' }, 'normal', storyConfig);
+    assert.ok(sanitizeStoryRun(run, storyConfig));
+    for (const broken of [
+      { ...run, catalog: ['lightning'], loadout: { neutral: 'lightning' } },
+      { ...run, slots: ['neutral', 'forward'], catalog: ['push', 'barrier'], loadout: { neutral: 'push', forward: 'push' } },
+      { ...run, loadout: { neutral: 'push', back: 'push' } },
+      { ...run, catalog: undefined },
+      { ...run, slots: ['neutral', 'typo'] },
+    ]) {
+      assert.equal(sanitizeStoryRun(broken, storyConfig), null);
+    }
   });
 
   it('never grants points beyond the budget and trims extra points from old saves', () => {
@@ -85,7 +169,7 @@ describe('story run', () => {
     const total = Object.values(run.protagonist.attributes).reduce((sum, value) => sum + value, 0);
     const full = { ...run, points: budget - total };
     assert.equal(getUnearnedPoints(full, config), 0);
-    assert.equal(resolveStoryResult(full, result(0), config, storyConfig.protagonist.loadouts).run.points, budget - total);
+    assert.equal(resolveStoryResult(full, result(0), config).run.points, budget - total);
     const saved = sanitizeStoryRun({ ...full, points: budget - total + 6 }, config);
     assert.equal(saved.points, budget - total);
     const spent = { ...run, points: 0, protagonist: { ...run.protagonist, attributes: { ...run.protagonist.attributes, health: run.protagonist.attributes.health + budget - total } } };
@@ -96,24 +180,25 @@ describe('story run', () => {
   it('keeps the encounter on a defeat and advances with points and rewards on a victory', () => {
     const config = testConfig();
     const run = createStoryRun(PROFILE, 'normal', config);
-    assert.equal(resolveStoryResult(run, result(1), config, storyConfig.protagonist.loadouts).run, run);
-    const won = resolveStoryResult(run, result(0), config, storyConfig.protagonist.loadouts);
+    assert.equal(resolveStoryResult(run, result(1), config).run, run);
+    const won = resolveStoryResult(run, result(0), config);
     assert.equal(won.run.encounter, 'b');
-    assert.equal(won.run.points, run.points + config.pointsPerVictory);
+    assert.equal(won.run.points, run.points + 2);
     assert.deepEqual(won.run.slots, ['neutral', 'forward']);
+    assert.deepEqual(won.run.loadout, { neutral: 'lightning', forward: 'pull' });
     assert.deepEqual(won.run.completed, ['a']);
   });
 
   it('routes the final duel by the remaining health and unlocks by ending', () => {
     const config = testConfig();
     const atB = { ...createStoryRun(PROFILE, 'normal', config), encounter: 'b' };
-    const normal = resolveStoryResult(atB, result(0, 0.6), config, storyConfig.protagonist.loadouts);
+    const normal = resolveStoryResult(atB, result(0, 0.6), config);
     assert.equal(normal.ending, 'normal');
     assert.equal(normal.run.encounter, null);
     assert.deepEqual(normal.unlocks, ['shadow']);
-    const secret = resolveStoryResult(atB, result(0, 0.8), config, storyConfig.protagonist.loadouts);
+    const secret = resolveStoryResult(atB, result(0, 0.8), config);
     assert.equal(secret.run.encounter, 'c');
-    const final = resolveStoryResult(secret.run, result(0), config, storyConfig.protagonist.loadouts);
+    const final = resolveStoryResult(secret.run, result(0), config);
     assert.equal(final.ending, 'secret');
     assert.deepEqual(final.unlocks, ['echo', 'guardian']);
   });
@@ -150,9 +235,9 @@ describe('story run', () => {
 });
 
 describe('protagonist', () => {
-  it('builds a fighter from the profile, the style base and the unlocked power slots', () => {
+  it('builds a fighter from the profile, the style base and the equipped powers', () => {
     const run = createStoryRun(PROFILE, 'normal', storyConfig);
-    const character = createProtagonistCharacter(run.protagonist, storyConfig, run.slots);
+    const character = createProtagonistCharacter(run.protagonist, storyConfig, run.loadout);
     const fighter = createFighterFromCharacter(character, { x: 0, y: 0, facing: 1 });
     assert.equal(fighter.name, 'Kael');
     assert.equal(fighter.appearance.saberColor, PROFILE.saberColor);
@@ -219,7 +304,7 @@ describe('story flow', () => {
     assert.equal(game.states.current.mode, 'upgrade');
     game.step(Action.CONFIRM);
     assert.equal(game.story.protagonist.attributes.health, storyConfig.startAttributes.health + 1);
-    assert.equal(game.story.points, storyConfig.startPoints[game.story.difficulty] - 1);
+    assert.equal(game.story.points, storyConfig.startPoints - 1);
     game.step(Action.BACK);
     assert.deepEqual(game.stateNames(), ['StoryState']);
 
@@ -277,13 +362,13 @@ it('uses an injected name prompt, keeps ready names and removes the prompt on st
 });
 
 describe('story secrets', () => {
-  it('fights the foretold at the boss difficulty and frees the elder only on the Aurora path', () => {
-    const atForetold = { ...createStoryRun(PROFILE, 'easy', storyConfig), encounter: 'foretold' };
-    assert.equal(getStoryStage(atForetold, storyConfig, ORDER).difficulty, 'boss');
-    const dark = resolveStoryResult(atForetold, result(0), storyConfig, storyConfig.protagonist.loadouts);
-    assert.equal(dark.ending, 'secret');
-    assert.ok(!dark.unlocks.includes('elder'));
-    const light = resolveStoryResult({ ...atForetold, protagonist: { ...atForetold.protagonist, alignment: 'light' } }, result(0), storyConfig, storyConfig.protagonist.loadouts);
-    assert.deepEqual(light.unlocks, ['foretold', 'elder']);
+  it('frees the other master at the end of each campaign and the defeated boss on the way', () => {
+    const light = { ...createStoryRun({ ...PROFILE, alignment: 'light' }, 'easy', storyConfig), encounter: 'sovereign' };
+    assert.deepEqual(resolveStoryResult(light, result(0, 0.5), storyConfig).unlocks, ['sovereign', 'elder']);
+    assert.deepEqual(resolveStoryResult({ ...light, encounter: 'foretoldEclipse' }, result(0), storyConfig).unlocks, ['elder']);
+    const dark = { ...createStoryRun({ ...PROFILE, alignment: 'dark' }, 'easy', storyConfig), encounter: 'elder' };
+    assert.deepEqual(resolveStoryResult(dark, result(0, 0.5), storyConfig).unlocks, ['elder', 'sovereign']);
+    assert.deepEqual(resolveStoryResult({ ...dark, encounter: 'foretoldAurora' }, result(0), storyConfig).unlocks, ['sovereign']);
+    for (const id of Object.keys(storyConfig.endings)) assert.equal(storyConfig.endings[id].secret === true, id.endsWith('Secret'));
   });
 });

@@ -61,7 +61,7 @@ describe('foretold variants', () => {
     const migrated = loadSave(store, 'save');
     assert.equal(migrated.version, SAVE_VERSION);
     assert.deepEqual(migrated.settings.unlockedVariants.foretold, ['aurora', 'eclipse']);
-    assert.deepEqual(migrated.story, fixture.story);
+    assert.equal(migrated.story, null);
     assert.deepEqual({ ...migrated.settings, unlockedVariants: null }, { ...fixture.settings, unlockedVariants: null });
     saveSave({ ...migrated.settings, unlockedVariants: { foretold: ['aurora'] } }, store, 'save', migrated.story);
     assert.deepEqual(loadSave(store, 'save').settings.unlockedVariants.foretold, ['aurora']);
@@ -94,10 +94,10 @@ describe('foretold variants', () => {
 
 it('story victory unlocks only the defeated variant, while defeat unlocks neither', () => {
   const profile = { name: 'Iria', alignment: 'light', style: 'technique', saberColor: '#7fe4ff' };
-  const run = { ...createStoryRun(profile, 'normal', storyConfig), encounter: 'foretold' };
+  const run = { ...createStoryRun(profile, 'normal', storyConfig), encounter: 'foretoldEclipse' };
   for (const variant of ['aurora', 'eclipse']) {
     const result = { mode: DuelMode.STORY, winnerSide: 0, fighters: [{ healthRatio: 1 }, { id: 'foretold', variant }] };
-    const context = { params: { story: run }, settings: {}, story: { config: storyConfig, texts: storyTexts, loadouts: storyConfig.protagonist.loadouts, names: Object.fromEntries(Object.entries(characters).map(([id, c]) => [id, c.name])) } };
+    const context = { params: { story: run }, settings: {}, story: { config: storyConfig, texts: storyTexts, names: Object.fromEntries(Object.entries(characters).map(([id, c]) => [id, c.name])) } };
     const outcome = resolveDuelOutcome(result, context);
     assert.deepEqual(outcome.progress.unlockedVariants, { foretold: [variant] });
     assert.ok(outcome.progress.unlockedCharacters.includes('foretold'));

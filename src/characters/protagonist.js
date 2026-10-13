@@ -3,9 +3,9 @@ import { characters } from './characterData.js';
 
 export const PROTAGONIST_ID = 'protagonist';
 
-export function createProtagonistCharacter(profile, { protagonist }, slots = null) {
+export function createProtagonistCharacter(profile, { protagonist, slotOrder }, powers = null) {
   const template = characters[protagonist.styles[profile.style].base];
-  const loadout = { powers: protagonist.loadouts[profile.alignment], techniques: template.loadout?.techniques ?? {} };
+  const loadout = { powers: powers ?? { [slotOrder[0]]: protagonist.startPowers[profile.alignment] }, techniques: template.loadout?.techniques ?? {} };
   return {
     id: PROTAGONIST_ID,
     name: profile.name,
@@ -21,7 +21,6 @@ export function createProtagonistCharacter(profile, { protagonist }, slots = nul
     sound: template.sound,
     loadout,
     powerSlots: 3,
-    unlockedPowerSlots: slots,
     appearance: resolveAppearance({ appearance: { ...template.appearance, ...protagonist.appearance, saberColor: profile.saberColor }, skins: protagonist.skins }, profile.skin),
   };
 }

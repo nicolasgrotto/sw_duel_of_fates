@@ -45,11 +45,11 @@ describe('ability catalog', () => {
 
   it('builds the protagonist loadout from the path and the style', () => {
     const profile = { name: 'Kael', alignment: 'dark', style: 'fury', saberColor: '#7fe4ff', attributes: storyConfig.startAttributes };
-    const character = createProtagonistCharacter(profile, storyConfig, ['neutral']);
-    assert.deepEqual(character.loadout.powers, storyConfig.protagonist.loadouts.dark);
+    const character = createProtagonistCharacter(profile, storyConfig, { neutral: 'lightning', forward: 'wrath' });
+    assert.deepEqual(character.loadout.powers, { neutral: 'lightning', forward: 'wrath' });
     assert.deepEqual(character.loadout.techniques, characters.shadow.loadout.techniques);
     const fighter = createFighterFromCharacter(character, { x: 0, y: 0, facing: 1 });
-    assert.deepEqual(Object.keys(fighter.stats.power.loadout), ['neutral']);
+    assert.deepEqual(Object.keys(fighter.stats.power.loadout), ['neutral', 'forward']);
     assert.ok(fighter.moves.dashSlash);
   });
 });

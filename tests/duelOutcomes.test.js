@@ -56,8 +56,8 @@ it('unlocks Arcade skins with challenge rewards and preserves ladder customizati
 
 it('unlocks roster skins at either story ending and secret skins only at the secret ending', () => {
   const profile = { name: 'Kael', alignment: 'light', style: 'technique', saberColor: storyConfig.protagonist.saberColors[0] };
-  const story = { config: storyConfig, texts: storyTexts, loadouts: storyConfig.protagonist.loadouts, names: Object.fromEntries(Object.values(characters).map((character) => [character.id, character.name])) };
-  for (const encounter of ['trial', 'sovereign', 'foretold']) {
+  const story = { config: storyConfig, texts: storyTexts, names: Object.fromEntries(Object.values(characters).map((character) => [character.id, character.name])) };
+  for (const encounter of ['trial', 'sovereign', 'foretoldEclipse']) {
     const run = { ...createStoryRun(profile, 'normal', storyConfig), encounter };
     const result = { mode: 'story', winnerSide: 0, fighters: [{ healthRatio: 0.5 }, {}], stats: [{}, {}] };
     const outcome = resolveDuelOutcome(result, { params: { mode: 'story', story: run }, settings: { unlocks: { guardian: ['challenge'] } }, story });
@@ -69,7 +69,7 @@ it('unlocks roster skins at either story ending and secret skins only at the sec
       assert.ok(outcome.progress.unlocks[character.id].includes('skin-story'));
     }
     assert.ok(outcome.progress.unlocks.guardian.includes('challenge'));
-    assert.equal(outcome.progress.unlocks.sovereign?.includes('skin-secret') ?? false, encounter === 'foretold');
-    assert.equal(outcome.progress.unlocks.foretold?.includes('skin-secret') ?? false, encounter === 'foretold');
+    assert.equal(outcome.progress.unlocks.sovereign?.includes('skin-secret') ?? false, encounter === 'foretoldEclipse');
+    assert.equal(outcome.progress.unlocks.foretold?.includes('skin-secret') ?? false, encounter === 'foretoldEclipse');
   }
 });
