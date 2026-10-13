@@ -13,6 +13,7 @@ import { STEP, createSimulation, segmentEntersBox, spawnFighter } from './helper
 const baseline = JSON.parse(readFileSync(new URL('./fixtures/attackPoses-v2.json', import.meta.url)));
 const MAX_CHAIN_ANGLE = Math.PI / 3;
 const TECHNIQUES = new Set(['spin', 'dashSlash', 'saberThrow']);
+const ADDED_AFTER_V2 = new Set(['reaper']);
 
 function attackAt(fighter, moveId, time) {
   const move = fighter.moves[moveId];
@@ -89,7 +90,7 @@ describe('historical attack animation contract (198525b)', () => {
   it('covers every character, either through the v2 baseline or through keyframe tracks', () => {
     for (const id of Object.keys(baseline.poses)) assert.ok(characters[id], id);
     for (const id of Object.keys(characters)) {
-      assert.ok(baseline.poses[id] || baseline.moves[id], `${id} has no historical contract`);
+      assert.ok(baseline.poses[id] || baseline.moves[id] || ADDED_AFTER_V2.has(id), `${id} has no historical contract`);
       assert.ok(getMotionStyle(spawnFighter(500, 1, id)).tracks, `${id} has no keyframe tracks`);
     }
   });

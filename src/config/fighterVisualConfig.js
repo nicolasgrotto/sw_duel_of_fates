@@ -630,7 +630,7 @@ const reaperKeyframes = {
     { phase: ACTIVE, at: 0.5, ease: 'in', blade: -20, lean: 8, crouch: 6, reach: 0.1, step: 0.06, hip: 0.02, twirl: 90 },
     { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 20, lean: 16, crouch: 10, reach: 0.15, step: 0.1, hip: 0.04, twirl: 180 },
     { phase: RECOVERY, at: 0.35, ease: 'outQuad', blade: 30, lean: 15, crouch: 10, reach: 0.13, step: 0.1, hip: 0.04, twirl: 180 },
-    { phase: RECOVERY, at: 1, ease: 'inOut', twirl: 180 },
+    { phase: RECOVERY, at: 1, ease: 'inOut', twirl: 360 },
   ],
   heavy: [
     { phase: STARTUP, at: 0.5, ease: 'out', blade: -120, lean: -3, crouch: 3, lift: 0.08, slide: 0.03, hip: -0.02, twirl: 180 },
