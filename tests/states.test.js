@@ -1112,3 +1112,32 @@ it('sets touch fourth-power availability from the local fighter and power rules'
     assert.deepEqual(features, expected);
   }
 });
+
+
+it('routes overlapping variant and skin touch regions to the closest row exclusively', () => {
+  const game = createFakeGame();
+  game.settings.unlockedCharacters = ['foretold'];
+  game.settings.unlockedVariants = { foretold: ['aurora', 'eclipse'] };
+  game.settings.unlocks = { foretold: ['skin-dusk', 'skin-secret'] };
+  game.changeState(StateId.CHARACTER_SELECT);
+  const select = game.states.current;
+  select.characterMenu.selectedIndex = select.characterIds.indexOf('foretold');
+  for (const x of [590, 1170]) {
+    game.input.touchTaps = [{ x, y: 342 }];
+    game.step();
+    assert.equal(select.getChosenVariant('foretold'), x === 590 ? 'eclipse' : 'aurora');
+    assert.equal(select.getChosenSkin('foretold'), 'base');
+  }
+  game.input.touchTaps = [{ x: 1170, y: 366 }];
+  game.step();
+  assert.equal(select.getChosenSkin('foretold'), 'skin-dusk');
+  assert.equal(select.getChosenVariant('foretold'), 'aurora');
+  game.input.touchTaps = [{ x: 1170, y: 354 }];
+  game.step();
+  assert.equal(select.getChosenVariant('foretold'), 'eclipse');
+  assert.equal(select.getChosenSkin('foretold'), 'skin-dusk');
+  game.settings.unlockedVariants = { foretold: ['aurora'] };
+  game.input.touchTaps = [{ x: 1170, y: 366 }];
+  game.step();
+  assert.equal(select.getChosenSkin('foretold'), 'skin-secret');
+});

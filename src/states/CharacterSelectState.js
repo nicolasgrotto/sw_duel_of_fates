@@ -127,12 +127,21 @@ export class CharacterSelectState extends GameState {
     const options = getUnlockedVariants(character, this.game.settings);
     if (options.length < 2) return;
     const taps = input.touchTaps ?? [];
-    const step = (input.wasPressed(Action.POWER) || taps.some(tap => containsTouch(tap, touchLayoutConfig.variantRight)) ? 1 : 0)
-      - (taps.some(tap => containsTouch(tap, touchLayoutConfig.variantLeft)) ? 1 : 0);
+    const step = (input.wasPressed(Action.POWER) || taps.some(tap => containsTouch(tap, touchLayoutConfig.variantRight) && this.isVariantTap(tap)) ? 1 : 0)
+      - (taps.some(tap => containsTouch(tap, touchLayoutConfig.variantLeft) && this.isVariantTap(tap)) ? 1 : 0);
     if (!step) return;
     const current = options.indexOf(this.getChosenVariant(character.id));
     this.variantChoices.set(character.id, options[(Math.max(0, current) + step + options.length) % options.length]);
     this.refreshPreview(character.id);
+  }
+
+  isVariantTap(tap) {
+    const character = characters[this.menu.selected.id];
+    if (getUnlockedVariants(character, this.game.settings).length < 2) return false;
+    const { variantLeft, variantRight, skinLeft, skinRight } = touchLayoutConfig;
+    const variantDistance = Math.min(Math.hypot(tap.x - variantLeft.x, tap.y - variantLeft.y), Math.hypot(tap.x - variantRight.x, tap.y - variantRight.y));
+    const skinDistance = Math.min(Math.hypot(tap.x - skinLeft.x, tap.y - skinLeft.y), Math.hypot(tap.x - skinRight.x, tap.y - skinRight.y));
+    return variantDistance <= variantLeft.radius && variantDistance <= skinDistance;
   }
 
   getChosenSkin(id) {
@@ -141,8 +150,8 @@ export class CharacterSelectState extends GameState {
 
   updateSkinChoice(input) {
     const taps = input.touchTaps ?? [];
-    const step = (input.wasPressed(Action.SPECIAL) || taps.some((tap) => containsTouch(tap, touchLayoutConfig.skinRight)) ? 1 : 0)
-      - (input.wasPressed(Action.BLOCK) || taps.some((tap) => containsTouch(tap, touchLayoutConfig.skinLeft)) ? 1 : 0);
+    const step = (input.wasPressed(Action.SPECIAL) || taps.some((tap) => containsTouch(tap, touchLayoutConfig.skinRight) && !this.isVariantTap(tap)) ? 1 : 0)
+      - (input.wasPressed(Action.BLOCK) || taps.some((tap) => containsTouch(tap, touchLayoutConfig.skinLeft) && !this.isVariantTap(tap)) ? 1 : 0);
     if (!step) return;
     const id = this.menu.selected.id;
     const options = getSkinOptions(characters[id], this.game.settings).filter((skin) => skin.unlocked);
