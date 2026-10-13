@@ -1,10 +1,8 @@
 export const ARCADE_UNLOCK = 'arcade';
 
 export function isAltColorUnlocked(character, alt, settings) {
-  if (alt.id === ARCADE_UNLOCK) {
-    return (settings.arcadeCleared ?? []).includes(character.id);
-  }
-  return (settings.unlocks?.[character.id] ?? []).includes(alt.id);
+  if ((settings.unlocks?.[character.id] ?? []).includes(alt.id)) return true;
+  return alt.id === ARCADE_UNLOCK && (settings.arcadeCleared ?? []).includes(character.id);
 }
 
 export function getSaberOptions(character, settings) {
@@ -39,12 +37,13 @@ export function getSkinOptions(character, settings) {
   }));
 }
 
-export function unlockAllSkins(unlocks, characters) {
+export function unlockAllCosmetics(unlocks, characters) {
   let next = unlocks ?? {};
   for (const character of characters) {
     const owned = next[character.id] ?? [];
     const skins = (character.skins ?? []).filter((skin) => skin.unlock && !owned.includes(skin.id));
-    if (skins.length) next = addUnlocks(next, character.id, skins);
+    const colors = (character.altSaberColors ?? []).filter((alt) => !owned.includes(alt.id));
+    if (skins.length || colors.length) next = addUnlocks(next, character.id, [...skins, ...colors]);
   }
   return next;
 }

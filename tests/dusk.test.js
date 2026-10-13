@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { characters } from '../src/characters/characterData.js';
 import { createFighter } from '../src/characters/characterFactory.js';
 import { colors } from '../src/config/themeConfig.js';
-import { getSkinOptions, unlockAllSkins } from '../src/modes/unlocks.js';
+import { getSaberOptions, getSkinOptions, unlockAllCosmetics } from '../src/modes/unlocks.js';
 import { loadSave, saveSave, SAVE_VERSION } from '../src/core/saveStorage.js';
 import { createStoryRun } from '../src/modes/story/storyRun.js';
 import { resolveDuelOutcome } from '../src/modes/duelOutcomes.js';
@@ -37,13 +37,18 @@ it('declares dusk for both variants while preserving blade, moves, stats and bas
   }
 });
 
-it('unlocks dusk through wardrobe idempotently without changing blade-color unlocks', () => {
+it('unlocks every skin and blade color through wardrobe idempotently, keeping existing unlocks', () => {
   const current = { foretold: ['skin-secret'], guardian: ['challenge'] };
-  const unlocked = unlockAllSkins(current, Object.values(characters));
+  const unlocked = unlockAllCosmetics(current, Object.values(characters));
   assert.ok(unlocked.foretold.includes('skin-dusk'));
   assert.ok(unlocked.guardian.includes('challenge'));
-  assert.deepEqual(unlockAllSkins(unlocked, Object.values(characters)), unlocked);
+  assert.deepEqual(unlockAllCosmetics(unlocked, Object.values(characters)), unlocked);
   assert.deepEqual(current, { foretold: ['skin-secret'], guardian: ['challenge'] });
+  for (const character of Object.values(characters)) {
+    const settings = { unlocks: unlocked };
+    assert.ok(getSkinOptions(character, settings).every((skin) => skin.unlocked), character.id);
+    assert.ok(getSaberOptions(character, settings).every((option) => option.unlocked), character.id);
+  }
 });
 
 for (const alignment of ['light', 'dark']) {

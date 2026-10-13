@@ -8,7 +8,7 @@ import { layout, texts } from '../config/uiConfig.js';
 import { addVariantUnlocks } from '../characters/variants.js';
 import { characters } from '../characters/characterData.js';
 import { SecretUnlockSystem } from '../modes/SecretUnlockSystem.js';
-import { unlockAllSkins } from '../modes/unlocks.js';
+import { unlockAllCosmetics } from '../modes/unlocks.js';
 import { clamp } from '../utils/math.js';
 import { GameState } from './GameState.js';
 import { StateId } from './stateIds.js';
@@ -88,7 +88,7 @@ export class IntroState extends GameState {
     const { settings } = this.game;
     const current = settings.unlockedCharacters ?? [];
     const fresh = unlocks.filter((id) => !current.includes(id));
-    const skins = allSkins ? unlockAllSkins(settings.unlocks, Object.values(characters)) : settings.unlocks ?? {};
+    const skins = allSkins ? unlockAllCosmetics(settings.unlocks, Object.values(characters)) : settings.unlocks ?? {};
     const variantUnlocks = addVariantUnlocks(settings.unlockedVariants, variants, characters);
     const changed = JSON.stringify(variantUnlocks) !== JSON.stringify(settings.unlockedVariants ?? {}) || fresh.length > 0 || JSON.stringify(skins) !== JSON.stringify(settings.unlocks ?? {});
     if (changed) {

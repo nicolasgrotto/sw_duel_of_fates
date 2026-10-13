@@ -170,7 +170,7 @@ describe('secret fighters', () => {
     assert.throws(() => createFighterFromCharacter(ordinary, { x: 0, y: 0, facing: 1 }), RangeError);
   });
 
-  it('unlocks every skin with tagline taps without touching blade colors', () => {
+  it('unlocks every skin and blade color with tagline taps', () => {
     const game = createFakeGame();
     game.changeState(StateId.INTRO);
     const sequence = secretsConfig.sequences.find(entry => entry.id === 'wardrobeTouch');
@@ -179,7 +179,9 @@ describe('secret fighters', () => {
       for (const skin of (character.skins ?? []).filter((entry) => entry.unlock)) {
         assert.ok(game.settings.unlocks[character.id].includes(skin.id), `${character.id} ${skin.id}`);
       }
-      assert.ok(!(game.settings.unlocks[character.id] ?? []).includes('arcade'));
+      for (const alt of character.altSaberColors ?? []) {
+        assert.ok(game.settings.unlocks[character.id].includes(alt.id), `${character.id} ${alt.id}`);
+      }
     }
     assert.equal(game.saved, 1);
   });
