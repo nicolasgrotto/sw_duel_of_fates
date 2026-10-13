@@ -28,6 +28,7 @@ function createCombat() {
     hasHit: false,
     attackConnected: false,
     freeRecovery: false,
+    matchPoint: false,
     finisherLimb: null,
     finisherSide: null,
     finisherX: 0,

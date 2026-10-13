@@ -12,6 +12,11 @@ export function createRandom(seed) {
   };
 }
 
+export function hashUnit(a, b, c) {
+  const value = Math.sin(a * 12.9898 + b * 78.233 + c * 37.719) * 43758.5453;
+  return value - Math.floor(value);
+}
+
 export function createRandomSeed() {
   return Math.floor(Math.random() * UINT32_RANGE);
 }

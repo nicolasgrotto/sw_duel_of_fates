@@ -1,7 +1,6 @@
-import { faceDetails, groundShadow, proportions } from '../config/fighterVisualConfig.js';
+import { faceDetails, finisherStyle, groundShadow, proportions } from '../config/fighterVisualConfig.js';
 import { colors } from '../config/themeConfig.js';
 import { clamp, lerp } from '../utils/math.js';
-import { drawEmber } from './finisherRenderer.js';
 
 const legPoints = [0, 0, 0, 0, 0, 0];
 const torsoPoints = [0, 0, 0, 0, 0, 0, 0, 0];
@@ -131,6 +130,28 @@ function drawEyes(renderer, fighter, pose) {
   renderer.fillCircle(x, y, radius * eyes.pupilRadius, eyes.pupil);
 }
 
+export function drawEmber(renderer, x, y, time, height) {
+  const alpha = clamp(1 - time / finisherStyle.emberDuration, 0, 1);
+  if (alpha <= 0) return;
+  renderer.save();
+  renderer.setBlendMode('lighter');
+  renderer.setAlpha(alpha);
+  renderer.fillCircle(x, y, height * finisherStyle.emberRadius, colors.finisherEmber);
+  renderer.restore();
+}
+
+const headPiecePose = { headX: 0, headY: 0, headRadius: 0 };
+
+export function drawSeveredHead(renderer, fighter, x, y, angle) {
+  const { appearance, height } = fighter;
+  headPiecePose.headRadius = height * proportions.headRadius;
+  renderer.save();
+  renderer.translate(x, y);
+  renderer.rotate(angle);
+  drawHead(renderer, fighter, headPiecePose, appearance.cloakColor, appearance.bodyColor, appearance.trimColor, false);
+  renderer.restore();
+}
+
 function drawHead(renderer, fighter, pose, cloakColor, bodyColor, trimColor, withFace) {
   const { headX, headY, headRadius: radius } = pose;
   const { hoodUp, masked, hairColor } = fighter.appearance;
@@ -233,7 +254,11 @@ export function drawFighterBody(renderer, fighter, pose, floorY, withShadow = tr
   if (appearance.pauldrons) {
     drawPauldrons(renderer, pose, shoulderWidth, trimColor);
   }
-  drawHead(renderer, fighter, pose, cloakColor, bodyColor, trimColor, !overrideColor);
+  if (severed === 'frontHead') {
+    drawEmber(renderer, pose.headX, pose.headY + pose.headRadius, fighter.stateTime, height);
+  } else {
+    drawHead(renderer, fighter, pose, cloakColor, bodyColor, trimColor, !overrideColor);
+  }
   drawArms(renderer, fighter, pose, cloakColor, bodyColor, handColor, severed);
   if (wound === 'arm' && severed !== 'frontArm') {
     renderer.line(pose.shoulderX + 3, pose.shoulderY + 3, pose.handX, pose.handY, colors.woundShade, height * proportions.armWidth);

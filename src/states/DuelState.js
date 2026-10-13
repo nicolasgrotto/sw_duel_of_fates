@@ -103,6 +103,7 @@ export class DuelState extends GameState {
     this.participants = this.createParticipants();
     this.opponentController = this.participants[1].controller;
     this.fighters = this.participants.map((participant) => participant.fighter);
+    this.markMatchPoints();
     this.game.touch?.setFeatures(this.rules.powers ? this.player.stats.power.loadout?.fourth ? ['powers', 'fourthPower'] : ['powers'] : []);
     if (this.survivalStage) {
       this.applySurvivalHealth();
@@ -320,11 +321,18 @@ export class DuelState extends GameState {
     return !this.survivalStage && !this.replayShown && this.game.settings.finalReplay !== false && this.replayBuffer.hasReplay();
   }
 
+  markMatchPoints() {
+    this.fighters.forEach((fighter, index) => {
+      fighter.combat.matchPoint = this.hasRoundLimit && this.mode !== DuelMode.GALLERY && this.roundWins[index] === this.roundsToWin - 1;
+    });
+  }
+
   startNextRound() {
     const centerX = (this.arena.left + this.arena.right) / 2;
     const half = gameConfig.duel.spawnDistance / 2;
     this.fighters[0].resetForRound(centerX - half, 1);
     this.fighters[1].resetForRound(centerX + half, -1);
+    this.markMatchPoints();
     this.simulation.projectiles.clear();
     if (this.survivalStage) {
       this.applySurvivalHealth();

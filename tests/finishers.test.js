@@ -122,6 +122,43 @@ describe('finisher selection', () => {
   });
 });
 
+describe('head finisher', () => {
+  function headStrike(matchPoint, x) {
+    const attacker = spawnFighter(x, 1, 'shadow');
+    const defender = spawnFighter(x + 70, -1, 'guardian');
+    const simulation = createSimulation([attacker, defender], { finishers: true });
+    attacker.combat.matchPoint = matchPoint;
+    defender.health = 1;
+    simulation.combat.applyDamage({ attacker, defender, attack: attacker.moves.heavy, attackType: 'heavy', x: 0, y: 0 }, 10, 'blade');
+    return defender.combat.finisherLimb;
+  }
+
+  it('can take the head only on the knockout that decides the match, with a deterministic chance', () => {
+    const positions = Array.from({ length: 200 }, (_, index) => 300 + index * 3.7);
+    const decisive = positions.map((x) => headStrike(true, x));
+    const heads = decisive.filter((limb) => limb === 'head').length / positions.length;
+    assert.ok(Math.abs(heads - combatRulesConfig.finishers.headChance) < 0.1, `head share ${heads}`);
+    assert.ok(decisive.every((limb) => limb === 'head' || limb === 'arm'));
+    assert.ok(positions.every((x) => headStrike(false, x) === 'arm'));
+    assert.deepEqual(positions.map((x) => headStrike(true, x)), decisive);
+  });
+
+  it('draws a headless body with an ember at the neck and a head piece that rests on its side', () => {
+    const x = Array.from({ length: 200 }, (_, index) => 300 + index * 3.7).find((value) => headStrike(true, value) === 'head');
+    const attacker = spawnFighter(x, 1, 'shadow');
+    const defender = spawnFighter(x + 70, -1, 'guardian');
+    const simulation = createSimulation([attacker, defender], { finishers: true });
+    attacker.combat.matchPoint = true;
+    defender.health = 1;
+    simulation.combat.applyDamage({ attacker, defender, attack: attacker.moves.heavy, attackType: 'heavy', x: 0, y: 0 }, 10, 'blade');
+    assert.equal(getSeveredLimb(defender, true), 'frontHead');
+    defender.stateTime = 6;
+    const renderer = { ...recordingRenderer(), translate() {}, rotate(angle) { renderer.angle = angle; }, fillEllipse() {}, fillPolygon() {} };
+    drawFinisherPiece(renderer, defender, defender.floorY, true);
+    assert.ok(Math.abs(Math.abs(Math.cos(renderer.angle))) < 1e-6, 'lies on its side');
+  });
+});
+
 describe('finisher drawing', () => {
   it('shows the severed limb only for a knocked out fighter with the option on', () => {
     const { defender, attacker } = finish('heavy');

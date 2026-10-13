@@ -1,27 +1,14 @@
 import { finisherStyle, proportions, saberStyle } from '../config/fighterVisualConfig.js';
 import { colors } from '../config/themeConfig.js';
-import { clamp, lerp } from '../utils/math.js';
+import { lerp } from '../utils/math.js';
+import { drawEmber, drawSeveredHead } from './fighterRenderer.js';
 
 const piece = { x: 0, y: 0, angle: 0, time: 0 };
 
 export function getSeveredLimb(fighter, shown) {
   const { combat } = fighter;
   if (!shown || fighter.isAlive || !combat?.finisherLimb) return null;
-  return `${combat.finisherSide}${combat.finisherLimb === 'arm' ? 'Arm' : 'Leg'}`;
-}
-
-function getEmberAlpha(time) {
-  return clamp(1 - time / finisherStyle.emberDuration, 0, 1);
-}
-
-export function drawEmber(renderer, x, y, time, height) {
-  const alpha = getEmberAlpha(time);
-  if (alpha <= 0) return;
-  renderer.save();
-  renderer.setBlendMode('lighter');
-  renderer.setAlpha(alpha);
-  renderer.fillCircle(x, y, height * finisherStyle.emberRadius, colors.finisherEmber);
-  renderer.restore();
+  return `${combat.finisherSide}${combat.finisherLimb[0].toUpperCase()}${combat.finisherLimb.slice(1)}`;
 }
 
 function getLandingTime(startY, restY) {
@@ -35,14 +22,16 @@ function placePiece(fighter, floorY) {
   const direction = combat.finisherDirection;
   const startX = combat.finisherX + direction * height * finisherStyle.startOffset;
   const startY = combat.finisherY - height * finisherStyle.startHeight[limb];
-  const restY = floorY - height * proportions.legWidth / 2;
+  const restY = floorY - height * finisherStyle.restHeight[limb];
   const landing = getLandingTime(startY, restY);
   const time = Math.min(stateTime, landing);
   const progress = time / landing;
   piece.time = stateTime;
   piece.x = startX + direction * finisherStyle.speed * time;
   piece.y = startY - finisherStyle.lift * time + finisherStyle.gravity * time * time / 2;
-  piece.angle = lerp(Math.PI / 2, direction * finisherStyle.turns * Math.PI * 2, progress);
+  piece.angle = limb === 'head'
+    ? direction * (finisherStyle.turns * Math.PI * 2 + Math.PI / 2) * progress
+    : lerp(Math.PI / 2, direction * finisherStyle.turns * Math.PI * 2, progress);
   return piece;
 }
 
@@ -50,6 +39,11 @@ export function drawFinisherPiece(renderer, fighter, floorY, shown) {
   const severed = getSeveredLimb(fighter, shown);
   if (!severed) return;
   const { height, appearance } = fighter;
+  if (fighter.combat.finisherLimb === 'head') {
+    const { x, y, angle } = placePiece(fighter, floorY);
+    drawSeveredHead(renderer, fighter, x, y, angle);
+    return;
+  }
   const arm = fighter.combat.finisherLimb === 'arm';
   const front = fighter.combat.finisherSide === 'front';
   const length = height * finisherStyle.length[fighter.combat.finisherLimb];

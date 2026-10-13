@@ -287,11 +287,12 @@ Traje do Predestinado, nas duas variantes, sem vantagem e com a cor da lâmina i
 
 ### Finalização (v2.9)
 
-Separação estilizada de braço ou perna só no K.O. por lâmina, sem sangue, órgãos ou decapitação (DESIGN → finalização estilizada). O corte que justifica a separação é o próprio golpe letal, visto na câmera lenta do K.O.
+Separação estilizada de braço ou perna só no K.O. por lâmina, sem sangue nem órgãos (DESIGN → finalização estilizada); no K.O. que decide a partida, às vezes a cabeça. O corte que justifica a separação é o próprio golpe letal, visto na câmera lenta do K.O.
 
 - **Braço:** fica o coto do ombro ao cotovelo; o antebraço com a mão sai girando. No braço da lâmina (golpe pela frente) o cabo, já apagado, cai junto com a mão.
 - **Perna:** fica a coxa do quadril ao joelho; canela e pé saem girando.
 - **Peça:** mesma cor e espessura do membro (manga `cloakColor` no braço da frente, `bodyColor` no de trás e nas pernas, mão na cor da luva). Sai para longe de quem cortou, sobe pouco, gira, pousa e fica deitada no chão até o round acabar. Sem quique, sem física de corpo.
+- **Cabeça** (pedido do autor): o corpo cai sem a cabeça, com brasa no pescoço; a cabeça sai rolando, com capuz, máscara ou cabelo do traje, mas sem rosto (olhos apagados), e para deitada no chão.
 - **Ponta cortada:** um ponto em brasa (`finisherEmber`) no coto e na peça, que esfria em 1,2 s, lendo como corte cauterizado.
 - **Opção:** desligada, o K.O. continua igual ao de antes.
 

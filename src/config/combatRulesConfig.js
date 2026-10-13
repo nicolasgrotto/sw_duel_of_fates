@@ -14,6 +14,7 @@ export const combatRulesConfig = {
     finishers: ['versus', 'local', 'training', 'tutorial', 'arcade', 'survival'],
   },
   finishers: {
+    headChance: 0.3,
     limbs: {
       light: 'arm', light2: 'arm', light4: 'arm', light5: 'arm', heavy: 'arm', riposte: 'arm', special: 'arm', counterStrike: 'arm', bladeLock: 'arm',
       light3: 'leg', forwardHeavy: 'leg', spin: 'leg', dashSlash: 'leg',

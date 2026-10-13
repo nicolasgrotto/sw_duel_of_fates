@@ -6,6 +6,7 @@ import { FighterState } from '../entities/fighterStates.js';
 import { canAfford, getStaminaCost, spendStamina } from '../systems/StaminaSystem.js';
 import { CombatAction, clearActionBuffer, updateActionBuffer } from './actionBuffer.js';
 import { clamp } from '../utils/math.js';
+import { hashUnit } from '../utils/random.js';
 import { ATTACK_STATES, AttackPhase, AttackType, getAttackDuration, getAttackPhase, getChargeLevel, isSaberAttack } from './attackPhases.js';
 import { CombatEvent, createCombatEvent } from './combatEvents.js';
 import { boxesOverlap, comesFromFront, createBox, getAttackHitbox, getHurtbox, hasActiveHitbox, hasHurtbox, isBladeInvulnerable, isGuardingAgainst, isInvulnerable } from './hitboxes.js';
@@ -826,12 +827,13 @@ export class CombatSystem {
     const limb = combatRulesConfig.finishers.limbs[attackType];
     if (!this.rules.finishers || !melee || !limb || !attacker) return null;
     const { combat } = defender;
-    combat.finisherLimb = limb;
-    combat.finisherSide = comesFromFront(defender, attacker) ? 'front' : 'back';
+    const head = attacker.combat.matchPoint && hashUnit(defender.x, attacker.x, attacker.stateTime) < combatRulesConfig.finishers.headChance;
+    combat.finisherLimb = head ? 'head' : limb;
+    combat.finisherSide = head || comesFromFront(defender, attacker) ? 'front' : 'back';
     combat.finisherX = defender.x;
     combat.finisherY = defender.y;
     combat.finisherDirection = Math.sign(defender.x - attacker.x) || attacker.facing;
-    return limb;
+    return combat.finisherLimb;
   }
 
   dealPowerDamage(caster, target, power, damage, type) {

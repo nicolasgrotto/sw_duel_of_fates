@@ -817,7 +817,8 @@ export const motionStyles = {
 };
 
 export const finisherStyle = {
-  startHeight: { arm: 0.62, leg: 0.2 },
+  startHeight: { arm: 0.62, leg: 0.2, head: 0.9 },
+  restHeight: { arm: 0.03, leg: 0.03, head: 0.1 },
   startOffset: 0.1,
   length: { arm: 0.2, leg: 0.24 },
   speed: 150,

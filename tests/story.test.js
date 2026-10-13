@@ -282,6 +282,7 @@ function winStoryDuel(game) {
   }
   duel.participants[1].controller = { updateIntent: (intent) => { intent.lightAttack = false; } };
   const [player, opponent] = duel.fighters;
+  assert.deepEqual(duel.fighters.map((fighter) => fighter.combat.matchPoint), [true, true]);
   opponent.x = player.x + 110;
   opponent.health = 1;
   game.step(Action.LIGHT_ATTACK);
