@@ -841,11 +841,11 @@
     "powers/hard/elder-shadowAwakened": "a63661b01f4174b9",
     "powers/hard/elder-sovereign": "10332b44370ad86c",
     "powers/hard/elder-foretold": "68053066c254624b",
-    "story/easy/light-sovereign": "cb22a7a483f214b9",
-    "story/easy/dark-sovereign": "808df1883683b17e",
-    "story/normal/light-sovereign": "bc7f1e9cafc49c70",
-    "story/normal/dark-sovereign": "26901bc9d406c563",
-    "story/hard/light-sovereign": "974aab333be46aba",
-    "story/hard/dark-sovereign": "3fa4f2e2de8d1e9d"
+    "story/easy/light-sovereign": "ebec5d0ddf92a7ac",
+    "story/easy/dark-elder": "6adff8704e755f76",
+    "story/normal/light-sovereign": "6fed22a8182e5d56",
+    "story/normal/dark-elder": "b861adb971ef07b2",
+    "story/hard/light-sovereign": "ac6b11c093001d21",
+    "story/hard/dark-elder": "c66d5dbc00a30c4c"
   }
 }
