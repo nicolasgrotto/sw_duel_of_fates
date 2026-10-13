@@ -50,7 +50,7 @@ export class StoryState extends GameState {
       items.push({ id: StoryOption.CONTINUE, label: formatText(texts.story.continue, { number: stage.number, title: storyTexts.encounters[stage.encounterId].title }) });
     }
     if (this.run) {
-      items.push({ id: StoryOption.UPGRADE, label: formatText(texts.story.upgrade, { points: this.run.points }) });
+      items.push({ id: StoryOption.UPGRADE, label: this.run.points > 0 ? formatText(texts.story.upgrade, { points: this.run.points }) : texts.story.upgradeView });
     }
     items.push({ id: StoryOption.NEW, label: this.run ? texts.story.restart : texts.story.start });
     items.push({ id: StoryOption.BACK, label: texts.story.back });

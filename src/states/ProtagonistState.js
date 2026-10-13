@@ -6,7 +6,7 @@ import { storyConfig } from '../config/storyConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
 import { difficultyNames, layout, texts } from '../config/uiConfig.js';
 import { attributeOrder } from '../config/attributesConfig.js';
-import { canRaiseAttribute, createStoryRun, getAttributeTotal, raiseAttribute } from '../modes/story/storyRun.js';
+import { canRaiseAttribute, createStoryRun, getAttributeTotal, isAttributeBudgetFull, raiseAttribute } from '../modes/story/storyRun.js';
 import { createPose } from '../rendering/fighterPose.js';
 import { drawFighterPreview } from '../rendering/fighterPreview.js';
 import { drawAttributeBars } from '../ui/attributeBars.js';
@@ -36,7 +36,7 @@ export function getPowerNames(alignment) {
 const STEPS = [CreationStep.NAME, CreationStep.ALIGNMENT, CreationStep.STYLE, CreationStep.SKIN, CreationStep.COLOR, CreationStep.DIFFICULTY];
 
 function getStepOptions(step) {
-  const { protagonist, difficulties, ratingCaps } = storyConfig;
+  const { protagonist, difficulties, budgets } = storyConfig;
   switch (step) {
     case CreationStep.NAME:
       return [{ id: 'customName', label: texts.story.customName }, ...protagonist.names.map((name) => ({ id: name, label: name }))];
@@ -49,8 +49,13 @@ function getStepOptions(step) {
     case CreationStep.COLOR:
       return protagonist.saberColors.map((color, index) => ({ id: color, label: texts.story.colorNames[index] }));
     default:
-      return difficulties.map((id) => ({ id, label: formatText(texts.story.difficultyOption, { level: difficultyNames[id], cap: ratingCaps[id] }) }));
+      return difficulties.map((id) => ({ id, label: formatText(texts.story.difficultyOption, { level: difficultyNames[id], budget: budgets[id] }) }));
   }
+}
+
+function getBudgetText(run) {
+  if (isAttributeBudgetFull(run, storyConfig)) return texts.story.budgetFull;
+  return run.points > 0 ? texts.story.budget : texts.story.budgetWaiting;
 }
 
 export class ProtagonistState extends GameState {
@@ -106,9 +111,8 @@ export class ProtagonistState extends GameState {
     for (const item of this.menu.items) {
       item.label = formatText(texts.story.attributeOption, { name: texts.attributes[item.id], value: attributes[item.id] });
     }
-    this.budgetLine = formatText(texts.story.budget, {
+    this.budgetLine = formatText(getBudgetText(this.run), {
       points: this.run.points,
-      cap: storyConfig.ratingCaps[this.run.difficulty],
       total: getAttributeTotal(attributes),
       budget: storyConfig.budgets[this.run.difficulty],
     });
@@ -215,6 +219,7 @@ export class ProtagonistState extends GameState {
       ? this.budgetLine
       : formatText(texts.story.step, { step: this.stepIndex + 1, total: STEPS.length, name: texts.story.steps[this.step] });
     renderer.text(stepLine, renderer.width / 2, stepY, textStyles.subtitle);
+    if (isUpgrade) renderer.text(texts.story.budgetNote, renderer.width / 2, layout.story.noteY, textStyles.hint);
     this.menu.render(renderer, layout.story.list.listX);
     renderer.text(this.profile.name, previewX, infoY, textStyles.subtitle);
     renderer.text(formatText(texts.story.summary, {

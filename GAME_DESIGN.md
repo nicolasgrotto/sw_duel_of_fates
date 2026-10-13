@@ -618,7 +618,7 @@ Alcance do Puxão por tier do Fluxo de quem lança (v2.16): Tênue 330 px, Firme
 **Comandos.** Nenhum botão novo. `Poder` + direção (neutro, frente, trás) escolhe entre até três habilidades do Fluxo; `Habilidade` + direção escolhe entre a habilidade própria (neutro) e até duas técnicas de lâmina (frente, trás). Espaço vazio cai no neutro. Técnicas só valem com a opção Poderes (os modos clássicos não mudam). O Eco e o Predestinado não têm técnicas: o avanço deles já segue a direção.
 
 - **Giro** (técnica): a lâmina dá a volta no corpo e acerta dos dois lados; quem estava atrás não consegue bloquear (a guarda só vale de frente).
-- **Avanço com corte** (técnica): avanço longo que termina num corte; recuperação longa se errar.
+- **Avanço com corte** (técnica): avanço longo que termina num corte; recuperação longa se errar. No acerto, o atordoamento próprio (0,72 s, desde a 2.21) deixa quem acertou livre primeiro (+3 a +5 quadros no elenco), mas sem tempo para um rápido garantido; defendido ou errado, continua punível.
 - **Arremesso** (Fluxo comum, v1.16): arranca um fragmento da arena e o lança em linha reta. O tamanho vem da faixa de Fluxo de quem lança, e cada faixa tem dano, velocidade, empurrão, desequilíbrio, custo e recarga próprios:
 
 | Fluxo | Tamanho | Dano | Velocidade | Custo | Recarga |
@@ -669,6 +669,7 @@ Loadouts da v1.18: Garça troca Barreira por Redirecionamento (trás + Poder); S
 | Brasa | Raio | Puxão | Congelar | Avanço com corte | Arremesso da lâmina |
 | Forja | Raio | Puxão | Arremesso | Arremesso da lâmina | Giro |
 | Garça | Repulsão | Arremesso | Absorção | — | Giro |
+| Ceifador | Repulsão | Puxão | Ira | Avanço com corte | Arremesso da lâmina |
 | Eco | Raio | Puxão | Arremesso | — | — |
 | Sombra Desperta | Raio | Puxão | Estrangular | Avanço com corte | Giro |
 | Soberano | Raio | Tempestade | Estrangular | — | Giro |
@@ -694,15 +695,15 @@ Campanha linear com um protagonista criado pelo jogador. Textos em `src/config/s
 
 **Criação.** Seis passos: nome (lista pronta ou digitado, até 16 caracteres), Caminho do Fluxo (Aurora ou Eclipse, que definem os poderes), estilo de luta (Técnica, Fúria ou Voo: usam golpes e habilidade do Guardião, da Sombra ou da Garça), visual (Errante, Vigia ou Peregrino), cor da lâmina e dificuldade. Logo depois, o jogador distribui os pontos iniciais.
 
-**Atributos e progressão.** Todos começam em 3 (total 18) com 3 pontos livres. Cada vitória dá 2 pontos. Um ponto sobe uma nota em 1, respeitando:
+**Atributos e progressão** (revisto na 2.21, pedido do autor). Todos começam em 3 (total 18). Qualquer atributo pode subir até 7 em todas as dificuldades; a dificuldade limita só o total. Cada vitória dá 1 ponto; os pontos iniciais mudam por dificuldade, de modo que o total fecha exatamente com as vitórias antes do último duelo (8 na rota atual) e toda vitória dá algo para investir:
 
-| Dificuldade | Teto por atributo | Total máximo |
-| --- | --- | --- |
-| Fácil | 7 | 33 |
-| Normal | 6 | 30 |
-| Difícil | 5 | 28 |
+| Dificuldade | Pontos iniciais | Por vitória | Total máximo |
+| --- | --- | --- | --- |
+| Fácil | 7 | 1 | 33 |
+| Normal | 4 | 1 | 30 |
+| Difícil | 2 | 1 | 28 |
 
-O total máximo impede um protagonista com tudo no teto: ele termina forte, mas especializado (o elenco comum tem totais entre 24 e 32; o chefe do Arcade, 35). O teto do Fluxo também decide a interação contra os chefes: contra o Soberano (Fluxo 9), o Fácil chega a −2 (poderes pela metade), o Normal a −3 e o Difícil a −4 (resistidos; a luta vira de lâmina). Os chefes são medidos no simulador (ARCHITECTURE → Balanceamento → fechamento v1.19): o Soberano é vencível em todas as dificuldades e o Predestinado, sempre com IA de chefe, é muito difícil, mas possível.
+Pontos nunca passam do total: uma vitória com o total já coberto não dá ponto, e saves antigos com pontos sobrando são cortados ao carregar. Pontos investidos são definitivos (sem redistribuição). O total máximo impede um protagonista com tudo no teto: ele termina forte, mas especializado (o elenco comum tem totais entre 24 e 32; o chefe do Arcade, 35). Com o teto 7 em todas as dificuldades, quem investe em Fluxo chega a −2 contra o Soberano (Fluxo 9) também no Difícil (poderes pela metade, não mais resistidos); o Difícil fica mais apertado no total, não no teto. Os chefes são medidos no simulador (ARCHITECTURE → Balanceamento → fechamento v1.19): o Soberano é vencível em todas as dificuldades e o Predestinado, sempre com IA de chefe, é muito difícil, mas possível.
 
 **Poderes.** O protagonista começa só com o poder principal do caminho; o segundo vem como recompensa de um capítulo. Na História os poderes estão sempre ligados.
 

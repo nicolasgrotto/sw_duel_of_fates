@@ -121,6 +121,7 @@ export const layout = {
   story: {
     titleY: 80,
     stepY: 140,
+    noteY: 172,
     footerY: 680,
     infoY: 200,
     infoSpacing: 34,

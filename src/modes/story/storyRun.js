@@ -7,7 +7,7 @@ export function createStoryRun(profile, difficulty, config) {
     protagonist: { ...profile, skin: profile.skin ?? 'base', attributes: { ...config.startAttributes } },
     difficulty,
     encounter: config.start,
-    points: config.startPoints,
+    points: config.startPoints[difficulty],
     slots: [NEUTRAL_SLOT],
     completed: [],
     ending: null,
@@ -47,12 +47,20 @@ export function getAttributeTotal(attributes) {
   return Object.values(attributes).reduce((sum, value) => sum + value, 0);
 }
 
+export function getUnearnedPoints(run, config) {
+  return Math.max(0, config.budgets[run.difficulty] - getAttributeTotal(run.protagonist.attributes) - run.points);
+}
+
+export function isAttributeBudgetFull(run, config) {
+  return getAttributeTotal(run.protagonist.attributes) >= config.budgets[run.difficulty];
+}
+
 export function canRaiseAttribute(run, attribute, config) {
   const { attributes } = run.protagonist;
   return run.points > 0
     && attribute in attributes
-    && attributes[attribute] < config.ratingCaps[run.difficulty]
-    && getAttributeTotal(attributes) < config.budgets[run.difficulty];
+    && attributes[attribute] < config.ratingCap
+    && !isAttributeBudgetFull(run, config);
 }
 
 export function raiseAttribute(run, attribute, config) {
@@ -100,7 +108,7 @@ export function resolveStoryResult(run, result, config, loadouts) {
       ...run,
       encounter: ending ? null : next,
       ending: ending ?? run.ending,
-      points: run.points + config.pointsPerVictory,
+      points: run.points + Math.min(config.pointsPerVictory, getUnearnedPoints(run, config)),
       slots: unlockSlots(run, encounter, loadouts),
       completed: [...run.completed, encounter.id],
     },
@@ -108,8 +116,7 @@ export function resolveStoryResult(run, result, config, loadouts) {
 }
 
 function isRatingMap(attributes, config) {
-  const highestCap = Math.max(...Object.values(config.ratingCaps));
-  return Boolean(attributes) && Object.keys(config.startAttributes).every((name) => Number.isInteger(attributes[name]) && attributes[name] >= 1 && attributes[name] <= highestCap);
+  return Boolean(attributes) && Object.keys(config.startAttributes).every((name) => Number.isInteger(attributes[name]) && attributes[name] >= 1 && attributes[name] <= config.ratingCap);
 }
 
 export function sanitizeStoryRun(raw, config) {
@@ -126,8 +133,10 @@ export function sanitizeStoryRun(raw, config) {
     || !Array.isArray(slots) || !Array.isArray(completed)) {
     return null;
   }
+  const room = Math.max(0, config.budgets[difficulty] - getAttributeTotal(protagonist.attributes));
   return {
     ...raw,
+    points: Math.min(points, room),
     protagonist: { ...protagonist, skin: config.protagonist.skins.some((skin) => skin.id === protagonist.skin) ? protagonist.skin : 'base',
       name: protagonist.name.slice(0, config.protagonist.maxNameLength), saberColor: saberColors.includes(protagonist.saberColor) ? protagonist.saberColor : saberColors[0] },
   };

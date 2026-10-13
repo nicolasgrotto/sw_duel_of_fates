@@ -131,7 +131,7 @@ NOME ESQUERDA                                         NOME DIREITA
 
 - **Hub** (`HISTÓRIA`): menu à esquerda (Continuar · Capítulo N: título, Evoluir atributos, Nova/Recomeçar campanha, Voltar); à direita, nome, caminho e estilo, poderes, barras de atributo e o protagonista parado. Linha de status abaixo do título (dificuldade e duelos vencidos, ou "Campanha concluída").
 - **Novo duelista**: mesma composição; o subtítulo mostra o passo (`2/5 · Caminho do Fluxo`) e a prévia muda junto com a opção destacada.
-- **Atributos**: lista das seis notas; o subtítulo mostra pontos, teto e total (`Pontos: 3 · teto 7 · total 30/37`). Subir além do permitido toca o som de ação recusada.
+- **Atributos** (revisto na 2.21): lista das seis notas; o subtítulo (subtitle, y=140) muda com o estado: com pontos, `Pontos para investir: 4 · total 22/30`; sem pontos e abaixo do total, `Total 26/30 · vença o próximo duelo para ganhar pontos`; com o total coberto, `Atributos completos · total 30/30`, sem número de pontos. Abaixo, em y=172 (hint), o aviso fixo `Pontos investidos são definitivos: não dá para redistribuir`. No hub, a opção vira `Ver atributos` quando não há pontos. A escolha de dificuldade mostra o total (`Normal · 30 pontos no total`). Subir além do permitido toca o som de ação recusada.
 - **Diálogo**: a arena do encontro ao fundo, escurecida; título do capítulo no alto; faixa escura embaixo com o nome de quem fala (acento, espaçado) e a fala (texto principal), com fade curto a cada linha. `Enter`/toque avança e `Esc` pula. Narração não mostra nome.
 - **Duelo**: faixa do modo com `CAPÍTULO N · TÍTULO`, como no Arcade.
 

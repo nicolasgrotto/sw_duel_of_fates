@@ -24,7 +24,7 @@ function migrateStoryRatings(story) {
   if (!attributes || typeof attributes !== 'object') {
     return story;
   }
-  const cap = storyConfig.ratingCaps[story.difficulty] ?? attributesConfig.maxRating;
+  const cap = storyConfig.ratingCap;
   return {
     ...story,
     points: Number.isInteger(story.points) ? convertLegacyPoints(story.points, attributesConfig) : story.points,

@@ -25,7 +25,7 @@ const PROTAGONIST_ORDER = ['flow', 'blade', 'health', 'agility', 'defense', 'sta
 function buildProtagonist(spec) {
   const [difficulty = 'normal', alignment = 'light', style = 'technique'] = spec.slice(PROTAGONIST_PREFIX.length).split(':');
   const attributes = { ...storyConfig.startAttributes };
-  const cap = storyConfig.ratingCaps[difficulty];
+  const cap = storyConfig.ratingCap;
   let total = Object.values(attributes).reduce((sum, value) => sum + value, 0);
   while (total < storyConfig.budgets[difficulty] && PROTAGONIST_ORDER.some((name) => attributes[name] < cap)) {
     for (const name of PROTAGONIST_ORDER) {

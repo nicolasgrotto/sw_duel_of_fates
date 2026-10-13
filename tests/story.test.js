@@ -12,7 +12,7 @@ import { StateMachine } from '../src/core/StateMachine.js';
 import { evaluateCondition } from '../src/modes/story/conditions.js';
 import { resolveDialogue } from '../src/modes/story/dialogue.js';
 import {
-  canRaiseAttribute, createStoryRun, getStoryStage, raiseAttribute, resolveStoryResult, sanitizeStoryRun,
+  canRaiseAttribute, createStoryRun, getStoryStage, getUnearnedPoints, isAttributeBudgetFull, raiseAttribute, resolveStoryResult, sanitizeStoryRun,
 } from '../src/modes/story/storyRun.js';
 import { DuelMode } from '../src/states/duelModes.js';
 import { createState } from '../src/states/stateFactory.js';
@@ -46,13 +46,13 @@ describe('story run', () => {
   it('starts with the base ratings, starting points and only the neutral power', () => {
     const run = createStoryRun(PROFILE, 'normal', storyConfig);
     assert.equal(run.encounter, storyConfig.start);
-    assert.equal(run.points, storyConfig.startPoints);
+    assert.equal(run.points, storyConfig.startPoints.normal);
     assert.deepEqual(run.slots, ['neutral']);
     assert.deepEqual(run.protagonist.attributes, storyConfig.startAttributes);
   });
 
-  it('raises attributes within points, the difficulty cap and the total budget', () => {
-    const cap = storyConfig.ratingCaps.hard;
+  it('raises attributes within points, the shared cap and the total budget', () => {
+    const cap = storyConfig.ratingCap;
     const start = storyConfig.startAttributes.flow;
     const budget = Object.values(storyConfig.startAttributes).reduce((sum, value) => sum + value, 0) + cap - start;
     const config = { ...storyConfig, budgets: { ...storyConfig.budgets, hard: budget } };
@@ -67,6 +67,30 @@ describe('story run', () => {
     const capped = { ...run, protagonist: { ...run.protagonist, attributes: { ...run.protagonist.attributes, flow: cap } } };
     assert.equal(canRaiseAttribute({ ...capped, points: 5 }, 'flow', { ...config, budgets: { hard: 99 } }), false);
     assert.equal(raiseAttribute({ ...run, points: 0 }, 'health', config).points, 0);
+  });
+
+  it('fills each difficulty budget exactly with the points of the duels before the last one', () => {
+    const base = Object.values(storyConfig.startAttributes).reduce((sum, value) => sum + value, 0);
+    const victories = storyConfig.encounters.length - 1;
+    for (const difficulty of storyConfig.difficulties) {
+      assert.equal(base + storyConfig.startPoints[difficulty] + storyConfig.pointsPerVictory * victories, storyConfig.budgets[difficulty], difficulty);
+    }
+    assert.ok(storyConfig.startPoints.easy > storyConfig.startPoints.normal && storyConfig.startPoints.normal > storyConfig.startPoints.hard);
+  });
+
+  it('never grants points beyond the budget and trims extra points from old saves', () => {
+    const config = testConfig();
+    const budget = config.budgets.normal;
+    const run = createStoryRun(PROFILE, 'normal', config);
+    const total = Object.values(run.protagonist.attributes).reduce((sum, value) => sum + value, 0);
+    const full = { ...run, points: budget - total };
+    assert.equal(getUnearnedPoints(full, config), 0);
+    assert.equal(resolveStoryResult(full, result(0), config, storyConfig.protagonist.loadouts).run.points, budget - total);
+    const saved = sanitizeStoryRun({ ...full, points: budget - total + 6 }, config);
+    assert.equal(saved.points, budget - total);
+    const spent = { ...run, points: 0, protagonist: { ...run.protagonist, attributes: { ...run.protagonist.attributes, health: run.protagonist.attributes.health + budget - total } } };
+    assert.equal(isAttributeBudgetFull(spent, config), true);
+    assert.equal(canRaiseAttribute({ ...spent, points: 1 }, 'flow', config), false);
   });
 
   it('keeps the encounter on a defeat and advances with points and rewards on a victory', () => {
@@ -195,7 +219,7 @@ describe('story flow', () => {
     assert.equal(game.states.current.mode, 'upgrade');
     game.step(Action.CONFIRM);
     assert.equal(game.story.protagonist.attributes.health, storyConfig.startAttributes.health + 1);
-    assert.equal(game.story.points, storyConfig.startPoints - 1);
+    assert.equal(game.story.points, storyConfig.startPoints[game.story.difficulty] - 1);
     game.step(Action.BACK);
     assert.deepEqual(game.stateNames(), ['StoryState']);
 

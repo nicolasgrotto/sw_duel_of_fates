@@ -114,7 +114,7 @@ it('migrates v3 story appearance without losing settings, progress or an existin
   }
 });
 
-it('migrates v4 protagonist ratings to the 1-7 scale with the shared rule and the difficulty cap', () => {
+it('migrates v4 protagonist ratings to the 1-7 scale with the shared rule and the story cap', () => {
   const settings = { unlockedCharacters: ['sovereign'], unlocks: { guardian: ['skin-story'] } };
   const protagonist = { name: 'Kael', alignment: 'light', style: 'technique', saberColor: '#7fe4ff', skin: 'watcher', attributes: { health: 8, stamina: 4, blade: 7, defense: 3, agility: 5, flow: 8 } };
   const story = { difficulty: 'easy', encounter: 'sovereign', points: 3, slots: ['neutral', 'back'], completed: ['trial', 'forest'], ending: null, protagonist };
@@ -127,6 +127,6 @@ it('migrates v4 protagonist ratings to the 1-7 scale with the shared rule and th
   assert.equal(save.story.protagonist.skin, 'watcher');
 
   const hard = loadSave(createStorage({ [KEY]: JSON.stringify({ version: 4, settings, story: { ...story, difficulty: 'hard' } }) }), KEY);
-  assert.deepEqual(hard.story.protagonist.attributes, { health: 5, stamina: 3, blade: 5, defense: 3, agility: 4, flow: 5 });
+  assert.deepEqual(hard.story.protagonist.attributes, { health: 6, stamina: 3, blade: 6, defense: 3, agility: 4, flow: 7 });
   assert.equal(loadSave(createStorage({ [KEY]: JSON.stringify({ version: 4, settings, story: null }) }), KEY).story, null);
 });

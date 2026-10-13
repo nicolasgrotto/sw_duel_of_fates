@@ -3,10 +3,10 @@ import { ptBR } from './locales/ptBR.js';
 
 export const storyConfig = {
   start: 'trial',
-  pointsPerVictory: 2,
-  startPoints: 3,
+  pointsPerVictory: 1,
+  startPoints: { easy: 7, normal: 4, hard: 2 },
   startAttributes: { health: 3, stamina: 3, blade: 3, defense: 3, agility: 3, flow: 3 },
-  ratingCaps: { easy: 7, normal: 6, hard: 5 },
+  ratingCap: 7,
   budgets: { easy: 33, normal: 30, hard: 28 },
   difficulties: ['easy', 'normal', 'hard'],
   rules: { powers: true, exhaustion: false, wounds: false, focusEvade: false, bladeLock: false },
