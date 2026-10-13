@@ -4,7 +4,7 @@ import { evadeConfig } from '../config/evadeConfig.js';
 import { powersConfig } from '../config/powersConfig.js';
 import { applyAttributes } from './attributes.js';
 import { resolveCharacterVariant } from './variants.js';
-import { resolvePowerStats } from './powers.js';
+import { isValidCustomPowers, resolvePowerStats } from './powers.js';
 import { fighterArchetypes } from '../config/fightersConfig.js';
 import { bladeTechniques } from '../config/movesConfig.js';
 import { Fighter } from '../entities/Fighter.js';
@@ -19,9 +19,12 @@ export function createFighter(characterId, spawn, options) {
   return createFighterFromCharacter(character, spawn, options);
 }
 
-export function createFighterFromCharacter(character, { x, y, facing }, { saberColor = null, skin = null, variant = undefined } = {}) {
+export function createFighterFromCharacter(character, { x, y, facing }, { saberColor = null, skin = null, variant = undefined, powers = null } = {}) {
   const resolved = resolveCharacterVariant(character, variant ?? character.defaultVariant ?? null);
   character = resolved.character;
+  if (powers && isValidCustomPowers(powers, character, powersConfig)) {
+    character = { ...character, loadout: { ...character.loadout, powers } };
+  }
   const stats = fighterArchetypes[character.archetype];
   if (!stats) {
     throw new Error(`Unknown archetype: ${character.archetype}`);

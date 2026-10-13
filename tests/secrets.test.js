@@ -194,7 +194,7 @@ describe('secret fighters', () => {
     game.changeState(StateId.CHARACTER_SELECT, { mode: DuelMode.ARCADE });
     const select = game.states.current;
     assert.ok(select.characterIds.includes('foretold'));
-    select.characterMenu.selectedIndex = select.characterIds.indexOf('foretold');
+    select.selectId(select.characterMenu, 'foretold');
     game.step(Action.CONFIRM);
     const duel = game.states.current;
     assert.equal(duel.player.id, 'foretold');

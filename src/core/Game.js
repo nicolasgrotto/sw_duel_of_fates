@@ -36,7 +36,7 @@ export class Game {
     this.touchControls = new TouchControls(this.touch);
     this.states = new StateMachine();
     this.settings = loadSettings(
-      { language: defaultLanguage, keyboardPreset: 'classic', difficulty: aiConfig.defaultDifficulty, reducedEffects: coarsePointer, sound: true, music: true, parryChallengeBest: 0, arcadeCleared: [], finalReplay: true, finishers: true, customBindings: {}, unlocks: {}, survivalBest: 0, powers: true, gallery: galleryConfig.defaults, bladeLockHold: [false, false], unlockedCharacters: [], unlockedVariants: {} },
+      { language: defaultLanguage, keyboardPreset: 'classic', difficulty: aiConfig.defaultDifficulty, reducedEffects: coarsePointer, sound: true, music: true, parryChallengeBest: 0, arcadeCleared: [], finalReplay: true, finishers: true, lastSelection: {}, loadoutModes: {}, customLoadouts: {}, customBindings: {}, unlocks: {}, survivalBest: 0, powers: true, gallery: galleryConfig.defaults, bladeLockHold: [false, false], unlockedCharacters: [], unlockedVariants: {} },
       globalThis.localStorage,
       gameConfig.settingsStorageKey,
       { language: languageIds, difficulty: aiConfig.difficultyOrder, keyboardPreset: keyboardPresetOrder },

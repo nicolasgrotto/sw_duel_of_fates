@@ -10,6 +10,8 @@ import { StateMachine } from '../src/core/StateMachine.js';
 import { createState } from '../src/states/stateFactory.js';
 import { DuelMode } from '../src/states/duelModes.js';
 import { StateId } from '../src/states/stateIds.js';
+import { MENU_GROUPS } from '../src/states/MenuState.js';
+import { touchLayoutConfig } from '../src/config/touchLayoutConfig.js';
 import { FighterState } from '../src/entities/fighterStates.js';
 import { captureFighter } from '../src/simulation/ReplayBuffer.js';
 
@@ -122,10 +124,20 @@ function createFakeGame() {
   return game;
 }
 
-function goToMenuItem(game, id) {
+function moveToMenuItem(game, id) {
   for (let i = 0; i < 20 && game.states.current.menu.selected.id !== id; i += 1) {
     game.step(Action.MENU_DOWN);
   }
+}
+
+function goToMenuItem(game, id) {
+  const group = Object.keys(MENU_GROUPS).find((key) => key !== 'root' && MENU_GROUPS[key].includes(id));
+  if (group && game.states.current.group !== group) {
+    if (game.states.current.group !== 'root') game.step(Action.BACK);
+    moveToMenuItem(game, group);
+    game.step(Action.CONFIRM);
+  }
+  moveToMenuItem(game, id);
 }
 
 function skipIntro(game) {
@@ -143,6 +155,8 @@ describe('state flow', () => {
     assert.deepEqual(game.stateNames(), ['MenuState']);
 
     game.step(Action.CONFIRM);
+    assert.equal(game.states.current.group, 'play');
+    game.step(Action.CONFIRM);
     assert.deepEqual(game.stateNames(), ['CharacterSelectState']);
     game.step(Action.CONFIRM);
     game.step(Action.CONFIRM);
@@ -155,7 +169,7 @@ describe('state flow', () => {
     const game = createFakeGame();
     game.changeState(StateId.MENU);
 
-    game.step(Action.MENU_UP);
+    goToMenuItem(game, 'controls');
     game.step(Action.CONFIRM);
     assert.deepEqual(game.stateNames(), ['MenuState', 'ControlsState']);
 
@@ -169,6 +183,8 @@ describe('state flow', () => {
     game.changeState(StateId.MENU);
 
     goToMenuItem(game, 'training');
+    game.step(Action.CONFIRM);
+    assert.deepEqual(game.stateNames(), ['CharacterSelectState']);
     game.step(Action.CONFIRM);
 
     assert.equal(game.states.current.mode, DuelMode.TRAINING);
@@ -722,6 +738,7 @@ it('lets the player select Shadow and keeps the choice after restart and between
   const game = createFakeGame();
   game.changeState(StateId.MENU);
   game.step(Action.CONFIRM);
+  game.step(Action.CONFIRM);
   game.step(Action.MENU_DOWN);
   game.step(Action.CONFIRM);
   game.step(Action.MENU_UP);
@@ -947,8 +964,11 @@ it('navigates character selection and colors using touch taps and hides desktop 
   assert.equal(game.states.current.menu.items.some(i => i.id === 'local'), false);
   game.input.touchTaps = [{ x: 640, y: layout.menu.firstItemY }];
   game.step();
+  assert.equal(game.states.current.group, 'play');
+  game.step();
   assert.equal(game.states.current.name, 'CharacterSelectState');
-  game.input.touchTaps = [{ x: 380, y: layout.characterSelect.firstItemY + layout.characterSelect.itemSpacing }];
+  const { list } = layout.characterSelect;
+  game.input.touchTaps = [{ x: list.listX, y: list.firstItemY + list.itemSpacing * 2 }];
   game.step();
   assert.equal(game.states.current.menu.selected.id, 'shadow');
   assert.equal(game.states.current.step, 'player');
@@ -965,7 +985,7 @@ it('touch color arrows preserve the chosen saber color in the duel', () => {
   const game = createFakeGame();
   game.settings.arcadeCleared = ['guardian'];
   game.changeState(StateId.CHARACTER_SELECT);
-  game.input.touchTaps = [{ x: 1170, y: 308 }];
+  game.input.touchTaps = [touchLayoutConfig.colorRight];
   game.step();
   assert.equal(game.states.current.getChosenColor('guardian'), '#5f8bff');
   game.input.touchTaps = [];
@@ -979,8 +999,8 @@ it('keeps color arrow taps separate from the character list, including a selecte
   const game = createFakeGame();
   game.settings.arcadeCleared = ['wasp'];
   game.changeState(StateId.CHARACTER_SELECT);
-  game.states.current.menu.selectedIndex = 3;
-  game.input.touchTaps = [{ x: 590, y: 308 }];
+  game.states.current.selectId(game.states.current.menu, 'wasp');
+  game.input.touchTaps = [touchLayoutConfig.colorLeft];
   game.step();
   assert.equal(game.states.current.step, 'player');
   assert.equal(game.states.current.menu.selected.id, 'wasp');
@@ -995,7 +1015,7 @@ describe('skin selection and duel persistence', () => {
     game.step(Action.SPECIAL);
     assert.equal(state.getChosenSkin('guardian'), 'base');
     game.settings.unlocks = { guardian: ['skin-story'] };
-    game.input.touchTaps = [{ x: 1170, y: 366 }];
+    game.input.touchTaps = [touchLayoutConfig.skinRight];
     game.step();
     game.input.touchTaps = [];
     assert.equal(state.getChosenSkin('guardian'), 'skin-story');
@@ -1012,7 +1032,7 @@ describe('skin selection and duel persistence', () => {
     game.changeState(StateId.CHARACTER_SELECT, { mode: DuelMode.LOCAL });
     game.step(Action.SPECIAL);
     game.step(Action.CONFIRM);
-    game.states.current.menu.selectedIndex = 0;
+    game.states.current.selectId(game.states.current.menu, 'guardian');
     game.stepSecond(Action.SPECIAL);
     game.stepSecond(Action.CONFIRM);
     game.step(Action.CONFIRM);
@@ -1051,7 +1071,7 @@ it('draws the variant line in the side color and switches it with Power', () => 
   game.settings.unlockedVariants = { foretold: ['aurora', 'eclipse'] };
   game.changeState(StateId.CHARACTER_SELECT, { mode: DuelMode.LOCAL });
   const select = game.states.current;
-  select.characterMenu.selectedIndex = select.characterIds.indexOf('foretold');
+  select.selectId(select.characterMenu, 'foretold');
   const variantLine = () => {
     const lines = [];
     const renderer = new Proxy({}, { get: (target, name) => {
@@ -1077,7 +1097,7 @@ it('keeps independent local variants through selection, back, restart and rematc
   game.settings.unlockedVariants = { foretold: ['aurora', 'eclipse'] };
   game.changeState(StateId.CHARACTER_SELECT, { mode: DuelMode.LOCAL });
   const select = game.states.current;
-  const chooseForetold = () => { select.characterMenu.selectedIndex = select.characterIds.indexOf('foretold'); };
+  const chooseForetold = () => { select.selectId(select.characterMenu, 'foretold'); };
   chooseForetold();
   game.step(Action.POWER);
   assert.equal(select.previews.get('foretold').stats.alignment, 'dark');
@@ -1147,23 +1167,24 @@ it('routes overlapping variant and skin touch regions to the closest row exclusi
   game.settings.unlocks = { foretold: ['skin-dusk', 'skin-secret'] };
   game.changeState(StateId.CHARACTER_SELECT);
   const select = game.states.current;
-  select.characterMenu.selectedIndex = select.characterIds.indexOf('foretold');
-  for (const x of [590, 1170]) {
-    game.input.touchTaps = [{ x, y: 342 }];
+  select.selectId(select.characterMenu, 'foretold');
+  const { variantLeft, variantRight, skinRight } = touchLayoutConfig;
+  for (const x of [variantLeft.x, variantRight.x]) {
+    game.input.touchTaps = [{ x, y: variantLeft.y }];
     game.step();
-    assert.equal(select.getChosenVariant('foretold'), x === 590 ? 'eclipse' : 'aurora');
+    assert.equal(select.getChosenVariant('foretold'), x === variantLeft.x ? 'eclipse' : 'aurora');
     assert.equal(select.getChosenSkin('foretold'), 'base');
   }
-  game.input.touchTaps = [{ x: 1170, y: 366 }];
+  game.input.touchTaps = [skinRight];
   game.step();
   assert.equal(select.getChosenSkin('foretold'), 'skin-dusk');
   assert.equal(select.getChosenVariant('foretold'), 'aurora');
-  game.input.touchTaps = [{ x: 1170, y: 354 }];
+  game.input.touchTaps = [{ x: skinRight.x, y: (variantRight.y + skinRight.y) / 2 }];
   game.step();
   assert.equal(select.getChosenVariant('foretold'), 'eclipse');
   assert.equal(select.getChosenSkin('foretold'), 'skin-dusk');
   game.settings.unlockedVariants = { foretold: ['aurora'] };
-  game.input.touchTaps = [{ x: 1170, y: 366 }];
+  game.input.touchTaps = [skinRight];
   game.step();
   assert.equal(select.getChosenSkin('foretold'), 'skin-secret');
 });

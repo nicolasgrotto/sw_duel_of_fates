@@ -57,3 +57,21 @@ export function findLoadoutProblems(loadout, alignment, config, techniques, powe
   }
   return problems;
 }
+
+export function getCustomPowerCatalog(character, config) {
+  const flow = character.attributes.flow;
+  return Object.entries(config.categories)
+    .filter(([id, category]) => id !== 'blade' && category.alignments.includes(character.alignment))
+    .flatMap(([, category]) => category.abilities)
+    .filter((id) => id in config.powers && (config.powers[id].minFlowLevel ?? 0) <= flow);
+}
+
+export function isValidCustomPowers(powers, character, config) {
+  if (!powers || typeof powers !== 'object') return false;
+  const slots = Object.keys(character.loadout?.powers ?? {});
+  const catalog = getCustomPowerCatalog(character, config);
+  const chosen = slots.map((slot) => powers[slot]);
+  return Object.keys(powers).length === slots.length
+    && chosen.every((id) => catalog.includes(id))
+    && new Set(chosen).size === chosen.length;
+}

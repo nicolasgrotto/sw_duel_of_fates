@@ -14,7 +14,7 @@ const roster = Object.keys(characters).filter(id => characters[id].selectable);
 for (const mode of [DuelMode.VERSUS, DuelMode.TRAINING, DuelMode.LOCAL, DuelMode.ARCADE, DuelMode.SURVIVAL]) {
   it(`selects the reaper without an unlock in ${mode}`, () => {
     let result;
-    const game = { settings: { unlockedCharacters: [] }, audio: { play() {} }, input: {},
+    const game = { settings: { unlockedCharacters: [] }, audio: { play() {} }, input: {}, saveSettings() {},
       changeState: (id, params) => { result = params; } };
     const state = new CharacterSelectState(game, { mode });
     state.enter();
@@ -24,6 +24,7 @@ for (const mode of [DuelMode.VERSUS, DuelMode.TRAINING, DuelMode.LOCAL, DuelMode
     state.choose('reaper');
     if (mode === DuelMode.ARCADE) assert.equal(result.arcade.playerCharacter, 'reaper');
     else if (mode === DuelMode.SURVIVAL) assert.equal(result.survival.playerCharacter, 'reaper');
+    else if (mode === DuelMode.TRAINING) assert.equal(result.playerCharacter, 'reaper');
     else {
       state.choose('guardian');
       state.choose(gameConfig.duel.arenaOrder[0]);
