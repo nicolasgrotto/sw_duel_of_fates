@@ -251,6 +251,15 @@ Pose `BLADE_LOCK`, com números por estilo em `motionStyles[motion].lock` e `loc
 
 O perdedor usa a pose de desequilíbrio existente.
 
+### Secretos revistos (v2.7, pedido do autor)
+
+Desenhos originais, sem nome, peça ou silhueta copiada de franquia; a referência é o arquétipo (o imperador sombrio, o cavaleiro caído), não um personagem.
+
+- **Soberano, traje base:** manto preto até o chão (`tunicLengthScale` 2: a barra da túnica desce o dobro e quase toca o chão), capuz fundo com o rosto na sombra (sem máscara: o rosto usa a cor do corpo, quase preta), sem ombreiras, tronco curvado para a frente (`torsoLeanDegrees` 8) e ombros estreitos (`shoulderScale` 0,95). Paleta: manto `#211c27`, corpo `#131016`, acabamento `#3a3340` (o preto puro sumia contra o fundo das arenas; o manto fica um tom acima para a silhueta ler). Lâmina principal vermelha (`#ff3040`, Carmesim); o ouro antigo vira cor alternativa, liberada ao vencer o Arcade com ele.
+- **Predestinado, traje Caído** (`skin-fallen`, liberado ao concluir a História): cavaleiro de armadura negra com capa longa e capuz, máscara na cor do acabamento cinza-aço, ombreiras e luvas pretas. Paleta: manto `#1b1b21`, corpo `#24242b`, acabamento `#4a4e58`, luva `#08080a`.
+- **Predestinado, traje Duelo** (`skin-duel`, liberado ao vencer o Arcade com ele): túnica escura em camadas, sem capa e sem capuz, luvas pretas, para o corpo ler inteiro no duelo. Paleta: manto `#2b2119`, corpo `#120f0d`, acabamento `#4d3c2d`, luva `#08080a`.
+- **Peça nova:** `tunicLengthScale` multiplica `proportions.tunicLength` só para o desenho do tronco; não muda hitbox nem pose.
+
 ### Ocaso (v2.7)
 
 Traje do Predestinado, nas duas variantes, sem vantagem e com a cor da lâmina independente. Intenção: presença austera, de quem já passou pelo fim; silhueta reconhecível do Predestinado, mais fechada e mais longa.

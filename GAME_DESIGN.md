@@ -714,9 +714,9 @@ O total máximo impede um protagonista com tudo no teto: ele termina forte, mas 
 
 | Personagem | Base | Notas | Alinhamento | Ideia |
 | --- | --- | --- | --- | --- |
-| Ancião | Garça (acrobacia) | potencial +1 (até 8): Vida 6, Stamina 6, Lâmina 6, Defesa 8, Agilidade 7, Fluxo 8 | Aurora | Mestre da Aurora: defesa e técnica acima de todos |
-| Soberano | Haste (alcance) | potencial +2 (até 9): Vida 7, Stamina 6, Lâmina 6, Defesa 6, Agilidade 4, Fluxo 9 | Eclipse | Pressiona com Raio e Estrangular; Tempestade cobre a aproximação, mas o corpo é lento |
-| Predestinado | Eco (fintas) | potencial +3 (até 10): Vida 8, Stamina 8, Lâmina 9, Defesa 7, Agilidade 9, Fluxo 10 | Aurora | O ápice: único no tier vermelho do Fluxo |
+| Ancião | Garça (acrobacia) | potencial +1 (até 8): Vida 6, Stamina 6, Lâmina 8, Defesa 8, Agilidade 8, Fluxo 8 (Lâmina e Agilidade no teto desde a 2.7, pedido do autor) | Aurora | Mestre da Aurora: defesa e técnica acima de todos |
+| Soberano | Haste (alcance) | potencial +2 (até 9): Vida 7, Stamina 6, Lâmina 9, Defesa 9, Agilidade 4, Fluxo 9 (Lâmina e Defesa no teto desde a 2.7, pedido do autor) | Eclipse | Pressiona com Raio e Estrangular; Tempestade cobre a aproximação, mas o corpo é lento |
+| Predestinado | Eco (fintas) | potencial +3 (até 10): Vida 8, Stamina 10, Lâmina 10, Defesa 7, Agilidade 9, Fluxo 10 (Lâmina e Vigor no teto desde a 2.7, pedido do autor) | Aurora | O ápice: único no tier vermelho do Fluxo |
 
 **Escala 7/8/9/10.** O elenco comum vai até 7 em todos os atributos (`attributesConfig.maxRating`). Secretos têm `potential` (+1, +2, +3): o teto de todos os atributos sobe nesse valor (8, 9 e 10), e a tela de seleção mostra os segmentos extras em dourado (`attributePotential`). Tiers do Fluxo: azul até 7 (todo o elenco), roxo em 8–9 (Ancião e Soberano), vermelho só no 10 (Predestinado).
 

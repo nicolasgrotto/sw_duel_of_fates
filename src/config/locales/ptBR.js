@@ -707,10 +707,11 @@ export const ptBR = {
       name: 'Soberano',
       info: {
         style: 'Secreto · senhor do Fluxo',
-        saberName: 'Ouro-velho',
+        saberName: 'Carmesim',
         trait: 'A ponta da lâmina dá mais dano; de perto, menos',
         ability: 'Varredura: golpe de alcance enorme e lento',
       },
+      saberColors: { arcade: 'Ouro-velho' },
       skins: { base: 'Original', 'skin-secret': 'Legado' },
     },
     foretold: {
@@ -721,7 +722,7 @@ export const ptBR = {
         trait: 'Finta: tocar a guarda cancela o forte',
         ability: 'Passo-reflexo: passo curto e invulnerável',
       },
-      skins: { base: 'Original', 'skin-dusk': 'Ocaso', 'skin-secret': 'Legado' },
+      skins: { base: 'Original', 'skin-dusk': 'Ocaso', 'skin-fallen': 'Caído', 'skin-duel': 'Duelo', 'skin-secret': 'Legado' },
     },
     elder: {
       name: 'Ancião',

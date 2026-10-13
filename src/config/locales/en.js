@@ -698,10 +698,11 @@ export const en = {
       name: 'Sovereign',
       info: {
         style: 'Secret · lord of the Flow',
-        saberName: 'Old gold',
+        saberName: 'Crimson',
         trait: 'The blade tip deals more damage; up close, less',
         ability: 'Sweep: huge, slow reaching blow',
       },
+      saberColors: { arcade: 'Old gold' },
       skins: { base: 'Original', 'skin-secret': 'Legacy' },
     },
     foretold: {
@@ -712,7 +713,7 @@ export const en = {
         trait: 'Feint: tapping guard cancels the heavy',
         ability: 'Reflex Step: short, invulnerable step',
       },
-      skins: { base: 'Original', 'skin-dusk': 'Dusk', 'skin-secret': 'Legacy' },
+      skins: { base: 'Original', 'skin-dusk': 'Dusk', 'skin-fallen': 'Fallen', 'skin-duel': 'Duel', 'skin-secret': 'Legacy' },
     },
     elder: {
       name: 'Elder',

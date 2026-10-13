@@ -15,7 +15,7 @@ it('applies only cosmetic overrides without mutating data or overriding the blad
 it('keeps stats and moves identical across every roster skin, with blade overrides applied last', () => {
   const spawn = { x: 100, y: 600, facing: 1 };
   for (const character of Object.values(characters).filter((character) => character.selectable || character.secret)) {
-    assert.equal(character.skins.length, character.id === 'foretold' ? 3 : character.secret ? 2 : 3);
+    assert.equal(character.skins.length, character.id === 'foretold' ? 5 : character.secret ? 2 : 3);
     const base = createFighter(character.id, spawn);
     for (const skin of character.skins) {
       const fighter = createFighter(character.id, spawn, { skin: skin.id, saberColor: 'custom-blade' });

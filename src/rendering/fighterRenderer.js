@@ -52,7 +52,7 @@ function drawCape(renderer, fighter, pose, shoulderWidth, flare, cloakColor) {
 }
 
 function drawTorso(renderer, fighter, pose, shoulderWidth, flare, cloakColor) {
-  const hemY = pose.hipY + fighter.height * proportions.tunicLength;
+  const hemY = pose.hipY + fighter.height * proportions.tunicLength * (fighter.appearance.tunicLengthScale ?? 1);
   const sway = pose.clothSway;
 
   setFourPoints(

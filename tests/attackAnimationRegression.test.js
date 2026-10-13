@@ -24,8 +24,10 @@ function attackAt(fighter, moveId, time) {
   return move;
 }
 
+const HISTORICAL_APPEARANCE = { sovereign: { torsoLeanDegrees: -2, shoulderScale: 1.1 } };
+
 function asStandard(fighter) {
-  fighter.appearance = { ...fighter.appearance, motion: 'standard' };
+  fighter.appearance = { ...fighter.appearance, ...HISTORICAL_APPEARANCE[fighter.id], motion: 'standard' };
   return fighter;
 }
 
