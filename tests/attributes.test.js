@@ -22,6 +22,17 @@ function base(id = 'guardian') {
   return { ...stats, ...scalars, movement: { ...stats.movement, ...scalars.movement }, stamina: { ...stats.stamina, ...scalars.stamina }, dodge: { ...stats.dodge, ...scalars.dodge }, parry: { ...stats.parry, ...scalars.parry }, evade: evadeConfig.profile, attacks: fighter.moves };
 }
 
+const GUARD_BREAK_STUN_RAISE = 0.4;
+
+function reviseLegacy(key, value) {
+  if (key === 'parry') {
+    const { stagger, ...rest } = value;
+    return rest;
+  }
+  if (key === 'guardBreakStun') return Math.round((value + GUARD_BREAK_STUN_RAISE) * 100) / 100;
+  return value;
+}
+
 it('preserves every legacy scalar, move damage and reserved flow without changing current combat', () => {
   for (const [id, expected] of Object.entries(legacy)) {
     const fighter = createFighter(id, spawn);
@@ -31,7 +42,7 @@ it('preserves every legacy scalar, move damage and reserved flow without changin
         const { maxJumps, airJumpVelocityScale, ...scalars } = stats.movement;
         const { maxJumps: legacyJumps, airJumpVelocityScale: legacyScale, ...legacyScalars } = value;
         assert.deepEqual(scalars, legacyScalars, `${id}.movement`);
-      } else if (key !== 'damage') assert.deepEqual(stats[key], value, `${id}.${key}`);
+      } else if (key !== 'damage') assert.deepEqual(stats[key], reviseLegacy(key, value), `${id}.${key}`);
     }
     for (const [move, damage] of Object.entries(expected.damage)) assert.equal(fighter.moves[move].damage, damage, `${id}.${move}`);
     assert.equal(stats.evade.invulnerableTime, evadeConfig.profile.invulnerableTime);

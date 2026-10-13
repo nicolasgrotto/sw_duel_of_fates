@@ -101,7 +101,7 @@ Os valores reais ficam em `src/config/fightersConfig.js`, por arquétipo.
 - **Buffer de input**: uma ação apertada enquanto o lutador ainda não pode agir (recovery, hitstun, blockstun, hit stop) fica guardada por `gameConfig.combat.inputBuffer` (0,15 s) e sai no primeiro frame possível. A última ação apertada substitui a anterior.
 - Prioridade quando várias teclas chegam juntas: esquiva > empurrão > ataque forte > ataque rápido > bloqueio.
 - Sem stamina suficiente, a ação é recusada e o jogo avisa: a barra de stamina pisca e toca um som seco (evento `actionRejected`). A ação recusada sai do buffer.
-- Um ataque só pode cancelar a recuperação para o próximo rápido declarado em `cancelsInto`, depois de acertar ou ser bloqueado. No whiff, parry ou clash a rota não abre. Demais interrupções continuam sendo hit, parry e clash.
+- Um ataque só pode cancelar a recuperação para o próximo rápido declarado em `cancelsInto`, depois de acertar, ser bloqueado, ser aparado ou se chocar com outro rápido (2.23). No whiff a rota não abre. Interrompem o combo o hit recebido, o parry perfeito num forte e o clash com um forte.
 
 **Ataques**
 
@@ -122,7 +122,7 @@ Os valores reais ficam em `src/config/fightersConfig.js`, por arquétipo.
 - Segurar bloquear mantém `BLOCKING`. Soltar volta a `IDLE`.
 - Só bloqueia golpes vindos da frente.
 - Golpe bloqueado: sem dano de vida, o defensor perde stamina, é empurrado um pouco e fica preso no bloqueio por um instante (blockstun).
-- **Quebra de guarda**: se o defensor não tiver stamina para o bloqueio, a stamina zera e ele fica `STUNNED`.
+- **Quebra de guarda**: se o defensor não tiver stamina para o bloqueio, a stamina zera e ele fica `STUNNED` (1,2 a 1,4 s pelo arquétipo desde a 2.23, para dar tempo de reagir e conectar um forte que fere).
 
 **Parry (aparar)**
 
@@ -134,8 +134,8 @@ O parry é a defesa ativa. Usa o mesmo botão do bloqueio: **tocar** abre a jane
 | 0,08 a 0,20 s | **Parry** |
 | depois | bloqueio normal |
 
-- **Parry**: nenhum dano e nenhum custo para o defensor, que fica livre na hora. O atacante perde o ataque e a stamina do bloqueio daquele golpe e fica `STAGGERED` por 0,30 s. Isso **garante um ataque rápido** (ou a riposta).
-- **Parry perfeito**: como o parry, mas o atacante fica `STAGGERED` por 0,50 s e perde o dobro de stamina, e o defensor recupera 15 de stamina. Isso **garante um ataque forte**.
+- **Parry** (revisto na 2.23, pedido do autor): nenhum dano e nenhum custo para o defensor, que fica livre na hora. O atacante perde a stamina do bloqueio daquele golpe, o golpe deixa de acertar e segue para a recuperação, **sem desequilíbrio**. Num rápido, o combo continua: o próximo rápido sai pela rota de encadeamento, e a recuperação pode ser trocada por bloqueio ou outra ação. Num forte, sobra a recuperação longa do forte para o defensor punir.
+- **Parry perfeito**: perde o dobro de stamina, e o defensor recupera 15 de stamina. Contra um **forte**, e só nesse caso, o atacante perde o golpe e fica `STAGGERED` por 0,50 s, o que **garante um ataque forte** ou a riposta. Contra um rápido, vale como o parry: desvia sem desequilíbrio.
 - **Parry falho**: se a janela acabar sem nenhum golpe, a janela não abre de novo por 0,40 s (o bloqueio continua funcionando). Isso impede apertar o botão sem parar.
 - O toque precisa ser novo: segurar o bloqueio não abre janela ao sair de um hitstun. Um toque durante o blockstun abre a janela (aparar o próximo golpe de uma sequência).
 - O empurrão não pode ser aparado.
@@ -144,7 +144,7 @@ O parry é a defesa ativa. Usa o mesmo botão do bloqueio: **tocar** abre a jane
 
 **Riposta**
 
-- Um ataque rápido apertado enquanto o oponente está desequilibrado por um parry vira a **riposta**: golpe próprio, mais rápido (startup 0,06 s), sem custo de stamina e com mais dano que o ataque rápido.
+- Um ataque rápido apertado enquanto o oponente está desequilibrado por um parry perfeito num forte vira a **riposta**: golpe próprio, mais rápido (startup 0,06 s), sem custo de stamina e com mais dano que o ataque rápido.
 - A janela da riposta dura o tempo do desequilíbrio do oponente.
 
 **Empurrão**
@@ -164,7 +164,8 @@ O parry é a defesa ativa. Usa o mesmo botão do bloqueio: **tocar** abre a jane
 
 - Acontece quando os dois lutadores estão na fase active ao mesmo tempo e as hitboxes dos dois se encostam.
 - O clash tem prioridade sobre o hit: ninguém leva dano.
-- Os dois ataques são cancelados, os dois são empurrados para trás e ficam um instante em recuo (`HIT`, sem dano).
+- **Rápido contra rápido** (2.23, pedido do autor): só mostra que as lâminas se encontraram (faíscas, som e tremor do clash). Os dois golpes deixam de acertar, um empurrão curto separa os lutadores e ninguém entra em recuo. Os dois continuam livres: o combo segue pela rota de encadeamento, e a recuperação pode ser trocada por bloqueio, parry, esquiva, empurrão ou poder.
+- **Com um forte envolvido**: os dois ataques são cancelados, os dois são empurrados para trás e ficam um instante em recuo (`HIT`, sem dano). Dois fortes elegíveis iniciam a disputa (2.5).
 - Emite o evento `clash`.
 - Valores em `gameConfig.combat.clash`.
 
@@ -258,7 +259,7 @@ A IA controla o oponente pelo mesmo `intent` do jogador. Ela só **solicita** a�
   - cooldown entre os próprios ataques
 - E escolhe, em ordem de prioridade:
   1. **Defender**: se o jogador está começando um golpe que alcança, bloqueia ou esquiva (chance depende do perfil e da dificuldade). Contra um **ataque forte** ainda no startup, pode tentar o **parry**: calcula quando o golpe vai ficar ativo (pela pose, como um humano) e toca o bloqueio na hora certa.
-  2. **Punir**: se o jogador está em recovery, atingido, desequilibrado ou atordoado e está no alcance, contra-ataca (ataque forte se houver stamina e o jogador estiver atordoado). Depois de um parry da IA, o ataque rápido vira riposta.
+  2. **Punir**: se o jogador está em recovery, atingido, desequilibrado ou atordoado e está no alcance, contra-ataca (ataque forte se houver stamina e o jogador estiver atordoado). Depois de um parry perfeito da IA num forte, o ataque rápido vira riposta.
   3. **Empurrar**: se o jogador está bloqueando perto, empurra (chance do perfil × dificuldade).
   4. **Recuperar**: com pouca stamina, recua até uma distância segura.
   5. **Atacar**: no alcance e sem cooldown, ataca com uma chance do perfil (rápido ou forte).

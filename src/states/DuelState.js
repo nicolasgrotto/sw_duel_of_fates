@@ -526,7 +526,7 @@ export class DuelState extends GameState {
     for (const event of this.simulation.events) {
       const type = event.type === CombatEvent.HIT && isStrongAttack(event.attackType) ? 'heavyHit' : event.type;
       this.game.input.rumble?.(type, this.game.settings.reducedEffects);
-      if (event.type === CombatEvent.PERFECT_PARRY) {
+      if (event.type === CombatEvent.PERFECT_PARRY && event.staggered) {
         this.letterbox.pulse(layout.letterbox.perfectParryAmount, layout.letterbox.perfectParryDuration);
       }
       if (event.type === CombatEvent.POWER_START && event.attackType === 'meteorRain') {

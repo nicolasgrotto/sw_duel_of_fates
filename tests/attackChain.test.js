@@ -61,15 +61,17 @@ describe('attack chains', () => {
     assert.equal(duel.simulation.events[0].type, 'actionRejected');
   });
 
-  it('does not allow a parried attack to use its cancel routes', () => {
+  it('keeps the light combo going after the light attack is parried', () => {
     const duel = setup();
     duel.defender.intent.block = true;
     duel.defender.intent.blockPressed = true;
     duel.step({ lightAttack: true });
     duel.defender.intent.blockPressed = false;
     for (let index = 0; index < 10; index += 1) duel.step();
-    assert.equal(duel.attacker.state, 'STAGGERED');
+    assert.notEqual(duel.attacker.state, 'STAGGERED');
+    assert.equal(duel.attacker.combat.attackConnected, true);
+    enterRecovery(duel);
     duel.step({ lightAttack: true });
-    assert.equal(duel.attacker.combat.attack, null);
+    assert.equal(duel.attacker.combat.attackType, 'light2');
   });
 });

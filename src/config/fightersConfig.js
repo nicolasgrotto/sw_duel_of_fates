@@ -74,7 +74,6 @@ export const fighterArchetypes = {
     parry: {
       window: 0.2,
       lockout: 0.4,
-      stagger: 0.3,
       perfectStagger: 0.5,
       perfectStaminaGain: 15,
       perfectStaminaDamageMultiplier: 2,
@@ -93,7 +92,7 @@ export const fighterArchetypes = {
     knockbackScale: 1,
     wallJump: null,
     feint: null,
-    guardBreakStun: 0.9,
+    guardBreakStun: 1.3,
   },
   shadow: {
     body: {
@@ -170,7 +169,6 @@ export const fighterArchetypes = {
     parry: {
       window: 0.2,
       lockout: 0.4,
-      stagger: 0.3,
       perfectStagger: 0.5,
       perfectStaminaGain: 15,
       perfectStaminaDamageMultiplier: 2,
@@ -189,7 +187,7 @@ export const fighterArchetypes = {
     knockbackScale: 1,
     wallJump: null,
     feint: null,
-    guardBreakStun: 1,
+    guardBreakStun: 1.4,
   },
   bastion: {
     body: {
@@ -266,7 +264,6 @@ export const fighterArchetypes = {
     parry: {
       window: 0.18,
       lockout: 0.4,
-      stagger: 0.3,
       perfectStagger: 0.5,
       perfectStaminaGain: 15,
       perfectStaminaDamageMultiplier: 2,
@@ -285,7 +282,7 @@ export const fighterArchetypes = {
     knockbackScale: 1.1,
     wallJump: null,
     feint: null,
-    guardBreakStun: 0.8,
+    guardBreakStun: 1.2,
   },
   wasp: {
     body: {
@@ -362,7 +359,6 @@ export const fighterArchetypes = {
     parry: {
       window: 0.2,
       lockout: 0.4,
-      stagger: 0.3,
       perfectStagger: 0.5,
       perfectStaminaGain: 15,
       perfectStaminaDamageMultiplier: 2,
@@ -382,7 +378,7 @@ export const fighterArchetypes = {
     airDash: { staminaCost: 8, speed: 660, duration: 0.2, invulnerableTime: 0, lift: 160, passThrough: true },
     wallJump: null,
     feint: null,
-    guardBreakStun: 1,
+    guardBreakStun: 1.4,
   },
   mirror: {
     body: {
@@ -459,7 +455,6 @@ export const fighterArchetypes = {
     parry: {
       window: 0.24,
       lockout: 0.35,
-      stagger: 0.32,
       perfectStagger: 0.45,
       perfectStaminaGain: 15,
       perfectStaminaDamageMultiplier: 2,
@@ -478,7 +473,7 @@ export const fighterArchetypes = {
     knockbackScale: 1,
     wallJump: null,
     feint: null,
-    guardBreakStun: 0.9,
+    guardBreakStun: 1.3,
   },
   shadowAwakened: {
     body: {
@@ -555,7 +550,6 @@ export const fighterArchetypes = {
     parry: {
       window: 0.2,
       lockout: 0.4,
-      stagger: 0.3,
       perfectStagger: 0.5,
       perfectStaminaGain: 15,
       perfectStaminaDamageMultiplier: 2,
@@ -574,7 +568,7 @@ export const fighterArchetypes = {
     knockbackScale: 1,
     wallJump: null,
     feint: null,
-    guardBreakStun: 1,
+    guardBreakStun: 1.4,
   },
   haste: {
     body: {
@@ -654,7 +648,6 @@ export const fighterArchetypes = {
     parry: {
       window: 0.2,
       lockout: 0.4,
-      stagger: 0.3,
       perfectStagger: 0.5,
       perfectStaminaGain: 15,
       perfectStaminaDamageMultiplier: 2,
@@ -673,7 +666,7 @@ export const fighterArchetypes = {
     knockbackScale: 1,
     wallJump: null,
     feint: null,
-    guardBreakStun: 0.9,
+    guardBreakStun: 1.3,
   },
   ember: {
     body: {
@@ -750,7 +743,6 @@ export const fighterArchetypes = {
     parry: {
       window: 0.2,
       lockout: 0.4,
-      stagger: 0.3,
       perfectStagger: 0.5,
       perfectStaminaGain: 15,
       perfectStaminaDamageMultiplier: 2,
@@ -769,7 +761,7 @@ export const fighterArchetypes = {
     knockbackScale: 1,
     wallJump: null,
     feint: null,
-    guardBreakStun: 0.9,
+    guardBreakStun: 1.3,
   },
   forge: {
     body: {
@@ -846,7 +838,6 @@ export const fighterArchetypes = {
     parry: {
       window: 0.18,
       lockout: 0.4,
-      stagger: 0.3,
       perfectStagger: 0.5,
       perfectStaminaGain: 15,
       perfectStaminaDamageMultiplier: 2,
@@ -865,7 +856,7 @@ export const fighterArchetypes = {
     knockbackScale: 1.25,
     wallJump: null,
     feint: null,
-    guardBreakStun: 0.85,
+    guardBreakStun: 1.25,
   },
   heron: {
     body: {
@@ -942,7 +933,6 @@ export const fighterArchetypes = {
     parry: {
       window: 0.2,
       lockout: 0.4,
-      stagger: 0.3,
       perfectStagger: 0.5,
       perfectStaminaGain: 15,
       perfectStaminaDamageMultiplier: 2,
@@ -962,7 +952,7 @@ export const fighterArchetypes = {
     knockbackScale: 1,
     wallJump: { speed: 560, heightScale: 0.95, wallMargin: 6 },
     feint: null,
-    guardBreakStun: 1,
+    guardBreakStun: 1.4,
   },
   reaper: {
     body: {
@@ -1039,7 +1029,6 @@ export const fighterArchetypes = {
     parry: {
       window: 0.2,
       lockout: 0.4,
-      stagger: 0.3,
       perfectStagger: 0.5,
       perfectStaminaGain: 15,
       perfectStaminaDamageMultiplier: 2,
@@ -1059,7 +1048,7 @@ export const fighterArchetypes = {
     knockbackScale: 1,
     wallJump: { speed: 560, heightScale: 0.95, wallMargin: 6 },
     feint: null,
-    guardBreakStun: 1,
+    guardBreakStun: 1.4,
   },
   echo: {
     body: {
@@ -1136,7 +1125,6 @@ export const fighterArchetypes = {
     parry: {
       window: 0.2,
       lockout: 0.4,
-      stagger: 0.3,
       perfectStagger: 0.5,
       perfectStaminaGain: 15,
       perfectStaminaDamageMultiplier: 2,
@@ -1155,6 +1143,6 @@ export const fighterArchetypes = {
     knockbackScale: 1,
     wallJump: null,
     feint: { staminaCost: 8 },
-    guardBreakStun: 0.95,
+    guardBreakStun: 1.35,
   },
 };

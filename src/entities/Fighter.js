@@ -27,6 +27,7 @@ function createCombat() {
     attackType: null,
     hasHit: false,
     attackConnected: false,
+    freeRecovery: false,
     airAttackUsed: false,
     airDashUsed: false,
     saberThrown: false,
@@ -246,6 +247,7 @@ export class Fighter {
     this.combat.attackType = null;
     this.combat.hasHit = false;
     this.combat.attackConnected = false;
+    this.combat.freeRecovery = false;
     this.combat.lungeApplied = false;
     this.clearPower();
   }

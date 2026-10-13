@@ -58,7 +58,7 @@ export function isContactEvent(event) {
   return CONTACT_EVENTS.has(event.type);
 }
 
-export function createCombatEvent(type, { attacker, defender, attackType, x, y, armored = false, damage = 0, auto, impactTime, hit, mode }) {
+export function createCombatEvent(type, { attacker, defender, attackType, x, y, armored = false, damage = 0, auto, impactTime, hit, mode, light, staggered }) {
   const event = {
     type,
     attacker,
@@ -75,5 +75,7 @@ export function createCombatEvent(type, { attacker, defender, attackType, x, y, 
   if (impactTime !== undefined) event.impactTime = impactTime;
   if (hit !== undefined) event.hit = hit;
   if (mode !== undefined) event.mode = mode;
+  if (light !== undefined) event.light = light;
+  if (staggered !== undefined) event.staggered = staggered;
   return event;
 }

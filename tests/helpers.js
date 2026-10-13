@@ -23,6 +23,7 @@ export const combatConfig = {
   clash: {
     pushback: 280,
     recoil: 0.25,
+    lightPushback: 120,
   },
 };
 

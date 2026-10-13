@@ -37,11 +37,11 @@ describe('frame advantage', () => {
     assert.ok(Math.abs(getFrameAdvantage(attacker, defender) - (-0.30)) < STEP);
   });
 
-  it('uses stagger instead of the cancelled attack on a parry', () => {
+  it('uses the remaining heavy recovery after a deflecting parry', () => {
     const { attacker, defender, contact } = resolveContact('parry', 0.14);
     assert.equal(contact.type, 'parry');
-    assert.equal(attacker.combat.attack, null);
-    assert.equal(getFrameAdvantage(attacker, defender), -defender.stats.parry.stagger);
+    assert.notEqual(attacker.combat.attack, null);
+    assert.ok(getFrameAdvantage(attacker, defender) < 0);
   });
 
   it('shows the larger disadvantage of a perfect parry', () => {

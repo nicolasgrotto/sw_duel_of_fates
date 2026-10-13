@@ -1,6 +1,6 @@
 import { describe, it } from 'node:test';
 import assert from 'node:assert/strict';
-import { getAttackDuration } from '../src/combat/attackPhases.js';
+import { getAttackDuration, getAttackPhase } from '../src/combat/attackPhases.js';
 import { CombatEvent, isContactEvent } from '../src/combat/combatEvents.js';
 import { boxesOverlap, createBox, getAttackHitbox, getHurtbox } from '../src/combat/hitboxes.js';
 import { FighterState } from '../src/entities/fighterStates.js';
@@ -116,7 +116,7 @@ describe('CombatSystem hits', () => {
     assert.deepEqual(eventTypes(duel.events), [CombatEvent.CLASH]);
   });
 
-  it('pushes both fighters apart and cancels both attacks on a clash', () => {
+  it('keeps both light attacks and frees their recovery when two lights clash', () => {
     const duel = createDuel();
     const { player, opponent } = duel;
     player.stats = { ...player.stats, attacks: { ...player.stats.attacks, light: opponent.stats.attacks.light } };
@@ -126,6 +126,31 @@ describe('CombatSystem hits', () => {
       duel.step();
     }
 
+    assert.equal(duel.events[0].light, true);
+    for (const fighter of [player, opponent]) {
+      assert.equal(fighter.state, FighterState.ATTACKING);
+      assert.equal(fighter.combat.hasHit, true);
+      assert.equal(fighter.combat.attackConnected, true);
+      assert.equal(fighter.combat.freeRecovery, true);
+    }
+    assert.ok(player.vx < 0);
+    assert.ok(opponent.vx > 0);
+    while (getAttackPhase(player.combat.attack, player.stateTime) !== 'recovery') duel.step();
+    duel.step({ block: true });
+    assert.equal(player.state, FighterState.BLOCKING);
+  });
+
+  it('pushes both fighters apart and cancels both attacks when a heavy clashes', () => {
+    const duel = createDuel();
+    const { player, opponent } = duel;
+    player.stats = { ...player.stats, attacks: { ...player.stats.attacks, light: { ...opponent.stats.attacks.light, type: 'heavy' } } };
+    duel.step({ lightAttack: true }, { lightAttack: true });
+
+    while (duel.events.length === 0) {
+      duel.step();
+    }
+
+    assert.equal(duel.events[0].light, false);
     assert.equal(player.state, FighterState.HIT);
     assert.equal(opponent.state, FighterState.HIT);
     assert.equal(player.combat.attack, null);
@@ -282,9 +307,12 @@ describe('parry', () => {
     assert.equal(player.health, player.stats.maxHealth);
     assert.equal(player.stamina, player.stats.maxStamina);
     assert.equal(player.state, FighterState.IDLE);
-    assert.equal(opponent.state, FighterState.STAGGERED);
-    assert.equal(opponent.combat.stunDuration, player.stats.parry.stagger);
-    assert.equal(opponent.combat.attack, null);
+    assert.equal(opponent.state, FighterState.HEAVY_ATTACK);
+    assert.equal(opponent.combat.hasHit, true);
+    assert.equal(duel.events[0].staggered, false);
+    assert.equal(player.combat.riposteTime, 0);
+    const heavy = opponent.stats.attacks.heavy;
+    assert.ok(Math.abs(opponent.stamina - (opponent.stats.maxStamina - heavy.staminaCost - heavy.blockStaminaCost)) < 1e-9);
   });
 
   it('gives a perfect parry at the start of the window', () => {
@@ -297,6 +325,8 @@ describe('parry', () => {
     parryHeavy(duel, 0.03);
 
     assert.deepEqual(eventTypes(duel.events), [CombatEvent.PERFECT_PARRY]);
+    assert.equal(opponent.state, FighterState.STAGGERED);
+    assert.equal(duel.events[0].staggered, true);
     assert.equal(opponent.combat.stunDuration, parry.perfectStagger);
     assert.ok(player.stamina >= 50 + parry.perfectStaminaGain);
     const expectedStamina = opponent.stats.maxStamina - heavy.staminaCost - heavy.blockStaminaCost * parry.perfectStaminaDamageMultiplier;
@@ -351,19 +381,36 @@ describe('parry', () => {
     assert.equal(player.combat.parryArmed, true);
   });
 
-  it('turns the next light attack into a riposte while the attacker is staggered', () => {
+  it('turns the next light attack into a riposte while the attacker is staggered by a perfect parry', () => {
     const duel = createDuel();
     const { player, opponent } = duel;
     const riposte = player.stats.attacks.riposte;
 
-    parryHeavy(duel, 0.14, { hold: false });
+    parryHeavy(duel, 0.03, { hold: false });
     duel.step({ lightAttack: true });
 
     assert.equal(player.combat.attackType, 'riposte');
     repeat(Math.ceil((riposte.startup + riposte.active) / STEP), () => duel.step());
 
     assert.equal(opponent.health, opponent.stats.maxHealth - riposte.damage);
-    assert.deepEqual(eventTypes(duel.events), [CombatEvent.PARRY, CombatEvent.HIT]);
+    assert.deepEqual(eventTypes(duel.events), [CombatEvent.PERFECT_PARRY, CombatEvent.HIT]);
+  });
+
+  it('deflects a light attack without stagger even on a perfect parry', () => {
+    const duel = createDuel();
+    const { player, opponent } = duel;
+    const light = opponent.stats.attacks.light;
+    const contactStep = stepsUntilActive(light);
+    duel.step({}, { lightAttack: true });
+    for (let step = 1; step <= contactStep + 3 && duel.events.length === 0; step += 1) {
+      duel.step({ block: step >= contactStep - 2, blockPressed: step === contactStep - 2 });
+    }
+
+    assert.deepEqual(eventTypes(duel.events), [CombatEvent.PERFECT_PARRY]);
+    assert.equal(duel.events[0].staggered, false);
+    assert.equal(opponent.state, FighterState.ATTACKING);
+    assert.equal(opponent.combat.attackConnected, true);
+    assert.equal(player.combat.riposteTime, 0);
   });
 });
 

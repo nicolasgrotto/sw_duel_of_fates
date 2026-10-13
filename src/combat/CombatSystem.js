@@ -175,6 +175,7 @@ export class CombatSystem {
     if (this.tryFeint(fighter) || this.tryAttackChain(fighter)) {
       return;
     }
+    this.releaseFreeRecovery(fighter);
     if (fighter.state === FighterState.BLOCKING && this.startActionFromBlock(fighter)) {
       return;
     }
@@ -192,6 +193,18 @@ export class CombatSystem {
       fighter.combat.blockstun = 0;
       fighter.setState(FighterState.BLOCKING);
     }
+  }
+
+  releaseFreeRecovery(fighter) {
+    const { combat } = fighter;
+    if (!combat.freeRecovery || !combat.attack || getAttackPhase(combat.attack, fighter.stateTime) !== AttackPhase.RECOVERY) {
+      return;
+    }
+    if (combat.bufferedAction === null && !fighter.intent.block) {
+      return;
+    }
+    fighter.clearAttack();
+    fighter.setState(FighterState.IDLE);
   }
 
   tryFeint(fighter) {
@@ -488,17 +501,33 @@ export class CombatSystem {
 
     if (this.bladeLocks?.tryStart(a, b)) return;
 
+    const light = a.combat.attack.type === AttackType.LIGHT && b.combat.attack.type === AttackType.LIGHT;
     this.events.push(
       createCombatEvent(CombatEvent.CLASH, {
         attacker: a,
         defender: b,
         attackType: a.combat.attackType,
+        light,
         x: (Math.max(boxA.left, boxB.left) + Math.min(boxA.right, boxB.right)) / 2,
         y: (Math.max(boxA.top, boxB.top) + Math.min(boxA.bottom, boxB.bottom)) / 2,
       }),
     );
+    if (light) {
+      this.deflect(a, b, this.clash.lightPushback);
+      this.deflect(b, a, this.clash.lightPushback);
+      return;
+    }
     this.recoil(a, b);
     this.recoil(b, a);
+  }
+
+  deflect(fighter, opponent, pushback) {
+    const { combat } = fighter;
+    combat.hasHit = true;
+    combat.attackConnected = true;
+    combat.freeRecovery = true;
+    combat.lungeApplied = true;
+    fighter.vx = (Math.sign(fighter.x - opponent.x) || -fighter.facing) * pushback;
   }
 
   recoil(fighter, opponent) {
@@ -618,18 +647,23 @@ export class CombatSystem {
     const { attacker, defender, attack } = contact;
     const { parry } = defender.stats;
     const perfect = defender.combat.parryTime < parry.perfectWindow;
-    const stagger = perfect ? parry.perfectStagger : parry.stagger;
+    const staggers = perfect && attack.type === AttackType.HEAVY;
     const staminaDamage = attack.blockStaminaCost * (perfect ? parry.perfectStaminaDamageMultiplier : 1);
 
     this.spendStamina(attacker, staminaDamage, 'drain');
-    attacker.clearAttack();
-    attacker.vx = -attacker.facing * parry.attackerRecoil;
-    attacker.combat.stunDuration = stagger;
-    attacker.restartState(FighterState.STAGGERED);
+    if (staggers) {
+      attacker.clearAttack();
+      attacker.vx = -attacker.facing * parry.attackerRecoil;
+      attacker.combat.stunDuration = parry.perfectStagger;
+      attacker.restartState(FighterState.STAGGERED);
+    } else {
+      this.deflect(attacker, defender, parry.attackerRecoil);
+    }
+    contact.staggered = staggers;
 
     defender.combat.parryArmed = false;
     defender.combat.blockstun = 0;
-    defender.combat.riposteTime = stagger;
+    defender.combat.riposteTime = staggers ? parry.perfectStagger : 0;
     defender.vx = 0;
     if (perfect) {
       defender.stamina = Math.min(defender.stats.maxStamina, defender.stamina + parry.perfectStaminaGain);

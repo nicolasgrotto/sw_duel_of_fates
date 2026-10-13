@@ -93,7 +93,8 @@ it('uses armor against blade interruption but not shove, parry or guard break', 
   combat.breakGuard(defender, contact);
   assert.equal(defender.state, FighterState.STUNNED);
   combat.powers.applySelf(attacker, wrath);
-  combat.resolveParry(contact);
+  defender.combat.parryTime = 0;
+  combat.resolveParry({ ...contact, attack: attacker.moves.heavy, attackType: 'heavy' });
   assert.equal(attacker.state, FighterState.STAGGERED);
   assert.ok(attacker.combat.wrathTime > 0);
 });
