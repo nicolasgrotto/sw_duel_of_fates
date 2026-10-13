@@ -690,23 +690,27 @@ O protagonista recebe os poderes do caminho (`storyConfig.protagonist.loadouts`)
 
 **IA (v1.19).** Usa os 11 poderes e as três técnicas por loadout. Acompanha projéteis em voo, mantém defesa pelo tempo da ameaça, esquiva de faixas imbloqueáveis quando as reconhece, evita Raio na janela de Redirecionamento, tenta quebrar Barreira com empurrão e pune a preparação de Cura e Foco. Dificuldade e perfil continuam limitando percepção e reação; a IA só solicita ações.
 
-## 23. História (v2)
+## 23. História (v2; rotas e progressão da 2.8)
 
-Campanha linear com um protagonista criado pelo jogador. Textos em `src/config/storyTexts.js`; regras e encontros em `src/config/storyConfig.js`.
+Campanha com um protagonista criado pelo jogador. Textos nas tabelas de idioma (`story`); regras e encontros em `src/config/storyConfig.js`. Especificação completa em versions/v3.md → 2.8.
 
 **Criação.** Seis passos: nome (lista pronta ou digitado, até 16 caracteres), Caminho do Fluxo (Aurora ou Eclipse, que definem os poderes), estilo de luta (Técnica, Fúria ou Voo: usam golpes e habilidade do Guardião, da Sombra ou da Garça), visual (Errante, Vigia ou Peregrino), cor da lâmina e dificuldade. Logo depois, o jogador distribui os pontos iniciais.
 
-**Atributos e progressão** (revisto na 2.21, pedido do autor). Todos começam em 3 (total 18). Qualquer atributo pode subir até 7 em todas as dificuldades; a dificuldade limita só o total. Cada vitória dá 1 ponto; os pontos iniciais mudam por dificuldade, de modo que o total fecha exatamente com as vitórias antes do último duelo (8 na rota atual) e toda vitória dá algo para investir:
+**Rotas (2.8).** Quatro encontros comuns (Guardião, Eco, Vespa, Brasa) e uma trilha de quatro por caminho, escolhida pelo Caminho do Fluxo, sem decisão em diálogo. Aurora: Bastião, Sombra, Sombra Desperta e o chefe **Soberano**. Eclipse: Ceifador, Espelho, Garça e o chefe **Ancião**. Vencer o chefe com **mais de 75%** de vida (exatamente 75% não conta) leva ao secreto, o **Predestinado da variante oposta** (Eclipse na campanha Aurora, Aurora na Eclipse), com IA de chefe. Cada caminho tem final normal e secreto. Vencer um chefe libera o personagem; terminar a campanha Aurora libera também o Ancião, e a Eclipse, o Soberano; vencer uma variante do Predestinado libera aquela variante.
 
-| Dificuldade | Pontos iniciais | Por vitória | Total máximo |
+**Atributos e progressão (2.8).** Todos começam em 3 (total 18) com 3 pontos livres. Qualquer atributo vai até 7; a dificuldade limita só o total. Cada encontro vencido dá pontos uma única vez, conforme a dificuldade, e os marcos dão um pouco mais; o chefe final e o secreto não dão pontos. O total fecha exatamente quando o protagonista chega ao chefe final:
+
+| Dificuldade | Pontos por vitória | Marcos (encontros 3 e 6) | Total ao chegar ao chefe |
 | --- | --- | --- | --- |
-| Fácil | 7 | 1 | 33 |
-| Normal | 4 | 1 | 30 |
-| Difícil | 2 | 1 | 28 |
+| Fácil | 3 | 3 e 3 | 42 (tudo em 7) |
+| Normal | 2 | 3 e 2 | 36 |
+| Difícil | 1 | 2 e 2 | 30 |
 
-Pontos nunca passam do total: uma vitória com o total já coberto não dá ponto, e saves antigos com pontos sobrando são cortados ao carregar. Pontos investidos são definitivos (sem redistribuição). O total máximo impede um protagonista com tudo no teto: ele termina forte, mas especializado (o elenco comum tem totais entre 24 e 32; o chefe do Arcade, 35). Com o teto 7 em todas as dificuldades, quem investe em Fluxo chega a −2 contra o Soberano (Fluxo 9) também no Difícil (poderes pela metade, não mais resistidos); o Difícil fica mais apertado no total, não no teto. Os chefes são medidos no simulador (ARCHITECTURE → Balanceamento → fechamento v1.19): o Soberano é vencível em todas as dificuldades e o Predestinado, sempre com IA de chefe, é muito difícil, mas possível.
+Pontos nunca passam do total: saves antigos com sobra são cortados ao carregar. Pontos investidos são definitivos (sem redistribuição). Normal e Difícil obrigam a escolher onde ir até 7. Com o teto 7 em todas as dificuldades, quem investe em Fluxo chega a −2 contra os chefes de Fluxo 9 (poderes pela metade).
 
-**Poderes.** O protagonista começa só com o poder principal do caminho; o segundo vem como recompensa de um capítulo. Na História os poderes estão sempre ligados.
+**Poderes e espaços (2.8).** O protagonista começa com um espaço (Poder) e libera Frente + Poder no 3º encontro e Trás + Poder no 6º. Cada encontro concluído libera um poder do caminho (Aurora: Repulsão no início, depois Barreira, Arremesso, Cura, Absorção, Foco e Puxão; Eclipse: Raio, depois Puxão, Estrangular, Congelar, Ira, Dreno e Repulsão). Nenhum exige Fluxo mínimo. O conjunto é trocado na tela Poderes do hub, entre encontros, nunca no meio da luta; espaço novo ou poder novo preenche um espaço vazio sozinho, e nenhum espaço fica vazio ou repete. Técnicas continuam as do personagem-base do estilo. Espaços e poderes são progressão de campanha, não custam pontos.
+
+**Regras do duelo.** Na História valem Poderes, exaustão, ferimento, Foco automático e disputa de lâminas (2.8).
 
 **Encontros.** Cada encontro tem adversário, arena, ajuste de dificuldade da IA (`aiOffset`) e diálogo antes e depois. Um round decide o duelo. Derrota: tentar de novo ou voltar à História, sem perder progresso. Vitória: diálogo, pontos e o próximo encontro.
 
