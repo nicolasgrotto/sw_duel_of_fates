@@ -10,6 +10,9 @@ import { GameState } from './GameState.js';
 import { StateId } from './stateIds.js';
 
 export const MenuOption = Object.freeze({
+  PLAY: 'play',
+  LEARN: 'learn',
+  EXTRAS: 'extras',
   STORY: 'story',
   DUEL: 'duel',
   ARCADE: 'arcade',
@@ -21,39 +24,62 @@ export const MenuOption = Object.freeze({
   GALLERY: 'gallery',
   OPTIONS: 'options',
   CONTROLS: 'controls',
+  BACK: 'back',
 });
 
-const MENU_ORDER = Object.freeze([
-  MenuOption.DUEL,
-  MenuOption.STORY,
-  MenuOption.ARCADE,
-  MenuOption.SURVIVAL,
-  MenuOption.LOCAL,
-  MenuOption.TUTORIAL,
-  MenuOption.CHALLENGE,
-  MenuOption.TRAINING,
-  MenuOption.GALLERY,
-  MenuOption.OPTIONS,
-  MenuOption.CONTROLS,
-]);
+const ROOT = 'root';
+
+export const MENU_GROUPS = Object.freeze({
+  [ROOT]: [MenuOption.PLAY, MenuOption.LEARN, MenuOption.EXTRAS, MenuOption.OPTIONS],
+  [MenuOption.PLAY]: [MenuOption.DUEL, MenuOption.STORY, MenuOption.ARCADE, MenuOption.SURVIVAL, MenuOption.LOCAL, MenuOption.BACK],
+  [MenuOption.LEARN]: [MenuOption.TUTORIAL, MenuOption.TRAINING, MenuOption.CHALLENGE, MenuOption.CONTROLS, MenuOption.BACK],
+  [MenuOption.EXTRAS]: [MenuOption.GALLERY, MenuOption.BACK],
+});
+
+const STATE_TARGETS = {
+  [MenuOption.STORY]: [StateId.STORY, {}],
+  [MenuOption.DUEL]: [StateId.CHARACTER_SELECT, { mode: DuelMode.VERSUS }],
+  [MenuOption.SURVIVAL]: [StateId.CHARACTER_SELECT, { mode: DuelMode.SURVIVAL }],
+  [MenuOption.LOCAL]: [StateId.CHARACTER_SELECT, { mode: DuelMode.LOCAL }],
+  [MenuOption.ARCADE]: [StateId.CHARACTER_SELECT, { mode: DuelMode.ARCADE }],
+  [MenuOption.TRAINING]: [StateId.CHARACTER_SELECT, { mode: DuelMode.TRAINING }],
+  [MenuOption.TUTORIAL]: [StateId.DUEL, { mode: DuelMode.TUTORIAL }],
+  [MenuOption.CHALLENGE]: [StateId.DUEL, { mode: DuelMode.CHALLENGE }],
+  [MenuOption.GALLERY]: [StateId.DUEL, { mode: DuelMode.GALLERY }],
+};
+
+const OVERLAYS = {
+  [MenuOption.OPTIONS]: StateId.OPTIONS,
+  [MenuOption.CONTROLS]: StateId.CONTROLS,
+};
 
 export class MenuState extends GameState {
   enter() {
+    const memory = this.game.menuMemory ?? { group: ROOT, index: 0 };
+    this.openGroup(memory.group, memory.index);
+    this.refreshFooter();
+  }
+
+  resume() {
+    this.openGroup(this.group, this.menu.selectedIndex);
+    this.refreshFooter();
+  }
+
+  openGroup(group, index = 0) {
+    this.group = group;
     this.menu = new MenuList(
-      MENU_ORDER
+      MENU_GROUPS[group]
         .filter((id) => !this.game.coarsePointer || id !== MenuOption.LOCAL)
         .map((id) => ({ id, label: texts.menu[id] })),
       layout.menu,
       this.game.audio,
     );
-    this.refreshFooter();
+    this.menu.selectedIndex = Math.min(index, this.menu.items.length - 1);
+    this.remember();
   }
 
-  resume() {
-    for (const item of this.menu.items) {
-      item.label = texts.menu[item.id];
-    }
-    this.refreshFooter();
+  remember() {
+    this.game.menuMemory = { group: this.group, index: this.menu.selectedIndex };
   }
 
   refreshFooter() {
@@ -65,46 +91,31 @@ export class MenuState extends GameState {
     });
   }
 
+  closeGroup() {
+    const index = MENU_GROUPS[ROOT].indexOf(this.group);
+    this.openGroup(ROOT, Math.max(0, index));
+  }
+
   update() {
     if (this.bindings !== (this.game.input.bindings ?? keyBindings)) {
       this.refreshFooter();
     }
-    switch (this.menu.update(this.game.input)) {
-      case MenuOption.STORY:
-        this.game.changeState(StateId.STORY);
-        break;
-      case MenuOption.DUEL:
-        this.game.changeState(StateId.CHARACTER_SELECT, { mode: DuelMode.VERSUS });
-        break;
-      case MenuOption.SURVIVAL:
-        this.game.changeState(StateId.CHARACTER_SELECT, { mode: DuelMode.SURVIVAL });
-        break;
-      case MenuOption.LOCAL:
-        this.game.changeState(StateId.CHARACTER_SELECT, { mode: DuelMode.LOCAL });
-        break;
-      case MenuOption.ARCADE:
-        this.game.changeState(StateId.CHARACTER_SELECT, { mode: DuelMode.ARCADE });
-        break;
-      case MenuOption.TUTORIAL:
-        this.game.changeState(StateId.DUEL, { mode: DuelMode.TUTORIAL });
-        break;
-      case MenuOption.CHALLENGE:
-        this.game.changeState(StateId.DUEL, { mode: DuelMode.CHALLENGE });
-        break;
-      case MenuOption.TRAINING:
-        this.game.changeState(StateId.DUEL, { mode: DuelMode.TRAINING });
-        break;
-      case MenuOption.GALLERY:
-        this.game.changeState(StateId.DUEL, { mode: DuelMode.GALLERY });
-        break;
-      case MenuOption.OPTIONS:
-        this.game.pushState(StateId.OPTIONS);
-        break;
-      case MenuOption.CONTROLS:
-        this.game.pushState(StateId.CONTROLS);
-        break;
-      default:
-        break;
+    if (this.game.input.wasPressed(Action.BACK) && this.group !== ROOT) {
+      this.closeGroup();
+      return;
+    }
+    const choice = this.menu.update(this.game.input);
+    this.remember();
+    if (!choice) return;
+    if (MENU_GROUPS[choice]) {
+      this.openGroup(choice);
+    } else if (choice === MenuOption.BACK) {
+      this.closeGroup();
+    } else if (OVERLAYS[choice]) {
+      this.game.pushState(OVERLAYS[choice]);
+    } else if (STATE_TARGETS[choice]) {
+      const [state, params] = STATE_TARGETS[choice];
+      this.game.changeState(state, params);
     }
   }
 
@@ -113,6 +124,9 @@ export class MenuState extends GameState {
 
     renderer.text(gameConfig.title.toUpperCase(), centerX, layout.menu.titleY, textStyles.title);
     renderer.text(texts.menu.tagline, centerX, layout.menu.taglineY, textStyles.tagline);
+    if (this.group !== ROOT) {
+      renderer.text(texts.menu[this.group].toUpperCase(), centerX, layout.menu.groupY, textStyles.menuGroup);
+    }
     this.menu.render(renderer, centerX);
     renderer.text(this.game.input.lastInputKind === 'touch' ? texts.touch.navigation : this.footer, centerX, layout.menu.footerY, textStyles.hint);
   }

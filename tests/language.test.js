@@ -110,5 +110,5 @@ it('switches the language from the options and refreshes the menu underneath', a
   assert.equal(options.items.language.label, 'Language: English');
   assert.equal(options.items.back.label, 'Back');
   menu.resume();
-  assert.equal(menu.menu.items[0].label, 'Duel');
+  assert.equal(menu.menu.items[0].label, 'Play');
 });

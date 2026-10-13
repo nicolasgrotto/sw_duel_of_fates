@@ -126,6 +126,13 @@ export const textStyles = {
     baseline: 'middle',
     letterSpacing: '6px',
   },
+  menuGroup: {
+    font: `20px ${FONT_FAMILY}`,
+    color: colors.accent,
+    align: 'center',
+    baseline: 'middle',
+    letterSpacing: '8px',
+  },
   heading: {
     font: `bold 48px ${FONT_FAMILY}`,
     color: colors.text,
