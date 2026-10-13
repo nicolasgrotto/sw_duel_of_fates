@@ -759,6 +759,8 @@ Foco mantém redução de custos e evita vários contatos de lâmina corpo a cor
 
 **Finalizações (2.9).** Um K.O. por golpe de lâmina corpo a corpo separa um braço ou uma perna do derrotado, de forma estilizada e sem sangue. O golpe decide o membro (perna no 3º rápido, forte de avanço, Giro e Avanço com corte; braço nos demais, inclusive na disputa), e a orientação decide o lado (pela frente, o membro da frente; pelas costas, o de trás). Golpe aéreo, lâmina arremessada, empurrão, poderes e dano periódico terminam no K.O. normal. No K.O. que decide a partida (o último round; em modos de um round, qualquer K.O.), há 30% de chance de a cabeça sair no lugar do membro, também estilizada (pedido do autor). É só apresentação: a opção Finalizações (Opções) desliga o desenho sem mudar nenhum resultado, e o replay mostra o mesmo corte.
 
+**Conjunto personalizado (2.13).** Na seleção de Duelar, 2 Jogadores e Treino, cada personagem pode usar o conjunto **Base** ou um **Personalizado**: os mesmos espaços, preenchidos com poderes do Fluxo comum e do seu lado (Aurora ou Eclipse), sem repetir e respeitando o Fluxo mínimo de cada poder. Técnicas, habilidade e atributos não mudam. Arcade, Sobrevivência, História e a IA usam o conjunto base.
+
 ## 27. Poderes novos e poderes de custo alto (v3, etapas 2.17 e 2.18)
 
 Especificação aprovada pelo autor. Números marcados como **inicial** são ponto de partida da calibração; os finais entram aqui no fechamento de cada etapa. Até a implementação, valem as regras da seção 22.

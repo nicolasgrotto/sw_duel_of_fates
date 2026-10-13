@@ -38,10 +38,16 @@ Os textos ficam em uma tabela por idioma em `src/config/locales/` (`ptBR.js`, `e
 
 ## Telas
 
-### Menu
+### Menu (revisto na 2.13)
 
 - Título do jogo (`gameConfig.title`) centralizado, em maiúsculas, com letras espaçadas, e um subtítulo curto (`texts.menu.tagline`) em `accent`.
-- Opções: **Duelar** (contra a IA), **Arcade**, **Sobrevivência**, **2 Jogadores**, **Tutorial**, **Desafio de parry**, **Treino** (contra o boneco), **Opções**, **Controles**.
+- **Agrupado por intenção, em dois níveis, na mesma tela.** Raiz: **Jogar**, **Aprender**, **Extras**, **Opções**. Confirmar um grupo troca a lista no lugar, sem tela nova, e o nome do grupo aparece em maiúsculas espaçadas (`menuGroup`, `accent`) entre o subtítulo e a lista. `Esc` (ou o item **Voltar** no fim de cada grupo) volta à raiz; na raiz, `Esc` não faz nada.
+  - **Jogar:** Duelar, História, Arcade, Sobrevivência, 2 Jogadores.
+  - **Aprender:** Tutorial, Treino, Desafio de parry, Controles.
+  - **Extras:** Galeria de poderes (a 2.15 acrescenta os próximos).
+  - **Opções** abre as Opções direto.
+- O menu lembra o grupo e o item de onde o jogador saiu durante a sessão: ao voltar de um modo, a lista reabre no mesmo lugar.
+- Mesma navegação nos três inputs: teclado e gamepad sobem e descem e confirmam; o toque usa os dois contatos da `MenuList`; o botão Voltar do toque volta à raiz. 2 Jogadores some em ponteiro coarse, como antes.
 
 ### Opções
 
@@ -169,7 +175,19 @@ NOME ESQUERDA                                         NOME DIREITA
 - Barras grossas ou HUD ocupando mais de ~10% da altura da tela.
 - Mais de uma fonte.
 
-### Seleção de personagem
+### Seleção de personagem (revista na 2.13)
+
+Substitui a composição abaixo e as posições das seções "Atributos na seleção v1.4", "Personalização (v1.10)" e "Quarto poder (v2.7)", que valem só como histórico. Resolução lógica 1280×720.
+
+- **Título** (`heading`) em y=70.
+- **Lista à esquerda** (centro x=210), começando em y=140 com espaçamento 38, mostrando no máximo 11 linhas; com mais itens, a janela rola com a seleção e setas `▲`/`▼` (`hint`) em y=112 e y=558 avisam que há mais. A primeira linha é **Aleatório**. Toque: região de 320 px, como antes.
+- **Coluna de informações** (centro x=640): estilo (`subtitle`, y=140); lado (`hint` na cor do lado: `sideLight` Aurora, `sideDark` Eclipse) em y=170; traço e habilidade (`hint`) em y=200 e y=226; um título curto **Poderes** (`accentHint`) em y=262 e uma linha por espaço em `hint` (`Poder · Repulsão`, `Frente + Poder · Cura`, `Trás + Poder · Barreira`, e `Poder + Habilidade · …` no quarto poder), espaçadas de 24; depois uma linha por técnica (`Frente + Habilidade · Avanço com corte`); por último, em `accentHint`, `Conjunto: Base` ou `Conjunto: Personalizado` com a tecla que abre o editor. Linhas largas demais são comprimidas na horizontal até 460 px, como no rodapé da galeria.
+- **Atributos** abaixo, a partir de y=486, espaçamento 26 (rótulo x=470, barra x=575, valor x=770), com as mesmas cores e segmentos dourados dos secretos.
+- **Coluna da direita** (centro x=1060): silhueta em guarda com os pés em y=410; abaixo, **Variante** (y=448, quando houver), **Visual** (y=476) e o requisito (y=498), **Lâmina** (y=530) e o requisito (y=552), e a linha de teclas do Visual/Variante (y=586). Toque: setas da Variante, do Visual e da Lâmina em x=900 e x=1220, nas mesmas alturas, raio 24.
+- **Aleatório:** sem silhueta; a coluna de informações diz `Um lutador sorteado entre os liberados` e a da direita fica vazia. O sorteio respeita desbloqueios e variantes liberadas e acontece ao confirmar, com uma seed guardada nos parâmetros do duelo. Na etapa do adversário, Aleatório também pode sortear o mesmo personagem do jogador. A lista de arenas começa com **Aleatória**.
+- **Última escolha:** cada modo lembra o último lutador, adversário e arena (`settings.lastSelection`), incluindo Aleatório; a lista abre neles.
+- **Editor de poderes:** Ataque forte (botão `Poderes` no toque, em (1060, 630), raio 30) abre o editor no lugar da coluna de informações, só em Duelar, 2 Jogadores e Treino com Poderes ligados. Título `PODERES · NOME` (`subtitle`, y=140). Primeira linha: `Conjunto: Base/Personalizado`. Depois uma linha por espaço, como na tela Poderes da História: Enter ou direita avança no catálogo, esquerda volta; escolher um poder que está em outro espaço troca os dois. Embaixo, a descrição da galeria do poder destacado e o custo; poder com Fluxo mínimo acima do nível do lutador não aparece. `Esc` fecha o editor e volta à seleção, guardando a escolha. A lista à esquerda continua visível e esmaecida.
+- **Rodapé** (`hint`) em y=690, sem invadir a lista.
 
 **Cor da lâmina**: nas etapas de lutador (e do Jogador 2), `←`/`→` trocam a cor entre as liberadas; a silhueta mostra a cor escolhida. Duas linhas `hint` na coluna da direita: "Lâmina: Nome (n/3)" e o próximo desafio bloqueado ("Desafio: ...") ou "Todas as cores liberadas". No resultado, uma linha em `accent` avisa a cor liberada no duelo.
 
