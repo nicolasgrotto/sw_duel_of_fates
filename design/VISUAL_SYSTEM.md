@@ -198,6 +198,33 @@ Cores compartilhadas (em `themeConfig`):
 | `arenaMoss` | `#0f1a14` | chão de musgo |
 | `arenaFungus` | `#1f3a30` | corpo dos fungos |
 | `arenaSpore` | `#6fe0b0` | esporos (alpha baixo) |
+| `arenaDusk` | `#8a4a3c` | faixas do céu das Salinas (alpha baixo) |
+| `arenaDuskSun` | `#e89a5c` | sol baixo das Salinas (glow, alpha baixo) |
+| `arenaMesa` | `#1a1216` | mesas distantes das Salinas |
+| `arenaSalt` | `#24212a` | crosta de sal |
+| `arenaSaltEdge` | `#7d6a6a` | borda do sal |
+| `arenaSaltCrack` | `#16141b` | rachaduras do sal |
+| `arenaHaze` | `#e0b49a` | miragem de calor (alpha baixo) |
+| `arenaSaltDust` | `#a89a90` | poeira do knockback nas Salinas |
+| `arenaNightSky` | `#121a2a` | faixas do céu do Convés |
+| `arenaCloud` | `#2a3550` | nuvens do Convés |
+| `arenaHull` | `#0e121a` | casco e estruturas do cargueiro |
+| `arenaDeck` | `#151a24` | convés |
+| `arenaDeckEdge` | `#5d6c86` | borda do convés |
+| `arenaBeacon` | `#e0a040` | luzes de navegação (glow, alpha baixo) |
+| `arenaWind` | `#b4c2da` | riscos de vento |
+| `arenaPeak` | `#2b3446` | picos do Cume Nevado |
+| `arenaMonastery` | `#11151f` | mosteiro |
+| `arenaSnowFloor` | `#202734` | neve compactada |
+| `arenaSnowEdge` | `#8696b0` | borda da neve |
+| `arenaSnow` | `#dde6f2` | flocos de neve |
+| `arenaMist` | `#c4d0e2` | luz difusa da nevasca (glow, alpha baixo) |
+| `arenaConcrete` | `#141319` | concreto da Cidadela |
+| `arenaConcreteEdge` | `#34303c` | arestas, caixilhos e borda do chão da Cidadela |
+| `arenaEclipseSky` | `#1a1622` | céu atrás da janela |
+| `arenaEclipse` | `#030205` | disco do eclipse |
+| `arenaCorona` | `#f2dcae` | coroa do eclipse (glow) e pó no ar |
+| `arenaEclipseShade` | `#030208` | sombra do eclipse sobre arena e corpos |
 
 ## Sabre
 
@@ -265,6 +292,20 @@ Controlado pela **Camera**, a pedido do `EffectsSystem`. Nunca diretamente pelo 
 ## Arenas
 
 Arenas são dados (`src/arenas/arenaData.js`) com cores sempre por token. Primitivas disponíveis nas camadas: retângulos, linhas, polígonos, círculos, arcos e glows. Partículas: vapor, poeira, ondulação e chuva (riscos com o comprimento de `streak`). Camadas estáticas são pré-renderizadas.
+
+Partículas da 2.14: `cloud` (glow grande de tamanho fixo que entra e sai devagar), `gust` (risco como a chuva, mas que entra e sai devagar) e `shimmer` (linha horizontal curta com `radius` de meio comprimento, tremendo na vertical). Com `wrapMargin`, a partícula que sai pela lateral volta do outro lado, a essa distância das bordas, sem reiniciar: é o que mantém nuvens, vento e neve correndo pela tela inteira. Teto de 120 partículas ambientes por arena.
+
+### Vento nas capas
+
+Arena com `wind` soma à inclinação do pano (`clothSway`) um empurrão na direção do vento (`sway`) e uma tremulação (`flutter` px em `frequency` rad/s, pelo tempo de animação do lutador), limitado a `maxSway`. Vale para capa, túnica e capuz, no duelo e no reflexo. Só visual: a pose não volta para a simulação.
+
+### Sombra da arena
+
+Arena com `shade` desenha um retângulo da cor `shade.color`, com `shade.alpha` (no máximo 0,45), depois dos corpos e antes da luz da lâmina nos corpos, das lâminas e dos efeitos, como a escuridão da Tempestade. Assim a arena e os corpos escurecem e as lâminas continuam com cor total, iluminando os corpos por cima. As prévias da seleção e dos diálogos aplicam a mesma sombra sobre o fundo.
+
+### Poeira no knockback
+
+Arena com `impactDust` levanta poeira nos pés de quem leva um golpe no chão (`HIT`), empurrada na direção do golpe, com o pool de partículas do `EffectsSystem` (contagem menor com efeitos reduzidos). Não muda a simulação.
 
 ### Reflexo na água
 

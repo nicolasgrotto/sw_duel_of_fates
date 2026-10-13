@@ -348,4 +348,38 @@ Clareira numa floresta bioluminescente.
 - **Chão**: musgo escuro (`arenaMoss`).
 - **Ambiente**: esporos subindo devagar.
 
+### Salinas de Vidro (2.14)
+
+Deserto de sal ao entardecer. A arena mais quente do jogo, mas ainda escura: o sol já afundou no horizonte.
+
+- **Fundo**: céu em quatro faixas horizontais de `arenaDusk`, mais fortes perto do horizonte (alpha 0,05 a 0,2); sol grande e baixo, meio escondido atrás do horizonte (glow `arenaDuskSun` alpha 0,2, disco alpha 0,3); mesas e rochas distantes em silhueta (`arenaMesa`) sobre a linha do horizonte, sem detalhe.
+- **Chão**: crosta de sal (`arenaSalt`) com borda `arenaSaltEdge` e rachaduras finas em polígonos (`arenaSaltCrack`). O sal é um espelho fraco: reflete os lutadores com película forte (`coverAlpha` 0,86), mais fraco que o Telhado Neon.
+- **Assinatura**: **miragem de calor**, linhas horizontais curtas e trêmulas (`arenaHaze`, alpha 0,12) entre o horizonte e o chão; **poeira no knockback**: cada golpe que acerta um lutador no chão levanta um punhado de poeira de sal (`arenaSaltDust`) nos pés, empurrado na direção do golpe.
+- **Ambiente**: poeira fina de sal levada pelo vento, quase parada.
+
+### Convés em Voo (2.14)
+
+Convés de um cargueiro atravessando nuvens, à noite. A única arena com movimento constante.
+
+- **Fundo**: céu noturno em faixas de `arenaNightSky`; mar de nuvens embaixo em dois planos de polígonos (`arenaCloud`, alpha 0,35 e 0,6); estruturas do cargueiro em silhueta (`arenaHull`): ponte de comando à direita, mastro com antenas à esquerda, guarda-corpo baixo atrás do convés. Duas luzes de navegação pequenas (`arenaBeacon`, glow alpha 0,25), nunca mais fortes que uma lâmina.
+- **Chão**: convés metálico (`arenaDeck`) com borda `arenaDeckEdge` e juntas de placas em `arenaHull`.
+- **Assinatura**: **parallax rápido**, nuvens soltas (glows grandes e fracos de `arenaCloud`) e riscos de vento (`arenaWind`, alpha 0,22) cruzando a tela da direita para a esquerda, atrás dos corpos; **vento nas capas**: capa, túnica e capuz pendem para a esquerda da tela e tremulam (`wind`). Só visual.
+
+### Cume Nevado (2.14)
+
+Mosteiro no alto da montanha, em plena nevasca. Luz branca difusa, sem fonte definida.
+
+- **Fundo**: picos em dois planos (`arenaPeak`, alpha 0,45 e 0,75), o de trás mais claro pela névoa; mosteiro em terraços com telhados inclinados e uma torre (`arenaMonastery`) dos dois lados, deixando o centro livre; glows grandes e fracos de `arenaMist` (alpha 0,08 a 0,12) espalhados no alto, como luz atravessando a nevasca.
+- **Chão**: neve compactada (`arenaSnowFloor`), escura o bastante para os pés lerem, com borda `arenaSnowEdge` e montes baixos nas pontas.
+- **Assinatura**: **neve de lado** em dois planos: muitos flocos pequenos e rápidos e poucos flocos maiores e lentos, da direita para a esquerda, atrás dos corpos.
+
+### Cidadela do Eclipse (2.14)
+
+Salão brutalista com uma janela enorme. O eclipse acontece lá fora, e só as lâminas iluminam o salão.
+
+- **Fundo**: paredes de concreto (`arenaConcrete`) em blocos grandes e pilares grossos; no centro, uma janela alta com caixilhos em grade (`arenaConcrete`, borda `arenaConcreteEdge`); através dela, céu (`arenaEclipseSky`) e o eclipse: disco preto (`arenaEclipse`) com a coroa em glow (`arenaCorona`, alpha 0,3) e um anel fino.
+- **Chão**: pedra polida (`arenaConcrete`) com borda `arenaConcreteEdge` e juntas largas.
+- **Assinatura**: **o eclipse escurece tudo menos os sabres**: uma sombra (`arenaEclipseShade`, alpha 0,36) cobre arena e corpos; a luz da lâmina nos corpos, as lâminas e os efeitos vêm por cima, com cor total. Os lutadores continuam legíveis pela luz das próprias lâminas.
+- **Ambiente**: partículas de pó lentas na cor da coroa, alpha baixo.
+
 Elementos interativos (colunas que caem, cristais que estilhaçam) ficam para o futuro: a arena reage a eventos de combate, como o `EffectsSystem`, sem mexer no combate.
