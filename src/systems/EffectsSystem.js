@@ -1,3 +1,4 @@
+import { finisherStyle } from '../config/fighterVisualConfig.js';
 import { isStrongAttack } from '../combat/attackPhases.js';
 import { CombatEvent } from '../combat/combatEvents.js';
 import { getPowerTier } from '../combat/flowInteractions.js';
@@ -14,6 +15,7 @@ export const EffectType = Object.freeze({
   HIT_SPARK: 'hitSpark',
   HEAVY_IMPACT: 'heavyImpact',
   WOUND_SPARK: 'woundSpark',
+  FINISHER_CUT: 'finisherCut',
   BLOCK_SPARK: 'blockSpark',
   GUARD_BREAK: 'guardBreak',
   SABER_CLASH: 'saberClash',
@@ -97,6 +99,7 @@ export class EffectsSystem {
     this.flashScale = 1;
     this.punchScale = 1;
     this.reduced = false;
+    this.showFinishers = true;
     this.eventParams = { x: 0, y: 0, direction: 1, color: '', secondaryColor: null, particleScale: 1 };
     this.evadeAfterimages = new Map();
     this.hitFlashes = new Map();
@@ -121,6 +124,14 @@ export class EffectsSystem {
       time: 0,
       duration: 0,
     };
+  }
+
+  spawnFinisherCut(defender, params) {
+    const { combat, height } = defender;
+    params.x = combat.finisherX + combat.finisherDirection * height * finisherStyle.startOffset;
+    params.y = combat.finisherY - height * finisherStyle.startHeight[combat.finisherLimb];
+    params.direction = combat.finisherDirection;
+    this.spawn(EffectType.FINISHER_CUT, params);
   }
 
   setReduced(reduced) {
@@ -189,6 +200,7 @@ export class EffectsSystem {
         break;
       case CombatEvent.DEATH:
         this.spawn(EffectType.FINAL_BLOW, params);
+        if (event.finisher && this.showFinishers) this.spawnFinisherCut(defender, params);
         break;
       case CombatEvent.SHOVE:
         this.spawn(EffectType.SHOVE_IMPACT, params);

@@ -52,6 +52,7 @@ export const colors = {
   hudExhausted: '#8c3b3e',
   hudWound: 'rgba(229, 72, 77, 0.8)',
   woundShade: 'rgba(0, 0, 0, 0.32)',
+  finisherEmber: '#ff9a4a',
   shockwaveCore: '#eef2fb',
   shockwaveDust: '#8b8272',
   hudTrack: 'rgba(255, 255, 255, 0.08)',

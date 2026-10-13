@@ -84,9 +84,9 @@ export const layout = {
     markerThickness: 2,
   },
   options: {
-    titleY: 130,
-    firstItemY: 214,
-    itemSpacing: 46,
+    titleY: 120,
+    firstItemY: 196,
+    itemSpacing: 42,
   },
   keyRemap: {
     titleY: 100,

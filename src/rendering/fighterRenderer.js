@@ -1,6 +1,7 @@
 import { faceDetails, groundShadow, proportions } from '../config/fighterVisualConfig.js';
 import { colors } from '../config/themeConfig.js';
 import { clamp, lerp } from '../utils/math.js';
+import { drawEmber } from './finisherRenderer.js';
 
 const legPoints = [0, 0, 0, 0, 0, 0];
 const torsoPoints = [0, 0, 0, 0, 0, 0, 0, 0];
@@ -37,6 +38,11 @@ function drawGroundShadow(renderer, fighter, floorY) {
 function drawLeg(renderer, pose, kneeX, kneeY, footX, footY, color, width) {
   setThreePoints(legPoints, pose.hipX, pose.hipY, kneeX, kneeY, footX, footY);
   renderer.polyline(legPoints, color, width);
+}
+
+function drawCutLeg(renderer, fighter, pose, kneeX, kneeY, color, width) {
+  renderer.line(pose.hipX, pose.hipY, kneeX, kneeY, color, width);
+  drawEmber(renderer, kneeX, kneeY, fighter.stateTime, fighter.height);
 }
 
 function drawCape(renderer, fighter, pose, shoulderWidth, flare, cloakColor) {
@@ -155,21 +161,32 @@ function drawHead(renderer, fighter, pose, cloakColor, bodyColor, trimColor, wit
   if (withFace) drawEyes(renderer, fighter, pose);
 }
 
-function drawArms(renderer, fighter, pose, cloakColor, bodyColor, handColor) {
+function drawArm(renderer, fighter, startX, startY, handX, handY, color, handColor, cut) {
   const { height } = fighter;
   const armWidth = height * proportions.armWidth;
-
-  const backHandX = lerp(pose.handX - 2, pose.freeHandX, pose.offHand);
-  const backHandY = lerp(pose.handY, pose.freeHandY, pose.offHand);
-  renderer.line(pose.shoulderX - 3, pose.shoulderY + 4, backHandX, backHandY, bodyColor, armWidth);
-  if (pose.offHand > 0) {
-    renderer.fillCircle(backHandX, backHandY, height * proportions.handRadius, handColor);
+  if (!cut) {
+    renderer.line(startX, startY, handX, handY, color, armWidth);
+    renderer.fillCircle(handX, handY, height * proportions.handRadius, handColor);
+    return;
   }
-  renderer.line(pose.shoulderX + 3, pose.shoulderY + 3, pose.handX, pose.handY, cloakColor, armWidth);
-  renderer.fillCircle(pose.handX, pose.handY, height * proportions.handRadius, handColor);
+  const elbowX = lerp(startX, handX, 0.5);
+  const elbowY = lerp(startY, handY, 0.5);
+  renderer.line(startX, startY, elbowX, elbowY, color, armWidth);
+  drawEmber(renderer, elbowX, elbowY, fighter.stateTime, height);
 }
 
-export function drawFighterBody(renderer, fighter, pose, floorY, withShadow = true, overrideColor = null) {
+function drawArms(renderer, fighter, pose, cloakColor, bodyColor, handColor, severed) {
+  const backHandX = lerp(pose.handX - 2, pose.freeHandX, pose.offHand);
+  const backHandY = lerp(pose.handY, pose.freeHandY, pose.offHand);
+  if (pose.offHand > 0 || severed === 'backArm') {
+    drawArm(renderer, fighter, pose.shoulderX - 3, pose.shoulderY + 4, backHandX, backHandY, bodyColor, handColor, severed === 'backArm');
+  } else {
+    renderer.line(pose.shoulderX - 3, pose.shoulderY + 4, backHandX, backHandY, bodyColor, fighter.height * proportions.armWidth);
+  }
+  drawArm(renderer, fighter, pose.shoulderX + 3, pose.shoulderY + 3, pose.handX, pose.handY, cloakColor, handColor, severed === 'frontArm');
+}
+
+export function drawFighterBody(renderer, fighter, pose, floorY, withShadow = true, overrideColor = null, severed = null) {
   const { height, appearance } = fighter;
   const cloakColor = overrideColor ?? appearance.cloakColor;
   const bodyColor = overrideColor ?? appearance.bodyColor;
@@ -192,10 +209,18 @@ export function drawFighterBody(renderer, fighter, pose, floorY, withShadow = tr
   if (appearance.longCape) {
     drawCape(renderer, fighter, pose, shoulderWidth, flare, cloakColor);
   }
-  drawLeg(renderer, pose, pose.backKneeX, pose.backKneeY, pose.backFootX, pose.backFootY, bodyColor, legWidth);
-  drawLeg(renderer, pose, pose.frontKneeX, pose.frontKneeY, pose.frontFootX, pose.frontFootY, bodyColor, legWidth);
+  if (severed === 'backLeg') {
+    drawCutLeg(renderer, fighter, pose, pose.backKneeX, pose.backKneeY, bodyColor, legWidth);
+  } else {
+    drawLeg(renderer, pose, pose.backKneeX, pose.backKneeY, pose.backFootX, pose.backFootY, bodyColor, legWidth);
+  }
+  if (severed === 'frontLeg') {
+    drawCutLeg(renderer, fighter, pose, pose.frontKneeX, pose.frontKneeY, bodyColor, legWidth);
+  } else {
+    drawLeg(renderer, pose, pose.frontKneeX, pose.frontKneeY, pose.frontFootX, pose.frontFootY, bodyColor, legWidth);
+  }
   const wound = overrideColor ? null : fighter.combat?.wound;
-  if (wound === 'leg') {
+  if (wound === 'leg' && severed !== 'frontLeg') {
     drawLeg(renderer, pose, pose.frontKneeX, pose.frontKneeY, pose.frontFootX, pose.frontFootY, colors.woundShade, legWidth);
   }
   if (appearance.scarf) {
@@ -209,8 +234,8 @@ export function drawFighterBody(renderer, fighter, pose, floorY, withShadow = tr
     drawPauldrons(renderer, pose, shoulderWidth, trimColor);
   }
   drawHead(renderer, fighter, pose, cloakColor, bodyColor, trimColor, !overrideColor);
-  drawArms(renderer, fighter, pose, cloakColor, bodyColor, handColor);
-  if (wound === 'arm') {
+  drawArms(renderer, fighter, pose, cloakColor, bodyColor, handColor, severed);
+  if (wound === 'arm' && severed !== 'frontArm') {
     renderer.line(pose.shoulderX + 3, pose.shoulderY + 3, pose.handX, pose.handY, colors.woundShade, height * proportions.armWidth);
   }
 

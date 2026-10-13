@@ -816,6 +816,19 @@ export const motionStyles = {
   },
 };
 
+export const finisherStyle = {
+  startHeight: { arm: 0.62, leg: 0.2 },
+  startOffset: 0.1,
+  length: { arm: 0.2, leg: 0.24 },
+  speed: 150,
+  lift: 320,
+  gravity: 1500,
+  turns: 1.5,
+  hiltLength: 0.09,
+  emberRadius: 0.018,
+  emberDuration: 1.2,
+};
+
 export const groundShadow = {
   radiusXRatio: 0.8,
   radiusY: 6,

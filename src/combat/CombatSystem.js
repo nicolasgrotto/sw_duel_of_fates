@@ -754,7 +754,7 @@ export class CombatSystem {
       this.emit(eventType, contact);
     }
     if (defender.health === 0) {
-      this.knockOut(defender, contact);
+      this.knockOut(defender, contact, source);
       return false;
     }
     return !contact.sanctuaryProtected;
@@ -812,12 +812,26 @@ export class CombatSystem {
     this.emit(CombatEvent.WOUND, contact);
   }
 
-  knockOut(defender, contact) {
+  knockOut(defender, contact, source = null) {
     this.statuses.onDeath(defender);
     defender.clearAttack();
     defender.combat.fallDirection = chooseFallDirection(defender, this.arena, this.fallRoomMargin);
     defender.restartState(FighterState.DEAD);
+    contact.finisher = this.chooseFinisher(defender, contact, source);
     this.emit(CombatEvent.DEATH, contact);
+  }
+
+  chooseFinisher(defender, { attacker, attack, attackType }, source) {
+    const melee = (source === 'blade' && attack) || source === 'bladeLock';
+    const limb = combatRulesConfig.finishers.limbs[attackType];
+    if (!this.rules.finishers || !melee || !limb || !attacker) return null;
+    const { combat } = defender;
+    combat.finisherLimb = limb;
+    combat.finisherSide = comesFromFront(defender, attacker) ? 'front' : 'back';
+    combat.finisherX = defender.x;
+    combat.finisherY = defender.y;
+    combat.finisherDirection = Math.sign(defender.x - attacker.x) || attacker.facing;
+    return limb;
   }
 
   dealPowerDamage(caster, target, power, damage, type) {

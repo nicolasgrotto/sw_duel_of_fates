@@ -16,6 +16,7 @@ export const OptionId = Object.freeze({
   MUSIC: 'music',
   KEYBOARD: 'keyboard',
   REPLAY: 'replay',
+  FINISHERS: 'finishers',
   POWERS: 'powers',
   BLADE_LOCK_HOLD: 'bladeLockHold',
   REMAP: 'remap',
@@ -37,6 +38,7 @@ export class OptionsState extends GameState {
       [OptionId.MUSIC]: { id: OptionId.MUSIC, label: '' },
       [OptionId.KEYBOARD]: { id: OptionId.KEYBOARD, label: '' },
       [OptionId.REPLAY]: { id: OptionId.REPLAY, label: '' },
+      [OptionId.FINISHERS]: { id: OptionId.FINISHERS, label: '' },
       [OptionId.POWERS]: { id: OptionId.POWERS, label: '' },
       [OptionId.BLADE_LOCK_HOLD]: { id: OptionId.BLADE_LOCK_HOLD, label: '' },
       [OptionId.REMAP]: { id: OptionId.REMAP, label: '' },
@@ -68,6 +70,7 @@ export class OptionsState extends GameState {
     this.items.sound.label = formatText(options.sound, { value: settings.sound ? options.on : options.off });
     this.items.keyboard.label = formatText(options.keyboard, { preset: options.keyboardPresets[settings.keyboardPreset ?? keyboardPresetOrder[0]] });
     this.items.replay.label = formatText(options.replay, { value: settings.finalReplay === false ? options.off : options.on });
+    this.items.finishers.label = formatText(options.finishers, { value: settings.finishers === false ? options.offFemininePlural : options.onFemininePlural });
     this.items.music.label = formatText(options.music, { value: settings.music ? options.onFeminine : options.offFeminine });
   }
 
@@ -116,6 +119,9 @@ export class OptionsState extends GameState {
         break;
       case OptionId.REPLAY:
         settings.finalReplay = settings.finalReplay === false;
+        break;
+      case OptionId.FINISHERS:
+        settings.finishers = settings.finishers === false;
         break;
       case OptionId.KEYBOARD: {
         const index = keyboardPresetOrder.indexOf(settings.keyboardPreset ?? keyboardPresetOrder[0]);

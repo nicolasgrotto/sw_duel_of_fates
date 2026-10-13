@@ -15,18 +15,19 @@ it('enables combat capabilities only in their approved modes', () => {
     assert.equal(rules.wounds, taught);
     assert.equal(rules.focusEvade, enabled || mode === 'gallery');
     assert.equal(rules.bladeLock, taught);
+    assert.equal(rules.finishers, taught || ['arcade', 'survival'].includes(mode));
   }
   assert.deepEqual(resolveCombatRules(storyConfig.rules), {
-    powers: true, exhaustion: true, wounds: true, focusEvade: true, bladeLock: true,
+    powers: true, exhaustion: true, wounds: true, focusEvade: true, bladeLock: true, finishers: true,
   });
 });
 
 it('requires powers only for automatic focus evasion', () => {
   assert.deepEqual(createDuelRules('versus', { powers: false }, powersConfig.modes), {
-    powers: false, exhaustion: true, wounds: true, focusEvade: false, bladeLock: true,
+    powers: false, exhaustion: true, wounds: true, focusEvade: false, bladeLock: true, finishers: true,
   });
   assert.deepEqual(resolveCombatRules(), {
-    powers: false, exhaustion: false, wounds: false, focusEvade: false, bladeLock: false,
+    powers: false, exhaustion: false, wounds: false, focusEvade: false, bladeLock: false, finishers: false,
   });
 });
 

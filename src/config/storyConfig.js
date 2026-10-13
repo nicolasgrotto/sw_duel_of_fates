@@ -14,7 +14,7 @@ export const storyConfig = {
   budgets: { easy: 42, normal: 36, hard: 30 },
   slotOrder: ['neutral', 'forward', 'back'],
   difficulties: ['easy', 'normal', 'hard'],
-  rules: { powers: true, exhaustion: true, wounds: true, focusEvade: true, bladeLock: true },
+  rules: { powers: true, exhaustion: true, wounds: true, focusEvade: true, bladeLock: true, finishers: true },
   roundsToWin: 1,
   protagonist: {
     names: ['Kael', 'Iria', 'Tarin', 'Vessa', 'Oren', 'Lyse'],

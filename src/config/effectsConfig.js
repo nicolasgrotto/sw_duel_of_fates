@@ -87,6 +87,20 @@ export const effectsConfig = {
     streakTime: 0.02,
   },
   recipes: {
+    finisherCut: {
+      count: [10, 14],
+      speed: [180, 420],
+      life: [0.25, 0.5],
+      size: [1.5, 3],
+      spreadDegrees: 70,
+      upwardDegrees: 20,
+      tinted: true,
+      light: { radius: 90, alpha: 0.5, duration: 0.25 },
+      shake: null,
+      flash: null,
+      hitStop: 0,
+      slowMotion: null,
+    },
     woundSpark: {
       count: [4, 6],
       speed: [120, 300],

@@ -1446,6 +1446,12 @@ Seleção, Sobrevivência, lançadores da Galeria e matriz leem personagens `sel
 
 A referência acrescenta os pares do Ceifador nas duas ordens, em clássico/poderes e Normal/Difícil: 112 adições, total 846; os 734 cenários anteriores permanecem idênticos. Lista exata e falhas de regressão de animação delegadas ao Claude em versions/v3.md → 2.21. Testes da etapa cobrem dados, contato frontal/traseiro, independência da aparência, ações de IA em Fighters congelados, combo, seleção, escadas, Galeria e execução dos instrumentos de balanceamento.
 
+### Finalizações (2.9)
+
+A capacidade `finishers` (`resolveCombatRules`, `combatRulesConfig.modes.finishers`, `storyConfig.rules`) só liga a escolha; ela nunca altera vencedor, dano, quedas ou tempos. `CombatSystem.knockOut(defender, contact, source)` chama `chooseFinisher`, que exige fonte `blade` com `contact.attack` (golpe corpo a corpo) ou `bladeLock`, e um id presente em `combatRulesConfig.finishers.limbs`; o lado vem de `comesFromFront`. O resultado fica no `combat` do derrotado (`finisherLimb`, `finisherSide`, `finisherX`, `finisherY`, `finisherDirection`), entra no snapshot e zera no `resetForRound`; o evento `death` leva `finisher`.
+
+Desenho só em `rendering/finisherRenderer.js` e `fighterRenderer.js`: `getSeveredLimb(fighter, shown)` devolve `frontArm`, `backArm`, `frontLeg` ou `backLeg`; o coto é desenhado no espaço do corpo e a peça no mundo, por uma função do tempo no estado `DEAD` (lançamento, giro, gravidade, repouso), com números em `fighterVisualConfig.finisherStyle`. Não há pool: o estado do lutador basta, então replay, revanche e troca de round mostram o mesmo e limpam sozinhos. `DuelRenderer.showFinishers` e `EffectsSystem.showFinishers` vêm de `settings.finishers`.
+
 ### Combate dinâmico (2.23)
 
 `CombatSystem.deflect` encerra o contato de um golpe sem mudar o estado: marca `hasHit`, `attackConnected` e `lungeApplied`, liga `combat.freeRecovery` e aplica um empurrão curto para longe do oponente. É usado no clash entre dois rápidos (`clash.lightPushback`, em `gameConfig.combat`) e no parry que não desequilibra (qualquer parry num rápido e o parry normal num forte, com `parry.attackerRecoil`). Só o parry perfeito num forte usa o caminho antigo (`clearAttack`, `STAGGERED` por `perfectStagger`, `riposteTime`). Clash com um forte mantém `recoil` e a disputa da 2.5.

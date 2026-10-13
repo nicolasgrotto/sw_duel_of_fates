@@ -11,6 +11,13 @@ export const combatRulesConfig = {
     wounds: ['versus', 'local', 'training', 'tutorial'],
     focusEvade: ['versus', 'local', 'training'],
     bladeLock: ['versus', 'local', 'training', 'tutorial'],
+    finishers: ['versus', 'local', 'training', 'tutorial', 'arcade', 'survival'],
+  },
+  finishers: {
+    limbs: {
+      light: 'arm', light2: 'arm', light4: 'arm', light5: 'arm', heavy: 'arm', riposte: 'arm', special: 'arm', counterStrike: 'arm', bladeLock: 'arm',
+      light3: 'leg', forwardHeavy: 'leg', spin: 'leg', dashSlash: 'leg',
+    },
   },
   wounds: {
     arm: { blockCostScale: 1.25 },
@@ -41,5 +48,6 @@ export function resolveCombatRules(rules = {}) {
     wounds: rules.wounds === true,
     focusEvade: rules.powers === true && rules.focusEvade === true,
     bladeLock: rules.bladeLock === true,
+    finishers: rules.finishers === true,
   };
 }

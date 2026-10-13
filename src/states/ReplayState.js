@@ -62,6 +62,7 @@ export class ReplayState extends GameState {
     this.effects = new EffectsSystem(effectsConfig, this.camera, random, this.timeControl);
     this.effects.setReduced(this.game.settings.reducedEffects);
     this.view = new DuelRenderer(arenas[arenaId]);
+    this.view.showFinishers = this.effects.showFinishers = this.game.settings.finishers !== false;
     this.letterbox = new Letterbox(layout.letterbox);
     this.letterbox.setTarget(1);
     this.interpolation = new RenderInterpolation(gameConfig.replay.interpolation);

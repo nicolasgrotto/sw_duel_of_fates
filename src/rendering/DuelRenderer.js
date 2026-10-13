@@ -9,6 +9,7 @@ import { ProjectileRenderer } from './ProjectileRenderer.js';
 import { drawDebris, drawDesaturation, drawFlash, drawStormDarkness, drawStormStrikes, drawImpactLights, drawParticles, drawRings, drawShockwaves } from './effectsRenderer.js';
 import { computePose, createPose, getBladeLockAdvantage } from './fighterPose.js';
 import { drawFighterBody } from './fighterRenderer.js';
+import { drawFinisherPiece, getSeveredLimb } from './finisherRenderer.js';
 import { SaberTrail } from './SaberTrail.js';
 import { drawSaber, drawSaberBodyLight, drawSaberFloorLight, getBladeWorldPoints } from './saberRenderer.js';
 
@@ -23,6 +24,7 @@ function getChargeGlow(fighter) {
 export class DuelRenderer {
   constructor(arenaDefinition) {
     this.arenaView = new ArenaRenderer(arenaDefinition);
+    this.showFinishers = true;
     this.poses = new Map();
     this.trails = new Map();
     this.afterimages = new Map();
@@ -83,7 +85,8 @@ export class DuelRenderer {
       renderer.translate(effects.getTremor(fighter), 0);
       this.drawPulseOutline(renderer, fighter, effects.getPulseOutline?.(fighter) ?? 0, arena.floorY);
       this.powerView.drawAura(renderer, fighter, this.getPose(fighter), arena.floorY);
-      drawFighterBody(renderer, fighter, this.getPose(fighter), arena.floorY, true, effects.hasHitFlash(fighter) ? colors.hitFlash : null);
+      drawFighterBody(renderer, fighter, this.getPose(fighter), arena.floorY, true, effects.hasHitFlash(fighter) ? colors.hitFlash : null, getSeveredLimb(fighter, this.showFinishers));
+      drawFinisherPiece(renderer, fighter, arena.floorY, this.showFinishers);
       this.powerView.drawFrozenEchoes(renderer, fighter, this.getPose(fighter), arena.floorY);
       renderer.restore();
     }
@@ -101,7 +104,7 @@ export class DuelRenderer {
     for (const fighter of fighters) {
       renderer.save();
       renderer.translate(effects.getTremor(fighter), 0);
-      drawSaber(renderer, fighter, this.getPose(fighter), Math.max(effects.getSaberFlare(fighter), getChargeGlow(fighter)));
+      if (!this.holdsSeveredSaber(fighter)) drawSaber(renderer, fighter, this.getPose(fighter), Math.max(effects.getSaberFlare(fighter), getChargeGlow(fighter)));
       renderer.restore();
     }
 
@@ -143,12 +146,17 @@ export class DuelRenderer {
     renderer.translate(0, floorY * 2);
     renderer.scale(1, -1);
     for (const fighter of fighters) {
-      drawFighterBody(renderer, fighter, this.getPose(fighter), floorY, false);
+      drawFighterBody(renderer, fighter, this.getPose(fighter), floorY, false, null, getSeveredLimb(fighter, this.showFinishers));
+      drawFinisherPiece(renderer, fighter, floorY, this.showFinishers);
     }
     for (const fighter of fighters) {
-      drawSaber(renderer, fighter, this.getPose(fighter));
+      if (!this.holdsSeveredSaber(fighter)) drawSaber(renderer, fighter, this.getPose(fighter));
     }
     renderer.restore();
+  }
+
+  holdsSeveredSaber(fighter) {
+    return getSeveredLimb(fighter, this.showFinishers) === 'frontArm';
   }
 
   preparePoses(fighters, bladeExtension, effects) {
