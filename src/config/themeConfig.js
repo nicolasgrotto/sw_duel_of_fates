@@ -124,6 +124,11 @@ export const colors = {
   arenaEclipse: '#030205',
   arenaCorona: '#f2dcae',
   arenaEclipseShade: '#030208',
+  detailMetal: '#a8987a',
+  guardianHair: '#4a3524',
+  guardianLeather: '#46362a',
+  guardianBoots: '#1c1815',
+  shadowBoots: '#09090d',
 };
 
 export const textStyles = {

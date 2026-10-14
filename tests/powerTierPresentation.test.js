@@ -155,7 +155,8 @@ describe('frozen and choked targets', () => {
     view.drawFrozenEchoes(renderer, fighter, pose, fighter.y);
     const echoes = powersConfig.render.status.freezeEchoOffsets.length;
     const torsos = renderer.calls.filter((call) => call.name === 'fillPolygon');
-    assert.equal(torsos.length, echoes);
+    assert.ok(torsos.length >= echoes);
+    assert.equal(torsos.length % echoes, 0);
     assert.ok(torsos.every((call) => call.args[1] === powersConfig.tiers[3].color));
     assert.ok(renderer.calls.some((call) => call.name === 'setAlpha' && call.args[0] === powersConfig.render.status.freezeEchoAlpha));
     const firstShift = renderer.calls.find((call) => call.name === 'translate').args[0];
