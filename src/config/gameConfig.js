@@ -50,6 +50,12 @@ export const gameConfig = {
       lockPressRate: 3,
     },
   },
+  offline: {
+    script: 'sw.js',
+    storageFlag: 'duel-of-fates.offline',
+    enabledValue: 'on',
+    localHosts: ['localhost', '127.0.0.1', '[::1]'],
+  },
   replay: {
     frames: 210,
     snapshotInterval: 30,

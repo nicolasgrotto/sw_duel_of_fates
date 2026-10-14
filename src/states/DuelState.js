@@ -299,6 +299,10 @@ export class DuelState extends GameState {
     }
   }
 
+  get allowsUpdate() {
+    return false;
+  }
+
   get usesDummy() {
     return usesDummy(this.mode);
   }

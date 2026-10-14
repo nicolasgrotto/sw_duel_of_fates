@@ -159,6 +159,7 @@ it('exits with Back and restores gallery touch context after a real pause stack 
     audio: { isReady: false, play() {}, setMusicTension() {} },
     touch: { setFeatures() {}, setContext: (mode) => contexts.push(mode) },
     saveSettings() {},
+    reportUpdateSafety() {},
     changeState: (id) => transitions.push(id),
     pushState: (id) => {
       transitions.push(id);

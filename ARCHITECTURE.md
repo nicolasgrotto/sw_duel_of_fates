@@ -17,6 +17,8 @@ index.html                  ✅ página com o canvas (caminhos relativos: funcio
 manifest.webmanifest        ✅ manifest para tela inicial em paisagem, fullscreen e start_url relativo; sem service worker
 .nojekyll                   ✅ desliga o Jekyll do GitHub Pages; os arquivos são servidos como estão
 media/                      ✅ capturas de tela usadas no README (não são carregadas pelo jogo)
+sw.js                       ✅ service worker do offline (2.10): cache versionado, ativação em momento seguro
+offline-resources.js        ✅ lista versionada dos arquivos do offline, gerada por tools/offline.js
 styles/
   main.css                  ✅ layout da página e do canvas, @font-face da fonte do jogo
 design/                     ✅ direção de arte, sistema visual, UI, VFX, referências
@@ -27,6 +29,7 @@ src/
   core/                     ✅ infraestrutura do jogo
     Game.js                 ✅ monta e conecta os módulos
     GameLoop.js             ✅ loop com timestep fixo
+    OfflineSupport.js       ✅ registra o service worker e avisa a atualização em espera se o jogo está num momento seguro
     textPrompt.js           ✅ input temporário com alvo DOM injetado; Enter, composição e limpeza
     Input.js                ✅ teclado e gamepad → ações; uma instância por jogador (gamepadSlot)
     KeyboardSource.js       ✅ eventos de teclado e bindings
@@ -203,6 +206,7 @@ tools/
   matrix.js                 ✅ matriz de vitórias de todos contra todos usando o simulate (npm run matrix)
   reference.js              ✅ conjunto de referência do simulador com digest por cenário (npm run reference)
   reference-v2.json         ✅ digests das regras v2, referência de regressão do ciclo v3
+  offline.js                ✅ gera e confere offline-resources.js (npm run offline)
 tests/                      ✅ testes com node --test
 ```
 
@@ -1482,3 +1486,10 @@ Desenho só em `rendering/finisherRenderer.js` e `fighterRenderer.js`: `getSever
 - **Galeria da História.** `resolveStoryOutcome` grava `settings.storySeen` (`markStorySeen`: encontro vencido e final alcançado, com `alignment` e `name` do protagonista). `buildStoryGallery` lista os encontros de `storyConfig.encounters` e os finais, com a testemunha de `storySeen` ou, para quem jogou antes da 2.15, da História em andamento (`completed`, `ending`). Um item visto abre o `DialogueState` com as falas resolvidas pela testemunha, sobre a arena do encontro (ou do encontro que leva ao final), e volta à galeria.
 
 - **Protótipos da disputa.** `settings.prototypes` (`bladeLockRhythm`, `competitiveHold`), desligados por padrão. `createDuelRules` liga a regra `bladeLockRhythm` só em `combatRulesConfig.prototypeModes` (Duelar, 2 Jogadores, Treino) e `resolveCombatRules` a exige junto com `bladeLock`; o replay recebe as mesmas regras. Na `BladeLockSystem.countPress`, com a regra, `countRhythmPress` dá +1 ao primeiro toque dentro da janela de cada compasso (`combat.lockBeat` guarda o último compasso pontuado) e −1 a qualquer outro, sem cair abaixo de zero; `combat.lockOnBeat` vai no evento `BLADE_LOCK_PRESS` (`onBeat`), e o `EffectsSystem` só solta o brilho da pressão no compasso. A IA (`requestRhythmPress`) mira um toque por compasso com erro uniforme de `difficulty.bladeLockRhythmError`. O `DuelRenderer` desenha a marca do compasso (`lockRhythm`, `getBeatProgress`). O segurar competitivo só troca a taxa do `PlayerController` para `competitiveHoldRate` (a do Difícil).
+
+## Offline (2.10)
+
+- **Lista.** `offline-resources.js` define `self.offlineResources = { version, files }`, com caminhos relativos ao escopo do worker (funciona em subdiretório). `tools/offline.js` gera a lista (`index.html`, `manifest.webmanifest`, `styles/`, `assets/fonts/`, `assets/ui/` e todo `src/`) e a versão (`v` + 16 hex do sha256 dos arquivos e do `sw.js`, fins de linha normalizados). `tests/offline.test.js` falha se o arquivo não bater com o disco; depois de mudar arquivos do jogo, `npm run offline`.
+- **Worker.** `sw.js` é um script clássico (`importScripts`, sem módulo) para valer em todos os navegadores. *install*: baixa todos os arquivos com `cache: 'reload'`, recusa resposta não-ok e script servido como HTML, e só então grava em `duel-of-fates-<versão>`; qualquer falha apaga o cache novo e deixa a versão anterior intacta. *activate*: apaga só caches `duel-of-fates-` de outras versões e assume as abas. *fetch*: só GET dentro do escopo; navegação recebe o `index.html` do cache; arquivo no cache sai do cache (ignorando query); fora do cache vai à rede e, sem rede, `Response.error()`, nunca uma página no lugar de um script. *message*: cada aba manda `{ type: 'safety', safe }`; o worker em espera guarda por aba e chama `skipWaiting` quando todas as abas abertas estão seguras.
+- **Página.** `OfflineSupport` (core) registra `sw.js` fora do `localhost` ou com `localStorage['duel-of-fates.offline'] = 'on'` (`gameConfig.offline`), acompanha a atualização instalada e reenvia a segurança. O `Game` chama `reportUpdateSafety()` em cada troca da pilha de estados: seguro quando todo estado da pilha tem `allowsUpdate` (falso no `DuelState` e no `ReplayState`; uma pausa sobre o duelo continua insegura). O save fica no `localStorage`, fora do alcance do worker.
+

@@ -10,6 +10,10 @@ export class GameState {
     return this.constructor.name;
   }
 
+  get allowsUpdate() {
+    return true;
+  }
+
   enter() {}
 
   exit() {}

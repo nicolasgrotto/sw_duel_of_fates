@@ -5,6 +5,7 @@ import { audioConfig } from '../config/audioConfig.js';
 import { loadSettings, loadStory, saveSettings } from './settingsStorage.js';
 import { storyConfig } from '../config/storyConfig.js';
 import { createStorySeen } from '../modes/story/storyGallery.js';
+import { OfflineSupport } from './OfflineSupport.js';
 import { sanitizeStoryRun } from '../modes/story/storyRun.js';
 import { Action, keyBindings, keyboardPresets, keyboardPresetOrder, remappableActions, twoPlayerBindings } from '../config/controlsConfig.js';
 import { createCustomBindings, sanitizeCustomBindings } from './keyBindings.js';
@@ -56,6 +57,7 @@ export class Game {
       render: (alpha) => this.render(alpha),
     });
     this.resizeObserver = new ResizeObserver(() => this.handleResize());
+    this.offline = new OfflineSupport({ container: navigator.serviceWorker, location: window.location, storage: globalThis.localStorage, config: gameConfig.offline });
   }
 
   createTextPrompt(options) {
@@ -77,6 +79,11 @@ export class Game {
     this.renderer.canvas.focus();
     this.changeState(StateId.INTRO);
     this.loop.start();
+    this.offline.start();
+  }
+
+  reportUpdateSafety() {
+    this.offline.setSafe(this.states.stack.every((state) => state.allowsUpdate));
   }
 
   applySettings() {
@@ -103,6 +110,7 @@ export class Game {
     state.id = id;
     this.touch.setContext(id === StateId.DUEL ? 'duel' : 'menu', id !== StateId.MENU && id !== StateId.INTRO);
     this.states.change(state);
+    this.reportUpdateSafety();
   }
 
   pushState(id, params) {
@@ -110,10 +118,12 @@ export class Game {
     state.id = id;
     this.touch.setContext(id === StateId.DUEL ? 'duel' : 'menu', id !== StateId.MENU && id !== StateId.INTRO);
     this.states.push(state);
+    this.reportUpdateSafety();
   }
 
   popState() {
     this.states.pop();
+    this.reportUpdateSafety();
     const id = this.states.current?.id;
     this.touch.setContext(this.states.current?.touchContext ?? (id === StateId.DUEL ? 'duel' : 'menu'), id !== StateId.MENU && id !== StateId.INTRO);
   }

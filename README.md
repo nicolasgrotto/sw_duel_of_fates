@@ -65,6 +65,13 @@ Versão publicada: https://nicolasgrotto.github.io/sw_duel_of_fates/
 
 As opções e o progresso (teclas, cores desbloqueadas, recorde) ficam no `localStorage` do navegador de cada jogador.
 
+### Offline
+
+Depois do primeiro carregamento completo, o jogo abre sem conexão: o `sw.js` guarda os arquivos listados em `offline-resources.js`. Uma versão nova é baixada em segundo plano e só entra quando nenhuma aba está em duelo ou replay; vale no próximo carregamento. O save não é afetado.
+
+- Depois de mudar qualquer arquivo do jogo (`src/`, `styles/`, `assets/`, `index.html`), rode `npm run offline` para regenerar a lista; o `npm test` avisa se ela ficou desatualizada.
+- No `localhost`, o worker fica desligado para não esconder mudanças. Para testar o offline localmente, rode no console do navegador `localStorage.setItem('duel-of-fates.offline', 'on')` e recarregue.
+
 ## Testes
 
 ```bash

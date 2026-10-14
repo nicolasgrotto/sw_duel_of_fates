@@ -75,6 +75,10 @@ export class ReplayState extends GameState {
     this.skipLine = formatText(texts.replay.skip, { confirm: formatActionKeys(this.game.input.bindings ?? keyBindings, Action.CONFIRM) });
   }
 
+  get allowsUpdate() {
+    return false;
+  }
+
   get isFinished() {
     return this.step >= this.playback.lastStep;
   }

@@ -9,7 +9,8 @@
     "simulate": "node tools/simulate.js",
     "matrix": "node tools/matrix.js",
     "reference": "node tools/reference.js",
-    "test": "node --test \"tests/**/*.test.js\""
+    "test": "node --test \"tests/**/*.test.js\"",
+    "offline": "node tools/offline.js --write"
   },
   "engines": {
     "node": ">=20"
