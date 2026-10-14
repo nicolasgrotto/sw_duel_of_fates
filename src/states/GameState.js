@@ -14,6 +14,10 @@ export class GameState {
     return true;
   }
 
+  get coversScreen() {
+    return false;
+  }
+
   enter() {}
 
   exit() {}

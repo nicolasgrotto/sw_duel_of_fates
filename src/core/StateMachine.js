@@ -31,8 +31,10 @@ export class StateMachine {
   }
 
   render(renderer) {
-    for (const state of this.stack) {
-      state.render(renderer);
+    let first = this.stack.length - 1;
+    while (first > 0 && !this.stack[first].coversScreen) first -= 1;
+    for (let index = Math.max(0, first); index < this.stack.length; index += 1) {
+      this.stack[index].render(renderer);
     }
   }
 }

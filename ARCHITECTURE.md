@@ -368,6 +368,8 @@ A pose de cada lutador é calculada por `computePose` a partir do estado, da fas
 
 ---
 
+**Telas que cobrem a cena.** `GameState.coversScreen` é falso por padrão. O `StateMachine.render` começa no último estado que declara `coversScreen`, preservando todas as sobreposições acima dele. `ReplayState` declara a cobertura porque limpa e redesenha a tela inteira: o duelo suspenso permanece na pilha, mas deixa de ser desenhado por baixo do replay. Ao sair, a renderização do duelo volta normalmente. Pausas transparentes continuam desenhando a cena inferior; a simulação não muda.
+
 ## Game loop
 
 Arquivo: [src/core/GameLoop.js](src/core/GameLoop.js)

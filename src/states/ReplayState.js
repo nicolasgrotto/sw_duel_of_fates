@@ -79,6 +79,10 @@ export class ReplayState extends GameState {
     return false;
   }
 
+  get coversScreen() {
+    return true;
+  }
+
   get isFinished() {
     return this.step >= this.playback.lastStep;
   }

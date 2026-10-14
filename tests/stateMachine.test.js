@@ -81,4 +81,25 @@ describe('StateMachine', () => {
 
     assert.deepEqual(log, ['duel:render', 'pause:render']);
   });
+
+  it('renders from the last covering state and resumes the underlying scene after pop', () => {
+    const log = [];
+    const machine = new StateMachine();
+    machine.push(createState('duel', log));
+    machine.push({ ...createState('replay', log), coversScreen: true });
+    machine.push(createState('pause', log));
+    log.length = 0;
+    machine.render();
+    assert.deepEqual(log, ['replay:render', 'pause:render']);
+    machine.push({ ...createState('screen', log), coversScreen: true });
+    log.length = 0;
+    machine.render();
+    assert.deepEqual(log, ['screen:render']);
+    machine.pop();
+    machine.pop();
+    machine.pop();
+    log.length = 0;
+    machine.render();
+    assert.deepEqual(log, ['duel:render']);
+  });
 });
