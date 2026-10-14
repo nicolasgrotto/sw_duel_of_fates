@@ -207,12 +207,18 @@ function drawChestPlates(renderer, color) {
   }
 }
 
-function drawBelt(renderer, fighter, pose, belt, overrideColor) {
+function placeBelt(fighter, pose) {
   const { height } = fighter;
-  const { offset, thickness, buckleSize, buckleAt } = detailStyle.belt;
+  const { offset, thickness } = detailStyle.belt;
   const top = getTorsoFraction(pose.hipY + height * offset - height * thickness / 2);
   const bottom = getTorsoFraction(pose.hipY + height * offset + height * thickness / 2);
   setTorsoBand(top, bottom, 0);
+}
+
+function drawBelt(renderer, fighter, pose, belt, overrideColor) {
+  const { height } = fighter;
+  const { buckleSize, buckleAt } = detailStyle.belt;
+  placeBelt(fighter, pose);
   renderer.fillPolygon(bandPoints, resolveDetailColor(belt.color, overrideColor));
   if (!belt.buckle) return;
   const size = height * buckleSize;
@@ -222,8 +228,13 @@ function drawBelt(renderer, fighter, pose, belt, overrideColor) {
   renderer.fillPolygon(setFourPoints(bucklePoints, x - half, y - half, x + half, y - half, x + half, y + half, x - half, y + half), resolveDetailColor(belt.buckle, overrideColor));
 }
 
-function drawBeltWithEnds(renderer, fighter, pose, belt, overrideColor) {
-  drawBelt(renderer, fighter, pose, belt, overrideColor);
+function drawBeltWithEnds(renderer, fighter, pose, belt, overrideColor, simplified) {
+  if (simplified) {
+    if (!belt.ends) return;
+    placeBelt(fighter, pose);
+  } else {
+    drawBelt(renderer, fighter, pose, belt, overrideColor);
+  }
   if (belt.ends) drawSashEnds(renderer, fighter, pose, resolveDetailColor(belt.color, overrideColor));
 }
 
@@ -347,7 +358,7 @@ export function drawSeveredHead(renderer, fighter, x, y, angle) {
   renderer.restore();
 }
 
-function drawHead(renderer, fighter, pose, cloakColor, bodyColor, trimColor, withFace, overrideColor = null) {
+function drawHead(renderer, fighter, pose, cloakColor, bodyColor, trimColor, withFace, overrideColor = null, withEyes = withFace) {
   const { headX, headY, headRadius: radius } = pose;
   const { hoodUp, masked, hairColor, hairStyle } = fighter.appearance;
   const beard = fighter.appearance.details?.beard;
@@ -360,7 +371,7 @@ function drawHead(renderer, fighter, pose, cloakColor, bodyColor, trimColor, wit
     renderer.fillCircle(headX, headY, radius, faceColor);
     if (hairColor && showsFace) drawHair(renderer, pose, overrideColor ?? hairColor, hairStyle ?? DEFAULT_HAIR_STYLE);
     if (beard && showsFace) drawBeard(renderer, beard, headX, headY, radius, resolveDetailColor(beard.color, overrideColor));
-    if (withFace) drawEyes(renderer, fighter, pose);
+    if (withEyes) drawEyes(renderer, fighter, pose);
     return;
   }
 
@@ -373,13 +384,17 @@ function drawHead(renderer, fighter, pose, cloakColor, bodyColor, trimColor, wit
   );
   renderer.fillPolygon(hoodTipPoints, cloakColor);
   renderer.fillCircle(headX, headY, hoodRadius, cloakColor);
+  if (overrideColor) {
+    if (beard) drawBeard(renderer, beard, headX + radius * 0.3, headY + radius * 0.1, radius * 0.75, overrideColor);
+    return;
+  }
   if (masked) {
     drawMask(renderer, pose, trimColor, bodyColor);
     return;
   }
   renderer.fillCircle(headX + radius * 0.3, headY + radius * 0.1, radius * 0.75, faceColor);
   if (beard && showsFace) drawBeard(renderer, beard, headX + radius * 0.3, headY + radius * 0.1, radius * 0.75, resolveDetailColor(beard.color, overrideColor));
-  if (withFace) drawEyes(renderer, fighter, pose);
+  if (withEyes) drawEyes(renderer, fighter, pose);
 }
 
 function drawArm(renderer, fighter, startX, startY, handX, handY, color, handColor, cut) {
@@ -417,7 +432,7 @@ function drawArms(renderer, fighter, pose, cloakColor, bodyColor, handColor, sev
   if (sleeveColor && severed !== 'frontArm') drawSleeve(renderer, pose.shoulderX + 3, pose.shoulderY + 3, pose.handX, pose.handY, sleeveColor, armWidth, sleeves.style);
 }
 
-export function drawFighterBody(renderer, fighter, pose, floorY, withShadow = true, overrideColor = null, severed = null) {
+export function drawFighterBody(renderer, fighter, pose, floorY, withShadow = true, overrideColor = null, severed = null, simplified = overrideColor !== null) {
   const { height, appearance } = fighter;
   const cloakColor = overrideColor ?? appearance.cloakColor;
   const bodyColor = overrideColor ?? appearance.bodyColor;
@@ -465,12 +480,12 @@ export function drawFighterBody(renderer, fighter, pose, floorY, withShadow = tr
     drawScarf(renderer, pose, trimColor, height);
   }
   drawTorso(renderer, fighter, pose, shoulderWidth, flare, cloakColor);
-  if (appearance.layeredTunic) {
+  if (appearance.layeredTunic && !simplified) {
     drawTunicLayer(renderer, trimColor);
   }
-  if (details?.chestPlates) drawChestPlates(renderer, resolveDetailColor(details.chestPlates.color, overrideColor));
-  if (details?.apron) drawApron(renderer, resolveDetailColor(details.apron.color, overrideColor));
-  if (details?.belt) drawBeltWithEnds(renderer, fighter, pose, details.belt, overrideColor);
+  if (details?.chestPlates && !simplified) drawChestPlates(renderer, resolveDetailColor(details.chestPlates.color, overrideColor));
+  if (details?.apron && !simplified) drawApron(renderer, resolveDetailColor(details.apron.color, overrideColor));
+  if (details?.belt) drawBeltWithEnds(renderer, fighter, pose, details.belt, overrideColor, simplified);
   if (appearance.pauldrons) {
     drawPauldrons(renderer, pose, shoulderWidth, trimColor);
   }
@@ -478,7 +493,7 @@ export function drawFighterBody(renderer, fighter, pose, floorY, withShadow = tr
   if (severed === 'frontHead') {
     drawEmber(renderer, pose.headX, pose.headY + pose.headRadius, fighter.stateTime, height);
   } else {
-    drawHead(renderer, fighter, pose, cloakColor, bodyColor, trimColor, !overrideColor, overrideColor);
+    drawHead(renderer, fighter, pose, cloakColor, bodyColor, trimColor, !overrideColor, overrideColor, !simplified);
   }
   drawArms(renderer, fighter, pose, cloakColor, bodyColor, handColor, severed, details, overrideColor);
   if (wound === 'arm' && severed !== 'frontArm') {

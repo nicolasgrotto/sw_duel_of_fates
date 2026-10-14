@@ -37,6 +37,7 @@ function recordingRenderer() {
     setAlpha: record('setAlpha'),
     drawGlow: record('drawGlow'),
     polyline: record('polyline'),
+    strokePolygon: record('strokePolygon'),
     strokeEllipse: record('strokeEllipse'),
     fillPolygon: (points, ...rest) => calls.push({ name: 'fillPolygon', args: [Array.from(points), ...rest] }),
     line: record('line'),

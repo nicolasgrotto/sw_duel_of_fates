@@ -79,27 +79,21 @@ function findNearestBlade(fighters, x, y) {
 export class ArenaRenderer {
   constructor(definition) {
     this.definition = definition;
-    this.layers = null;
+    this.backdrop = null;
     this.floorLayer = null;
   }
 
   ensureLayers(renderer, arena) {
-    if (this.layers) {
+    if (this.backdrop) {
       return;
     }
-    const { layers, crystals } = this.definition;
-    this.layers = layers.map((layer) => renderer.createLayer((target) => drawShapes(target, layer), arena.overscan));
-    if (crystals.length > 0) {
-      this.layers.push(renderer.createLayer((target) => this.drawCrystalBodies(target), arena.overscan));
-    }
+    this.backdrop = renderer.createLayer((target) => this.drawBackdrop(target), arena.overscan);
     this.floorLayer = renderer.createLayer((target) => drawArena(target, arena, this.definition), arena.overscan);
   }
 
   renderBackground(renderer, arena, ambients, fighters) {
     this.ensureLayers(renderer, arena);
-    for (const layer of this.layers) {
-      renderer.drawLayer(layer, arena.overscan);
-    }
+    renderer.drawLayer(this.backdrop, arena.overscan);
     this.renderCrystalGlows(renderer, fighters);
     this.renderAmbient(renderer, ambients, AmbientLayer.AIR);
   }
@@ -183,6 +177,15 @@ export class ArenaRenderer {
       }
     }
     renderer.restore();
+  }
+
+  drawBackdrop(renderer) {
+    for (const layer of this.definition.layers) {
+      drawShapes(renderer, layer);
+    }
+    if (this.definition.crystals.length > 0) {
+      this.drawCrystalBodies(renderer);
+    }
   }
 
   drawCrystalBodies(renderer) {

@@ -30,7 +30,8 @@ export class Game {
     this.getViewport = getViewport;
     this.portrait = false;
     this.renderer = new Renderer(canvas, gameConfig.canvas);
-    const getGamepads = () => navigator.getGamepads?.() ?? [];
+    this.gamepads = [];
+    const getGamepads = () => this.gamepads;
     this.input = new Input({ bindings: keyBindings, target: window, getGamepads });
     this.secondInput = new Input({ bindings: twoPlayerBindings.p2, target: window, getGamepads, gamepadSlot: 1 });
     this.touch = new TouchInput({ target: canvas, getView: () => ({ width: this.renderer.viewWidth, offsetX: this.renderer.offsetX }) });
@@ -145,6 +146,7 @@ export class Game {
   }
 
   update(dt) {
+    this.gamepads = navigator.getGamepads?.() ?? [];
     this.input.pollGamepads();
     this.secondInput.pollGamepads();
     if (this.input.wasPressed(Action.TOGGLE_DEBUG)) {

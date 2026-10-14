@@ -26,7 +26,7 @@ function createEffects(reduced = false) {
 function recordingRenderer() {
   const calls = [];
   const record = (name) => (...args) => calls.push({ name, args: args.map((value) => (value instanceof Float32Array ? Array.from(value) : value)) });
-  const names = ['save', 'restore', 'setBlendMode', 'setAlpha', 'drawGlow', 'polyline', 'strokeEllipse', 'fillPolygon', 'line', 'translate', 'scale', 'rotate', 'fillCircle', 'fillEllipse', 'fillRect', 'strokeCircle'];
+  const names = ['save', 'restore', 'setBlendMode', 'setAlpha', 'drawGlow', 'polyline', 'strokePolygon', 'strokeEllipse', 'fillPolygon', 'line', 'translate', 'scale', 'rotate', 'fillCircle', 'fillEllipse', 'fillRect', 'strokeCircle'];
   return { calls, ...Object.fromEntries(names.map((name) => [name, record(name)])) };
 }
 

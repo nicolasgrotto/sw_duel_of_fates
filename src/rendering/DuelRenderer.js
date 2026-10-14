@@ -165,7 +165,7 @@ export class DuelRenderer {
     renderer.translate(0, floorY * 2);
     renderer.scale(1, -1);
     for (const fighter of fighters) {
-      drawFighterBody(renderer, fighter, this.getPose(fighter), floorY, false, null, getSeveredLimb(fighter, this.showFinishers));
+      drawFighterBody(renderer, fighter, this.getPose(fighter), floorY, false, null, getSeveredLimb(fighter, this.showFinishers), true);
       drawFinisherPiece(renderer, fighter, floorY, this.showFinishers);
     }
     for (const fighter of fighters) {

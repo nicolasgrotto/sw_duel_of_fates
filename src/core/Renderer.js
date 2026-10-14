@@ -144,6 +144,15 @@ export class Renderer {
     this.context.stroke();
   }
 
+  strokePolygon(points, color, lineWidth = 1) {
+    this.context.strokeStyle = color;
+    this.context.lineWidth = lineWidth;
+    this.context.lineJoin = 'round';
+    this.tracePath(points);
+    this.context.closePath();
+    this.context.stroke();
+  }
+
   polyline(points, color, lineWidth = 1, lineJoin = 'round') {
     this.context.strokeStyle = color;
     this.context.lineWidth = lineWidth;

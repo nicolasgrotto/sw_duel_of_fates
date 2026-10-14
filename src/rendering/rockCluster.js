@@ -18,13 +18,10 @@ function drawRock(renderer, x, y, radius, angle, edgeColor) {
     points[i] = x + px * cos - py * sin;
     points[i + 1] = y + px * sin + py * cos;
   }
-  const last = points.length - 2;
   renderer.fillPolygon(points, colors.floorEdge);
-  renderer.polyline(points, colors.rockShade, style.fragmentEdgeWidth);
-  renderer.line(points[last], points[last + 1], points[0], points[1], colors.rockShade, style.fragmentEdgeWidth);
+  renderer.strokePolygon(points, colors.rockShade, style.fragmentEdgeWidth);
   renderer.setAlpha(style.rocks.energyAlpha);
-  renderer.polyline(points, edgeColor, style.rocks.energyWidth);
-  renderer.line(points[last], points[last + 1], points[0], points[1], edgeColor, style.rocks.energyWidth);
+  renderer.strokePolygon(points, edgeColor, style.rocks.energyWidth);
   renderer.setAlpha(1);
 }
 
