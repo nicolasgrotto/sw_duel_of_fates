@@ -5,6 +5,7 @@ import { characters } from '../src/characters/characterData.js';
 import { createFighterFromCharacter } from '../src/characters/characterFactory.js';
 import { createProtagonistCharacter } from '../src/characters/protagonist.js';
 import { storyConfig } from '../src/config/storyConfig.js';
+import { bladeTechniques } from '../src/config/movesConfig.js';
 import { createBox, getAttackHitbox } from '../src/combat/hitboxes.js';
 import { getMotionStyle, computePose, createPose } from '../src/rendering/fighterPose.js';
 import { getBladeWorldPoints } from '../src/rendering/saberRenderer.js';
@@ -12,7 +13,7 @@ import { STEP, createSimulation, segmentEntersBox, spawnFighter } from './helper
 
 const baseline = JSON.parse(readFileSync(new URL('./fixtures/attackPoses-v2.json', import.meta.url)));
 const MAX_CHAIN_ANGLE = Math.PI / 3;
-const TECHNIQUES = new Set(['spin', 'dashSlash', 'saberThrow']);
+const TECHNIQUES = new Set(Object.keys(bladeTechniques));
 const ADDED_AFTER_V2 = new Set(['reaper']);
 
 function attackAt(fighter, moveId, time) {
@@ -41,8 +42,16 @@ function assertTransitionFrame(previous, angle, label) {
   assert.ok(change <= MAX_CHAIN_ANGLE, `${label}: ${(change * 180 / Math.PI).toFixed(2)} degrees`);
 }
 
+function withoutTechniques(keys) {
+  return keys.filter((key) => !TECHNIQUES.has(key)).sort();
+}
+
+function sharedMoves(fighter, moves) {
+  return Object.fromEntries(Object.entries(moves).filter(([key]) => !TECHNIQUES.has(key) || fighter.moves[key]));
+}
+
 function assertHistoricalPoses(fighter, moves, label) {
-  assert.deepEqual(Object.keys(fighter.moves).sort(), Object.keys(moves).sort());
+  assert.deepEqual(withoutTechniques(Object.keys(fighter.moves)), withoutTechniques(Object.keys(moves)));
   for (const [moveId, rows] of Object.entries(moves)) {
     if (TECHNIQUES.has(moveId)) continue;
     const move = fighter.moves[moveId];
@@ -117,16 +126,16 @@ describe('historical attack animation contract (198525b)', () => {
   for (const id of ['guardian', 'wasp']) {
     it(`${id}: preserves startup, active, recovery and hitbox dimensions for all moves`, () => {
       const fighter = spawnFighter(500, 1, id);
-      const actual = Object.fromEntries(Object.entries(fighter.moves).map(([key, move]) => [key, {
+      const expectedMoves = structuredClone(sharedMoves(fighter, baseline.moves[id]));
+      const actual = Object.fromEntries(Object.entries(fighter.moves).filter(([key]) => key in expectedMoves).map(([key, move]) => [key, {
         startup: move.startup, active: move.active, recovery: move.recovery,
         reach: key === 'saberThrow' ? undefined : move.hitbox.reach, top: move.hitbox.top, bottom: move.hitbox.bottom,
       }]));
-      const expectedMoves = structuredClone(baseline.moves[id]);
       if (expectedMoves.saberThrow) expectedMoves.saberThrow.reach = undefined;
       assert.deepEqual(actual, expectedMoves);
       for (const facing of [-1, 1]) {
         fighter.facing = facing;
-        for (const [key, expected] of Object.entries(baseline.moves[id])) {
+        for (const [key, expected] of Object.entries(expectedMoves)) {
           if (key === 'saberThrow') continue;
           const hitbox = getAttackHitbox(fighter, fighter.moves[key], createBox());
           assert.equal(hitbox.top, fighter.y - fighter.height * expected.top);

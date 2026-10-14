@@ -440,6 +440,7 @@ export const aiConfig = {
     evadeWeight: 1,
     airJumpFallSpeed: 0,
     techniqueChance: 0.2,
+    technique: { groundedLaunchChance: 0.3, openSweepChance: 0.4, plungeHeight: 0.3 },
     airDashCrossGap: 70,
     airDashClearance: 0.7,
     cornerMargin: 110,

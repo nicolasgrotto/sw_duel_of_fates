@@ -47,8 +47,14 @@ export function selectPower(fighter, fourth = fighter.intent.fourthPower || figh
   return loadout[getIntentSlot(fighter, moveX)] ?? loadout.neutral;
 }
 
+export const AIR_TECHNIQUE_SLOT = 'air';
+
 export function selectTechnique(fighter, moveX) {
   return fighter.stats.techniques?.[getIntentSlot(fighter, moveX)] ?? null;
+}
+
+export function selectAirTechnique(fighter) {
+  return fighter.stats.techniques?.[AIR_TECHNIQUE_SLOT] ?? null;
 }
 
 export function getPowerRange(fighter, power) {

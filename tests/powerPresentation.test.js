@@ -18,6 +18,7 @@ import { TimeControl } from '../src/systems/TimeControl.js';
 import { buildMoveList } from '../src/ui/moveList.js';
 import { createRandom } from '../src/utils/random.js';
 import { spawnFighter } from './helpers.js';
+import { formatText } from '../src/ui/formatText.js';
 
 function startPower(fighter, id, stateTime, endTime = 0) {
   const power = powersConfig.powers[id];
@@ -147,6 +148,8 @@ describe('move list powers', () => {
     assert.ok(withPowers.some((row) => row.label.includes(texts.powers.push)));
     assert.ok(withPowers.some((row) => row.label.includes(texts.powers.barrier) && row.keys.includes('U')));
     assert.ok(withPowers.some((row) => row.label.includes(texts.powers.dashSlash) && row.keys.includes('I') && row.keys.includes('D')));
-    assert.equal(buildMoveList(characters.echo, keyBindings, true).length, rows.length + 3);
+    assert.equal(buildMoveList(characters.echo, keyBindings, true).length, rows.length + 5);
+    const shadow = buildMoveList(characters.shadow, keyBindings, true);
+    assert.ok(shadow.some((row) => row.label === formatText(texts.moveList.airTechnique, { name: texts.powers.plunge })));
   });
 });

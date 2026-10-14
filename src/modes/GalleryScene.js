@@ -6,6 +6,7 @@ import { powersConfig } from '../config/powersConfig.js';
 import { getPowerRange } from '../combat/PowerSystem.js';
 import { GalleryController } from '../controllers/GalleryController.js';
 import { GalleryTargetController } from '../controllers/GalleryTargetController.js';
+import { AIR_TECHNIQUE_SLOT } from '../combat/PowerSystem.js';
 
 export class GalleryScene {
   constructor(director, simulation, onReset = () => {}) {
@@ -23,7 +24,8 @@ export class GalleryScene {
   configure() {
     const { item, selection, level } = this.director;
     const character = characters[selection.caster];
-    const loadout = { powers: item.kind === 'power' ? { neutral: item.id } : {}, techniques: item.kind === 'technique' ? { forward: item.id } : {} };
+    const techniqueSlot = item.data.airborne ? AIR_TECHNIQUE_SLOT : 'forward';
+    const loadout = { powers: item.kind === 'power' ? { neutral: item.id } : {}, techniques: item.kind === 'technique' ? { [techniqueSlot]: item.id } : {} };
     this.fighters[0] = createFighterFromCharacter({ ...character, loadout, powerSlots: null }, {
       x: this.fighters[0].x, y: this.simulation.arena.floorY, facing: 1,
     });
@@ -102,6 +104,7 @@ export class GalleryScene {
     this.fighters[0].resetForRound(center - gap / 2, 1);
     this.fighters[1].resetForRound(center + gap / 2, -1);
     this.launchPending = false;
+    this.controllers[0].airDelay = 0;
     this.controllers[1].reset();
     this.delay = 0;
     this.director.phase = 'ready';

@@ -3,6 +3,7 @@ import { powersConfig } from '../config/powersConfig.js';
 import { keyComboSeparator, texts } from '../config/uiConfig.js';
 import { formatActionKeys } from './keyLabels.js';
 import { formatText } from './formatText.js';
+import { AIR_TECHNIQUE_SLOT } from '../combat/PowerSystem.js';
 
 export function countLightChain(moves) {
   let count = 1;
@@ -36,7 +37,7 @@ function buildPowerRows(character, bindings) {
     return { label, keys: slotKeys(bindings, slot, Action.POWER) };
   });
   const techniqueRows = Object.entries(character.loadout?.techniques ?? {}).map(([slot, id]) => ({
-    label: formatText(texts.moveList.technique, { name: texts.powers[id] }),
+    label: formatText(slot === AIR_TECHNIQUE_SLOT ? texts.moveList.airTechnique : texts.moveList.technique, { name: texts.powers[id] }),
     keys: slotKeys(bindings, slot, Action.SPECIAL),
   }));
   return [...powerRows, ...techniqueRows];

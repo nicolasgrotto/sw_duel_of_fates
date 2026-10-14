@@ -37,6 +37,8 @@ function createCombat() {
     airAttackUsed: false,
     airDashUsed: false,
     saberThrown: false,
+    multiHitIndex: 0,
+    multiHitStopped: false,
     wallJumpSide: 0,
     jumpsUsed: 0,
     lungeApplied: false,
@@ -257,6 +259,8 @@ export class Fighter {
     this.combat.attackConnected = false;
     this.combat.freeRecovery = false;
     this.combat.lungeApplied = false;
+    this.combat.multiHitIndex = 0;
+    this.combat.multiHitStopped = false;
     this.clearPower();
   }
 

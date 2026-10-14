@@ -17,7 +17,7 @@ export const combatRulesConfig = {
     headChance: 0.3,
     limbs: {
       light: 'arm', light2: 'arm', light4: 'arm', light5: 'arm', heavy: 'arm', riposte: 'arm', special: 'arm', counterStrike: 'arm', bladeLock: 'arm',
-      light3: 'leg', forwardHeavy: 'leg', spin: 'leg', dashSlash: 'leg',
+      light3: 'leg', forwardHeavy: 'leg', spin: 'leg', dashSlash: 'leg', sweep: 'leg', thrust: 'arm', risingCut: 'arm', flurry: 'arm', plunge: 'arm',
     },
   },
   wounds: {
@@ -43,6 +43,7 @@ export const combatRulesConfig = {
     rhythm: { beat: 0.3, window: 0.07 },
   },
   prototypeModes: ['versus', 'local', 'training'],
+  techniqueClash: { pushback: 420, stagger: 0.4, staminaLoss: 12 },
 };
 
 export function resolveCombatRules(rules = {}) {

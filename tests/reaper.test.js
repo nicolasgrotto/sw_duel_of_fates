@@ -21,7 +21,7 @@ it('creates the common Eclipse reaper from the heron archetype and the specified
   assert.equal(data.alignment, 'dark');
   assert.equal(data.powerSlots, 3);
   assert.equal(data.aiProfile, 'reaper');
-  assert.deepEqual(data.loadout, { powers: { neutral: 'push', forward: 'pull', back: 'wrath' }, techniques: { forward: 'dashSlash', back: 'saberThrow' } });
+  assert.deepEqual(data.loadout, { powers: { neutral: 'push', forward: 'pull', back: 'wrath' }, techniques: { forward: 'dashSlash', back: 'saberThrow', air: 'plunge' } });
   assert.deepEqual(Object.keys(fighter.stats.power.loadout).sort(), ['back', 'forward', 'neutral']);
   assert.equal(fighter.moves.spin, undefined);
   assert.equal(fighter.stats.movement.maxJumps, 2);

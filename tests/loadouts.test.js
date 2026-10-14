@@ -62,9 +62,9 @@ describe('blade techniques', () => {
     assert.equal(selectTechnique(fighter), 'dashSlash');
     fighter.intent.moveX = -1;
     assert.equal(selectTechnique(fighter), 'saberThrow');
-    const bastion = spawnFighter(400, 1, 'bastion');
-    bastion.intent.moveX = 1;
-    assert.equal(selectTechnique(bastion), null);
+    const heron = spawnFighter(400, 1, 'heron');
+    heron.intent.moveX = 1;
+    assert.equal(selectTechnique(heron), null);
   });
 
   it('scale damage with the blade rating', () => {

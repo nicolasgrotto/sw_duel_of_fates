@@ -34,6 +34,9 @@ export function getAbilityCategory(id, { categories }) {
 
 export const POWER_SLOTS = Object.freeze(['neutral', 'forward', 'back', 'fourth']);
 
+const AIR_SLOT = 'air';
+const TECHNIQUE_SLOTS = ['forward', 'back', AIR_SLOT];
+
 export function findLoadoutProblems(loadout, alignment, config, techniques, powerSlots = 3) {
   const problems = [];
   const powers = Object.entries(loadout?.powers ?? {});
@@ -52,8 +55,9 @@ export function findLoadoutProblems(loadout, alignment, config, techniques, powe
     check(`powers.${slot}`, id, id in config.powers);
   }
   for (const [slot, id] of Object.entries(loadout?.techniques ?? {})) {
-    if (!['forward', 'back'].includes(slot)) problems.push(`techniques.${slot}: invalid slot`);
+    if (!TECHNIQUE_SLOTS.includes(slot)) problems.push(`techniques.${slot}: invalid slot`);
     check(`techniques.${slot}`, id, id in techniques);
+    if (id in techniques && (slot === AIR_SLOT) !== (techniques[id].airborne === true)) problems.push(`techniques.${slot}: ${id} does not fit the slot`);
   }
   return problems;
 }

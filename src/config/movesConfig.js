@@ -256,17 +256,45 @@ export const movesByCharacter = {
 
 export const bladeTechniques = {
   spin: {
-    attack: 'heavy', type: 'heavy', pose: 'spin', cancelsInto: [], damage: 18,
+    attack: 'heavy', type: 'heavy', pose: 'spin', technique: true, cancelsInto: [], damage: 18,
     staminaCost: 24, startup: 0.26, active: 0.16, recovery: 0.42, lunge: 0, knockback: 260,
     hitbox: { reach: 62, top: 0.85, bottom: 0.3, around: true },
   },
   dashSlash: {
-    attack: 'heavy', type: 'heavy', pose: 'dashSlash', cancelsInto: [], damage: 13,
+    attack: 'heavy', type: 'heavy', pose: 'dashSlash', technique: true, cancelsInto: [], damage: 13,
     staminaCost: 34, startup: 0.3, active: 0.14, recovery: 0.62, lunge: 900, hitstun: 0.72,
   },
   saberThrow: {
-    attack: 'heavy', type: 'heavy', pose: 'saberThrow', cancelsInto: [], damage: 9, projectile: true,
+    attack: 'heavy', type: 'heavy', pose: 'saberThrow', technique: true, cancelsInto: [], damage: 9, projectile: true,
     staminaCost: 28, startup: 0.26, active: 0.08, recovery: 0.4, lunge: 0, knockback: 220,
     hitbox: { top: 0.7, bottom: 0.4 },
+  },
+  thrust: {
+    attack: 'heavy', type: 'heavy', pose: 'thrust', technique: true, cancelsInto: [], damage: 14,
+    staminaCost: 26, startup: 0.24, active: 0.1, recovery: 0.5, lunge: 220, knockback: 240, hitstun: 0.35,
+    reachBonus: 55, hitbox: { top: 0.64, bottom: 0.46 },
+  },
+  risingCut: {
+    attack: 'heavy', type: 'heavy', pose: 'risingCut', technique: true, cancelsInto: [], damage: 15,
+    staminaCost: 26, startup: 0.3, active: 0.14, recovery: 0.55, lunge: 60, knockback: 120,
+    airborneScale: 1.3, launch: 620,
+    hitbox: { reach: 80, top: 1.45, bottom: 0.35 },
+  },
+  flurry: {
+    attack: 'heavy', type: 'heavy', pose: 'flurry', technique: true, cancelsInto: [], damage: 4,
+    staminaCost: 30, startup: 0.18, active: 0.28, recovery: 0.42, lunge: 120, knockback: 50, hitstun: 0.2,
+    blockStaminaCost: 9, blockPushback: 40, hits: 4, hitInterval: 0.07,
+    hitbox: { reach: 95, top: 0.75, bottom: 0.4 },
+  },
+  sweep: {
+    attack: 'heavy', type: 'heavy', pose: 'sweep', technique: true, cancelsInto: [], damage: 9,
+    staminaCost: 26, startup: 0.42, active: 0.12, recovery: 0.5, lunge: 120, knockback: 80, hitstun: 0.55,
+    sweep: true,
+    hitbox: { reach: 105, top: 0.22, bottom: -0.02 },
+  },
+  plunge: {
+    attack: 'heavy', type: 'heavy', pose: 'plunge', technique: true, airborne: true, cancelsInto: [], damage: 16,
+    staminaCost: 28, startup: 0.12, active: 0.36, recovery: 0.6, lunge: 520, dive: 1300, knockback: 200,
+    hitbox: { reach: 60, top: 0.55, bottom: -0.25 },
   },
 };

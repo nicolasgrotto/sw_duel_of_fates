@@ -4,6 +4,7 @@ export const galleryConfig = {
   attackPower: 'lightning',
   arsenalAttackPower: 'throw',
   reactionLead: 0.1,
+  airLaunchDelay: 0.14,
   defaults: { ability: 'push', tier: 1, target: 'idle', caster: 'guardian', repeat: true },
   cycleDelay: 0.8,
   distanceRatio: 0.6,

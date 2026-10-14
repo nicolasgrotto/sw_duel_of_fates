@@ -10,13 +10,17 @@ import { hashUnit } from '../utils/random.js';
 import { ATTACK_STATES, AttackPhase, AttackType, getAttackDuration, getAttackPhase, getChargeLevel, isSaberAttack } from './attackPhases.js';
 import { CombatEvent, createCombatEvent } from './combatEvents.js';
 import { boxesOverlap, comesFromFront, createBox, getAttackHitbox, getHurtbox, hasActiveHitbox, hasHurtbox, isBladeInvulnerable, isGuardingAgainst, isInvulnerable } from './hitboxes.js';
-import { PowerSystem, isBarrierUp, selectPower, selectTechnique } from './PowerSystem.js';
+import { PowerSystem, isBarrierUp, selectAirTechnique, selectPower, selectTechnique } from './PowerSystem.js';
 import { ProjectileSystem } from './ProjectileSystem.js';
 import { StatusSystem } from './StatusSystem.js';
 import { projectilesConfig } from '../config/projectilesConfig.js';
 import { isStormShieldUp } from './StormSystem.js';
 
 const PUNISHED_STATES = new Set([FighterState.STAGGERED, FighterState.STUNNED]);
+
+function sweepsGuard(contact) {
+  return contact.attack.sweep === true && contact.defender.grounded;
+}
 
 function isInCounterStance(defender, attacker) {
   const { attack } = defender.combat;
@@ -181,7 +185,7 @@ export class CombatSystem {
       return;
     }
     if (!fighter.canAct) {
-      if (!this.tryAirDash(fighter)) {
+      if (!this.tryAirDash(fighter) && !this.tryAirTechnique(fighter)) {
         this.tryAirAttack(fighter);
       }
       return;
@@ -241,6 +245,24 @@ export class CombatSystem {
     const { moveX } = fighter.intent;
     this.startDodge(fighter, profile, moveX !== 0 ? Math.sign(moveX) : fighter.facing, profile.passThrough);
     fighter.vy = -profile.lift;
+    return true;
+  }
+
+  tryAirTechnique(fighter) {
+    const { combat } = fighter;
+    if (combat.bufferedAction !== CombatAction.SPECIAL || fighter.grounded || fighter.state !== FighterState.JUMPING) {
+      return false;
+    }
+    const technique = this.powers.enabled && !combat.rainActive ? selectAirTechnique(fighter) : null;
+    if (!technique) {
+      return false;
+    }
+    clearActionBuffer(fighter);
+    if (combat.airAttackUsed || !this.tryAttack(fighter, technique)) {
+      this.emitAction(CombatEvent.ACTION_REJECTED, fighter, technique);
+      return true;
+    }
+    combat.airAttackUsed = true;
     return true;
   }
 
@@ -467,6 +489,9 @@ export class CombatSystem {
   }
 
   resolveHits(fighters) {
+    for (const fighter of fighters) {
+      this.refreshMultiHit(fighter);
+    }
     this.resolveClashes(fighters);
     this.findContacts(fighters);
 
@@ -475,6 +500,19 @@ export class CombatSystem {
     }
     for (const contact of this.contacts) {
       this.resolveContact(contact);
+    }
+  }
+
+  refreshMultiHit(fighter) {
+    const { combat } = fighter;
+    const { attack } = combat;
+    if (!attack?.hits || combat.multiHitStopped || getAttackPhase(attack, fighter.stateTime) !== AttackPhase.ACTIVE) {
+      return;
+    }
+    const index = Math.min(attack.hits - 1, Math.floor((fighter.stateTime - attack.startup) / attack.hitInterval + Number.EPSILON * 8));
+    if (index > combat.multiHitIndex) {
+      combat.multiHitIndex = index;
+      combat.hasHit = false;
     }
   }
 
@@ -500,6 +538,10 @@ export class CombatSystem {
       return;
     }
 
+    if (a.combat.attack.technique && b.combat.attack.technique) {
+      this.techniqueClash(a, b, boxA, boxB);
+      return;
+    }
     if (this.bladeLocks?.tryStart(a, b)) return;
 
     const light = a.combat.attack.type === AttackType.LIGHT && b.combat.attack.type === AttackType.LIGHT;
@@ -520,6 +562,26 @@ export class CombatSystem {
     }
     this.recoil(a, b);
     this.recoil(b, a);
+  }
+
+  techniqueClash(a, b, boxA, boxB) {
+    const { pushback, stagger, staminaLoss } = combatRulesConfig.techniqueClash;
+    this.events.push(
+      createCombatEvent(CombatEvent.TECHNIQUE_CLASH, {
+        attacker: a,
+        defender: b,
+        attackType: a.combat.attackType,
+        x: (Math.max(boxA.left, boxB.left) + Math.min(boxA.right, boxB.right)) / 2,
+        y: (Math.max(boxA.top, boxB.top) + Math.min(boxA.bottom, boxB.bottom)) / 2,
+      }),
+    );
+    for (const [fighter, opponent] of [[a, b], [b, a]]) {
+      fighter.clearAttack();
+      fighter.vx = (Math.sign(fighter.x - opponent.x) || -fighter.facing) * pushback;
+      fighter.combat.stunDuration = stagger;
+      fighter.restartState(FighterState.STAGGERED);
+      this.spendStamina(fighter, staminaLoss, 'drain');
+    }
   }
 
   deflect(fighter, opponent, pushback) {
@@ -600,7 +662,7 @@ export class CombatSystem {
       this.resolveBarrierBlock(contact);
     } else if (isInCounterStance(contact.defender, contact.attacker)) {
       this.resolveCounter(contact);
-    } else if (!isGuardingAgainst(contact.defender, contact.attacker)) {
+    } else if (!isGuardingAgainst(contact.defender, contact.attacker) || sweepsGuard(contact)) {
       this.applyHit(contact);
     } else if (contact.defender.combat.parryArmed) {
       this.resolveParry(contact);
@@ -652,6 +714,7 @@ export class CombatSystem {
     const staminaDamage = attack.blockStaminaCost * (perfect ? parry.perfectStaminaDamageMultiplier : 1);
 
     this.spendStamina(attacker, staminaDamage, 'drain');
+    attacker.combat.multiHitStopped = true;
     if (staggers) {
       attacker.clearAttack();
       attacker.vx = -attacker.facing * parry.attackerRecoil;
@@ -706,7 +769,8 @@ export class CombatSystem {
   getHitDamage(attacker, defender, attack) {
     const punishScale = isOpenToPunish(defender) ? attacker.stats.punishDamageScale : 1;
     const chargeScale = attack.charge ? attack.charge.damageScales[getChargeLevel(attack, attacker.combat.chargeTime) - 1] : 1;
-    return attack.damage * punishScale * chargeScale * getSweetSpotScale(attacker, defender, attack);
+    const airborneScale = attack.airborneScale && !defender.grounded ? attack.airborneScale : 1;
+    return attack.damage * punishScale * chargeScale * airborneScale * getSweetSpotScale(attacker, defender, attack);
   }
 
   applyHit(contact) {
@@ -728,8 +792,16 @@ export class CombatSystem {
       return;
     }
 
+    const sweeps = attack.sweep && defender.grounded;
+    if (sweeps) {
+      defender.combat.parryArmed = false;
+      defender.combat.blockstun = 0;
+    }
     defender.combat.stunDuration = attack.hitstun;
-    defender.restartState(FighterState.HIT);
+    defender.restartState(sweeps ? FighterState.STAGGERED : FighterState.HIT);
+    if (attack.launch && !defender.grounded) {
+      defender.vy = -attack.launch;
+    }
   }
 
   applyDamage(contact, amount, source, eventType = null) {

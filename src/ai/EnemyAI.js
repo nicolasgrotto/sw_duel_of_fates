@@ -1,5 +1,5 @@
 import { AttackPhase, AttackType, getAttackDuration, getAttackPhase, isHeavyAttack } from '../combat/attackPhases.js';
-import { getPowerMode, isBarrierUp, isChannelOpen, isInPowerRange, isUsingPower } from '../combat/PowerSystem.js';
+import { AIR_TECHNIQUE_SLOT, getPowerMode, isBarrierUp, isChannelOpen, isInPowerRange, isUsingPower } from '../combat/PowerSystem.js';
 import { isStormShieldUp } from '../combat/StormSystem.js';
 import { getFlowDifference, resolveInteraction, resolveLevelBand } from '../combat/flowInteractions.js';
 import { ProjectileKind, projectilesConfig } from '../config/projectilesConfig.js';
@@ -332,6 +332,7 @@ export class EnemyAI {
     }
     if (!self.grounded && self.canMove && this.tryAirJump()) return AiDecision.JUMP;
     if (!self.grounded && self.state === FighterState.JUMPING && this.tryAirDash()) return AiDecision.AIR_DASH;
+    if (!self.grounded && self.state === FighterState.JUMPING && this.tryAirTechnique()) return AiDecision.TECHNIQUE;
     if (!self.canAct && self.state !== FighterState.BLOCKING) {
       this.planRecoveryGuard();
       return AiDecision.BUSY;
@@ -453,7 +454,9 @@ export class EnemyAI {
       return null;
     }
     for (const [slot, id] of Object.entries(self.stats.techniques ?? {})) {
+      if (slot === AIR_TECHNIQUE_SLOT) continue;
       const move = self.moves[id];
+      if (!this.suitsTechnique(move)) continue;
       const reach = move.throwRange ?? getAttackReach(move) + (move.lunge ?? 0) * move.active;
       if (!this.canSpend(move.staminaCost, move) || getGap(self, opponent) >= reach - this.perception.reachMargin) {
         continue;
@@ -469,6 +472,28 @@ export class EnemyAI {
       return AiDecision.TECHNIQUE;
     }
     return null;
+  }
+
+  suitsTechnique(move) {
+    const { opponent } = this;
+    const { technique } = this.perception;
+    if (move.launch) return !opponent.grounded || this.random() < technique.groundedLaunchChance;
+    if (move.sweep) return opponent.grounded && (opponent.state === FighterState.BLOCKING || this.random() < technique.openSweepChance);
+    return true;
+  }
+
+  tryAirTechnique() {
+    const { self, opponent } = this;
+    const id = self.stats.techniques?.[AIR_TECHNIQUE_SLOT];
+    if (!this.powersEnabled || !id || self.combat.airAttackUsed || this.attackCooldown > 0) return false;
+    const move = self.moves[id];
+    const reach = getAttackReach(move) + move.lunge * move.active;
+    if (!this.canSpend(move.staminaCost, move) || getGap(self, opponent) >= reach || self.y >= opponent.y - opponent.height * this.perception.technique.plungeHeight) return false;
+    if (this.random() >= (this.profile.techniqueChance ?? this.perception.techniqueChance) * this.difficulty.specialMultiplier) return false;
+    this.plan.moveX = 0;
+    this.plan.pendingAction = PendingAction.SPECIAL;
+    this.attackCooldown = this.difficulty.attackCooldown;
+    return true;
   }
 
   trySpecialAttack() {

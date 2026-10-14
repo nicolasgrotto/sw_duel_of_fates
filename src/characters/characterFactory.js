@@ -39,7 +39,10 @@ export function createFighterFromCharacter(character, { x, y, facing }, { saberC
   }
   const techniques = character.loadout?.techniques ?? {};
   for (const id of Object.values(techniques)) {
-    moves[id] = { ...stats.attacks[bladeTechniques[id].attack], ...bladeTechniques[id] };
+    const base = stats.attacks[bladeTechniques[id].attack];
+    const technique = bladeTechniques[id];
+    moves[id] = { ...base, ...technique };
+    if (technique.reachBonus) moves[id].hitbox = { ...technique.hitbox, reach: base.hitbox.reach + technique.reachBonus };
   }
 
   const scalars = attributesConfig.bases[character.archetype];

@@ -86,13 +86,13 @@ describe('technique keyframe tracks', () => {
 
 
   it('pulls the blade behind the shoulder before the spin', () => {
-    const fighter = spawnFighter(500, 1, 'forge');
+    const fighter = spawnFighter(500, 1, 'bastion');
     const pose = poseAt(fighter, 'spin', fighter.moves.spin.startup);
     assert.ok(Math.cos(pose.bladeAngle) < -0.8);
   });
 
   it('cuts upward in the rising dash slash and downward in the guardian falling variant', () => {
-    for (const [id, startupSign, strikeSign] of [['shadow', 1, -1], ['wasp', 1, -1], ['ember', 1, -1], ['guardian', -1, 1]]) {
+    for (const [id, startupSign, strikeSign] of [['shadow', 1, -1], ['shadowAwakened', 1, -1], ['ember', 1, -1], ['guardian', -1, 1]]) {
       const fighter = spawnFighter(500, 1, id);
       const move = fighter.moves.dashSlash;
       const windup = poseAt(fighter, 'dashSlash', move.startup);
@@ -112,7 +112,7 @@ describe('technique keyframe tracks', () => {
   });
 
   it('winds the thrown blade behind the body and releases with the arm extended', () => {
-    for (const id of ['guardian', 'wasp', 'ember', 'forge']) {
+    for (const id of ['guardian', 'wasp', 'reaper', 'forge']) {
       const fighter = spawnFighter(500, 1, id);
       const move = fighter.moves.saberThrow;
       const idle = computePose(spawnFighter(500, 1, id), createPose());

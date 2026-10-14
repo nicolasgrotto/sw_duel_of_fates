@@ -5,6 +5,7 @@ export class GalleryController {
   constructor(scene, role) {
     this.scene = scene;
     this.role = role;
+    this.airDelay = 0;
   }
 
   isReady(dt) {
@@ -18,7 +19,14 @@ export class GalleryController {
   updateIntent(intent, dt) {
     this.scene.fighters[this.role].clearIntent();
     if (this.role === 0) {
-      if (this.scene.launchPending && this.isReady(dt)) {
+      if (this.airDelay > 0) {
+        this.airDelay -= dt;
+        intent.special = this.airDelay <= 0;
+        this.scene.launchPending = !intent.special;
+      } else if (this.scene.launchPending && this.isReady(dt) && this.scene.director.item.data.airborne) {
+        intent.jump = true;
+        this.airDelay = galleryConfig.airLaunchDelay;
+      } else if (this.scene.launchPending && this.isReady(dt)) {
         const technique = this.scene.director.item.kind === 'technique';
         intent.power = !technique;
         intent.special = technique;

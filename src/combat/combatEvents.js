@@ -3,6 +3,7 @@ export const CombatEvent = Object.freeze({
   BLOCK: 'block',
   GUARD_BREAK: 'guardBreak',
   CLASH: 'clash',
+  TECHNIQUE_CLASH: 'techniqueClash',
   BLADE_LOCK_START: 'bladeLockStart',
   BLADE_LOCK_PRESS: 'bladeLockPress',
   BLADE_LOCK_END: 'bladeLockEnd',
