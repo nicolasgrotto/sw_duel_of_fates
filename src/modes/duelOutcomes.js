@@ -1,6 +1,8 @@
 import { isLastStage, nextArcadeRun } from './arcade.js';
 import { nextSurvivalRun } from './survival.js';
+import { recordTrialTime } from './challenges.js';
 import { resolveDialogue } from './story/dialogue.js';
+import { markStorySeen } from './story/storyGallery.js';
 import { resolveStoryResult } from './story/storyRun.js';
 import { addVariantUnlocks } from '../characters/variants.js';
 import { characters } from '../characters/characterData.js';
@@ -8,7 +10,7 @@ import { unlockProgressSkins, ARCADE_UNLOCK, addUnlocks, findChallengeUnlocks } 
 import { DuelMode } from '../states/duelModes.js';
 import { StateId } from '../states/stateIds.js';
 import { texts } from '../config/uiConfig.js';
-import { formatText } from '../ui/formatText.js';
+import { formatSeconds, formatText } from '../ui/formatText.js';
 
 function addUnlockedCharacters(settings, ids) {
   const current = settings.unlockedCharacters ?? [];
@@ -46,6 +48,7 @@ function resolveStoryOutcome(result, { params, settings, story }) {
     if (story.config.endings[outcome.ending].secret) progress.unlocks = unlockProgressSkins(progress.unlocks, Object.values(characters), 'secret');
   }
   const { protagonist } = params.story;
+  progress.storySeen = markStorySeen(settings.storySeen, { encounterId: outcome.encounter.id, ending: outcome.ending, protagonist });
   const lines = resolveDialogue(story.texts.encounters[outcome.encounter.id].after, protagonist, story.names);
   if (outcome.ending) {
     lines.push(...resolveDialogue(story.texts.endings[outcome.ending].lines, protagonist, story.names));
@@ -66,9 +69,31 @@ function resolveStoryOutcome(result, { params, settings, story }) {
   };
 }
 
+function resolveTrialOutcome(result, { params, settings }) {
+  const { id } = params.trial;
+  const title = texts.trials.names[id];
+  const screen = {
+    duelParams: params, summary: '', rematchLabel: texts.trials.retry, rematchParams: params,
+    menuLabel: texts.trials.backToList, menuState: StateId.TRIAL_SELECT,
+  };
+  if (result.winnerSide !== 0) {
+    return { state: StateId.GAME_OVER, progress: {}, params: { ...screen, title: texts.trials.failedTitle, subtitle: title } };
+  }
+  const { records, improved, best } = recordTrialTime(settings.challengeRecords, id, result.duration);
+  const template = improved ? texts.trials.newRecord : texts.trials.time;
+  return {
+    state: StateId.GAME_OVER,
+    progress: improved ? { challengeRecords: records } : {},
+    params: { ...screen, title: texts.trials.clearedTitle, subtitle: title, summary: formatText(template, { time: formatSeconds(result.duration), best: formatSeconds(best) }) },
+  };
+}
+
 export function resolveDuelOutcome(result, { params, settings, character, survivalConfig, story = null }) {
   if (result.mode === DuelMode.STORY) {
     return resolveStoryOutcome(result, { params, settings, story });
+  }
+  if (result.mode === DuelMode.TRIAL) {
+    return resolveTrialOutcome(result, { params, settings });
   }
   const playerWon = result.winnerSide === 0;
   const player = result.fighters[0];

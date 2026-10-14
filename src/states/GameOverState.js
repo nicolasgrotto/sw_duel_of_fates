@@ -1,7 +1,7 @@
 import { Action } from '../config/controlsConfig.js';
 import { colors, textStyles } from '../config/themeConfig.js';
 import { layout, texts } from '../config/uiConfig.js';
-import { formatText } from '../ui/formatText.js';
+import { formatSeconds, formatText } from '../ui/formatText.js';
 import { MenuList } from '../ui/MenuList.js';
 import { GameState } from './GameState.js';
 import { StateId } from './stateIds.js';
@@ -10,10 +10,6 @@ export const GameOverOption = Object.freeze({
   REMATCH: 'rematch',
   MENU: 'menu',
 });
-
-function formatSeconds(seconds) {
-  return seconds.toFixed(1).replace('.', ',');
-}
 
 export class GameOverState extends GameState {
   enter() {

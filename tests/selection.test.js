@@ -55,7 +55,7 @@ describe('grouped menu', () => {
     moveTo(game, 'learn');
     game.step(Action.CONFIRM);
     assert.equal(menu.group, 'learn');
-    assert.deepEqual(menu.menu.items.map((item) => item.id), ['tutorial', 'training', 'challenge', 'controls', 'back']);
+    assert.deepEqual(menu.menu.items.map((item) => item.id), ['tutorial', 'drills', 'training', 'challenge', 'controls', 'back']);
     game.step(Action.BACK);
     assert.equal(menu.group, 'root');
     assert.equal(menu.menu.selected.id, 'learn');

@@ -10,9 +10,11 @@ export const DuelMode = Object.freeze({
   TUTORIAL: 'tutorial',
   CHALLENGE: 'parryChallenge',
   STORY: 'story',
+  DRILL: 'drill',
+  TRIAL: 'trial',
 });
 
-const DUMMY_MODES = new Set([DuelMode.TRAINING, DuelMode.TUTORIAL, DuelMode.CHALLENGE, DuelMode.GALLERY]);
+const DUMMY_MODES = new Set([DuelMode.TRAINING, DuelMode.TUTORIAL, DuelMode.CHALLENGE, DuelMode.GALLERY, DuelMode.DRILL]);
 
 export function createDuelRules(mode, settings, powerModes) {
   if (mode === DuelMode.GALLERY) return resolveCombatRules({ powers: true, focusEvade: true });

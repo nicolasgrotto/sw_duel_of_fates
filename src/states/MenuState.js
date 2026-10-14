@@ -22,6 +22,9 @@ export const MenuOption = Object.freeze({
   CHALLENGE: 'challenge',
   TRAINING: 'training',
   GALLERY: 'gallery',
+  DRILLS: 'drills',
+  TRIALS: 'trials',
+  STORY_GALLERY: 'storyGallery',
   OPTIONS: 'options',
   CONTROLS: 'controls',
   BACK: 'back',
@@ -32,8 +35,8 @@ const ROOT = 'root';
 export const MENU_GROUPS = Object.freeze({
   [ROOT]: [MenuOption.PLAY, MenuOption.LEARN, MenuOption.EXTRAS, MenuOption.OPTIONS],
   [MenuOption.PLAY]: [MenuOption.DUEL, MenuOption.STORY, MenuOption.ARCADE, MenuOption.SURVIVAL, MenuOption.LOCAL, MenuOption.BACK],
-  [MenuOption.LEARN]: [MenuOption.TUTORIAL, MenuOption.TRAINING, MenuOption.CHALLENGE, MenuOption.CONTROLS, MenuOption.BACK],
-  [MenuOption.EXTRAS]: [MenuOption.GALLERY, MenuOption.BACK],
+  [MenuOption.LEARN]: [MenuOption.TUTORIAL, MenuOption.DRILLS, MenuOption.TRAINING, MenuOption.CHALLENGE, MenuOption.CONTROLS, MenuOption.BACK],
+  [MenuOption.EXTRAS]: [MenuOption.GALLERY, MenuOption.TRIALS, MenuOption.STORY_GALLERY, MenuOption.BACK],
 });
 
 const STATE_TARGETS = {
@@ -46,6 +49,9 @@ const STATE_TARGETS = {
   [MenuOption.TUTORIAL]: [StateId.DUEL, { mode: DuelMode.TUTORIAL }],
   [MenuOption.CHALLENGE]: [StateId.DUEL, { mode: DuelMode.CHALLENGE }],
   [MenuOption.GALLERY]: [StateId.DUEL, { mode: DuelMode.GALLERY }],
+  [MenuOption.DRILLS]: [StateId.DRILL_SELECT, {}],
+  [MenuOption.TRIALS]: [StateId.TRIAL_SELECT, {}],
+  [MenuOption.STORY_GALLERY]: [StateId.STORY_GALLERY, {}],
 };
 
 const OVERLAYS = {

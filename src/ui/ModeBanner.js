@@ -1,7 +1,7 @@
 import { Action } from '../config/controlsConfig.js';
 import { textStyles } from '../config/themeConfig.js';
 import { layout, texts } from '../config/uiConfig.js';
-import { formatText } from './formatText.js';
+import { formatSeconds, formatText } from './formatText.js';
 import { formatActionKeys } from './keyLabels.js';
 
 export const BannerKind = Object.freeze({
@@ -10,6 +10,8 @@ export const BannerKind = Object.freeze({
   ARCADE: 'arcade',
   SURVIVAL: 'survival',
   STORY: 'story',
+  DRILL: 'drill',
+  TRIAL: 'trial',
 });
 
 function createKeyNames(bindings) {
@@ -18,6 +20,7 @@ function createKeyNames(bindings) {
     heavy: formatActionKeys(bindings, Action.HEAVY_ATTACK),
     block: formatActionKeys(bindings, Action.BLOCK),
     dodge: formatActionKeys(bindings, Action.DODGE),
+    evade: formatActionKeys(bindings, Action.EVADE),
     special: formatActionKeys(bindings, Action.SPECIAL),
     left: formatActionKeys(bindings, Action.MOVE_LEFT),
     right: formatActionKeys(bindings, Action.MOVE_RIGHT),
@@ -47,28 +50,33 @@ export class ModeBanner {
       this.describeStory();
       return;
     }
-    const signature = this.kind === BannerKind.TUTORIAL
+    if (this.kind === BannerKind.TRIAL) {
+      this.describeTrial();
+      return;
+    }
+    const isSteps = this.kind === BannerKind.TUTORIAL || this.kind === BannerKind.DRILL;
+    const signature = isSteps
       ? `${this.director.index}:${this.director.progress}`
       : `${Math.ceil(this.director.timeLeft)}:${this.director.score}`;
     if (signature === this.signature) {
       return;
     }
     this.signature = signature;
-    if (this.kind === BannerKind.TUTORIAL) {
-      this.describeTutorial();
+    if (isSteps) {
+      this.describeTutorial(this.kind === BannerKind.DRILL ? texts.drills.steps : texts.tutorial.steps);
     } else {
       this.describeChallenge();
     }
   }
 
-  describeTutorial() {
+  describeTutorial(stepTexts) {
     const { step, progress } = this.director;
     if (!step) {
       this.title = '';
       this.detail = '';
       return;
     }
-    this.title = formatText(texts.tutorial.steps[step.id], this.keys);
+    this.title = formatText(stepTexts[step.id], this.keys);
     this.detail = formatText(texts.tutorial.progress, {
       step: this.director.index + 1,
       steps: this.director.steps.length,
@@ -111,6 +119,16 @@ export class ModeBanner {
     this.signature = 'story';
     this.title = formatText(texts.story.banner, { number: this.director.number, title: this.director.title.toUpperCase() });
     this.detail = '';
+  }
+
+  describeTrial() {
+    const tenths = Math.floor(this.director.clock() * 10);
+    if (`${tenths}` === this.signature) {
+      return;
+    }
+    this.signature = `${tenths}`;
+    this.title = formatText(texts.trials.banner, { title: this.director.title.toUpperCase() });
+    this.detail = formatText(texts.trials.clock, { time: formatSeconds(tenths / 10) });
   }
 
   describeChallenge() {

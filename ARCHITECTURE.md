@@ -59,6 +59,10 @@ src/
     StoryState.js           ✅ hub da História: continuar, evoluir, nova campanha
     ProtagonistState.js     ✅ criação do protagonista em seis passos e distribuição de pontos
     DialogueState.js        ✅ falas em sequência sobre a arena ou sobre o duelo; ao fim troca para `params.next`
+    ListScreenState.js      ✅ base das telas de lista com detalhe à direita (2.15)
+    DrillSelectState.js     ✅ lista dos treinos guiados
+    TrialSelectState.js     ✅ lista dos desafios, com recordes
+    StoryGalleryState.js    ✅ galeria da História: encontros e finais vistos
   arenas/                   ✅ dados visuais de arenas, sem regras de gameplay
     arenaData.js            ✅ camadas estáticas e partículas ambientes por arena
   characters/               ✅ dados e criação de personagens
@@ -73,7 +77,8 @@ src/
   modes/                    ✅ regras de modos de jogo, puras e testáveis (sem render)
     DuelResult.js           ✅ resultado independente dos Fighters
     duelOutcomes.js         ✅ resultado + escada -> tela e patch de progresso
-    TutorialDirector.js     ✅ passos do tutorial: objetivo, progresso e comportamento do boneco
+    TutorialDirector.js     ✅ passos do tutorial e dos treinos guiados: objetivo, progresso e comportamento do boneco
+    challenges.js           ✅ desafios: parâmetros do duelo, degrau da escada e recorde
     GalleryDirector.js      ✅ seleção da galeria, tiers e persistência via callback
     galleryCatalog.js       ✅ catálogo gerado dos poderes e técnicas; valida settings.gallery
     GalleryScene.js         ✅ ciclos roteirizados sobre a DuelSimulation e reset completo
@@ -167,6 +172,8 @@ src/
     uiConfig.js             ✅ textos da interface (clonados do locale) e layout das telas
     locales/                ✅ ptBR.js e en.js: todo texto de tela por idioma, mesmas chaves
     tutorialConfig.js       ✅ passos do tutorial (objetivo, contagem, boneco) e regras do desafio de parry
+    drillsConfig.js         ✅ treinos guiados (2.15): passos por treino
+    challengesConfig.js     ✅ desafios (2.15): lutadores, arena, dificuldade, regras, vida e seed
     aiConfig.js             ✅ perfis, dificuldades e percepção da IA
     audioConfig.js          ✅ volumes, receitas de som, zumbido e música
     movesConfig.js          ✅ golpes por personagem: base de atributos, tipo, pose e cancelsInto
@@ -1466,3 +1473,11 @@ Desenho só em `rendering/finisherRenderer.js` e `fighterRenderer.js`: `getSever
 `CombatSystem.deflect` encerra o contato de um golpe sem mudar o estado: marca `hasHit`, `attackConnected` e `lungeApplied`, liga `combat.freeRecovery` e aplica um empurrão curto para longe do oponente. É usado no clash entre dois rápidos (`clash.lightPushback`, em `gameConfig.combat`) e no parry que não desequilibra (qualquer parry num rápido e o parry normal num forte, com `parry.attackerRecoil`). Só o parry perfeito num forte usa o caminho antigo (`clearAttack`, `STAGGERED` por `perfectStagger`, `riposteTime`). Clash com um forte mantém `recoil` e a disputa da 2.5.
 
 `releaseFreeRecovery` roda em `startActions` depois de `tryAttackChain`: na recuperação de um golpe com `freeRecovery`, qualquer ação no buffer ou o bloqueio segurado encerra o golpe e devolve o lutador a `IDLE`, de onde a ação sai pelo fluxo normal; o próximo rápido do combo continua saindo pela rota `cancelsInto`. `clearAttack` zera a flag. Eventos `clash` levam `light` e eventos de parry levam `staggered`, para a apresentação distinguir os casos (a faixa de cinema só pulsa num parry perfeito que desequilibra). `parry.stagger` saiu dos 12 arquétipos, porque o parry normal não desequilibra mais.
+
+## Treinos guiados, desafios e galeria da História (2.15)
+
+- **Telas de lista.** `ListScreenState` monta uma `MenuList` com rolagem a partir de `buildItems()` (cada item com `label`, `locked` e `detail`: nome, linhas e destaque), acrescenta Voltar e chama `confirmItem` nos itens liberados. `DrillSelectState`, `TrialSelectState` e `StoryGalleryState` só constroem os itens e decidem o destino. `Esc` volta ao menu, que reabre no grupo de onde o jogador saiu.
+- **Treinos guiados.** `DuelMode.DRILL` é um modo com boneco (sem rounds) com exaustão, ferimento, disputa e finalizações em `combatRulesConfig.modes`, sem Poderes. O `DuelState` cria um `TutorialDirector` com `drillsConfig.drills[params.drill].steps` e a faixa `BannerKind.DRILL`, que lê `texts.drills.steps`. O diretor aceita `goal.type: 'streak'` (lê `player.combat[goal.field]`), `role: 'either'` e `resetOn` (um evento listado com o jogador como defensor zera o progresso). O resultado oferece o próximo treino e volta à lista.
+- **Desafios.** `createTrialParams` monta `{ mode: TRIAL, trial, rules, seed }`; as regras vêm de `challengesConfig.rules` com `powers` do desafio, então as Opções de Poderes e dificuldade não pesam. No `DuelState`, `getTrialStage` vira mais um degrau da escada (adversário, dificuldade, arena), com `roundsToWin` 1, `params.seed` no gerador do duelo (IA e efeitos) e `applyStartHealth` aplicando a vida inicial no começo e em cada round. A faixa `BannerKind.TRIAL` mostra o cronômetro do duelo. `resolveDuelOutcome` desvia para `resolveTrialOutcome`, que grava `settings.challengeRecords[id].time` só quando melhora (`recordTrialTime`).
+- **Galeria da História.** `resolveStoryOutcome` grava `settings.storySeen` (`markStorySeen`: encontro vencido e final alcançado, com `alignment` e `name` do protagonista). `buildStoryGallery` lista os encontros de `storyConfig.encounters` e os finais, com a testemunha de `storySeen` ou, para quem jogou antes da 2.15, da História em andamento (`completed`, `ending`). Um item visto abre o `DialogueState` com as falas resolvidas pela testemunha, sobre a arena do encontro (ou do encontro que leva ao final), e volta à galeria.
+

@@ -1,7 +1,16 @@
 import { getChainStep } from '../combat/attackPhases.js';
 
+const EITHER_ROLE = 'either';
+
+function hasRole(goal, event, player) {
+  if (goal.role === EITHER_ROLE) {
+    return event.attacker === player || event.defender === player;
+  }
+  return event[goal.role] === player;
+}
+
 function matchesGoal(goal, event, player) {
-  if (!goal.events.includes(event.type) || event[goal.role] !== player) {
+  if (!goal.events.includes(event.type) || !hasRole(goal, event, player)) {
     return false;
   }
   if (goal.attackTypes && !goal.attackTypes.includes(event.attackType)) {
@@ -33,6 +42,10 @@ export class TutorialDirector {
 
   update(dt, player) {
     const { step } = this;
+    if (step?.goal.type === 'streak') {
+      this.updateStreak(step, player);
+      return;
+    }
     if (!step || step.goal.type !== 'move' || player.intent.moveX === 0) {
       return;
     }
@@ -46,9 +59,20 @@ export class TutorialDirector {
     }
   }
 
+  updateStreak(step, player) {
+    this.progress = Math.min(step.count, player.combat[step.goal.field]);
+    if (this.progress >= step.count) {
+      this.advance();
+    }
+  }
+
   handleEvents(events, player) {
     for (const event of events) {
       const { step } = this;
+      if (step?.goal.resetOn?.includes(event.type) && event.defender === player) {
+        this.progress = 0;
+        continue;
+      }
       if (step && step.goal.type === 'event' && matchesGoal(step.goal, event, player)) {
         this.progress += 1;
         if (this.progress >= step.count) {

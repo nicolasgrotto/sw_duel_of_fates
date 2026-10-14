@@ -10,7 +10,7 @@ it('enables combat capabilities only in their approved modes', () => {
   for (const mode of Object.values(DuelMode)) {
     const rules = createDuelRules(mode, {}, powersConfig.modes);
     const enabled = ['versus', 'local', 'training'].includes(mode);
-    const taught = enabled || mode === 'tutorial';
+    const taught = enabled || mode === 'tutorial' || mode === 'drill';
     assert.equal(rules.exhaustion, taught);
     assert.equal(rules.wounds, taught);
     assert.equal(rules.focusEvade, enabled || mode === 'gallery');

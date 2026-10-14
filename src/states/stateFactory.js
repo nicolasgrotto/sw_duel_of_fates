@@ -1,6 +1,7 @@
 import { CharacterSelectState } from './CharacterSelectState.js';
 import { ControlsState } from './ControlsState.js';
 import { DialogueState } from './DialogueState.js';
+import { DrillSelectState } from './DrillSelectState.js';
 import { DuelState } from './DuelState.js';
 import { GameOverState } from './GameOverState.js';
 import { IntroState } from './IntroState.js';
@@ -12,7 +13,9 @@ import { PauseState } from './PauseState.js';
 import { ProtagonistState } from './ProtagonistState.js';
 import { ReplayState } from './ReplayState.js';
 import { StateId } from './stateIds.js';
+import { StoryGalleryState } from './StoryGalleryState.js';
 import { StoryState } from './StoryState.js';
+import { TrialSelectState } from './TrialSelectState.js';
 
 const stateClasses = {
   [StateId.MENU]: MenuState,
@@ -29,6 +32,9 @@ const stateClasses = {
   [StateId.PROTAGONIST]: ProtagonistState,
   [StateId.DIALOGUE]: DialogueState,
   [StateId.INTRO]: IntroState,
+  [StateId.DRILL_SELECT]: DrillSelectState,
+  [StateId.TRIAL_SELECT]: TrialSelectState,
+  [StateId.STORY_GALLERY]: StoryGalleryState,
 };
 
 export function createState(id, game, params) {

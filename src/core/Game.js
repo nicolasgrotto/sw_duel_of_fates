@@ -4,6 +4,7 @@ import { aiConfig } from '../config/aiConfig.js';
 import { audioConfig } from '../config/audioConfig.js';
 import { loadSettings, loadStory, saveSettings } from './settingsStorage.js';
 import { storyConfig } from '../config/storyConfig.js';
+import { createStorySeen } from '../modes/story/storyGallery.js';
 import { sanitizeStoryRun } from '../modes/story/storyRun.js';
 import { Action, keyBindings, keyboardPresets, keyboardPresetOrder, remappableActions, twoPlayerBindings } from '../config/controlsConfig.js';
 import { createCustomBindings, sanitizeCustomBindings } from './keyBindings.js';
@@ -36,7 +37,7 @@ export class Game {
     this.touchControls = new TouchControls(this.touch);
     this.states = new StateMachine();
     this.settings = loadSettings(
-      { language: defaultLanguage, keyboardPreset: 'classic', difficulty: aiConfig.defaultDifficulty, reducedEffects: coarsePointer, sound: true, music: true, parryChallengeBest: 0, arcadeCleared: [], finalReplay: true, finishers: true, lastSelection: {}, loadoutModes: {}, customLoadouts: {}, customBindings: {}, unlocks: {}, survivalBest: 0, powers: true, gallery: galleryConfig.defaults, bladeLockHold: [false, false], unlockedCharacters: [], unlockedVariants: {} },
+      { language: defaultLanguage, keyboardPreset: 'classic', difficulty: aiConfig.defaultDifficulty, reducedEffects: coarsePointer, sound: true, music: true, parryChallengeBest: 0, arcadeCleared: [], finalReplay: true, finishers: true, lastSelection: {}, loadoutModes: {}, customLoadouts: {}, customBindings: {}, unlocks: {}, survivalBest: 0, powers: true, gallery: galleryConfig.defaults, bladeLockHold: [false, false], unlockedCharacters: [], unlockedVariants: {}, challengeRecords: {}, storySeen: createStorySeen(), prototypes: { bladeLockRhythm: false, competitiveHold: false } },
       globalThis.localStorage,
       gameConfig.settingsStorageKey,
       { language: languageIds, difficulty: aiConfig.difficultyOrder, keyboardPreset: keyboardPresetOrder },

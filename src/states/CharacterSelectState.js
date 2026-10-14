@@ -26,6 +26,7 @@ import { MenuList } from '../ui/MenuList.js';
 import { DuelMode } from './duelModes.js';
 import { GameState } from './GameState.js';
 import { StateId } from './stateIds.js';
+import { drawFitted } from '../ui/fittedText.js';
 
 export const SelectStep = Object.freeze({
   PLAYER: 'player',
@@ -39,19 +40,6 @@ const VARIANT_STYLES = { light: textStyles.galleryCategoryAurora, dark: textStyl
 const SIDE_CATEGORIES = { light: 'aurora', dark: 'eclipse' };
 const SINGLE_PICK_MODES = new Set([DuelMode.ARCADE, DuelMode.SURVIVAL, DuelMode.TRAINING]);
 const CUSTOM_LOADOUT_MODES = new Set([DuelMode.VERSUS, DuelMode.LOCAL, DuelMode.TRAINING]);
-
-function drawFitted(renderer, text, x, y, style, maxWidth) {
-  const scale = Math.min(1, maxWidth / renderer.measureText(text, style));
-  if (scale === 1) {
-    renderer.text(text, x, y, style);
-    return;
-  }
-  renderer.save();
-  renderer.translate(x, y);
-  renderer.scale(scale, 1);
-  renderer.text(text, 0, 0, style);
-  renderer.restore();
-}
 
 export function getLoadoutKey(id, variant) {
   return variant ? `${id}.${variant}` : id;

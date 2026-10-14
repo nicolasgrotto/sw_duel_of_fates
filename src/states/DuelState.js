@@ -25,6 +25,9 @@ import { ENCODED_INTENT_RANGE, IntentRecorder, encodeIntent } from '../controlle
 import { formatIntent } from '../ui/trainingInputs.js';
 import { DummyController } from '../controllers/DummyController.js';
 import { tutorialConfig } from '../config/tutorialConfig.js';
+import { drillsConfig } from '../config/drillsConfig.js';
+import { challengesConfig } from '../config/challengesConfig.js';
+import { getTrialStage } from '../modes/challenges.js';
 import { ParryChallenge } from '../modes/ParryChallenge.js';
 import { TutorialDirector } from '../modes/TutorialDirector.js';
 import { GalleryDirector } from '../modes/GalleryDirector.js';
@@ -83,16 +86,17 @@ export class DuelState extends GameState {
     this.arcadeStage = this.mode === DuelMode.ARCADE ? getArcadeStage(this.params.arcade, gameConfig.arcade, gameConfig.duel.arenaOrder) : null;
     this.survivalStage = this.mode === DuelMode.SURVIVAL ? this.createSurvivalStage() : null;
     this.storyStage = this.mode === DuelMode.STORY ? getStoryStage(this.params.story, storyConfig, aiConfig.difficultyOrder) : null;
-    this.ladderStage = this.arcadeStage ?? this.survivalStage ?? this.storyStage;
-    this.ladderRun = this.params.arcade ?? this.params.survival ?? this.params.story ?? null;
-    this.roundsToWin = this.survivalStage ? 1 : this.storyStage ? storyConfig.roundsToWin : gameConfig.duel.roundsToWin;
+    this.trialStage = this.mode === DuelMode.TRIAL ? getTrialStage(this.params.trial, challengesConfig) : null;
+    this.ladderStage = this.arcadeStage ?? this.survivalStage ?? this.storyStage ?? this.trialStage;
+    this.ladderRun = this.params.arcade ?? this.params.survival ?? this.params.story ?? this.params.trial ?? null;
+    this.roundsToWin = this.survivalStage || this.trialStage ? 1 : this.storyStage ? storyConfig.roundsToWin : gameConfig.duel.roundsToWin;
     this.playerCharacterData = this.storyStage ? createProtagonistCharacter(this.params.story.protagonist, storyConfig, this.params.story.loadout) : null;
     this.playerCharacter = this.ladderStage ? this.ladderRun.playerCharacter : (this.params.playerCharacter ?? gameConfig.duel.playerCharacter);
     this.opponentCharacter = this.ladderStage ? this.ladderStage.opponentCharacter : (this.params.opponentCharacter ?? gameConfig.duel.opponentCharacter);
     this.difficultyId = this.ladderStage ? this.ladderStage.difficulty : this.game.settings.difficulty;
     this.rules = this.params.rules ?? createDuelRules(this.mode, this.game.settings, powersConfig.modes);
     this.enraged = false;
-    this.random = createRandom(createRandomSeed());
+    this.random = createRandom(this.params.seed ?? createRandomSeed());
     if (this.isLocal) {
       this.game.input.setBindings(twoPlayerBindings.p1);
     }
@@ -105,9 +109,7 @@ export class DuelState extends GameState {
     this.fighters = this.participants.map((participant) => participant.fighter);
     this.markMatchPoints();
     this.game.touch?.setFeatures(this.rules.powers ? this.player.stats.power.loadout?.fourth ? ['powers', 'fourthPower'] : ['powers'] : []);
-    if (this.survivalStage) {
-      this.applySurvivalHealth();
-    }
+    this.applyStartHealth();
     this.simulation = new DuelSimulation({
       arena: this.arena,
       fighters: this.fighters,
@@ -164,6 +166,12 @@ export class DuelState extends GameState {
     } else if (this.mode === DuelMode.CHALLENGE) {
       this.director = new ParryChallenge(tutorialConfig.challenge);
       this.banner = new ModeBanner(BannerKind.CHALLENGE, this.director, bindings);
+    } else if (this.mode === DuelMode.DRILL) {
+      this.director = new TutorialDirector(drillsConfig.drills[this.params.drill].steps);
+      this.banner = new ModeBanner(BannerKind.DRILL, this.director, bindings);
+    } else if (this.trialStage) {
+      this.banner = new ModeBanner(BannerKind.TRIAL, { title: texts.trials.names[this.trialStage.id], clock: () => this.duelTime }, bindings);
+      this.banner.update();
     } else if (this.ladderStage) {
       const kind = this.storyStage ? BannerKind.STORY : this.survivalStage ? BannerKind.SURVIVAL : BannerKind.ARCADE;
       const title = this.storyStage ? storyTexts.encounters[this.storyStage.encounterId].title : '';
@@ -229,6 +237,10 @@ export class DuelState extends GameState {
   }
 
   showModeResult() {
+    if (this.mode === DuelMode.DRILL) {
+      this.showDrillResult();
+      return;
+    }
     if (this.mode === DuelMode.TUTORIAL) {
       this.game.pushState(StateId.GAME_OVER, {
         duelParams: this.params,
@@ -254,6 +266,27 @@ export class DuelState extends GameState {
       rematchLabel: texts.tutorial.tryAgain,
       rematchParams: this.params,
     });
+  }
+
+  showDrillResult() {
+    const { order } = drillsConfig;
+    const next = order[order.indexOf(this.params.drill) + 1];
+    this.game.pushState(StateId.GAME_OVER, {
+      duelParams: this.params,
+      title: texts.drills.doneTitle,
+      subtitle: texts.drills.names[this.params.drill],
+      summary: '',
+      rematchLabel: next ? texts.drills.next : texts.drills.again,
+      rematchParams: next ? { mode: DuelMode.DRILL, drill: next } : this.params,
+      menuLabel: texts.drills.backToList,
+      menuState: StateId.DRILL_SELECT,
+    });
+  }
+
+  updateTrialBanner() {
+    if (this.trialStage && this.isPlaying()) {
+      this.banner.update();
+    }
   }
 
   keepFightersAlive() {
@@ -319,6 +352,14 @@ export class DuelState extends GameState {
     }
   }
 
+  applyStartHealth() {
+    if (this.survivalStage) {
+      this.applySurvivalHealth();
+    } else if (this.trialStage) {
+      this.player.health = this.player.stats.maxHealth * this.trialStage.playerHealth;
+    }
+  }
+
   shouldShowReplay() {
     return !this.survivalStage && !this.replayShown && this.game.settings.finalReplay !== false && this.replayBuffer.hasReplay();
   }
@@ -336,9 +377,7 @@ export class DuelState extends GameState {
     this.fighters[1].resetForRound(centerX + half, -1);
     this.markMatchPoints();
     this.simulation.projectiles.clear();
-    if (this.survivalStage) {
-      this.applySurvivalHealth();
-    }
+    this.applyStartHealth();
     this.clearCapturedInputs();
     if (this.usesDummy) {
       this.opponentController.attackTimer = 0;
@@ -468,6 +507,7 @@ export class DuelState extends GameState {
 
     this.updateTrainingStatus();
     this.updateDirector(dt);
+    this.updateTrialBanner();
     this.updateBossEnrage();
     for (const ambient of this.ambients) {
       ambient.update(dt);
