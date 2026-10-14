@@ -804,3 +804,12 @@ Especificação aprovada pelo autor. Números marcados como **inicial** são pon
 Fora do ciclo: Cataclismo e Redemoinho (repetem a chuva de impactos); Suspensão Suprema no backlog (repete o Congelar e levaria a combo garantido entre jogadores).
 
 **Escolha de poderes na seleção (2.13).** Opção **Base** (loadout do personagem, padrão) ou **Personalizar**. Personagens Aurora escolhem entre Fluxo comum e Aurora; Eclipse, entre Fluxo comum e Eclipse. Valem os requisitos de Fluxo (por exemplo, Tempestade exige Fluxo 6) e não há poder repetido. Só em Duelar, 2 Jogadores e Treino; Arcade, Sobrevivência e História usam o loadout base. O loadout escolhido entra no replay e no simulador.
+
+## 28. Treinos guiados, desafios, galeria da História e protótipos da disputa (v3, etapa 2.15)
+
+Regras completas em [versions/v3.md](versions/v3.md) → 2.15.
+
+- **Treinos guiados** (Aprender): Esquiva, Exaustão e ferimento, Disputa. Boneco, sem rounds, passos com meta e progresso, como o tutorial; Poderes desligados, consequências da v3 ligadas.
+- **Desafios** (Extras): quatro duelos com lutadores, arena, dificuldade, regras e seed fixas, um round, recorde do menor tempo de vitória salvo no navegador. Não leem as Opções de Poderes nem de dificuldade.
+- **Galeria da História** (Extras): encontros vencidos e finais alcançados, revistos com as falas daquela vez; o que não foi visto aparece como `???`.
+- **Protótipos** (Opções, desligados): *disputa no ritmo* (toque no compasso vale +1, fora dele −1) e *segurar competitivo* (segurar dá 9 toques por segundo). A regra da 2.5 continua a padrão até decisão do autor.

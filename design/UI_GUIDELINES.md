@@ -110,6 +110,23 @@ NOME ESQUERDA                                         NOME DIREITA
 - No duelo, a linha do topo (mesma posição do tutorial) mostra a luta atual em `subtitle`.
 - Resultado de cada luta: a mesma tabela do duelo; a primeira opção é **Próxima luta** (vitória) ou **Tentar de novo** (derrota). No fim: "ARCADE CONCLUÍDO", em modo resumo, com **Jogar de novo**.
 
+### Telas de lista (2.15): treinos, desafios e galeria da História
+
+Uma tela só (`ListScreenState`) para as três listas, no visual do menu:
+
+- **Título** (`heading`) em y=90.
+- **Lista à esquerda** (centro x=360), a partir de y=180, espaçamento 42, até 10 linhas com rolagem e setas, como a `MenuList`. Última linha: **Voltar**.
+- **Detalhe à direita** (centro x=860): nome do item (`subtitle`, y=190) e até seis linhas (`hint`, a partir de y=232, espaçamento 28), comprimidas na horizontal até 520 px. Na lista de desafios, a última linha é o recorde em `accentHint` (`Recorde: 42,3 s` ou `Sem recorde`).
+- **Item bloqueado** (galeria): rótulo `???` em `hint` esmaecido; o detalhe diz só onde ele se libera (`Vença este encontro na História`, `Alcance este final`), sem nomes nem títulos. Confirmar um item bloqueado não faz nada.
+- **Rodapé** (`hint`) em y=690 com as teclas, igual ao menu. `Esc` volta ao menu, no mesmo grupo.
+- Toque: a mesma área da `MenuList`; o botão Voltar do toque volta ao menu.
+
+Treinos guiados usam a faixa do tutorial (instrução e progresso no topo). Desafios usam a faixa das escadas com o nome do desafio e, abaixo, o tempo decorrido (`hint`). O resultado dos dois segue a tela de resultado do tutorial e do desafio de parry (título, frase, resumo em uma linha); a primeira opção leva ao próximo treino ou a tentar de novo.
+
+### Protótipos nas Opções (2.15)
+
+Duas linhas no fim da lista, antes de Voltar: `Protótipo · disputa no ritmo: Ligado/Desligado` e `Protótipo · segurar competitivo: Ligado/Desligado`. Com elas a lista das Opções passa a rolar (até 11 linhas visíveis, setas como na seleção). Na disputa com o ritmo ligado, uma elipse fina em `text`, alpha até 0,5, fecha sobre o ponto das lâminas a cada compasso (0,3 s) e some no instante do compasso; toque no compasso solta o brilho curto das pressões de sempre, toque fora não solta nada.
+
 ### Tutorial e desafio
 
 - Uma linha de instrução no topo, abaixo das barras (`subtitle`, centralizada), com as teclas do preset ativo. Embaixo dela, o progresso do passo (`hint`, ex.: `1 / 2`).
