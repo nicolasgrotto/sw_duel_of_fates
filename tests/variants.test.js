@@ -25,7 +25,7 @@ function storage(raw) {
 }
 
 describe('foretold variants', () => {
-  it('shares attributes, moves and appearance, with independent alignment and four-slot loadouts', () => {
+  it('shares attributes, moves and appearance except the hilt, with independent alignment and four-slot loadouts', () => {
     const aurora = createFighter('foretold', spawn);
     const eclipse = createFighter('foretold', spawn, { variant: 'eclipse' });
     assert.equal(aurora.variant, 'aurora');
@@ -36,7 +36,8 @@ describe('foretold variants', () => {
     assert.deepEqual(Object.values(eclipse.stats.power.loadout).map(power => power.id), ['lightning', 'pull', 'choke', 'arsenal']);
     assert.deepEqual(eclipse.stats.attributes, aurora.stats.attributes);
     assert.deepEqual(eclipse.moves, aurora.moves);
-    assert.deepEqual(eclipse.appearance, aurora.appearance);
+    assert.deepEqual({ ...eclipse.appearance, hiltStyle: null }, { ...aurora.appearance, hiltStyle: null });
+    assert.deepEqual([aurora.appearance.hiltStyle, eclipse.appearance.hiltStyle], ['ringed', 'curved']);
     for (const character of Object.values(characters)) {
       assert.equal(character.powerSlots, character.variants ? 4 : 3);
       for (const variant of Object.values(character.variants ?? {})) {

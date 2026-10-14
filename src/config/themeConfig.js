@@ -137,6 +137,7 @@ export const colors = {
   heronHair: '#4a3a2c',
   foretoldBoots: '#1d2028',
   elderBeard: '#d8d2c2',
+  hiltGrip: '#4a4e58',
 };
 
 export const textStyles = {

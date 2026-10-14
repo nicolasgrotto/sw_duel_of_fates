@@ -288,6 +288,13 @@ Peças acrescentadas para o resto do elenco: **rabo de cavalo** (`ponytail`, cai
 - **Predestinado:** cinto com fivela e botas escuras (`foretoldBoots`), em todas as variantes e trajes.
 - **Ancião:** barba longa branca (`elderBeard`) e mangas largas.
 
+**Cabos** (`hiltStyle`, desenho em `saberRenderer`, geometria em `saberStyle.hilt`): o cabo tem uns 10 px no jogo, então os detalhes são discretos e em dois tons (`saberHilt` e `hiltGrip`). `grip`: empunhadura escura no meio do cabo. `ringed`: empunhadura e um anel no emissor. `guard`: barra curta atravessada na base da lâmina. `bands`: quatro faixas escuras ao longo do cabo longo. `center`: faixa escura e dois anéis marcando o centro de um cabo duplo. `curved`: o pomo dobra para baixo. Sem `hiltStyle`, o cabo continua liso.
+
+- Guardião, Garça, Ancião, Soberano e Predestinado Aurora: `ringed`.
+- Sombra, Sombra Desperta e Predestinado Eclipse: `curved` (a variante troca o cabo).
+- Bastião, Vespa, Brasa e Eco: `grip`.
+- Forja: `guard`. Haste: `bands`. Ceifador: `center`. Espelho: liso.
+
 ### Ceifador (v2.21)
 
 Lutador do Eclipse com lâmina dupla de cabo único: uma lâmina sai de cada ponta do cabo. Desenho original; a referência é o arquétipo do duelista acrobático de arma dupla, sem rosto, marcas, chifres ou traje copiados de franquia.

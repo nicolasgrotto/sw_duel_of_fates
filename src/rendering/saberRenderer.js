@@ -16,6 +16,15 @@ function createBladeGeometry() {
   };
 }
 
+const HiltStyle = Object.freeze({
+  GRIP: 'grip',
+  RINGED: 'ringed',
+  GUARD: 'guard',
+  BANDS: 'bands',
+  CENTER: 'center',
+  CURVED: 'curved',
+});
+
 const blade = createBladeGeometry();
 const secondBlade = createBladeGeometry();
 
@@ -114,11 +123,58 @@ function getGlowStrength(fighter) {
   return saberStyle.staggerFlickerMin + (1 - saberStyle.staggerFlickerMin) * wave;
 }
 
+function hiltSegment(renderer, geometry, from, to, color, width) {
+  const { hiltStartX: x0, hiltStartY: y0, baseX: x1, baseY: y1 } = geometry;
+  renderer.line(x0 + (x1 - x0) * from, y0 + (y1 - y0) * from, x0 + (x1 - x0) * to, y0 + (y1 - y0) * to, color, width);
+}
+
+function hiltCrossbar(renderer, geometry, at, halfLength, color, width) {
+  const { hiltStartX: x0, hiltStartY: y0, baseX: x1, baseY: y1 } = geometry;
+  const length = Math.hypot(x1 - x0, y1 - y0) || 1;
+  const normalX = -(y1 - y0) / length;
+  const normalY = (x1 - x0) / length;
+  const x = x0 + (x1 - x0) * at;
+  const y = y0 + (y1 - y0) * at;
+  renderer.line(x - normalX * halfLength, y - normalY * halfLength, x + normalX * halfLength, y + normalY * halfLength, color, width);
+}
+
+function drawCurvedPommel(renderer, geometry, width) {
+  const { hiltStartX: x0, hiltStartY: y0, baseX: x1, baseY: y1 } = geometry;
+  const { curveLength, curveDrop } = saberStyle.hilt;
+  const length = Math.hypot(x1 - x0, y1 - y0) || 1;
+  const normalX = -(y1 - y0) / length;
+  const normalY = (x1 - x0) / length;
+  const endX = x0 - (x1 - x0) * curveLength + normalX * length * curveDrop;
+  const endY = y0 - (y1 - y0) * curveLength + normalY * length * curveDrop;
+  renderer.line(x0, y0, endX, endY, colors.saberHilt, width);
+}
+
+function drawHiltDetail(renderer, geometry, style, width) {
+  const hilt = saberStyle.hilt;
+  if (style === HiltStyle.GRIP || style === HiltStyle.RINGED) {
+    hiltSegment(renderer, geometry, hilt.grip[0], hilt.grip[1], colors.hiltGrip, width);
+  }
+  if (style === HiltStyle.RINGED) {
+    hiltCrossbar(renderer, geometry, hilt.ringAt, width * hilt.ringLength / 2, colors.hiltGrip, hilt.ringWidth);
+  } else if (style === HiltStyle.GUARD) {
+    hiltCrossbar(renderer, geometry, hilt.guardAt, width * hilt.guardLength / 2, colors.saberHilt, width * hilt.guardWidth);
+  } else if (style === HiltStyle.BANDS) {
+    for (const at of hilt.bands) hiltSegment(renderer, geometry, at, at + hilt.bandLength, colors.hiltGrip, width);
+  } else if (style === HiltStyle.CENTER) {
+    hiltSegment(renderer, geometry, hilt.centerBand[0], hilt.centerBand[1], colors.hiltGrip, width);
+    for (const at of hilt.centerRings) hiltCrossbar(renderer, geometry, at, width * hilt.ringLength / 2, colors.hiltGrip, hilt.ringWidth);
+  } else if (style === HiltStyle.CURVED) {
+    drawCurvedPommel(renderer, geometry, width);
+  }
+}
+
 function drawBlade(renderer, geometry, fighter, pose, flare) {
-  const { saberColor, bladeWidthScale } = fighter.appearance;
+  const { saberColor, bladeWidthScale, hiltStyle } = fighter.appearance;
+  const hiltWidth = saberStyle.hiltWidth * bladeWidthScale;
 
   renderer.save();
-  renderer.line(geometry.hiltStartX, geometry.hiltStartY, geometry.baseX, geometry.baseY, colors.saberHilt, saberStyle.hiltWidth * bladeWidthScale);
+  renderer.line(geometry.hiltStartX, geometry.hiltStartY, geometry.baseX, geometry.baseY, colors.saberHilt, hiltWidth);
+  if (hiltStyle) drawHiltDetail(renderer, geometry, hiltStyle, hiltWidth);
   if (!isBladeLit(pose)) {
     renderer.restore();
     return;

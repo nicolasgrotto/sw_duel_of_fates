@@ -1,5 +1,5 @@
 self.offlineResources = {
-  version: 'v0ba0f8b67c51c5dd',
+  version: 'vc19609b3fcadb78a',
   files: [
     'index.html',
     'manifest.webmanifest',

@@ -238,6 +238,7 @@ Cores compartilhadas (em `themeConfig`):
 | `heronHair` | `#4a3a2c` | coque da Garça |
 | `foretoldBoots` | `#1d2028` | botas do Predestinado |
 | `elderBeard` | `#d8d2c2` | barba do Ancião |
+| `hiltGrip` | `#4a4e58` | empunhadura, anéis e faixas dos cabos (2.22) |
 
 ## Sabre
 

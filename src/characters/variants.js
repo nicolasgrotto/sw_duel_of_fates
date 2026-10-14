@@ -2,7 +2,8 @@ export function resolveCharacterVariant(character, variantId = character.default
   if (!variantId && !character.variants) return { character, variant: null };
   const variant = character.variants?.[variantId];
   if (!variant) throw new Error(`Unknown variant: ${character.id}=${variantId}`);
-  return { character: { ...character, alignment: variant.alignment, loadout: variant.loadout, powerSlots: variant.powerSlots ?? character.powerSlots ?? 3 }, variant: variantId };
+  const appearance = variant.hiltStyle ? { ...character.appearance, hiltStyle: variant.hiltStyle } : character.appearance;
+  return { character: { ...character, appearance, alignment: variant.alignment, loadout: variant.loadout, powerSlots: variant.powerSlots ?? character.powerSlots ?? 3 }, variant: variantId };
 }
 
 export function sanitizeVariantUnlocks(raw, characters) {

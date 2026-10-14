@@ -863,6 +863,21 @@ export const groundShadow = {
 
 export const saberStyle = {
   hiltWidth: 4,
+  hilt: {
+    grip: [0.15, 0.55],
+    ringAt: 0.86,
+    ringLength: 1.9,
+    ringWidth: 1.5,
+    guardAt: 0.97,
+    guardLength: 2.2,
+    guardWidth: 0.55,
+    bands: [0.2, 0.38, 0.56, 0.74],
+    bandLength: 0.06,
+    centerBand: [0.3, 0.5],
+    centerRings: [0.27, 0.53],
+    curveLength: 0.3,
+    curveDrop: 0.22,
+  },
   outerGlowWidth: 16,
   outerGlowAlpha: 0.15,
   glowWidth: 7,
