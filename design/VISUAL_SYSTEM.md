@@ -323,7 +323,7 @@ Arena com `impactDust` levanta poeira nos pés de quem leva um golpe no chão (`
 
 ### Reflexo na água
 
-Quando a arena tem `reflection`, os corpos e as lâminas são desenhados espelhados no eixo do chão, logo depois do chão. Por cima vem uma película da cor da água (`reflection.cover`), que escurece o reflexo por igual, inclusive o brilho das lâminas. O reflexo nunca fica mais forte que os lutadores e não tem sombra no chão.
+Quando a arena tem `reflection`, os corpos e as lâminas são desenhados espelhados no eixo do chão, logo depois do chão. Por cima vem uma película da cor da água (`reflection.cover`), que escurece o reflexo por igual, inclusive o brilho das lâminas. O reflexo nunca fica mais forte que os lutadores e não tem sombra no chão. Por desempenho, o reflexo usa o corpo simplificado das silhuetas (sem túnica sobreposta, placas, avental, faixa e fivela do cinto e olhos; pontas da faixa mantidas): a película já apagava esses detalhes.
 
 ### Lâmina carregando (Forja)
 

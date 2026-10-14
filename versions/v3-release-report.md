@@ -129,6 +129,37 @@ Após restaurar todo o runtime ao candidato validado, nova coleta pelo GameLoop,
 
 Reconferência após descartar os experimentos: `npm.cmd test`, **1.964 testes, 176 suítes, zero falhas**. Lista offline regenerada sem alteração do hash ou dos 174 recursos; nenhum arquivo de runtime mudou nesta investigação.
 
+## Investigação de desempenho (Claude)
+
+Pedido do autor: resolver, se possível, o orçamento 6×. Resultado: **otimizações pequenas mantidas; o orçamento por janela continua sem garantia neste ambiente**. Harness fora do repositório, mesmos casos do Codex (duelo, Raio × Barreira, estresse), Chrome headless, viewport 844×390, DPR 3 limitado a 2, canvas 1688×780. A = worktree em `cd709ec`; B = árvore com as mudanças.
+
+**Diagnóstico.**
+
+- **Ruído do ambiente domina a maior janela.** A calibração da máquina (3·10⁶ raízes) variou de 25 a 181 ms entre execuções seguidas, e o mesmo código oscilou de 8,0 a 9,6 ms na maior janela de render do duelo. Na última rodada, a GPU/máquina passou a limitar o estresse a 20–30 fps com render médio de 3–4 ms: execuções separadas não são comparáveis.
+- **O update de janela dobra quando um frame atrasa.** `GameLoop` soma em `updateMs` todos os passos do frame; frame acima de 16,7 ms roda dois passos. As maiores janelas de update (2,4–2,9 ms) vêm de frames atrasados, não do custo de um passo (cerca de 1,2 ms sob 6×; 0,25 ms sem limitação).
+- **Parte do render é fixa por frame.** Sem limitação, desenhar a cena duas vezes no mesmo frame custa 1,14 ms, contra 0,73 ms uma vez (cena vazia 0,04). A primeira passada roda tudo, inclusive cálculo puro de pose, 1,5–2× mais devagar que a segunda: a CPU reduz o clock no ócio entre frames. Cortar chamadas só atinge a parte marginal.
+- **Custo marginal da cena (segunda passada, duelo):** reflexos 0,10 ms (23%), HUD 0,054, fundo 0,038, poses 0,024. Desligar o reflexo inteiro reduz o render médio sem limitação de 0,75 para 0,66 ms (−12%).
+- **Cada `drawImage` de canvas custa cerca de 2–3 µs**, mais que um círculo por caminho. `ImageBitmap` (via `OffscreenCanvas`) e sprites de 256 px não baratearam.
+
+**Experimentos descartados, com medida.** Partículas agrupadas em um caminho por cor/alpha/espessura: −10% de CPU no render do estresse, mas o p95 de frame sem limitação foi de 16,8 para 33,4 ms (a GPU rasteriza caminhos com vários segmentos muito mais devagar que linhas isoladas; mesmo lotes de 4 segmentos). Cache de estado do Canvas (cor, espessura, alpha, composição e texto, com pilha espelhando `save`/`restore`): sem ganho mensurável, de novo. Poeira ambiente em sprite: pior. `ImageBitmap` para camadas e brilhos: pior no duelo.
+
+**Mantido.**
+
+- Uma leitura de `navigator.getGamepads()` por frame, compartilhada pelos dois `Input`.
+- Contorno fechado das pedras (`Renderer.strokePolygon`), em vez de polilinha mais segmento de fechamento, duas vezes.
+- Silhuetas de aura e reflexo usam o corpo simplificado (sem túnica sobreposta, placas, avental, faixa e fivela do cinto e olhos; pontas da faixa mantidas).
+- Camadas estáticas do fundo pré-compostas numa só imagem: 4 → 1 cópia de tela cheia por frame. Reduz preenchimento na GPU, sem ganho de CPU mensurável.
+
+Medida sem limitação, ABBA, ruído ±2%: render do estresse 1,28 → 1,23 ms (−4%), duelo e Raio iguais. CPU 6×, três rodadas ABBA (n=6 por lado, última rodada com o ambiente instável): duelo update/render médio A 0,64/2,77 e B 0,51/2,31 ms, maiores janelas A 1,22/6,75 e B 1,02/5,61; Raio A 0,54/2,46 e B 0,56/2,42 ms, maiores janelas 0,97/5,59 e 0,97/5,49; estresse A 0,30/4,20 e B 0,26/3,50 ms, maiores janelas 1,04/15,78 e 0,80/9,11. Todas as janelas B ficaram dentro do orçamento nessa rodada, mas os números absolutos não batem com rodadas anteriores do mesmo código, então isso não é apresentado como aprovação.
+
+**Decisão do autor.** O que reduziria o render de forma garantida muda o visual ou o critério:
+
+1. Reflexo mais leve (só lâminas e uma silhueta simples): até −12% no duelo do Santuário.
+2. Aura com 2 cópias em vez de 4 e pools menores no estresse.
+3. Medir no hardware alvo ou trocar a maior janela de parede por tempo de CPU (trace `tdur`), que oscila cerca de 2% em vez de ±50%.
+
+1.964 testes passando; referência conferida; lista offline regenerada.
+
 ## Offline e publicação
 
 **Causa encontrada e corrigida.** A instalação ficou presa porque o worker aguardava todos os cabeçalhos antes de consumir qualquer corpo. Respostas pendentes podiam reter as conexões necessárias aos demais arquivos. Um worker mínimo com um download completo isolou o problema; consumir imediatamente o corpo de uma cópia de cada resposta resolveu a instalação dos 174 arquivos. A resposta original é gravada depois da verificação completa, preservando sua URL. A explicação anterior de limitação do ambiente foi substituída por esse diagnóstico confirmado.
