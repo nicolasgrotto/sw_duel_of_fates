@@ -295,6 +295,17 @@ Peças acrescentadas para o resto do elenco: **rabo de cavalo** (`ponytail`, cai
 - Bastião, Vespa, Brasa e Eco: `grip`.
 - Forja: `guard`. Haste: `bands`. Ceifador: `center`. Espelho: liso.
 
+### Técnicas de lâmina novas (2.24)
+
+Trilhas de pose no sistema da 2.12, uma por técnica, iguais para todas as famílias (a diferença vem da silhueta e da lâmina):
+
+- **Estocada:** preparação recolhe a lâmina para trás na altura do peito, com o peso no pé de trás; no ativo, braço todo estendido, lâmina na horizontal, passo longo à frente; a recuperação volta devagar à guarda.
+- **Corte ascendente:** preparação abaixa o corpo e leva a lâmina para trás do quadril, apontada para o chão; no ativo, a lâmina sobe pela frente até acima da cabeça e o corpo se estica.
+- **Rajada:** lâmina curta à frente; no ativo, quatro idas e voltas rápidas alternando um pouco a altura, com o tronco firme.
+- **Varredura:** corpo baixo, joelho da frente dobrado; a lâmina varre rente ao chão de trás para a frente.
+- **Investida descendente:** no ar, joelhos encolhidos e lâmina apontada para baixo e para a frente; mantém a pose até o chão e se levanta na recuperação.
+- **Choque entre técnicas:** clarão curto, tremor forte da câmera, anel e faíscas nas duas cores das lâminas, os dois recuam visivelmente; som de clash mais grave e mais alto. Reaproveita receitas existentes (clash e impacto forte), em escala maior.
+
 ### Ceifador (v2.21)
 
 Lutador do Eclipse com lâmina dupla de cabo único: uma lâmina sai de cada ponta do cabo. Desenho original; a referência é o arquétipo do duelista acrobático de arma dupla, sem rosto, marcas, chifres ou traje copiados de franquia.
