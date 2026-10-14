@@ -14,7 +14,7 @@ Legenda: ✅ existe · ⏳ planejado (criar só quando a tarefa pedir)
 
 ```
 index.html                  ✅ página com o canvas (caminhos relativos: funciona em qualquer servidor estático e no GitHub Pages)
-manifest.webmanifest        ✅ manifest para tela inicial em paisagem, fullscreen e start_url relativo; sem service worker
+manifest.webmanifest        ✅ manifest para tela inicial em paisagem, fullscreen e start_url relativo; offline pelo sw.js
 .nojekyll                   ✅ desliga o Jekyll do GitHub Pages; os arquivos são servidos como estão
 media/                      ✅ capturas de tela usadas no README (não são carregadas pelo jogo)
 sw.js                       ✅ service worker do offline (2.10): cache versionado, ativação em momento seguro
@@ -39,7 +39,7 @@ src/
     StateMachine.js         ✅ pilha de estados
     Camera.js               ✅ screen shake (com limites)
     AudioManager.js         ✅ AudioContext, buses de sfx e música, liberação no primeiro input
-    saveStorage.js          ✅ save versionado com lista ordenada de migrações (v6: `{ version, settings, story }`)
+    saveStorage.js          ✅ save versionado com lista ordenada de migrações (v7: `{ version, settings, story }`)
     settingsStorage.js      ✅ carrega e salva as opções (localStorage, tolerante a erro)
     keyBindings.js          ✅ preset personalizado: junta, troca teclas entre ações e valida o que vem do armazenamento
     AssetManager.js         ⏳ só quando houver assets externos
@@ -206,6 +206,7 @@ tools/
   matrix.js                 ✅ matriz de vitórias de todos contra todos usando o simulate (npm run matrix)
   reference.js              ✅ conjunto de referência do simulador com digest por cenário (npm run reference)
   reference-v2.json         ✅ digests das regras v2, referência de regressão do ciclo v3
+  releaseMatrix.js          ✅ matrizes finais em JSON: elenco, secretos/variantes e pilotos da História, usando runDuel do simulador
   offline.js                ✅ gera e confere offline-resources.js (npm run offline)
 tests/                      ✅ testes com node --test
 ```
@@ -317,7 +318,7 @@ main.js
        ├─ Input e secondInput (2 Jogadores), com TouchInput como fonte do Input
        ├─ AudioManager
        ├─ StateMachine ── createState(StateId) → IntroState (primeira tela) / MenuState / DuelState / ...
-       ├─ settings + story (save v5)
+       ├─ settings + story (save v7)
        ├─ DebugOverlay
        └─ GameLoop
             ├─ update(step)  → debug toggle → states.update(step) → input.endFrame()
@@ -1099,6 +1100,12 @@ npm run reference -- --out <pasta> --only powers              # grava as saídas
 ```
 
 Gerada sobre a v2.0.0 com Node v24 (registrado no JSON); duas execuções seguidas sem diferença, em cerca de 3,5 min com 4 processos. Dois cenários terminam com um K.O. duplo cada (os mesmos do fechamento v1.19); nenhum atinge o limite de tempo. Uma mudança só visual, de idioma ou de ferramenta deve passar no `--check`. A partir da 2.4, o preset `reference` das regras precisa passar no mesmo `--check`; mudanças intencionais nas regras v2 exigem regenerar o arquivo no mesmo commit e explicar o motivo aqui.
+
+### Matrizes da 3.0
+
+`tools/simulate.js` exporta `runDuel` sem executar o CLI ao ser importado. A função usa os mesmos sistemas, controladores, timestep, RNG e alternância de lados do CLI; aceita uma ficha de protagonista por participante e retorna vida restante além dos contadores. A saída textual do CLI mantém o contrato da referência. `tools/releaseMatrix.js` evita criar um processo por par e grava configuração, atributos, seeds, vitórias, K.O. duplo, timeout, duração, golpes, consequências e acesso ao secreto em JSON. Suites `roster`, `heron`, `secrets` e `story`; padrões: 60 duelos por cenário, seeds 1 e 2, regras completas. História usa os pontos, slots e catálogo reais de cada encontro, três distribuições de atributos e conjuntos, três estilos e três pilotos (mesma dificuldade do adversário, Normal fixo e Difícil fixo), incluindo os dois chefes e ambas as variantes secretas. Cada encontro é medido isoladamente; avanço forçado por vitória serve apenas para construir os cenários seguintes, sem alegar taxa de conclusão da campanha.
+
+Equilíbrio da 3.0: Garça Lâmina 3 → 5, Sombra Vida 4 → 3 e Vespa Lâmina 2 → 3, aprovados pelo autor. Bases compartilhadas preservam Ancião, Sombra Desperta e protagonista. Lâmina altera dano derivado e a pequena janela de parry perfeito, sem mudar alcance ou tempos. Calibração, matrizes e limites em [versions/v3-release-report.md](versions/v3-release-report.md); os JSON completos ficam em pasta temporária, conforme ASSETS.md.
 
 ## AI
 

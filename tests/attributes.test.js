@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import { attributesConfig } from '../src/config/attributesConfig.js';
 import { fighterArchetypes } from '../src/config/fightersConfig.js';
 import { characters } from '../src/characters/characterData.js';
-import { createFighter } from '../src/characters/characterFactory.js';
+import { createFighter, createFighterFromCharacter } from '../src/characters/characterFactory.js';
 import { applyAttributes } from '../src/characters/attributes.js';
 import { convertLegacyPoints, convertLegacyRating, convertLegacyRatings } from '../src/utils/legacyRatings.js';
 import { evadeConfig } from '../src/config/evadeConfig.js';
@@ -23,6 +23,7 @@ function base(id = 'guardian') {
 }
 
 const GUARD_BREAK_STUN_RAISE = 0.4;
+const HISTORICAL_RATINGS = { heron: { blade: 3 }, shadow: { health: 4 }, wasp: { blade: 2 } };
 
 function reviseLegacy(key, value) {
   if (key === 'parry') {
@@ -33,9 +34,10 @@ function reviseLegacy(key, value) {
   return value;
 }
 
-it('preserves every legacy scalar, move damage and reserved flow without changing current combat', () => {
+it('preserves every legacy scalar and move damage at the historical ratings', () => {
   for (const [id, expected] of Object.entries(legacy)) {
-    const fighter = createFighter(id, spawn);
+    const character = characters[id];
+    const fighter = createFighterFromCharacter({ ...character, attributes: { ...character.attributes, ...HISTORICAL_RATINGS[id] } }, spawn);
     const stats = fighter.stats;
     for (const [key, value] of Object.entries(expected)) {
       if (key === 'movement') {

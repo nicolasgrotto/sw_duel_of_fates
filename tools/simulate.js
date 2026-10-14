@@ -18,6 +18,8 @@ import { gameConfig } from '../src/config/gameConfig.js';
 import { createArenaBounds } from '../src/simulation/arenaBounds.js';
 import { DuelSimulation } from '../src/simulation/DuelSimulation.js';
 import { createRandom } from '../src/utils/random.js';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const STEP = gameConfig.loop.fixedStep;
 const PROTAGONIST_PREFIX = 'protagonist:';
@@ -103,11 +105,11 @@ function readOptions(argv) {
   return options;
 }
 
-function createController(self, opponent, { characterId, difficulty, profile }, random, rules, arena) {
+function createController(self, opponent, { characterId, character, difficulty, profile }, random, rules, arena) {
   return new EnemyAI({
     self,
     opponent,
-    profile: aiConfig.profiles[profile || resolveCharacter(characterId).aiProfile],
+    profile: aiConfig.profiles[profile || (character ?? resolveCharacter(characterId)).aiProfile],
     difficulty: aiConfig.difficulties[difficulty],
     perception: aiConfig.perception,
     random,
@@ -126,14 +128,14 @@ function describeEnding(left, right) {
   return left.isAlive || right.isAlive ? 'knockout' : 'doubleKnockout';
 }
 
-function runDuel(leftSetup, rightSetup, random, rules, maxSeconds) {
+export function runDuel(leftSetup, rightSetup, random, rules, maxSeconds) {
   const leftId = leftSetup.characterId;
   const rightId = rightSetup.characterId;
   const arena = createArenaBounds(gameConfig);
   const centerX = (arena.left + arena.right) / 2;
   const half = gameConfig.duel.spawnDistance / 2;
-  const left = createFighterFromCharacter(resolveCharacter(leftId), { x: centerX - half, y: arena.floorY, facing: 1 }, { variant: leftSetup.variant });
-  const right = createFighterFromCharacter(resolveCharacter(rightId), { x: centerX + half, y: arena.floorY, facing: -1 }, { variant: rightSetup.variant });
+  const left = createFighterFromCharacter(leftSetup.character ?? resolveCharacter(leftId), { x: centerX - half, y: arena.floorY, facing: 1 }, { variant: leftSetup.variant });
+  const right = createFighterFromCharacter(rightSetup.character ?? resolveCharacter(rightId), { x: centerX + half, y: arena.floorY, facing: -1 }, { variant: rightSetup.variant });
   const fighters = [left, right];
   const controllers = [
     createController(left, right, leftSetup, random, rules, arena),
@@ -154,6 +156,10 @@ function runDuel(leftSetup, rightSetup, random, rules, maxSeconds) {
   let firstWound = null;
   let time = 0;
   while (time < maxSeconds && left.isAlive && right.isAlive) {
+    for (const fighter of fighters) {
+      counts.focusSeconds = (counts.focusSeconds ?? 0) + (fighter.combat.focusTime > 0 ? STEP : 0);
+      counts.maxEvadeStreak = Math.max(counts.maxEvadeStreak ?? 0, fighter.combat.evadeStreak);
+    }
     for (let i = 0; i < fighters.length; i += 1) {
       controllers[i].updateIntent(fighters[i].intent, STEP);
       if (fighters[i].intent.evade) counts.evadeAttempts += 1;
@@ -197,7 +203,8 @@ function runDuel(leftSetup, rightSetup, random, rules, maxSeconds) {
   counts.lockWinsB = leftSetup.side === 'B' ? left.combat.lockWinCount : right.combat.lockWinCount;
   const winnerSetup = winner === left ? leftSetup : winner === right ? rightSetup : null;
   const woundedFirst = firstWound ? { winnerWounded: winner === firstWound.attacker, timeAfter: time - firstWound.time } : null;
-  return { winnerSide: winnerSetup?.side ?? null, ending: describeEnding(left, right), time, counts, woundedFirst, hitsToKnockout: winner ? hitsReceived.get(winner === left ? right : left) : null };
+  const healthRatios = { [leftSetup.side]: left.health / left.stats.maxHealth, [rightSetup.side]: right.health / right.stats.maxHealth };
+  return { winnerSide: winnerSetup?.side ?? null, ending: describeEnding(left, right), time, counts, woundedFirst, healthRatios, hitsToKnockout: winner ? hitsReceived.get(winner === left ? right : left) : null };
 }
 
 function average(values) {
@@ -277,4 +284,4 @@ function main() {
   }
 }
 
-main();
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) main();

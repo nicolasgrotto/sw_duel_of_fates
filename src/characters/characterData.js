@@ -51,7 +51,7 @@ export const characters = {
   },
   shadow: {
     id: 'shadow',
-    attributes: {"health": 4, "stamina": 4, "blade": 5, "defense": 3, "agility": 4, "flow": 5},
+    attributes: {"health": 3, "stamina": 4, "blade": 5, "defense": 3, "agility": 4, "flow": 5},
     archetype: 'shadow',
     alignment: 'dark',
     loadout: { powers: { neutral: 'lightning', forward: 'pull', back: 'choke' }, techniques: { forward: 'dashSlash', back: 'spin', air: 'plunge' } },
@@ -137,7 +137,7 @@ export const characters = {
   },
   wasp: {
     id: 'wasp',
-    attributes: {"health": 3, "stamina": 6, "blade": 2, "defense": 3, "agility": 7, "flow": 3},
+    attributes: {"health": 3, "stamina": 6, "blade": 3, "defense": 3, "agility": 7, "flow": 3},
     archetype: 'wasp',
     alignment: 'light',
     loadout: { powers: { neutral: 'push', back: 'barrier', forward: 'throw' }, techniques: { forward: 'flurry', back: 'saberThrow' } },
@@ -355,7 +355,7 @@ export const characters = {
   },
   heron: {
     id: 'heron',
-    attributes: {"health": 5, "stamina": 6, "blade": 3, "defense": 3, "agility": 6, "flow": 5},
+    attributes: {"health": 5, "stamina": 6, "blade": 5, "defense": 3, "agility": 6, "flow": 5},
     archetype: 'heron',
     alignment: 'light',
     loadout: { powers: { neutral: 'push', back: 'absorb', forward: 'throw' }, techniques: { back: 'spin', air: 'plunge' } },

@@ -12,7 +12,7 @@ it('keeps a powers scenario identical to the reference digests', () => {
   assert.match(output, /1 scenarios, 0 changed, 0 missing/);
 });
 
-it('temporarily checks an unchanged powers scenario until the stage 2.19 reference review', () => {
+it('keeps an unaffected powers scenario identical to the reference digests', () => {
   const output = execFileSync(process.execPath, ['tools/reference.js', '--check', 'tools/reference-v2.json', '--only', 'powers/normal/guardian-mirror'], { encoding: 'utf8' });
   assert.match(output, /1 scenarios, 0 changed, 0 missing/);
 });
