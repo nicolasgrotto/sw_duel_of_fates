@@ -20,6 +20,7 @@ async function fetchVerified(file) {
   if (file.endsWith(SCRIPT_EXTENSION) && (response.headers.get('content-type') ?? '').includes(HTML_TYPE)) {
     throw new Error(`offline: ${file} answered HTML`);
   }
+  await response.clone().arrayBuffer();
   return [url, response];
 }
 

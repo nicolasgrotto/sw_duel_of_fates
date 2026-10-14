@@ -136,6 +136,49 @@ describe('service worker', () => {
     }
   });
 
+  it('drains response bodies while later requests wait for a connection', { timeout: 3000 }, async () => {
+    const caches = createCaches();
+    let releaseHeaders;
+    let drained = false;
+    const available = new Promise(resolve => { releaseHeaders = resolve; });
+    const network = serveAll();
+    const firstUrl = `${SCOPE}${resources.files[0]}`;
+    const response = new Response(new ReadableStream({
+      pull(controller) {
+        controller.enqueue(new Uint8Array([1, 2, 3]));
+        controller.close();
+        drained = true;
+        releaseHeaders();
+      },
+    }, { highWaterMark: 0 }));
+    Object.defineProperty(response, 'url', { value: firstUrl });
+    const worker = loadWorker({
+      caches: { ...caches.api, open: async (name) => { assert.equal(drained, true); return caches.api.open(name); } },
+      fetch: async (url) => {
+        if (url === firstUrl) return response;
+        await available;
+        return network(url);
+      },
+    });
+    await worker.dispatch('install', {});
+    const stored = caches.stores.get(worker.cacheName).get(firstUrl);
+    assert.equal(stored.url, firstUrl);
+    assert.deepEqual(new Uint8Array(await stored.arrayBuffer()), new Uint8Array([1, 2, 3]));
+    assert.equal(caches.stores.get(worker.cacheName).size, resources.files.length);
+  });
+
+  it('preserves the old cache when a response body fails after successful headers', async () => {
+    const caches = createCaches({ 'duel-of-fates-vold': [[`${SCOPE}index.html`, new Response('old')]] });
+    const worker = loadWorker({ caches: caches.api, fetch: serveAll({
+      'src/main.js': () => new Response(new ReadableStream({
+        pull(controller) { controller.error(new TypeError('Download interrupted')); },
+      }, { highWaterMark: 0 }), { headers: { 'content-type': 'text/javascript' } }),
+    }) });
+    await assert.rejects(worker.dispatch('install', {}), /Download interrupted/);
+    assert.deepEqual([...caches.stores.keys()], ['duel-of-fates-vold']);
+    assert.equal(await caches.stores.get('duel-of-fates-vold').get(`${SCOPE}index.html`).text(), 'old');
+  });
+
   it('deletes only its own older caches on activation and never touches other storage', async () => {
     const caches = createCaches({ 'duel-of-fates-vold': [], 'another-app': [], [`duel-of-fates-${resources.version}`]: [] });
     const worker = loadWorker({ caches: caches.api, fetch: serveAll() });
