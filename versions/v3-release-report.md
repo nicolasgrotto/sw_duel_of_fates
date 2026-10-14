@@ -172,7 +172,24 @@ O autor aprovou as três opções da investigação, uma etapa por commit: refle
 
 **Pools do estresse: mantidos no máximo (decisão registrada).** O caso força os tetos reais do jogo (300 partículas, 8 luzes, 4 anéis, 2 ondas, 6 projéteis e Cura/Foco/Ira simultâneos). Esses tetos limitam qualquer cena; reduzir o caso esconderia o pior custo possível sem mudar o jogo, e reduzir os pools mudaria efeitos de todas as cenas. O estresse continua como pior caso sintético e entra no critério novo (etapa 3) com os mesmos tetos.
 
-## Offline e publicação
+**3. Medição robusta (`tools/perfBudget.js`).** Ferramenta em Node, sem dependências: Chrome instalado em headless, DevTools Protocol pelo `WebSocket` nativo, perfil temporário apagado no fim, página de medição gerada em memória. Cada execução registra a sonda de calibração a 1×, o caso a 1× com trace (`tdur` de `FireAnimationFrame`, só dos callbacks do `GameLoop`), update/render/intervalos/passos a 1× e o método anterior sob CPU 6× com sondas antes e depois. Com dois diretórios, alterna ABBA. Uso e detalhes na ARCHITECTURE ("Medição de desempenho").
+
+Execução completa, A = `d96d28a` (antes das etapas 1 e 2), B = HEAD, duas rodadas ABBA (n=4 por lado e caso), 120 frames + 11 s, canvas 1688×780, zero exceções:
+
+| Caso | CPU/frame a 1× A → B (ms) | Projeção 6× B: frame / update / render (ms) | p95 de frame a 1× | Janelas sob 6× B: maior update / render (ms) | Passos/frame sob 6× | Fator efetivo medido |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| Duelo | 1,017 → 0,983 | 5,90 / 1,45 / 4,32 | 16,9 | 1,99 / 8,31 | 1,00 (3% com 2) | 4,7–6,5 |
+| Raio × Barreira | 0,990 → 0,968 | 5,81 / 1,48 / 4,40 | 17,0 | 1,86 / 7,92 | 1,00 (3%) | 5,1–6,8 |
+| Estresse | 1,400 → 1,300 | 7,80 / 0,66 / 6,94 | 16,9 | 1,16 / 13,99 | 1,07 (11%) | 3,5–6,5 |
+| Replay em laço | 0,846 → 0,831 | 4,99 / 0,81 / 4,20 | 17,1 | 1,13 / 7,67 | 1,00 (2%) | 2,4–7,6 |
+
+O `tdur` variou no máximo 3% entre execuções do mesmo lado (estresse B: 1,287–1,315 ms), contra 12,05–13,99 ms da maior janela de render 6× no mesmo lado. Pelo critério proposto em versions/v3.md, todos os casos passam; o estresse usa 65% do orçamento de frame. Pelo método anterior, o estresse continua acima de 10 ms na maior janela.
+
+Reconferência após as três etapas: `npm run offline` sem alteração da lista, **1.970 testes, zero falhas** (4 novos da ferramenta, 2 do reflexo), referência **846 cenários, 0 changed, 0 missing**. Publicação na `main`, tag e envio continuam não autorizados.
+
+**Divergência registrada, não explicada.** Sob 6×, o tempo de parede médio fica 8–9× o de 1× (duelo B: render 0,72 → ~6,3 ms; estresse 1,15 → ~10,4 ms), acima do fator 5–7 que a sonda mede antes e depois. Hipóteses não comprovadas: a suspensão da thread pela limitação tem granularidade grossa no Windows e cai dentro de trechos curtos medidos com `performance.now()`; o render espera a GPU em pontos que contam como parede e não como CPU. Execuções isoladas mostram a limitação quase desligada (fator 1,1–2,4 e render "6×" de 2,2–2,9 ms), o que confirma que a janela 6× desta máquina não mede só o jogo. A projeção por CPU é menos severa que a janela 6×; por isso o critério novo depende da aprovação do autor e da conferência no celular.
+
+
 
 **Causa encontrada e corrigida.** A instalação ficou presa porque o worker aguardava todos os cabeçalhos antes de consumir qualquer corpo. Respostas pendentes podiam reter as conexões necessárias aos demais arquivos. Um worker mínimo com um download completo isolou o problema; consumir imediatamente o corpo de uma cópia de cada resposta resolveu a instalação dos 174 arquivos. A resposta original é gravada depois da verificação completa, preservando sua URL. A explicação anterior de limitação do ambiente foi substituída por esse diagnóstico confirmado.
 

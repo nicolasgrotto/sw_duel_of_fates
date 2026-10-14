@@ -92,6 +92,14 @@ npm run simulate -- --duels 300 --difficulty normal
 
 Roda duelos IA × IA sem navegador e mostra vitórias e estatísticas. `npm run matrix` roda todos contra todos e mostra a média de vitórias de cada personagem. `npm run reference -- --check tools/reference-v2.json` confere o preset de regressão, atualizado apenas nas mudanças intencionais aprovadas. Matrizes finais e limites da 3.0 em [versions/v3-release-report.md](versions/v3-release-report.md); opções e exemplos em [ARCHITECTURE.md](ARCHITECTURE.md#balanceamento).
 
+## Desempenho
+
+```bash
+node tools/perfBudget.js
+```
+
+Mede o orçamento de frame no Chrome instalado (headless, pelo DevTools Protocol, sem dependências): tempo de CPU por frame projetado para CPU 6× e, como informação, as janelas do `GameLoop` sob limitação. Aceita dois diretórios para A/B. Detalhes em [ARCHITECTURE.md](ARCHITECTURE.md#medição-de-desempenho).
+
 ## Controles
 
 | Ação | Teclas |

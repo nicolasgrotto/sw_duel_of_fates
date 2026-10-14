@@ -690,6 +690,21 @@ Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 23).
 - A seleção filtra bloqueadas, mostra requisitos e guarda escolhas confirmadas por lado, mesmo com personagens iguais. `playerSkin`/`opponentSkin` seguem params e escadas; pausa, revanche e próxima luta reutilizam esses dados. A prévia conserva cor e skin ao mudar uma delas e ao voltar.
 - A criação tem Nome, Caminho, Estilo, Visual, Cor e Dificuldade. `Game.createTextPrompt` injeta documento, host e limites do canvas no helper de core; o estado apenas consome valor e envio. O input intercepta teclas, respeita composição e sai ao mudar de passo ou estado. O resize reposiciona o campo. Nenhum estado acessa DOM. `sanitizeStoryRun` valida a skin e retorna base para ids desconhecidos.
 
+## Medição de desempenho
+
+`tools/perfBudget.js` mede o orçamento no Chrome instalado, sem dependências: sobe um servidor estático por diretório, abre o Chrome headless com perfil temporário (apagado no fim) e fala o DevTools Protocol pelo `WebSocket` nativo do Node. A página de medição é gerada em memória (`/__perf__.html`) e só cria o `Game`; o cenário é injetado com `Runtime.evaluate` e reutiliza os sistemas reais (IA, efeitos, replay), sem mudar o jogo.
+
+```bash
+node tools/perfBudget.js                                  # árvore atual, 4 casos, 1 rodada
+node tools/perfBudget.js --cases normal,stress --rounds 3 <dirA> <dirB>   # A/B em ordem ABBA
+node tools/perfBudget.js --out medicao.json               # dados completos em JSON
+```
+
+- **Casos:** `normal` (Garça × Sombra por IA), `lightning` (Raio do Soberano contra a Barreira do Guardião), `stress` (tetos dos pools, 6 projéteis e Cura/Foco/Ira nos dois) e `replay` (replay em laço). Todos no Santuário, viewport 844×390, DPR 3 limitado a 2 (canvas 1688×780), 120 frames de aquecimento e 11 s de coleta.
+- **Por execução:** (1) sonda de calibração a 1×; (2) caso a 1× com `Tracing` na categoria `devtools.timeline`: tempo de CPU da thread por frame (`tdur` de `FireAnimationFrame`, só dos callbacks do `GameLoop`, identificados pelos ids de `schedule`), mais update/render, intervalo p95 e passos por frame; (3) o método anterior sob CPU 6× (janelas de 60 frames do `GameLoop`), com sondas de calibração antes e depois; o fator efetivo da limitação é registrado.
+- **Critério:** projeção 6× = média de `tdur` a 1× × 6 (orçamento de frame 12 ms), com update e render médios a 1× × 6 dentro de 2 e 10 ms. A maior janela sob 6× é informativa (ver versions/v3.md).
+- As funções puras (`parseArgs`, `runOrder`, `selectGameFrames`, `summarizeCpu`, `summarizeWall`, `evaluateBudget`) são testadas em Node; a parte que fala com o Chrome só roda pela linha de comando.
+
 ## Balanceamento
 
 `npm run simulate` roda duelos IA × IA na `DuelSimulation` real, sem navegador, alternando os lados, e mostra vitórias, tempo médio, hits, bloqueios, clashes, quebras de guarda, parries (comuns e perfeitos) e empurrões.
