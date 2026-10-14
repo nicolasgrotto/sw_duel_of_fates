@@ -623,7 +623,7 @@ Arquivos: [src/combat/PowerSystem.js](src/combat/PowerSystem.js), [src/combat/po
 
 Regras em [GAME_DESIGN.md](GAME_DESIGN.md) (seção 22).
 
-- **Regra por modo.** `createDuelRules(mode, settings, powersConfig.modes)` devolve `{ powers }`: ligado só em Duelar, 2 Jogadores e Treino, e só se `settings.powers` não for `false`. O `DuelState` guarda `this.rules` (ou usa `params.rules`, para o Story) e passa para a `DuelSimulation`, para a HUD e para o `ReplayState` (o replay re-simula com as mesmas regras). O simulador aceita `--rules powers` e a matriz repassa a opção.
+- **Regra por modo.** `createDuelRules(mode, settings, powersConfig.modes)` resolve as capacidades por modo: Poderes ligados em Duelar, 2 Jogadores, Treino, Arcade e Sobrevivência, e só se `settings.powers` não for `false`. O `DuelState` guarda `this.rules` (ou usa `params.rules`, para o Story) e passa para a `DuelSimulation`, para a HUD e para o `ReplayState` (o replay re-simula com as mesmas regras). O simulador aceita `--rules powers` e a matriz repassa a opção.
 - **Medidor.** A `DuelSimulation` repassa `rules` ao `CombatSystem`, que cria o `PowerSystem` (desligado quando `rules.powers` não é `true`). O `PowerSystem` regenera `fighter.flowMeter` depois da stamina e soma ganhos nos ganchos do `CombatSystem` (`onHit` no `applyHit`, `onBlock` no `resolveBlock`, `onParry` no `resolveParry`). `flowMeter` fica no `Fighter` (como `stamina`), começa em `stats.power.start` e volta a esse valor no `resetForRound`; o snapshot do replay o inclui.
 - **Nível.** `stats.flowLevel` vem do atributo Fluxo. A factory soma `stats.alignment` (do `characterData`) e `stats.power` (`resolvePowerStats`): o nível muda o ganho do medidor e a potência dos poderes, não o máximo.
 - **Interações.** `getFlowDifference(caster, target)` = `caster.flowLevel − target.flowLevel` (positivo: quem lança é mais forte). Cada poder aponta para sua tabela em `powersConfig.interactions[power.interaction]`. `resolveInteraction(table, diff)` devolve a primeira faixa com `diff ≥ atLeast` (a última tem `atLeast: -Infinity`). A faixa é o conjunto de modificadores que os handlers leem: `outcome` (`normal`, `reduced`, `resisted`), `scale` (escala do efeito, multiplicada pela potência), `knockback` (fator do deslocamento: empurrão, puxão, recuo do Raio; 0 = não desloca), `blockable` (a guarda de frente vale), `guardDamage` (fração do dano escalado que passa pela guarda), `guardSlide` (fator do recuo na guarda), `guardStamina` (fator sobre `power.guard.staminaCost`), `duration` (stun e efeitos com duração) e `stagger` (desequilíbrio). Falhar é sempre por limiar (`outcome: resisted`), nunca por sorteio, para o replay continuar determinístico. Nenhum `if` por poder: um poder novo ganha uma tabela, e um modificador novo entra em todas as faixas e no handler que o usa. As faixas atuais (v1.11) reproduzem a regra da v1.6 com o sinal novo: −1 ou mais normal, −2 metade, −3 ou menos resistido; guarda da Repulsão e do Puxão sem dano e com metade do recuo, guarda do Raio com um quarto do dano. Na v1.14 a Repulsão ganhou sete faixas (+3 imbloqueável; +2 e +1 guarda com dano e mais deslize; 0 como antes; −1 menos deslize e stamina; −2 meio efeito sem empurrar; −3 resistida), tabela em GAME_DESIGN seção 22. A IA (`isPowerBlocked`) só deixa de lançar contra quem bloqueia quando a faixa é bloqueável; sem `powerAware` ela continua evitando qualquer guarda.
@@ -1250,16 +1250,18 @@ Roteiro, etapas e especificação aprovada em [versions/v3.md](versions/v3.md). 
 
 **Princípios.** Os da v2 continuam. Toda mecânica nova roda na `DuelSimulation`, guarda estado em `fighter.combat` ou em campo coberto pelo teste de snapshot, e passa no replay a partir de snapshots intermediários. Render, áudio e VFX só leem eventos e estado.
 
-**Configuração da 2.4.** `src/config/combatRulesConfig.js` lista os modos por capacidade. `resolveCombatRules` normaliza as capacidades e exige Poderes para `focusEvade`; `createDuelRules` e o simulador usam essa resolução. História declara as três capacidades desligadas até a 2.8. O simulador expõe a config em `--set combatRules.*`.
+**Configuração.** `src/config/combatRulesConfig.js` lista os modos por capacidade. `resolveCombatRules` normaliza as capacidades e exige Poderes para `focusEvade`; `createDuelRules` e o simulador usam essa resolução. História declara todas as capacidades em `storyConfig.rules` desde a 2.8. O simulador expõe a config em `--set combatRules.*`.
 
 **Regras como capacidades.** `rules` deixa de ser só `{ powers }`. Cada mecânica nova ganha uma capacidade booleana própria, criada na etapa que a implementa, sem campo antecipado: `exhaustion`, `wounds` e `focusEvade` (2.4), `bladeLock` (2.5), `finishers` (2.9). `focusEvade` e o quarto poder exigem `rules.powers`; a Ira é um poder comum e só existe para quem a equipa. `createDuelRules` monta o objeto a partir de uma lista de modos por capacidade em config, no mesmo padrão de `powersConfig.modes`; a História usa as regras do `storyConfig`. O simulador aceita `--rules` com nomes de capacidades; sem nenhuma capacidade nova ligada, o resultado é o preset `reference`, que precisa passar em `npm run reference -- --check tools/reference-v2.json`.
 
-| Modo | Capacidades novas |
+| Modo | Capacidades na 3.0 |
 | --- | --- |
-| Duelar, 2 Jogadores, Treino | ligadas quando a etapa fecha |
-| Tutorial | ligadas, com passos novos |
-| História | ligadas a partir da 2.8 |
-| Arcade, Sobrevivência, Desafio | desligadas; tabela final revista antes da 3.0 |
+| Duelar, 2 Jogadores, Treino, Arcade, Sobrevivência | exaustão, ferimentos, disputa e finalizações; Poderes/técnicas seguem Opções; Foco automático exige Poderes |
+| Tutorial, Treinos guiados | exaustão, ferimentos, disputa e finalizações, sem Poderes |
+| História | todas ligadas, independentemente das Opções |
+| Desafio de parry | todas desligadas |
+| Desafios | regras de cada desafio em challengesConfig |
+| Galeria | Poderes e Foco automático |
 | Simulador | escolhidas por execução |
 
 **Ordem do passo.** A ordem atual de `DuelSimulation.step` é a referência; mecânicas novas se encaixam nela sem reordenar o que existe:

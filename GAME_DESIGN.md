@@ -573,7 +573,7 @@ Vida, Stamina, Lâmina, Defesa, Agilidade e Fluxo usam a **escala 7/8/9/10** (v1
 
 O Fluxo é a energia dos poderes. Nomes de tela em `uiConfig`; no código, `power`. Tudo roda na simulação e é testável no simulador.
 
-**Regra por modo.** Os poderes só valem quando `rules.powers` está ligado: Duelar, 2 Jogadores e Treino seguem a opção **Poderes** (ligada por padrão); Arcade, Sobrevivência, Tutorial e Desafio de parry continuam no duelo clássico da v1.0. Sem a regra, não há medidor nem poderes.
+**Regra por modo (3.0, aprovada pelo autor).** Duelar, 2 Jogadores, Treino, Arcade e Sobrevivência usam exaustão, ferimentos, disputa e finalizações; Poderes e técnicas seguem a opção **Poderes** (ligada por padrão), assim como as esquivas automáticas do Foco. História usa todas essas regras sempre. Tutorial e Treinos guiados usam consequências, disputa e finalizações sem Poderes; Desafios definem suas próprias regras; Desafio de parry mantém só o combate clássico; Galeria usa Poderes e Foco. Sem Poderes, não há medidor nem técnicas direcionais. Arcade e Sobrevivência mantêm conjuntos base e suas regras de rounds, dificuldade e recuperação de vida.
 
 **Nível e medidor.**
 

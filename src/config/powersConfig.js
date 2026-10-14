@@ -15,7 +15,7 @@ const SELF_BUFF_PHASES = { active: 0.08, recovery: 0.3 };
 const STORM_PHASES = { invocation: 0.5, storm: 5, recovery: 0.8 };
 
 export const powersConfig = {
-  modes: ['versus', 'local', 'training'],
+  modes: ['versus', 'local', 'training', 'arcade', 'survival'],
   cooldown: 1.2,
   impactHeight: 0.55,
   castHeight: 0.6,

@@ -7,10 +7,10 @@ export const combatRulesConfig = {
     damageScale: 1.1,
   },
   modes: {
-    exhaustion: ['versus', 'local', 'training', 'tutorial', 'drill'],
-    wounds: ['versus', 'local', 'training', 'tutorial', 'drill'],
-    focusEvade: ['versus', 'local', 'training'],
-    bladeLock: ['versus', 'local', 'training', 'tutorial', 'drill'],
+    exhaustion: ['versus', 'local', 'training', 'arcade', 'survival', 'tutorial', 'drill'],
+    wounds: ['versus', 'local', 'training', 'arcade', 'survival', 'tutorial', 'drill'],
+    focusEvade: ['versus', 'local', 'training', 'arcade', 'survival'],
+    bladeLock: ['versus', 'local', 'training', 'arcade', 'survival', 'tutorial', 'drill'],
     finishers: ['versus', 'local', 'training', 'tutorial', 'arcade', 'survival', 'drill'],
   },
   finishers: {

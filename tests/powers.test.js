@@ -75,7 +75,11 @@ describe('duel rules', () => {
     assert.equal(createDuelRules(DuelMode.VERSUS, {}, modes).powers, true);
     assert.equal(createDuelRules(DuelMode.LOCAL, { powers: true }, modes).powers, true);
     assert.equal(createDuelRules(DuelMode.TRAINING, { powers: false }, modes).powers, false);
-    for (const mode of [DuelMode.ARCADE, DuelMode.SURVIVAL, DuelMode.TUTORIAL, DuelMode.CHALLENGE]) {
+    for (const mode of [DuelMode.ARCADE, DuelMode.SURVIVAL]) {
+      assert.equal(createDuelRules(mode, { powers: true }, modes).powers, true);
+      assert.equal(createDuelRules(mode, { powers: false }, modes).powers, false);
+    }
+    for (const mode of [DuelMode.TUTORIAL, DuelMode.CHALLENGE]) {
       assert.equal(createDuelRules(mode, { powers: true }, modes).powers, false);
     }
   });

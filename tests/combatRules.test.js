@@ -9,18 +9,28 @@ import { createDuelRules, DuelMode } from '../src/states/duelModes.js';
 it('enables combat capabilities only in their approved modes', () => {
   for (const mode of Object.values(DuelMode)) {
     const rules = createDuelRules(mode, {}, powersConfig.modes);
-    const enabled = ['versus', 'local', 'training'].includes(mode);
+    const enabled = ['versus', 'local', 'training', 'arcade', 'survival'].includes(mode);
     const taught = enabled || mode === 'tutorial' || mode === 'drill';
     assert.equal(rules.exhaustion, taught);
     assert.equal(rules.wounds, taught);
     assert.equal(rules.focusEvade, enabled || mode === 'gallery');
     assert.equal(rules.bladeLock, taught);
-    assert.equal(rules.finishers, taught || ['arcade', 'survival'].includes(mode));
+    assert.equal(rules.finishers, taught);
+    assert.equal(rules.powers, enabled || mode === 'gallery');
   }
   assert.deepEqual(resolveCombatRules(storyConfig.rules), {
     powers: true, exhaustion: true, wounds: true, focusEvade: true, bladeLock: true, finishers: true,
     bladeLockRhythm: false,
   });
+});
+
+it('keeps ladder consequences enabled when the powers option is off', () => {
+  for (const powers of [true, false]) {
+    const expected = createDuelRules(DuelMode.VERSUS, { powers }, powersConfig.modes);
+    for (const mode of [DuelMode.ARCADE, DuelMode.SURVIVAL]) {
+      assert.deepEqual(createDuelRules(mode, { powers }, powersConfig.modes), expected);
+    }
+  }
 });
 
 it('requires powers only for automatic focus evasion', () => {
