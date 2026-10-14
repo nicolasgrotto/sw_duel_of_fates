@@ -251,6 +251,28 @@ Pose `BLADE_LOCK`, com números por estilo em `motionStyles[motion].lock` e `loc
 
 O perdedor usa a pose de desequilíbrio existente.
 
+### Peças de detalhe (2.22)
+
+Decisões do autor: o elenco ganha peças que dão identidade sem perder a simplicidade. Prioridade para o que muda a silhueta; fivelas e faixas ficam discretas. Rostos continuam sem feições: a identidade vem do cabelo, da barba e da forma da cabeça. Os trajes alternativos herdam as peças do traje base e mudam só as cores (as peças em `trim`, `body`, `cloak` ou `glove` seguem as cores do traje); um traje só troca peças quando a peça não combinar com ele.
+
+Biblioteca (`appearance.details`, desenhada no `fighterRenderer`, geometria em `fighterVisualConfig.detailStyle`):
+
+- **Cinto** (`belt`): faixa sobre a túnica na altura do quadril, com fivela pequena à frente (`detailMetal`).
+- **Botas** (`boots`): o terço de baixo da perna mais grosso e numa cor própria; `height` diz até onde sobem.
+- **Braçadeiras** (`bracers`): o antebraço mais grosso, nos dois braços.
+- **Barra rasgada da capa** (`capeHem`): a barra da capa longa termina em pontas desiguais em vez de uma linha reta.
+- **Placas no peito** (`chestPlates`): duas faixas horizontais na parte de cima do tronco, recuadas das bordas.
+- **Caneleiras** (`greaves`): placa da canela ao joelho, com a joelheira redonda.
+- **Cabelo** (`hairStyle` com `hairColor`): `wavy` (traje Duelo do Predestinado) e `short` (curto, colado à cabeça). Só aparece sem capuz.
+
+Cores das peças: `trim`, `body`, `cloak` e `glove` usam as cores do traje; qualquer outro nome é um token do tema.
+
+Pilotos:
+
+- **Guardião:** cabelo curto castanho (`guardianHair`), cinto largo de couro (`guardianLeather`) com fivela, braçadeiras de couro, botas escuras (`guardianBoots`) até a metade da canela.
+- **Sombra:** barra da capa rasgada em cinco pontas, botas altas quase pretas (`shadowBoots`) até perto do joelho.
+- **Bastião:** cabeça raspada (sem cabelo), duas placas no peito e caneleiras com joelheira na cor do acabamento, cinto escuro.
+
 ### Ceifador (v2.21)
 
 Lutador do Eclipse com lâmina dupla de cabo único: uma lâmina sai de cada ponta do cabo. Desenho original; a referência é o arquétipo do duelista acrobático de arma dupla, sem rosto, marcas, chifres ou traje copiados de franquia.

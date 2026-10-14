@@ -225,6 +225,11 @@ Cores compartilhadas (em `themeConfig`):
 | `arenaEclipse` | `#030205` | disco do eclipse |
 | `arenaCorona` | `#f2dcae` | coroa do eclipse (glow) e pó no ar |
 | `arenaEclipseShade` | `#030208` | sombra do eclipse sobre arena e corpos |
+| `detailMetal` | `#a8987a` | fivelas e pequenas peças de metal das roupas (2.22) |
+| `guardianHair` | `#4a3524` | cabelo do Guardião |
+| `guardianLeather` | `#46362a` | cinto e braçadeiras do Guardião |
+| `guardianBoots` | `#1c1815` | botas do Guardião |
+| `shadowBoots` | `#09090d` | botas da Sombra |
 
 ## Sabre
 
