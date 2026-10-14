@@ -93,6 +93,7 @@ export class EnemyAI {
     this.random = random;
     this.powersEnabled = rules.powers === true;
     this.rules = resolveCombatRules(rules);
+    this.rhythm = { lock: -1, beat: 0, pressAt: 0, done: true };
     this.thinkTimer = 0;
     this.attackCooldown = 0;
     this.decision = AiDecision.WAIT;
@@ -167,11 +168,34 @@ export class EnemyAI {
     this.thinkTimer = 0;
     this.decision = AiDecision.BLADE_LOCK;
     this.writeIntent(intent);
+    if (this.rules.bladeLockRhythm) {
+      this.requestRhythmPress(intent, dt);
+      return;
+    }
     const interval = Math.max(combatRulesConfig.bladeLock.minPressInterval,
       (1 + this.perception.reactionJitter * this.random()) / difficulty.bladeLockRate);
     const { combat } = self;
     if (combat.lockTime + dt >= difficulty.bladeLockDelay && !combat.lockPressHeld && combat.lockTime + dt - combat.lockLastPress + Number.EPSILON * Math.max(1, combat.lockTime) >= interval
       && this.random() >= difficulty.mistakeChance) intent.lightAttack = true;
+  }
+
+  requestRhythmPress(intent, dt) {
+    const { combat } = this.self;
+    const { rhythm } = this;
+    const { beat, window } = combatRulesConfig.bladeLock.rhythm;
+    const now = combat.lockTime + dt;
+    if (rhythm.lock !== combat.lockCount) {
+      Object.assign(rhythm, { lock: combat.lockCount, beat: 0, done: true });
+    }
+    if (rhythm.done && now > rhythm.beat * beat + window) {
+      rhythm.beat += 1;
+      rhythm.pressAt = rhythm.beat * beat + (this.random() * 2 - 1) * this.difficulty.bladeLockRhythmError;
+      rhythm.done = this.random() < this.difficulty.mistakeChance;
+    }
+    if (!rhythm.done && now >= rhythm.pressAt && !combat.lockPressHeld) {
+      intent.lightAttack = true;
+      rhythm.done = true;
+    }
   }
 
   updateBlockPunish() {

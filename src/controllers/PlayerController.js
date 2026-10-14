@@ -171,7 +171,8 @@ export class PlayerController {
   updateBladeLockHold(intent, dt) {
     if (this.fighter?.state !== FighterState.BLADE_LOCK || this.settings.bladeLockHold?.[this.playerIndex] !== true) return;
     const { combat } = this.fighter;
-    const interval = 1 / combatRulesConfig.bladeLock.holdRate;
+    const { holdRate, competitiveHoldRate } = combatRulesConfig.bladeLock;
+    const interval = 1 / (this.settings.prototypes?.competitiveHold === true ? competitiveHoldRate : holdRate);
     const requested = intent.lightAttack || this.input.isDown(Action.LIGHT_ATTACK);
     intent.lightAttack = requested && !combat.lockPressHeld && (combat.lockPresses === 0
       || combat.lockTime + dt - combat.lockLastPress + Number.EPSILON * Math.max(1, combat.lockTime) >= interval);

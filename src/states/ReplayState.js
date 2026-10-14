@@ -64,6 +64,7 @@ export class ReplayState extends GameState {
     this.effects.arenaDust = arenas[arenaId].impactDust ?? null;
     this.view = new DuelRenderer(arenas[arenaId]);
     this.view.showFinishers = this.effects.showFinishers = this.game.settings.finishers !== false;
+    this.view.lockRhythm = rules.bladeLockRhythm === true;
     this.letterbox = new Letterbox(layout.letterbox);
     this.letterbox.setTarget(1);
     this.interpolation = new RenderInterpolation(gameConfig.replay.interpolation);

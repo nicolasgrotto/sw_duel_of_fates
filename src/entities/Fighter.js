@@ -72,6 +72,8 @@ function createCombat() {
     lockOpponent: -1,
     lockCooldown: 0,
     lockPressHeld: false,
+    lockBeat: -1,
+    lockOnBeat: false,
     lockReleaseGuard: 0,
     lockCount: 0,
     lockWinCount: 0,

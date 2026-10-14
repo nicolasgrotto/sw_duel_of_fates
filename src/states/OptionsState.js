@@ -19,6 +19,8 @@ export const OptionId = Object.freeze({
   FINISHERS: 'finishers',
   POWERS: 'powers',
   BLADE_LOCK_HOLD: 'bladeLockHold',
+  BLADE_LOCK_RHYTHM: 'bladeLockRhythm',
+  COMPETITIVE_HOLD: 'competitiveHold',
   REMAP: 'remap',
   BACK: 'back',
 });
@@ -42,6 +44,8 @@ export class OptionsState extends GameState {
       [OptionId.POWERS]: { id: OptionId.POWERS, label: '' },
       [OptionId.BLADE_LOCK_HOLD]: { id: OptionId.BLADE_LOCK_HOLD, label: '' },
       [OptionId.REMAP]: { id: OptionId.REMAP, label: '' },
+      [OptionId.BLADE_LOCK_RHYTHM]: { id: OptionId.BLADE_LOCK_RHYTHM, label: '' },
+      [OptionId.COMPETITIVE_HOLD]: { id: OptionId.COMPETITIVE_HOLD, label: '' },
       [OptionId.BACK]: { id: OptionId.BACK, label: '' },
     };
     this.menu = new MenuList(Object.values(this.items).filter((item) => !this.game.coarsePointer || ![OptionId.REMAP, OptionId.KEYBOARD].includes(item.id)), layout.options, this.game.audio);
@@ -72,6 +76,8 @@ export class OptionsState extends GameState {
     this.items.replay.label = formatText(options.replay, { value: settings.finalReplay === false ? options.off : options.on });
     this.items.finishers.label = formatText(options.finishers, { value: settings.finishers === false ? options.offFemininePlural : options.onFemininePlural });
     this.items.music.label = formatText(options.music, { value: settings.music ? options.onFeminine : options.offFeminine });
+    this.items.bladeLockRhythm.label = formatText(options.bladeLockRhythm, { value: settings.prototypes?.bladeLockRhythm ? options.on : options.off });
+    this.items.competitiveHold.label = formatText(options.competitiveHold, { value: settings.prototypes?.competitiveHold ? options.on : options.off });
   }
 
   update() {
@@ -108,6 +114,10 @@ export class OptionsState extends GameState {
         settings.bladeLockHold = hold[0] ? [false, !hold[1]] : [true, hold[1]];
         break;
       }
+      case OptionId.BLADE_LOCK_RHYTHM:
+      case OptionId.COMPETITIVE_HOLD:
+        settings.prototypes = { ...settings.prototypes, [option]: settings.prototypes?.[option] !== true };
+        break;
       case OptionId.EFFECTS:
         settings.reducedEffects = !settings.reducedEffects;
         break;

@@ -1,4 +1,6 @@
 import { AttackPhase, getAttackPhase, getChargeRatio } from '../combat/attackPhases.js';
+import { getBeatProgress } from '../combat/BladeLockSystem.js';
+import { FighterState } from '../entities/fighterStates.js';
 import { isSaberStrikeActive } from '../combat/hitboxes.js';
 import { colors } from '../config/themeConfig.js';
 import { effectsConfig } from '../config/effectsConfig.js';
@@ -25,6 +27,7 @@ export class DuelRenderer {
   constructor(arenaDefinition) {
     this.arenaView = new ArenaRenderer(arenaDefinition);
     this.showFinishers = true;
+    this.lockRhythm = false;
     this.poses = new Map();
     this.trails = new Map();
     this.afterimages = new Map();
@@ -109,6 +112,7 @@ export class DuelRenderer {
       renderer.restore();
     }
 
+    this.drawLockBeat(renderer, fighters);
     this.projectileView.draw(renderer, projectiles, fighters);
     this.powerView.draw(renderer, fighters, this.poses, arena.floorY);
     if (effects.stormStrikes) drawStormStrikes(renderer, effects.stormStrikes, effectsConfig.stormStrike);
@@ -139,6 +143,20 @@ export class DuelRenderer {
       drawFighterBody(renderer, fighter, pose, floorY, false, colors.hitFlash);
       renderer.translate(-offsetX, -offsetY);
     }
+    renderer.restore();
+  }
+
+  drawLockBeat(renderer, fighters) {
+    if (!this.lockRhythm) return;
+    const first = fighters.find((fighter) => fighter.state === FighterState.BLADE_LOCK && fighter.combat.lockOpponent >= 0);
+    if (!first) return;
+    const second = fighters[first.combat.lockOpponent];
+    const { contactHeight, beat } = effectsConfig.bladeLock;
+    const progress = getBeatProgress(first.combat.lockTime);
+    const radius = beat.maxRadius + (beat.minRadius - beat.maxRadius) * progress;
+    renderer.save();
+    renderer.setAlpha(beat.alpha * progress);
+    renderer.strokeEllipse((first.x + second.x) / 2, first.y - contactHeight - beat.lift, radius, radius * beat.flatten, colors.text, beat.lineWidth);
     renderer.restore();
   }
 

@@ -117,6 +117,9 @@ export const layout = {
     titleY: 120,
     firstItemY: 196,
     itemSpacing: 42,
+    visibleRows: 11,
+    scrollArrowTopY: 164,
+    scrollArrowBottomY: 646,
   },
   keyRemap: {
     titleY: 100,

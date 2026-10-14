@@ -331,6 +331,7 @@ export class EffectsSystem {
     if (!lock.active) return;
     const presser = event.attacker;
     lock.advantage = presser === lock.first ? event.advantage : -event.advantage;
+    if (event.onBeat === false) return;
     this.placeAtLockContact(params);
     this.spawn(EffectType.BLADE_LOCK_PRESS, params);
     this.spawnLight(this.config.bladeLock.pressLight, params.x, params.y, presser.appearance.saberColor);

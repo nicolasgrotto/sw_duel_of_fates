@@ -39,7 +39,10 @@ export const combatRulesConfig = {
     winnerRecovery: 0.25,
     lockReleaseGuard: 0.15,
     holdRate: 6,
+    competitiveHoldRate: 9,
+    rhythm: { beat: 0.3, window: 0.07 },
   },
+  prototypeModes: ['versus', 'local', 'training'],
 };
 
 export function resolveCombatRules(rules = {}) {
@@ -50,5 +53,6 @@ export function resolveCombatRules(rules = {}) {
     focusEvade: rules.powers === true && rules.focusEvade === true,
     bladeLock: rules.bladeLock === true,
     finishers: rules.finishers === true,
+    bladeLockRhythm: rules.bladeLock === true && rules.bladeLockRhythm === true,
   };
 }

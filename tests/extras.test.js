@@ -103,7 +103,7 @@ describe('guided drills', () => {
     assert.equal(duel.name, 'DuelState');
     assert.equal(duel.mode, DuelMode.DRILL);
     assert.equal(duel.director.steps, drillsConfig.drills.evade.steps);
-    assert.deepEqual({ ...duel.rules }, { powers: false, exhaustion: true, wounds: true, focusEvade: false, bladeLock: true, finishers: true });
+    assert.deepEqual({ ...duel.rules }, { powers: false, exhaustion: true, wounds: true, focusEvade: false, bladeLock: true, finishers: true, bladeLockRhythm: false });
     duel.showModeResult();
     const result = game.states.current;
     assert.equal(result.params.rematchParams.drill, 'exhaustion');

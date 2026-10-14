@@ -41,6 +41,7 @@ it('generates every gallery power by category followed by every technique', () =
 it('forces gallery capabilities and has no rounds even with powers disabled in settings', () => {
   assert.deepEqual(createDuelRules(DuelMode.GALLERY, { powers: false }, []), {
     powers: true, focusEvade: true, exhaustion: false, wounds: false, bladeLock: false, finishers: false,
+    bladeLockRhythm: false,
   });
   assert.equal(hasRoundLimit(DuelMode.GALLERY), false);
 });

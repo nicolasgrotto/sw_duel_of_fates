@@ -8,6 +8,20 @@ function hasPeriodicOffense(fighter) {
   return fighter.combat.chokeTime > 0 || ['choke', 'storm', 'lightning'].includes(fighter.combat.power?.effect);
 }
 
+export function getNearestBeat(lockTime) {
+  return Math.round(lockTime / combatRulesConfig.bladeLock.rhythm.beat);
+}
+
+export function isOnBeat(lockTime) {
+  const { beat, window } = combatRulesConfig.bladeLock.rhythm;
+  return Math.abs(lockTime - getNearestBeat(lockTime) * beat) <= window + Number.EPSILON * Math.max(1, lockTime);
+}
+
+export function getBeatProgress(lockTime) {
+  const { beat } = combatRulesConfig.bladeLock.rhythm;
+  return (lockTime % beat) / beat;
+}
+
 export class BladeLockSystem {
   constructor(combat, fighters, arena) {
     this.combat = combat;
@@ -51,6 +65,8 @@ export class BladeLockSystem {
     combat.lockLastPress = -combatRulesConfig.bladeLock.minPressInterval;
     combat.lockOpponent = this.fighters.indexOf(opponent);
     combat.lockPressHeld = fighter.intent.lightAttack;
+    combat.lockBeat = -1;
+    combat.lockOnBeat = false;
     combat.lockReleaseGuard = 0;
     combat.lockCount += 1;
     fighter.clearAttack();
@@ -93,8 +109,8 @@ export class BladeLockSystem {
     const aPressed = this.countPress(a);
     const bPressed = this.countPress(b);
     const margin = a.combat.lockPresses - b.combat.lockPresses;
-    if (aPressed) this.emit(CombatEvent.BLADE_LOCK_PRESS, a, b, { side: this.fighters.indexOf(a), advantage: margin, presses: a.combat.lockPresses });
-    if (bPressed) this.emit(CombatEvent.BLADE_LOCK_PRESS, b, a, { side: this.fighters.indexOf(b), advantage: b.combat.lockPresses - a.combat.lockPresses, presses: b.combat.lockPresses });
+    if (aPressed) this.emit(CombatEvent.BLADE_LOCK_PRESS, a, b, { side: this.fighters.indexOf(a), advantage: margin, presses: a.combat.lockPresses, onBeat: a.combat.lockOnBeat });
+    if (bPressed) this.emit(CombatEvent.BLADE_LOCK_PRESS, b, a, { side: this.fighters.indexOf(b), advantage: b.combat.lockPresses - a.combat.lockPresses, presses: b.combat.lockPresses, onBeat: b.combat.lockOnBeat });
     if (Math.abs(margin) >= config.winMargin) {
       this.finish(a, b, margin > 0 ? a : b);
     } else if (a.combat.lockTime >= config.maxDuration) {
@@ -107,9 +123,25 @@ export class BladeLockSystem {
     const pressed = intent.lightAttack && !combat.lockPressHeld;
     combat.lockPressHeld = intent.lightAttack;
     if (!pressed || combat.lockTime - combat.lockLastPress + Number.EPSILON * Math.max(1, combat.lockTime) < combatRulesConfig.bladeLock.minPressInterval) return false;
-    combat.lockPresses += 1;
     combat.lockLastPress = combat.lockTime;
+    if (this.combat.rules.bladeLockRhythm) {
+      this.countRhythmPress(combat);
+      return true;
+    }
+    combat.lockPresses += 1;
+    combat.lockOnBeat = true;
     return true;
+  }
+
+  countRhythmPress(combat) {
+    const beatIndex = getNearestBeat(combat.lockTime);
+    combat.lockOnBeat = beatIndex > 0 && beatIndex !== combat.lockBeat && isOnBeat(combat.lockTime);
+    if (combat.lockOnBeat) {
+      combat.lockPresses += 1;
+      combat.lockBeat = beatIndex;
+    } else {
+      combat.lockPresses = Math.max(0, combat.lockPresses - 1);
+    }
   }
 
   finish(a, b, winner, reason = winner ? 'margin' : 'timeout') {
@@ -176,6 +208,8 @@ export class BladeLockSystem {
     combat.lockLastPress = 0;
     combat.lockOpponent = -1;
     combat.lockPressHeld = false;
+    combat.lockBeat = -1;
+    combat.lockOnBeat = false;
     combat.lockReleaseGuard = combatRulesConfig.bladeLock.lockReleaseGuard;
     clearActionBuffer(fighter);
   }

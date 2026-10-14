@@ -22,6 +22,7 @@ export function createDuelRules(mode, settings, powerModes) {
   for (const [capability, modes] of Object.entries(combatRulesConfig.modes)) {
     rules[capability] = modes.includes(mode);
   }
+  rules.bladeLockRhythm = settings.prototypes?.bladeLockRhythm === true && combatRulesConfig.prototypeModes.includes(mode);
   return resolveCombatRules(rules);
 }
 

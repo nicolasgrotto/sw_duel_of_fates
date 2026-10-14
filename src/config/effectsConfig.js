@@ -12,6 +12,7 @@ export const effectsConfig = {
     sparkInterval: 0.07,
     reducedSparkScale: 0.5,
     pressLight: { radius: 70, alpha: 0.35, duration: 0.1 },
+    beat: { maxRadius: 46, minRadius: 8, flatten: 0.6, alpha: 0.5, lineWidth: 1.5, lift: 18 },
   },
   woundHealedLight: { radius: 60, alpha: 0.45, duration: 0.3 },
   throwDust: { count: 8, reducedScale: 0.5, spread: 36, speed: [20, 90], lift: [90, 200], life: [0.25, 0.5], size: [1.5, 2.5] },
