@@ -13,22 +13,24 @@ Jogo 2D de duelo de lâminas de energia para navegador, feito com HTML5, CSS3, J
 
 > Projeto acadêmico, sem fins comerciais, inspirado nos duelos de sabre de Star Wars. Não é um produto oficial e não tem afiliação com a Lucasfilm ou a Disney. O código usa termos neutros e não inclui assets oficiais, para que o jogo possa receber uma identidade própria no futuro (ver [DESIGN.md](DESIGN.md#propriedade-intelectual)).
 
-![Duelo na Mina de Cristal](media/duel-crystal-mine.png)
+![O Soberano lança Raio contra o Guardião na Cidadela do Eclipse](media/duel-lightning-eclipse.png)
 
 | | |
 | --- | --- |
+| ![Ceifador e Garça nas Salinas de Vidro](media/duel-salt-flats.png) | ![Bastião e Espelho no Santuário Alagado](media/duel-sanctuary.png) |
 | ![Menu principal](media/menu.png) | ![Seleção de personagem](media/character-select.png) |
-| ![Duelo no Telhado Neon](media/duel-rooftop.png) | |
+| ![Diálogo da História no Santuário Alagado](media/story-dialogue.png) | |
 
 ## O que tem no jogo
 
-- **10 personagens** com atributos (seis notas de 1 a 7; os secretos chegam a 8, 9 e 10), golpes, habilidade, alinhamento e IA próprios: Guardião, Sombra, Bastião, Vespa, Espelho, Haste, Brasa, Forja, Garça e Eco. Mais um chefe no Arcade e na Sobrevivência e **três personagens secretos**, liberados pela História ou por um segredo na tela de abertura.
-- **6 arenas** desenhadas por código: Plataforma de Refino, Santuário Alagado, Mina de Cristal, Telhado Neon, Anel Orbital e Floresta Lumínica.
-- **Combate por timing**: rápido, forte, bloqueio, parry e parry perfeito com riposta, empurrão, esquiva (dash) e esquiva de precisão, sequências, golpe aéreo, pulo duplo, dash aéreo e habilidade de cada personagem.
-- **Poderes do Fluxo** (opcionais): medidor próprio, catálogo de Fluxo comum, Aurora e Eclipse, loadouts por personagem e resistência pela diferença de nível. Inclui projéteis (como o Corte de Fluxo, que um parry perfeito devolve), efeitos de estado, Absorção, Dreno, Truque Mental e o Arsenal Telecinético, além de poderes de custo alto sinalizados no medidor: Tempestade e Telecinese em Massa (raios ou meteoros marcados no chão), Fratura, Repulsão Suprema, Santuário e Ira.
-- **Modos**: **História** (campanha com protagonista criado e evoluído pelo jogador, diálogos, dois finais e um duelo secreto), Duelar (contra a IA, em Fácil, Normal ou Difícil), Arcade, Sobrevivência, 2 Jogadores no mesmo teclado ou com dois controles, Tutorial, Desafio de parry e Treino (boneco configurável, gravação e reprodução de inputs, hitboxes).
-- **Apresentação**: abertura com a lâmina acendendo, replay em câmera lenta do golpe final, música e som sintetizados que reagem à luta, cores de lâmina e trajes desbloqueáveis, teclas configuráveis e suporte a gamepad.
-- **Celular**: controles de toque (joystick e botões desenhados no jogo), menus por toque, paisagem com safe areas e efeitos reduzidos automáticos.
+- **11 personagens** com atributos (seis notas de 1 a 7; os secretos chegam a 8, 9 e 10), golpes, habilidade, técnicas, alinhamento, peças de roupa e IA próprios: Guardião, Sombra, Bastião, Vespa, Espelho, Haste, Brasa, Forja, Garça, Ceifador (lâmina dupla) e Eco. Mais um chefe no Arcade e na Sobrevivência e **três personagens secretos** (Soberano, Ancião e o Predestinado, em duas variantes), liberados pela História ou por um segredo na tela de abertura.
+- **10 arenas** desenhadas por código, entre elas Santuário Alagado (com reflexo), Mina de Cristal, Telhado Neon, Salinas de Vidro, Convés em Voo, Cume Nevado e Cidadela do Eclipse.
+- **Combate por timing**: rápido, forte, bloqueio, parry e parry perfeito com riposta, empurrão, esquiva (dash) e esquiva de precisão, sequências, golpe aéreo, pulo duplo, dash aéreo, disputa de lâminas, exaustão e ferimentos, e finalizações no K.O.
+- **Técnicas de lâmina**: Giro, Avanço com corte, Arremesso da lâmina, Estocada, Corte ascendente, Rajada, Varredura e Investida descendente (no ar); duas técnicas que se cruzam terminam num choque.
+- **Poderes do Fluxo** (opcionais): medidor próprio, catálogo de Fluxo comum, Aurora e Eclipse, conjuntos por personagem (ou montados na seleção) e resistência pela diferença de nível. Inclui projéteis, efeitos de estado, Absorção, Dreno, Truque Mental, Arsenal Telecinético e poderes de custo alto sinalizados no medidor, como Tempestade, Telecinese em Massa, Fratura, Repulsão Suprema, Santuário e Ira.
+- **Modos**: **História** (campanha com protagonista criado e evoluído pelo jogador, rotas Aurora e Eclipse, diálogos, quatro finais e duelos secretos), Duelar (Fácil, Normal ou Difícil), Arcade, Sobrevivência, 2 Jogadores no mesmo teclado ou com dois controles, Tutorial, Treinos guiados, Desafio de parry, Treino (boneco configurável, gravação de inputs, hitboxes), Desafios com recorde, Galeria de poderes e Galeria da História.
+- **Apresentação**: abertura com a lâmina acendendo, replay em câmera lenta do golpe final, música e som sintetizados que reagem à luta, cores de lâmina e trajes desbloqueáveis, português e inglês, teclas configuráveis e suporte a gamepad.
+- **Celular e offline**: controles de toque (joystick e botões desenhados no jogo), menus por toque, paisagem com safe areas, efeitos reduzidos automáticos; depois do primeiro carregamento, o jogo abre sem conexão.
 
 ## Requisitos
 

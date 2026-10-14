@@ -37,7 +37,7 @@ assets/
 | src/arenas/arenaData.js (saltFlats, skyDeck, snowPeak, eclipseCitadel) | cenário procedural | geometria original do projeto | MIT | Salinas de Vidro, Convés em Voo, Cume Nevado e Cidadela do Eclipse (2.14) desenhados por código; sem imagem externa |
 | assets/fonts/Oxanium.ttf | fonte | The Oxanium Project Authors (github.com/sevmeyer/oxanium), via github.com/google/fonts | SIL OFL 1.1 | Fonte variável; licença completa em assets/fonts/Oxanium-OFL.txt |
 | assets/fonts/Oxanium-OFL.txt | licença | The Oxanium Project Authors | SIL OFL 1.1 | Texto da licença distribuído junto com a fonte |
-| media/menu.png, media/character-select.png, media/duel-crystal-mine.png, media/duel-rooftop.png | captura de tela | capturas do próprio jogo (Chrome headless, 1280×720) | MIT | Usadas só no README; o jogo não carrega esses arquivos |
+| media/menu.png, media/character-select.png, media/story-dialogue.png, media/duel-lightning-eclipse.png, media/duel-salt-flats.png, media/duel-sanctuary.png | captura de tela | capturas do próprio jogo (Chrome headless, 1600×900, refeitas na 3.0) | MIT | Usadas só no README; o jogo não carrega esses arquivos |
 
 | assets/ui/icon-192.png, assets/ui/icon-512.png | ícone PNG | geometria original do projeto, Canvas 2D com tokens de themeConfig; duas lâminas cruzadas | MIT | Sem logo de franquia, tamanhos 192 e 512 |
 
