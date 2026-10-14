@@ -6,6 +6,7 @@ export const SoundName = Object.freeze({
   BLOCK: 'block',
   GUARD_BREAK: 'guardBreak',
   CLASH: 'clash',
+  TECHNIQUE_CLASH: 'techniqueClash',
   BLADE_LOCK_PRESS: 'bladeLockPress',
   BLADE_LOCK_WIN: 'bladeLockWin',
   BLADE_LOCK_BREAK: 'bladeLockBreak',

@@ -27,6 +27,8 @@ function getSoundForEvent(event) {
     case CombatEvent.CLASH:
     case CombatEvent.BLADE_LOCK_START:
       return SoundName.CLASH;
+    case CombatEvent.TECHNIQUE_CLASH:
+      return SoundName.TECHNIQUE_CLASH;
     case CombatEvent.BLADE_LOCK_PRESS:
       return SoundName.BLADE_LOCK_PRESS;
     case CombatEvent.BLADE_LOCK_END:

@@ -17,7 +17,7 @@ export const combatRulesConfig = {
     headChance: 0.3,
     limbs: {
       light: 'arm', light2: 'arm', light4: 'arm', light5: 'arm', heavy: 'arm', riposte: 'arm', special: 'arm', counterStrike: 'arm', bladeLock: 'arm',
-      light3: 'leg', forwardHeavy: 'leg', spin: 'leg', dashSlash: 'leg', sweep: 'leg', thrust: 'arm', risingCut: 'arm', flurry: 'arm', plunge: 'arm',
+      light3: 'leg', forwardHeavy: 'leg', spin: 'leg', dashSlash: 'leg', lowSweep: 'leg', longThrust: 'arm', risingCut: 'arm', flurry: 'arm', plunge: 'arm',
     },
   },
   wounds: {

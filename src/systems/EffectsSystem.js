@@ -19,6 +19,7 @@ export const EffectType = Object.freeze({
   BLOCK_SPARK: 'blockSpark',
   GUARD_BREAK: 'guardBreak',
   SABER_CLASH: 'saberClash',
+  TECHNIQUE_CLASH: 'techniqueClash',
   FINAL_BLOW: 'finalBlow',
   PARRY_SPARK: 'parrySpark',
   PERFECT_PARRY: 'perfectParry',
@@ -199,6 +200,12 @@ export class EffectsSystem {
       case CombatEvent.CLASH:
         params.secondaryColor = defender.appearance.saberColor;
         this.spawn(EffectType.SABER_CLASH, params);
+        break;
+      case CombatEvent.TECHNIQUE_CLASH:
+        params.secondaryColor = defender.appearance.saberColor;
+        this.spawn(EffectType.TECHNIQUE_CLASH, params);
+        this.spawnRing(this.config.techniqueClashRing, x, y, attacker.appearance.saberColor);
+        this.spawnRing(this.config.techniqueClashRing, x, y, defender.appearance.saberColor);
         break;
       case CombatEvent.DEATH:
         this.spawn(EffectType.FINAL_BLOW, params);

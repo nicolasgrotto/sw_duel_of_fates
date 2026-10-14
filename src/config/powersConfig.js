@@ -24,7 +24,7 @@ export const powersConfig = {
     flow: { alignments: ['light', 'dark'], abilities: ['push', 'pull', 'throw', 'mindTwist', 'supremePush', 'fracture'] },
     aurora: { alignments: ['light'], abilities: ['barrier', 'heal', 'focus', 'absorb', 'sanctuary', 'meteorRain', 'flowCleave'] },
     eclipse: { alignments: ['dark'], abilities: ['lightning', 'choke', 'freeze', 'storm', 'wrath', 'drain', 'arsenal'] },
-    blade: { alignments: ['light', 'dark'], abilities: ['spin', 'dashSlash', 'saberThrow', 'thrust', 'risingCut', 'flurry', 'sweep', 'plunge'] },
+    blade: { alignments: ['light', 'dark'], abilities: ['spin', 'dashSlash', 'saberThrow', 'longThrust', 'risingCut', 'flurry', 'lowSweep', 'plunge'] },
   },
   powers: {
     arsenal: {

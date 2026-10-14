@@ -45,7 +45,7 @@ describe('thrust', () => {
     const { attacker, defender, simulation } = setup('haste', 0);
     defender.x = attacker.x + attacker.width / 2 + attacker.moves.heavy.hitbox.reach + defender.width / 2 + 40;
     useTechnique(simulation, attacker, 1);
-    assert.equal(attacker.combat.attackType, 'thrust');
+    assert.equal(attacker.combat.attackType, 'longThrust');
     const hits = run(simulation, 0.5).filter((event) => event.type === CombatEvent.HIT && event.attacker === attacker);
     assert.equal(hits.length, 1);
 
@@ -130,7 +130,7 @@ describe('sweep', () => {
     const guard = setup('ember', 520);
     run(guard.simulation, 0.1, () => { guard.defender.intent.block = true; });
     useTechnique(guard.simulation, guard.attacker, -1);
-    assert.equal(guard.attacker.combat.attackType, 'sweep');
+    assert.equal(guard.attacker.combat.attackType, 'lowSweep');
     let staggered = false;
     const events = run(guard.simulation, 0.8, () => {
       guard.defender.intent.block = true;
@@ -208,7 +208,7 @@ describe('technique clash', () => {
     assert.ok(!events.some((event) => event.type === CombatEvent.HIT));
     assert.deepEqual([left.health, right.health], health);
     const { staminaLoss } = combatRulesConfig.techniqueClash;
-    assert.ok(left.stamina <= stamina[0] - bladeTechniques.thrust.staminaCost - staminaLoss + 1e-6 + 30);
+    assert.ok(left.stamina <= stamina[0] - bladeTechniques.longThrust.staminaCost - staminaLoss + 1e-6 + 30);
     assert.equal(left.combat.attack, null);
     assert.equal(right.combat.attack, null);
     assert.ok(left.vx < 0 || left.x < 520);
@@ -242,7 +242,7 @@ describe('techniques and the AI', () => {
     for (let i = 0; i < 400; i += 1) airborne += ai.suitsTechnique(self.moves.risingCut) ? 1 : 0;
     assert.equal(airborne, 400);
     assert.ok(grounded > 60 && grounded < 200, `${grounded}`);
-    const sweep = bladeTechniques.sweep;
+    const sweep = bladeTechniques.lowSweep;
     opponent.grounded = true;
     opponent.setState(FighterState.BLOCKING);
     assert.equal(ai.suitsTechnique(sweep), true);

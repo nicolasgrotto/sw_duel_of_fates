@@ -269,8 +269,8 @@ export const bladeTechniques = {
     staminaCost: 28, startup: 0.26, active: 0.08, recovery: 0.4, lunge: 0, knockback: 220,
     hitbox: { top: 0.7, bottom: 0.4 },
   },
-  thrust: {
-    attack: 'heavy', type: 'heavy', pose: 'thrust', technique: true, cancelsInto: [], damage: 14,
+  longThrust: {
+    attack: 'heavy', type: 'heavy', pose: 'longThrust', technique: true, cancelsInto: [], damage: 14,
     staminaCost: 26, startup: 0.24, active: 0.1, recovery: 0.5, lunge: 220, knockback: 240, hitstun: 0.35,
     reachBonus: 55, hitbox: { top: 0.64, bottom: 0.46 },
   },
@@ -286,8 +286,8 @@ export const bladeTechniques = {
     blockStaminaCost: 9, blockPushback: 40, hits: 4, hitInterval: 0.07,
     hitbox: { reach: 95, top: 0.75, bottom: 0.4 },
   },
-  sweep: {
-    attack: 'heavy', type: 'heavy', pose: 'sweep', technique: true, cancelsInto: [], damage: 9,
+  lowSweep: {
+    attack: 'heavy', type: 'heavy', pose: 'lowSweep', technique: true, cancelsInto: [], damage: 9,
     staminaCost: 26, startup: 0.42, active: 0.12, recovery: 0.5, lunge: 120, knockback: 80, hitstun: 0.55,
     sweep: true,
     hitbox: { reach: 105, top: 0.22, bottom: -0.02 },

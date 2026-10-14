@@ -15,6 +15,10 @@ import { TimeControl } from '../src/systems/TimeControl.js';
 import { createRandom } from '../src/utils/random.js';
 import { segmentEntersBox, spawnFighter } from './helpers.js';
 
+const NEW_TECHNIQUES = ['longThrust', 'risingCut', 'flurry', 'lowSweep', 'plunge'];
+const MELEE_TECHNIQUES = ['spin', 'dashSlash', ...NEW_TECHNIQUES];
+const STEP = 1 / 60;
+
 const techniqueCasters = Object.keys(characters).map((id) => ({ id, create: (facing) => spawnFighter(500, facing, id) }));
 techniqueCasters.push({ id: 'protagonist/technique', create: (facing) => createFighterFromCharacter(createProtagonistCharacter({
   name: 'Pilot', style: 'technique', alignment: 'light', attributes: storyConfig.startAttributes,
@@ -127,12 +131,28 @@ describe('technique keyframe tracks', () => {
 
   for (const { id, create } of techniqueCasters) {
     const equipped = new Set(Object.values(create(1).stats.techniques));
-    for (const moveId of ['spin', 'dashSlash'].filter((move) => equipped.has(move))) {
+    for (const moveId of MELEE_TECHNIQUES.filter((move) => equipped.has(move))) {
       for (const facing of [-1, 1]) {
         it(`${id}/${moveId}/${facing}: the blade enters the real hitbox interior during active`, () => {
           assertBladeReachesHitbox(create(facing), moveId);
         });
       }
+    }
+    for (const moveId of NEW_TECHNIQUES.filter((move) => equipped.has(move))) {
+      it(`${id}/${moveId}: turns the blade at most 60 degrees per frame from guard to guard`, () => {
+        const fighter = create(1);
+        const move = fighter.moves[moveId];
+        const pose = createPose();
+        let previous = computePose(spawnFighter(500, 1, fighter.id === 'protagonist' ? 'guardian' : fighter.id), createPose()).bladeAngle;
+        const frames = Math.ceil((move.startup + move.active + move.recovery) / STEP);
+        for (let frame = 0; frame <= frames; frame += 1) {
+          attackAt(fighter, moveId, Math.min(frame * STEP, move.startup + move.active + move.recovery - 1e-6));
+          const angle = computePose(fighter, pose).bladeAngle;
+          const change = Math.abs(Math.atan2(Math.sin(angle - previous), Math.cos(angle - previous)));
+          assert.ok(change <= Math.PI / 3, `${fighter.id}/${moveId} frame ${frame}: ${(change * 180 / Math.PI).toFixed(1)}`);
+          previous = angle;
+        }
+      });
     }
     if (!equipped.has('saberThrow')) continue;
     for (const facing of [-1, 1]) {

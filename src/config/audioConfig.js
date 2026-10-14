@@ -96,6 +96,12 @@ export const audioConfig = {
       { type: 'noise', duration: 0.3, attack: 0.002, gain: 0.9, filter: { type: 'bandpass', from: 3000, to: 900, q: 0.9 } },
       { type: 'tone', wave: 'sawtooth', from: 520, to: 160, duration: 0.3, attack: 0.002, gain: 0.1, filter: { type: 'lowpass', from: 1800, to: 500, q: 1 } },
     ],
+    techniqueClash: [
+      { type: 'tone', wave: 'triangle', from: 900, to: 640, duration: 0.5, attack: 0.002, gain: 0.34, filter: null },
+      { type: 'tone', wave: 'square', from: 1320, to: 980, duration: 0.42, attack: 0.002, gain: 0.07, filter: { type: 'lowpass', from: 4600, to: 1600, q: 1 } },
+      { type: 'noise', duration: 0.42, attack: 0.002, gain: 1, filter: { type: 'bandpass', from: 2600, to: 600, q: 0.8 } },
+      { type: 'tone', wave: 'sine', from: 90, to: 32, duration: 0.5, attack: 0.002, gain: 0.4, filter: null },
+    ],
     bladeLockPress: [
       { type: 'tone', wave: 'triangle', from: 940, to: 860, duration: 0.07, attack: 0.002, gain: 0.07, filter: null },
       { type: 'noise', duration: 0.04, attack: 0.001, gain: 0.16, filter: { type: 'bandpass', from: 2600, to: 2600, q: 1.5 } },

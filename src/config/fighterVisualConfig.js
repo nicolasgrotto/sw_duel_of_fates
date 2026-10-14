@@ -392,6 +392,46 @@ export const techniqueKeyframes = {
     { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 10, lean: 14, lift: 0.02, reach: 0.24, step: 0.07, hip: 0.03 },
     { phase: RECOVERY, at: 0.6, ease: 'inOut', blade: 5, lean: 10, reach: 0.2, step: 0.06, hip: 0.02 },
   ],
+  longThrust: [
+    { phase: STARTUP, at: 0.6, ease: 'out', blade: 4, lean: -6, reach: -0.06, slide: 0.04, hip: -0.02 },
+    { phase: STARTUP, at: 1, ease: 'inOut', blade: 2, lean: -8, reach: -0.09, slide: 0.05, hip: -0.025 },
+    { phase: ACTIVE, at: 0.5, ease: 'in', blade: 0, lean: 10, reach: 0.18, step: 0.08, hip: 0.025 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 0, lean: 15, reach: 0.27, step: 0.11, hip: 0.04 },
+    { phase: RECOVERY, at: 0.35, ease: 'outQuad', blade: 3, lean: 14, reach: 0.25, step: 0.11, hip: 0.04 },
+  ],
+  risingCut: [
+    { phase: STARTUP, at: 0.5, ease: 'out', blade: 110, lean: 6, crouch: 14, slide: 0.02, hip: -0.01 },
+    { phase: STARTUP, at: 1, ease: 'inOut', blade: 135, lean: 10, crouch: 20, slide: 0.03, hip: -0.015 },
+    { phase: ACTIVE, at: 0.4, ease: 'in', blade: 40, lean: 6, crouch: 10, reach: 0.1, step: 0.04, hip: 0.01 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: -95, lean: -3, lift: 0.12, reach: 0.06, step: 0.05, hip: 0.02 },
+    { phase: RECOVERY, at: 0.35, ease: 'outQuad', blade: -100, lean: -3, lift: 0.12, reach: 0.05, step: 0.05, hip: 0.02 },
+  ],
+  flurry: [
+    { phase: STARTUP, at: 1, ease: 'out', blade: 4, lean: -2, reach: -0.05, slide: 0.02, hip: -0.01 },
+    { phase: ACTIVE, at: 0.125, ease: 'in', blade: -6, lean: 8, reach: 0.18, step: 0.04, hip: 0.015 },
+    { phase: ACTIVE, at: 0.25, ease: 'out', blade: 4, lean: 6, reach: 0.04, step: 0.04, hip: 0.01 },
+    { phase: ACTIVE, at: 0.375, ease: 'in', blade: 8, lean: 8, reach: 0.18, step: 0.05, hip: 0.015 },
+    { phase: ACTIVE, at: 0.5, ease: 'out', blade: -2, lean: 6, reach: 0.04, step: 0.05, hip: 0.01 },
+    { phase: ACTIVE, at: 0.625, ease: 'in', blade: -8, lean: 9, reach: 0.19, step: 0.06, hip: 0.02 },
+    { phase: ACTIVE, at: 0.75, ease: 'out', blade: 2, lean: 7, reach: 0.04, step: 0.06, hip: 0.015 },
+    { phase: ACTIVE, at: 0.875, ease: 'in', blade: 6, lean: 10, reach: 0.2, step: 0.07, hip: 0.02 },
+    { phase: ACTIVE, at: 1, ease: 'out', blade: 4, lean: 10, reach: 0.16, step: 0.07, hip: 0.02 },
+    { phase: RECOVERY, at: 0.35, ease: 'outQuad', blade: 6, lean: 8, reach: 0.12, step: 0.06, hip: 0.015 },
+  ],
+  lowSweep: [
+    { phase: STARTUP, at: 0.5, ease: 'out', blade: 140, lean: 6, crouch: 18, slide: 0.03, hip: -0.01 },
+    { phase: STARTUP, at: 1, ease: 'inOut', blade: 160, lean: 10, crouch: 26, slide: 0.04, hip: -0.015 },
+    { phase: ACTIVE, at: 0.5, ease: 'in', blade: 80, lean: 14, crouch: 28, reach: 0.12, step: 0.06, hip: 0.02 },
+    { phase: ACTIVE, at: 1, ease: 'outQuad', blade: 30, lean: 16, crouch: 28, reach: 0.18, step: 0.08, hip: 0.03 },
+    { phase: RECOVERY, at: 0.35, ease: 'outQuad', blade: 28, lean: 14, crouch: 26, reach: 0.16, step: 0.08, hip: 0.03 },
+  ],
+  plunge: [
+    { phase: STARTUP, at: 0.5, ease: 'inOut', blade: 10, lean: 6, crouch: 6, lift: 0.08, hip: 0.005 },
+    { phase: STARTUP, at: 1, ease: 'inOut', blade: 60, lean: 10, crouch: 10, lift: 0.1, hip: 0.01 },
+    { phase: ACTIVE, at: 0.3, ease: 'in', blade: 80, lean: 14, crouch: 16, lift: 0.06, reach: 0.06, hip: 0.02 },
+    { phase: ACTIVE, at: 1, ease: 'linear', blade: 82, lean: 14, crouch: 18, lift: 0.04, reach: 0.06, hip: 0.02 },
+    { phase: RECOVERY, at: 0.4, ease: 'outQuad', blade: 78, lean: 12, crouch: 22, reach: 0.06, hip: 0.02 },
+  ],
 };
 
 const waspLight = [
