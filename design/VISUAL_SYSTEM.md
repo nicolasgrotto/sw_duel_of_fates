@@ -352,6 +352,7 @@ O estilo trainingStatus usa system-ui 18 px, textMuted, alinhado à esquerda; st
 - **Repulsão**: anel que se abre à frente de quem lança; **Puxão**: anel que se fecha no mesmo ponto, puxando o olhar para quem lança.
 - **Raio**: duas polilinhas (glow largo e translúcido + núcleo fino) da mão até o alvo ou até o alcance máximo, redesenhadas em intervalos curtos.
 - **Barreira**: elipse em volta de quem lança, com glow fraco que pulsa; clareia ao absorver.
+- **Contorno de Foco e Ira**: duas silhuetas de cor única em diagonais opostas, atrás do corpo (`auraCopies`); detalhes em VFX_GUIDELINES.
 - **Resistido**: anel curto na cor do tier do **alvo**, como se o poder batesse numa parede.
 - Pose: ao lançar, a lâmina vai para trás e o corpo inclina para a frente; ao canalizar, o corpo treme de leve; na barreira, a lâmina sobe e o corpo abaixa.
 

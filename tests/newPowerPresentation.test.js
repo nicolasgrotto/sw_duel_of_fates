@@ -283,10 +283,13 @@ describe('focus and wrath auras', () => {
   it('outlines a focused fighter steadily and orbits two motes around the chest', () => {
     const { behind, front } = auraCalls((fighter) => { fighter.combat.focusTime = 2; });
     const torsos = behind.filter((call) => call.name === 'fillPolygon' && call.args[1] === powersConfig.tiers[2].color);
-    assert.ok(torsos.length >= 4);
+    const { auraCopies } = powersConfig.render.status;
+    assert.equal(auraCopies.length, 2);
+    assert.ok(torsos.length >= auraCopies.length);
     const { offset } = powersConfig.render.status.focusOutline;
     const shifts = behind.filter((call) => call.name === 'translate').map((call) => `${call.args[0]},${call.args[1]}`);
-    for (const expected of [`${offset},0`, `${-offset},0`, `0,${-offset}`, `0,${offset}`]) assert.ok(shifts.includes(expected), expected);
+    for (const expected of [`${offset},${-offset}`, `${-offset},${offset}`]) assert.ok(shifts.includes(expected), expected);
+    for (const absent of [`${offset},0`, `0,${-offset}`]) assert.ok(!shifts.includes(absent), absent);
     assert.equal(front.filter((call) => call.name === 'drawGlow').length, 1 + powersConfig.render.status.focusMotes.count);
   });
 

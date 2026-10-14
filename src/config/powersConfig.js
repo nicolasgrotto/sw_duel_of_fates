@@ -314,6 +314,7 @@ export const powersConfig = {
       focusOutline: { offset: 2.5, alpha: [0.3, 0.5], speed: 2.5 },
       focusMotes: { count: 2, radiusX: 0.3, radiusY: 0.12, height: 0.6, speed: 2.2, size: 7, alpha: 0.7 },
       wrathOutline: { offset: [3, 5.5], alpha: [0.3, 0.6], flicker: [17, 23], rise: 1.5 },
+      auraCopies: [{ side: 1, rise: 1, drop: 0 }, { side: -1, rise: 0, drop: 1 }],
       wrathEmbers: { count: 7, rate: 1.4, rise: 70, length: 9, width: 2, alpha: 0.75, spread: 1.3, height: 0.72 },
       sanctuaryCenter: 0.5,
       sanctuaryRadiusX: 0.3,

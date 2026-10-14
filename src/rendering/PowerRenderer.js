@@ -157,9 +157,11 @@ export class PowerRenderer {
   }
 
   drawOffsetSilhouettes(renderer, fighter, pose, floorY, color, side, up) {
-    for (let index = 0; index < 4; index += 1) {
-      const offsetX = index === 0 ? side : index === 1 ? -side : 0;
-      const offsetY = index === 2 ? -up : index === 3 ? side : 0;
+    const copies = style.status.auraCopies;
+    for (let index = 0; index < copies.length; index += 1) {
+      const copy = copies[index];
+      const offsetX = copy.side * side;
+      const offsetY = copy.drop * side - copy.rise * up;
       renderer.translate(offsetX, offsetY);
       drawFighterBody(renderer, fighter, pose, floorY, false, color);
       renderer.translate(-offsetX, -offsetY);
