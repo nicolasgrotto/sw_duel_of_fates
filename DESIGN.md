@@ -68,8 +68,8 @@ O coração do duelo é o triângulo **ataque > empurrão > guarda/parry > ataqu
   - **Guardião**: postura defensiva, movimentos controlados, sabre de cor fria (azul ou verde).
   - **Sombra**: postura agressiva, movimentos amplos, sabre vermelho.
 - Silhueta reconhecível de longe: capa, capuz, postura e forma de segurar o sabre diferenciam os personagens antes da cor.
-- Os nomes finais ainda não estão definidos.
-- **Elenco planejado** (conceitos aprovados, detalhes em [GAME_DESIGN.md](GAME_DESIGN.md#15-elenco-planejado)): Guardião, Sombra, Bastião, Vespa, Garça, Espelho, Haste, Brasa, Eco e Forja. Cada um muda a forma de jogar, não só os números, e passa no teste da silhueta pintada de preto.
+- Os nomes de tela vigentes ficam nas tabelas PT-BR/EN; mudanças de identidade são feitas nesses dados.
+- **Elenco comum** (conceitos aprovados, detalhes em [GAME_DESIGN.md](GAME_DESIGN.md#15-elenco-planejado)): Guardião, Sombra, Bastião, Vespa, Garça, Espelho, Haste, Brasa, Eco, Forja e Ceifador. Cada um muda a forma de jogar, não só os números, e passa no teste da silhueta pintada de preto.
 
 ## Arenas
 
@@ -197,6 +197,6 @@ O ciclo v2.1 → v3.0 dá consequência ao duelo sem trocar o ritmo de leitura. 
 - **Toque.** O limite de seis botões de combate ganha uma exceção: um botão contextual aparece só para lutadores com quarto poder. Registrado em UI_GUIDELINES na etapa 2.7.
 - **Termos de tela.** Vigor (no lugar de Stamina), Contra-ataque (no lugar de Riposta) e Golpe de resposta (no lugar de Contra-golpe) em português. O poder novo do Eclipse se chama Ira, distinto do estilo Fúria do protagonista; glossário PT-BR/EN em versions/v3.md.
 
-## Decisões em aberto
+## Apresentação da 3.0
 
-- Estilo dos sprites: desenho por código (formas e silhuetas) ou sprites desenhados/gerados.
+Desenho por código no Canvas 2D, com formas, silhuetas e trilhas de poses; sem sprites externos. Uma mudança futura de técnica visual exige revisão dos documentos de design antes da implementação.

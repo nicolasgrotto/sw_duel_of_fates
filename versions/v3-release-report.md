@@ -39,11 +39,11 @@ Garça antes: 41,7%; candidato Lâmina 4: 46,6%; Lâmina 5: 51,1% nas seeds 1/2 
 | Predestinado Aurora | 89,0% | 88,7% | 89,3% |
 | Predestinado Eclipse | 85,8% | 83,3% | 88,2% |
 
-Ordem média preservada: Ancião < Soberano < ambas as variantes do Predestinado. A ordem não é promessa por dificuldade ou adversário.
+Ordem média preservada: Ancião < Soberano < ambas as variantes do Predestinado. A ordem não é promessa por dificuldade ou adversário. No confronto direto entre variantes (480 duelos, ambas as ordens), Aurora 54,0% e Eclipse 46,0%.
 
 ## História
 
-**2.916 cenários e 174.960 duelos**, seeds 1/2, 60 duelos por caso; três dificuldades de campanha, dois caminhos, três estilos, três builds e três pilotos. Builds: equilibrada (investimento alternado nos seis atributos), lâmina (prioriza Lâmina/Vida/Vigor) e fluxo (prioriza Fluxo/Vigor/Vida); as duas especializadas equipam poderes preferidos disponíveis do próprio caminho. Pontos, teto, slots e poderes vêm de `storyRun` e `storyConfig`; no Fácil, o orçamento leva todos os atributos ao teto. Cada encontro é medido isoladamente; a vitória usada para avançar a preparação não mede conclusão da campanha. Os 486 cenários contra Vespa/Sombra foram repetidos após seus ajustes, e os outros 2.430 preservados. **0 timeouts e 2 K.O. duplos**, contabilizados separadamente.
+**2.916 cenários e 174.960 duelos**, seeds 1/2, 60 duelos por caso; três dificuldades de campanha, dois caminhos, três estilos, três builds e três pilotos. Builds: equilibrada (investimento alternado nos seis atributos), lâmina (prioriza Lâmina/Vida/Vigor) e fluxo (prioriza Fluxo/Vigor/Vida); as duas especializadas equipam poderes preferidos disponíveis do próprio caminho. Pontos, teto, slots e poderes vêm de `storyRun` e `storyConfig`; no Fácil, o orçamento leva todos os atributos ao teto. Cada encontro é medido isoladamente; a vitória usada para avançar a preparação não mede conclusão da campanha. Os 486 cenários contra Vespa/Sombra foram repetidos após seus ajustes, e os outros 2.430 preservados. **0 timeouts e 2 K.O. duplos**, contabilizados separadamente: seed 2, encontro Mina, estilo Voo, build fluxo, piloto Normal, um na campanha Fácil e outro na Difícil.
 
 Piloto Normal fixo: vitórias por dificuldade da campanha, com percentual de todos os duelos em que venceu mantendo **mais de 75% de vida**, entre parênteses; esse é o acesso real ao secreto no chefe final, não uma estimativa pela vida média.
 
@@ -79,7 +79,7 @@ Médias por duelo, somando ambos os lutadores. Disputas contam as duas participa
 
 ## Regressão e navegador
 
-- 1.961 testes, 0 falhas, incluindo snapshots/replay, save antigo/corrompido/futuro, input, limites dos sistemas e offline.
+- 1.962 testes, 0 falhas, incluindo snapshots/replay, save antigo/corrompido/futuro, input, limites dos sistemas e offline.
 - Referência: 846 cenários; 312 alterações intencionais, todas nos pares ordenados que incluem `heron`, `shadow` ou `wasp`: 78 pares × dois níveis × clássico/Poderes. Os 534 demais, incluindo os seis da História, permaneceram idênticos. Fixture regravada após auditoria; reconferência: **0 changed e 0 missing**.
 - Chrome: Arcade/Sobrevivência em PT-BR/EN, Poderes ligados/desligados, comando real do teclado, pausa e reset; sem exceções.
 - Revisão de conteúdo: 428 renders em PT-BR/EN, todos os personagens/variantes e arenas, menus/seleção/História e 20 poderes + 8 técnicas da galeria; sem exceções, chaves literais, `undefined`, `NaN` ou placeholders.
@@ -96,3 +96,33 @@ Médias por duelo, somando ambos os lutadores. Disputas contam as duas participa
 `node tools/releaseMatrix.js --suite story --out <pasta-temporaria>/story.json`
 
 Comparação de candidatos: `--suite heron --heronBlade 4` ou `--targets shadow,wasp --ratings shadow.health=4,wasp.blade=2`. Todos usam os mesmos sistemas do jogo, sem modelo paralelo. Capturas e JSON de QA são temporários; este relatório textual fica no repositório, conforme ASSETS.md.
+
+## Desempenho final e limites
+
+Chrome 155.0.8059.40 no Windows 10, Intel i5-2400 (4 CPUs lógicas), 16 GB, NVIDIA GT 730; Canvas 2D e composição acelerados, ANGLE/D3D11. CPU 6×, viewport 844×390, DPR 3 limitado a 2, **canvas 1688×780**, 120 frames de aquecimento e 11 s de coleta por caso, janelas de 60 frames do GameLoop/F3. Matrizes e testes encerrados antes das medições; nenhum teste pesado nosso em paralelo. Não é possível certificar ausência de toda carga externa na máquina. Intervalos de RAF e picos são registrados separadamente do tempo de trabalho.
+
+| Cena | Update médio / maior janela (ms) | Render médio / maior janela (ms) | Intervalo p95 / máximo (ms) |
+| --- | ---: | ---: | ---: |
+| Duelo IA × IA | 2,17 / 2,84 | 7,61 / 10,03 | 18,10 / 36,10 |
+| Raio × Barreira | 1,72 / 2,89 | 7,24 / 9,60 | 18,10 / 36,10 |
+| Raio reduzido | 0,96 / 2,79 | 4,42 / 9,74 | 18,10 / 72,00 |
+| Dois jogadores | 1,62 / 2,30 | 7,10 / 8,63 | 18,10 / 54,00 |
+| Disputa | 1,02 / 1,98 | 5,03 / 8,37 | 18,10 / 36,00 |
+| Replay completo | 0,95 / 1,64 | 6,33 / 8,62 | 18,10 / 36,00 |
+| Replay reduzido | 1,05 / 1,58 | 6,99 / 9,22 | 18,10 / 89,90 |
+| Estresse de pools | 0,81 / 1,31 | 10,86 / 13,95 | 36,00 / 36,10 |
+| Estresse + F3 | 0,93 / 1,98 | 12,52 / 18,14 | 36,10 / 54,00 |
+
+**Correção do replay.** A pilha desenhava o duelo suspenso antes do replay, que cobre a tela. `GameState.coversScreen` permite começar no último estado que cobre toda a cena; `ReplayState` usa esse contrato. Sobreposições transparentes e a volta ao duelo continuam funcionando. Render médio completo **10,87 → 6,33 ms**, maior janela **14,00 → 8,62 ms**; reduzido **9,61 → 6,99 ms**, maior janela **14,06 → 9,22 ms**. Comparação de quadro congelado antes/depois: apenas 4 dos 1.316.640 pixels diferiram, com variação máxima de 1 em um canal de 8 bits; sem diferença visual perceptível. Volta ao duelo conferida e teste da pilha cobre sobreposições e dois estados que cobrem a cena.
+
+**Ressalvas.** O orçamento ≤ 2 ms update / ≤ 10 ms render por janela **não passou em todos os casos 6×**. Duelo: duas rodadas, update médio 1,95/2,17 ms, maiores janelas 2,90/2,84; render médio 7,82/7,61, maiores 10,06/10,03. Raio: update máximo 2,64/2,89 e render máximo 10,87/9,60. Estresse sintético excedeu render: 13,95 ms, com F3 18,14 ms; ele força 300 partículas, 8 luzes, 4 anéis, 2 ondas, 6 projéteis e Cura/Foco/Ira simultâneos. O caso com F3 não representa a cena comum. Não se atribuem os excessos a ruído sem prova.
+
+Transições isoladas do replay corrigido em CPU 6×: entrada completa até 18,50 ms, reduzida até 23,70; saída incluindo update e render até 36,60/46,60 ms. São picos fora das médias de janela e continuam registrados. Sem exceções nos nove cenários e nas repetições. Sem limitação artificial, duelo update/render médio 0,27/0,77 ms (maiores janelas 0,32/0,87) e estresse + F3 0,13/1,63 ms (0,14/1,79). RAF p95 ~18 ms neste Chrome; esse ambiente não certifica 60 FPS em hardware móvel. A/Bs e conferências físicas das etapas anteriores continuam no histórico; esta etapa não repete Android/iOS.
+
+## Offline e publicação
+
+Lista de 174 recursos regenerada após as mudanças; testes de completude, hash por conteúdo, instalação atômica, download interrompido, segurança entre abas e save passaram em Node. O teste final de instalação e reabertura offline no Chrome **não foi concluído neste ambiente**: a página acessa `index.html` com HTTP 200, mas o mesmo fetch no service worker permanece pendente, e a instalação não chega ao cache completo. Reproduzido em perfis isolados, dentro e fora do sandbox; sem alteração no worker para contornar o ambiente. A reabertura real e atualização com múltiplas abas da 2.10 estão registradas em v3.md, mas não substituem a conferência do pacote final.
+
+Implementação e documentação do candidato 3.0.0 prontas. Próximas verificações: offline do pacote final em navegador comum e desempenho em hardware alvo, com atenção aos excessos 6× acima. Publicação depende da aprovação do autor prevista na task 3.0: integrar na main, criar a tag e enviar ao GitHub. Até essa decisão, o candidato permanece em v3-development.
+
+Arquivos principais: `src/config/combatRulesConfig.js`, `src/config/powersConfig.js`, `src/characters/characterData.js`, `tools/simulate.js`, `tools/releaseMatrix.js`, `tools/reference-v2.json`, `src/core/StateMachine.js`, `src/states/GameState.js`, `src/states/ReplayState.js`, testes de regras/poderes/atributos/referência/pilha, `offline-resources.js`, `package.json` e documentação README/DESIGN/GAME_DESIGN/ARCHITECTURE/versions.

@@ -5,7 +5,7 @@ Este é um projeto estritamente acadêmico e sem fins lucrativos, desenvolvido e
 Os conceitos de "A Força" e mecânicas de duelo contidos aqui são inspirados na franquia Star Wars, de propriedade da Lucasfilm Ltd. e Walt Disney Company. 
 Não há intenção de violação de direitos autorais. Todo o código e implementação lógica são de autoria própria.
 
-**Academic Project / Prototype**
+**Academic Project / Prototype — versão 3.0.0**
 
 Jogo 2D de duelo de lâminas de energia para navegador, feito com HTML5, CSS3, JavaScript puro (ES Modules) e Canvas 2D. Sem frameworks, sem engine e sem bundler.
 
@@ -82,7 +82,7 @@ npm test
 
 Usa o test runner nativo do Node (`node --test`). Não há dependências para instalar.
 
-Os testes cobrem apenas módulos de lógica. Por isso, módulos de lógica não podem acessar DOM nem Canvas diretamente (ver [ARCHITECTURE.md](ARCHITECTURE.md)).
+Os testes cobrem lógica, dados, persistência, offline e contratos de renderização, usando substitutos de DOM/Canvas quando necessário. Módulos de lógica não acessam DOM nem Canvas diretamente (ver [ARCHITECTURE.md](ARCHITECTURE.md)).
 
 ## Balanceamento
 
@@ -90,7 +90,7 @@ Os testes cobrem apenas módulos de lógica. Por isso, módulos de lógica não 
 npm run simulate -- --duels 300 --difficulty normal
 ```
 
-Roda duelos IA × IA sem navegador e mostra vitórias e estatísticas. `npm run matrix` roda todos contra todos e mostra a média de vitórias de cada personagem. `npm run reference -- --check tools/reference-v2.json` confere se as regras v2 continuam idênticas. Opções e exemplos em [ARCHITECTURE.md](ARCHITECTURE.md#balanceamento).
+Roda duelos IA × IA sem navegador e mostra vitórias e estatísticas. `npm run matrix` roda todos contra todos e mostra a média de vitórias de cada personagem. `npm run reference -- --check tools/reference-v2.json` confere o preset de regressão, atualizado apenas nas mudanças intencionais aprovadas. Matrizes finais e limites da 3.0 em [versions/v3-release-report.md](versions/v3-release-report.md); opções e exemplos em [ARCHITECTURE.md](ARCHITECTURE.md#balanceamento).
 
 ## Controles
 
@@ -102,7 +102,7 @@ Roda duelos IA × IA sem navegador e mostra vitórias e estatísticas. `npm run 
 | Ataque forte | `K` |
 | Bloquear (segurar) | `L` |
 | Aparar / parry (tocar na hora do golpe) | `L` |
-| Riposta (logo depois de aparar) | `J` |
+| Contra-ataque (logo depois de aparar) | `J` |
 | Empurrar (quebra a defesa) | `L` + `J` |
 | Esquivar (dash) | `Shift` |
 | Esquiva de precisão | `S` ou seta para baixo |
@@ -120,9 +120,11 @@ O preset alternativo, selecionável em Opções, usa setas para mover/pular e Z/
 
 Habilidade do personagem: `I`. Gamepad: ataques nos botões frontais (X rápido, Y forte), guarda em LB/LT, habilidade em RB, poder em RT, esquiva em B, pulo em A.
 
-**Poderes do Fluxo** (opção **Poderes**, ligada por padrão em Duelar, 2 Jogadores, Treino, Arcade e Sobrevivência): `U` usa o espaço neutro do loadout; frente ou trás + `U` escolhe os outros espaços. Os poderes variam por personagem: o Guardião tem Repulsão, Cura e Barreira; a Garça tem Repulsão, Arremesso e Absorção. Segure para manter poderes canalizados. Habilidade (`I`) com direção usa as técnicas de lâmina do personagem (Avanço com corte, Giro ou Arremesso da lâmina), também só com Poderes ligados. A lista de golpes (pausa) mostra os comandos de cada um. O catálogo tem 20 poderes e 3 técnicas; cada lutador usa seu próprio conjunto. O medidor fica abaixo da stamina. No celular há um botão **Poder**; o joystick escolhe a direção.
+**Poderes do Fluxo** (opção **Poderes**, ligada por padrão em Duelar, 2 Jogadores, Treino, Arcade e Sobrevivência): `U` usa o espaço neutro do loadout; frente ou trás + `U` escolhe os outros espaços. Os poderes variam por personagem: o Guardião tem Repulsão, Cura e Barreira; a Garça tem Repulsão, Arremesso e Absorção. Segure para manter poderes canalizados. Habilidade (`I`) com direção usa as técnicas de lâmina do personagem; no ar, usa a técnica aérea quando disponível, também só com Poderes ligados. A lista de golpes (pausa) mostra os comandos de cada um. O catálogo tem 20 poderes e 8 técnicas; cada lutador usa seu próprio conjunto. O medidor fica abaixo da stamina. No celular há um botão **Poder**; o joystick escolhe a direção.
 
 **Dois jogadores no mesmo teclado:** J1 usa `W A S D`, `F G H` (rápido, forte, guarda), `T` (habilidade), `R` (poder) e `Shift` esquerdo; J2 usa as setas, `J K L`, `I`, `O` (poder) e `Shift` direito (ou o teclado numérico). Cada jogador também pode usar um controle.
+
+As duas variantes do Predestinado têm um quarto poder: **Poder + Habilidade** no teclado e no gamepad, ou o botão contextual **Poder 4** no toque. Os demais personagens usam até três poderes. Arcade e Sobrevivência usam o conjunto base; Duelar, 2 Jogadores e Treino permitem personalizá-lo na seleção.
 
 As teclas de luta podem ser trocadas em **Opções → Configurar teclas** (fica salvo no navegador).
 
@@ -132,7 +134,7 @@ Os controles ficam em [src/config/controlsConfig.js](src/config/controlsConfig.j
 
 ## Mobile
 
-Use o aparelho em paisagem. Joystick na esquerda; rápido, forte, guarda, esquiva, habilidade e pulo na direita. Arraste para baixo para a esquiva de precisão. Toque uma opção para selecionar e novamente para confirmar. A pausa fica no topo. O manifest permite adicionar à tela inicial; não há suporte offline. Conferido pelo autor em Chrome Android e Safari iOS reais (versions/v2.md).
+Use o aparelho em paisagem. Joystick na esquerda; rápido, forte, guarda, esquiva, habilidade e pulo na direita. Arraste para baixo para a esquiva de precisão. Toque uma opção para selecionar e novamente para confirmar. A pausa fica no topo. O manifest permite adicionar à tela inicial; depois do primeiro carregamento completo, o jogo funciona offline. Conferido pelo autor em Chrome Android e Safari iOS reais (versions/v2.md).
 
 ## Documentação
 

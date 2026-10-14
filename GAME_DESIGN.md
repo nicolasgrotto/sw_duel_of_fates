@@ -1,8 +1,8 @@
 # GAME DESIGN — Star Wars: Duel of Fates
 
-Regras aprovadas da disputa v3 (2.5): [versions/v3.md](versions/v3.md), seção "Notas de implementação da 2.5". A capacidade `bladeLock` vale em Duelar, 2 Jogadores e Treino, com ou sem Poderes. Fortes elegíveis em contato ativo iniciam uma disputa de pressões limitada no tempo e na frequência; outros contatos mantêm o clash curto. A disputa suspende ações, movimento, regeneração, status e cooldowns dos participantes. Vitória causa dano e perda de Vigor uma única vez; empate só separa. Recuperação, separação e proteção de saída impedem converter pressões em ataque ou garantir um forte seguinte. A opção de segurar produz pressões pelo controlador, abaixo do teto, e o replay registra os intents resultantes.
+Regras vigentes da 3.0: capacidades por modo na seção 22; detalhes e validações em [versions/v3.md](versions/v3.md). Disputa de lâminas: fortes elegíveis em contato ativo iniciam uma disputa de pressões limitada no tempo e na frequência; outros contatos mantêm o clash curto. A disputa suspende ações, movimento, regeneração, status e cooldowns dos participantes. Vitória causa dano e perda de Vigor uma única vez; empate só separa. Recuperação, separação e proteção de saída impedem converter pressões em ataque ou garantir um forte seguinte. A opção de segurar produz pressões pelo controlador, abaixo do teto, e o replay registra os intents resultantes.
 
-Regras aprovadas da simulação v3 (2.4): [versions/v3.md](versions/v3.md), seções "Notas de implementação da 2.4" e "Especificação aprovada → Combate". Capacidades `exhaustion`, `wounds` e `focusEvade` habilitam as consequências em Duelar, 2 Jogadores e Treino; demais modos preservam a v2 até suas etapas. Dano efetivo de qualquer categoria, inclusive periódico, interrompe a Cura; dano absorvido não interrompe. Apresentação e calibração entram depois da simulação.
+Consequências: `exhaustion`, `wounds` e `focusEvade` habilitam exaustão, ferimentos e Foco automático conforme o modo. Dano efetivo de qualquer categoria, inclusive periódico, interrompe a Cura; dano absorvido não interrompe. Números vigentes na seção 26 e em `src/config/combatRulesConfig.js`.
 
 Este documento é a fonte de verdade sobre **o que** o jogo é. Para **como** o código é organizado, veja [ARCHITECTURE.md](ARCHITECTURE.md).
 
@@ -51,7 +51,7 @@ O jogador pode:
 - No chão, o lutador sempre vira de frente para o oponente.
 - Andar para trás é mais lento que andar para a frente.
 - Movimento com aceleração e desaceleração, para transmitir peso. No ar, o controle é reduzido.
-- Pulo com altura fixa. Sem pulo duplo.
+- Pulo com altura fixa e segundo salto no ar; ferimento de perna impede o segundo salto. Regras e dash aéreo na seção 21.1.
 - Os corpos dos lutadores não se atravessam: ao encostar, eles se empurram.
 - Ninguém sai dos limites laterais da arena.
 
@@ -72,6 +72,9 @@ O combate é baseado em estados:
 | `HEAVY_ATTACK` | Ataque forte |
 | `BLOCKING` | Bloqueando |
 | `DODGING` | Esquivando |
+| `CASTING` | Preparando um poder |
+| `CHANNELING` | Mantendo um poder canalizado |
+| `BLADE_LOCK` | Participando da disputa de lâminas |
 | `HIT` | Atingido |
 | `STAGGERED` | Desequilibrado: golpe aparado por parry ou empurrão recebido (sem dano) |
 | `STUNNED` | Atordoado (guarda quebrada por falta de stamina) |
@@ -395,7 +398,7 @@ Este é um protótipo de estudo inspirado em Star Wars. Para publicação públi
 
 ## 15. Elenco planejado
 
-Conceitos aprovados. Entram aos poucos (ver [versions/TASKS.md](versions/TASKS.md)). Escala de 1 a 5; "Dific." é a dificuldade de jogar com o personagem.
+Conceitos originais aprovados, todos implementados; o Ceifador de lâmina dupla entrou na 2.21. A tabela conserva as notas qualitativas do planejamento (1 a 5); elas não são atributos de combate. Os atributos vigentes usam 1 a 7/8/9/10 e vêm de `characterData.attributes` (seção 21). Ajustes da 3.0: Garça Lâmina 5, Sombra Vida 3 e Vespa Lâmina 3, conforme o [relatório final](versions/v3-release-report.md).
 
 | Personagem | Estilo | Vel. | Alcance | Dano | Defesa | Mobil. | Dific. | Diferencial mecânico |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -489,7 +492,7 @@ No fim, a tela de resultado oferece o desafio de parry.
 
 Menu → Arcade → escolha do lutador → uma sequência de duelos (melhor de 3 cada).
 
-- **Adversários**: todos os outros personagens selecionáveis, na ordem do elenco, até 6. Depois vem o **chefe**.
+- **Adversários**: até 6 outros personagens selecionáveis, em rodízio pelo elenco conforme o jogador escolhido. Depois vem o **chefe**.
 - **Dificuldade crescente**: os dois primeiros duelos no Fácil, os dois seguintes no Normal e o resto no Difícil (`gameConfig.arcade.difficulties`).
 - **Arenas**: em rodízio pela lista de arenas.
 - **Chefe: Sombra Desperta.** Versão mais forte da Sombra: mais vida (150), forte mais pesado, silhueta com ombreiras. Joga no Difícil. Quando cai abaixo da metade da vida, **desperta**: aparece a mensagem "A SOMBRA DESPERTA", as barras do letterbox pulsam e a IA passa para a dificuldade `boss` (reage no limite humano, completa sequências, pune quase tudo). O chefe não aparece na seleção de personagem.
@@ -657,27 +660,28 @@ O retorno interrompe o canal. A parcela não absorvida causa hit; a falha extrem
 
 Loadouts da v1.18: Garça troca Barreira por Redirecionamento (trás + Poder); Soberano troca Puxão por Tempestade (frente + Poder). Demais espaços e atributos permanecem iguais. IA reage ao Raio com Redirecionamento a partir de diferença −1 e usa Tempestade de perto, respeitando o requisito de Fluxo.
 
-**Loadouts atuais (v1.19; Absorção no lugar do Redirecionamento desde a 2.17).** Direções relativas à frente do lutador. Todos os espaços abaixo vêm de `characterData.loadout`; a lista de golpes mostra os comandos do preset ativo.
+**Conjuntos base da 3.0.** Direções relativas à frente do lutador. Todos os espaços abaixo vêm de `characterData.loadout` e das variantes; a lista de golpes mostra os comandos do preset ativo. Técnicas usam Direção + Habilidade e, quando equipada, Habilidade no ar. O quarto Poder do Predestinado usa Poder + Habilidade dentro de 0,1 s, em qualquer ordem; no toque, usa o botão contextual Poder 4. Nesses personagens, comandos isolados aguardam a janela do acorde; nos demais, continuam imediatos.
 
-| Personagem | Poder neutro | Frente + Poder | Trás + Poder | Frente + Habilidade | Trás + Habilidade |
-| --- | --- | --- | --- | --- | --- |
-| Guardião | Repulsão | Cura | Barreira | Avanço com corte | Arremesso da lâmina |
-| Sombra | Raio | Puxão | Estrangular | Avanço com corte | Giro |
-| Bastião | Repulsão | Absorção | Barreira | — | Giro |
-| Vespa | Repulsão | Arremesso | Barreira | Avanço com corte | Arremesso da lâmina |
-| Espelho | Repulsão | Arremesso | Barreira | — | Giro |
-| Haste | Raio | Puxão | Arremesso | — | Giro |
-| Brasa | Raio | Puxão | Congelar | Avanço com corte | Arremesso da lâmina |
-| Forja | Raio | Puxão | Arremesso | Arremesso da lâmina | Giro |
-| Garça | Repulsão | Arremesso | Absorção | — | Giro |
-| Ceifador | Repulsão | Puxão | Ira | Avanço com corte | Arremesso da lâmina |
-| Eco | Raio | Puxão | Arremesso | — | — |
-| Sombra Desperta | Raio | Puxão | Estrangular | Avanço com corte | Giro |
-| Soberano | Raio | Tempestade | Estrangular | — | Giro |
-| Predestinado | Repulsão | Arremesso | Barreira | — | — |
-| Ancião | Repulsão | Cura | Barreira | — | Giro |
+| Personagem | Poder neutro | Frente + Poder | Trás + Poder | Quarto Poder | Técnica frente | Técnica trás | Técnica no ar |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Guardião | Repulsão | Cura | Barreira | — | Avanço com corte | Arremesso da lâmina | — |
+| Sombra | Raio | Puxão | Estrangular | — | Avanço com corte | Giro | Investida descendente |
+| Bastião | Repulsão | Absorção | Barreira | — | Corte ascendente | Giro | — |
+| Vespa | Repulsão | Arremesso | Barreira | — | Rajada | Arremesso da lâmina | — |
+| Espelho | Repulsão | Arremesso | Barreira | — | Estocada | Giro | — |
+| Haste | Raio | Puxão | Arremesso | — | Estocada | Giro | — |
+| Brasa | Raio | Puxão | Congelar | — | Avanço com corte | Varredura | — |
+| Forja | Raio | Puxão | Arremesso | — | Arremesso da lâmina | Corte ascendente | — |
+| Garça | Repulsão | Arremesso | Absorção | — | — | Giro | Investida descendente |
+| Ceifador | Repulsão | Puxão | Ira | — | Avanço com corte | Arremesso da lâmina | Investida descendente |
+| Eco | Raio | Puxão | Arremesso | — | Rajada | Varredura | — |
+| Sombra Desperta | Raio | Puxão | Estrangular | — | Avanço com corte | Giro | Investida descendente |
+| Soberano | Raio | Tempestade | Estrangular | — | Corte ascendente | Giro | — |
+| Predestinado Aurora | Repulsão | Arremesso | Barreira | Telecinese em Massa | Estocada | — | — |
+| Predestinado Eclipse | Raio | Puxão | Estrangular | Arsenal Telecinético | Varredura | — | — |
+| Ancião | Repulsão | Cura | Barreira | — | Estocada | Giro | — |
 
-O protagonista recebe os poderes do caminho (`storyConfig.protagonist.loadouts`) e as técnicas do personagem-base do estilo. Sem técnica direcional, vale a habilidade própria; sem poder direcional, vale o neutro.
+O protagonista equipa poderes já aprendidos do caminho, nos slots abertos de `storyRun.loadout`, e recebe as técnicas do personagem-base do estilo. Sem técnica direcional, vale a habilidade própria; sem poder direcional, vale o neutro.
 
 - Quem lança fica vulnerável na preparação: um golpe interrompe o poder.
 - Esquiva e EVADE com invulnerabilidade fazem o poder passar. O dash aéreo não tem invulnerabilidade.
@@ -686,9 +690,9 @@ O protagonista recebe os poderes do caminho (`storyConfig.protagonist.loadouts`)
 - Repulsão, Puxão e Raio não têm projétil: o efeito é decidido no instante ativo ou em cada pulso. O Arremesso e o Arremesso da lâmina são projéteis (descritos acima).
 - Nomes de tela em `uiConfig.texts.powers`; os ids e suas categorias ficam em `powersConfig.categories`.
 
-**Elenco.** Aurora: Guardião, Bastião, Vespa, Espelho, Garça. Eclipse: Sombra, Haste, Brasa, Forja, Eco. Chefe do Arcade: Eclipse, nível 7.
+**Elenco.** Aurora: Guardião, Bastião, Vespa, Espelho, Garça. Eclipse: Sombra, Haste, Brasa, Forja, Ceifador, Eco. Chefe do Arcade: Sombra Desperta, Eclipse.
 
-**IA (v1.19).** Usa os 11 poderes e as três técnicas por loadout. Acompanha projéteis em voo, mantém defesa pelo tempo da ameaça, esquiva de faixas imbloqueáveis quando as reconhece, evita Raio na janela de Redirecionamento, tenta quebrar Barreira com empurrão e pune a preparação de Cura e Foco. Dificuldade e perfil continuam limitando percepção e reação; a IA só solicita ações.
+**IA.** Usa os poderes e técnicas equipados, incluindo os da 2.24. Acompanha projéteis em voo, mantém defesa pelo tempo da ameaça, esquiva de faixas imbloqueáveis quando as reconhece, evita Raio contra Absorção, tenta quebrar Barreira com empurrão e pune a preparação de Cura e Foco. Dificuldade e perfil continuam limitando percepção e reação; a IA só solicita ações.
 
 ## 23. História (v2; rotas e progressão da 2.8)
 
@@ -743,7 +747,7 @@ O protagonista escolhe Errante, Vigia ou Peregrino desde o início, em um passo 
 
 ## 26. Consequências no duelo (v3, etapa 2.4)
 
-Especificação aprovada em versions/v3.md → notas da 2.4; apresentação e calibração são a etapa seguinte. Capacidades independentes `exhaustion`, `wounds` e `focusEvade`, inicialmente em Duelar, 2 Jogadores e Treino. Foco automático exige Poderes; História aguarda a 2.8. Sem capacidades novas, vale a referência v2.
+Especificação e calibração em versions/v3.md → notas da 2.4. Capacidades independentes `exhaustion`, `wounds` e `focusEvade`, vigentes nos modos principais conforme a seção 22, incluindo Arcade e Sobrevivência na 3.0. Foco automático exige Poderes; História liga todas as capacidades desde a 2.8. Sem capacidades novas, vale o preset clássico da referência.
 
 Gastar Vigor até 10% ou menos causa exaustão; regeneração não a inicia. Sai com pelo menos 40% de Vigor e 1 s de duração, ou 1,6 s após quebra de guarda. Motivos: gasto, bloqueio, quebra de guarda e dreno externo. Não há stun extra nem redução de regeneração. Golpes corpo a corpo elegíveis recebem dano × 1,2 contra exaustos.
 
