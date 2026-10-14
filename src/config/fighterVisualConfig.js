@@ -34,12 +34,22 @@ export const faceDetails = {
       [0.5, -0.78], [0.05, -1.1], [-0.5, -1], [-0.95, -0.6], [-1.08, 0.02], [-0.92, 0.5], [-0.62, 0.3], [-0.4, -0.2], [0.05, -0.5], [0.55, -0.55],
     ],
   },
+  beard: {
+    short: [[0.55, 0.35], [0.95, 0.45], [0.8, 0.95], [0.35, 1.15], [-0.05, 0.85], [0.1, 0.5]],
+    long: [[0.55, 0.35], [0.95, 0.45], [0.85, 1.3], [0.55, 2.1], [0.25, 1.5], [-0.05, 0.9], [0.1, 0.5]],
+  },
 };
 
 export const detailStyle = {
   belt: { offset: -0.005, thickness: 0.035, buckleSize: 0.026, buckleAt: 0.78 },
+  sash: { length: 0.04, drop: 0.13, width: 0.016, spread: 0.022, swayScale: 0.8 },
+  apron: { top: 0.22, bottom: 0.97, backInset: 0.32, frontInset: 0.04 },
   boots: { widthScale: 1.22 },
-  bracers: { start: 0.52, end: 0.9, widthScale: 1.35 },
+  bracers: { start: 0.52, end: 0.9, widthScale: 1.35, heavyScale: 1.7 },
+  sleeves: { start: 0.42, end: 0.92, elbowScale: 0.6, wristScale: 1.5, tornDepth: 0.38 },
+  collar: { height: 0.075, frontRise: 0.6, back: 0.95, backTop: 0.75, front: 0.45, frontTop: 0.15 },
+  ponytail: { base: [-0.9, -0.35], mid: [-1.45, 0.35], tip: [-1.6, 1.35], width: 0.4, swayScale: 0.6 },
+  bun: { at: [-0.98, -0.72], radius: 0.42 },
   capeHem: { depth: 0.075, points: [[0, 0], [0.14, 1], [0.3, 0.35], [0.47, 0.9], [0.64, 0.2], [0.82, 0.75], [1, 0]] },
   chestPlates: { bands: [[0.1, 0.24], [0.3, 0.44]], inset: 0.14 },
   greaves: { start: 0.18, end: 0.72, widthScale: 1.2, kneeRadius: 0.03 },

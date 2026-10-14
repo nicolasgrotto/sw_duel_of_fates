@@ -129,6 +129,14 @@ export const colors = {
   guardianLeather: '#46362a',
   guardianBoots: '#1c1815',
   shadowBoots: '#09090d',
+  waspHair: '#6b4b2c',
+  hasteHair: '#3e3530',
+  wrapCloth: '#9a8a78',
+  forgeApron: '#2b2119',
+  forgeBeard: '#5e4330',
+  heronHair: '#4a3a2c',
+  foretoldBoots: '#1d2028',
+  elderBeard: '#d8d2c2',
 };
 
 export const textStyles = {

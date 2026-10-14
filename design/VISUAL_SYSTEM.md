@@ -230,6 +230,14 @@ Cores compartilhadas (em `themeConfig`):
 | `guardianLeather` | `#46362a` | cinto e braçadeiras do Guardião |
 | `guardianBoots` | `#1c1815` | botas do Guardião |
 | `shadowBoots` | `#09090d` | botas da Sombra |
+| `waspHair` | `#6b4b2c` | rabo de cavalo da Vespa |
+| `hasteHair` | `#3e3530` | cabelo da Haste |
+| `wrapCloth` | `#9a8a78` | ataduras da Brasa |
+| `forgeApron` | `#2b2119` | avental da Forja |
+| `forgeBeard` | `#5e4330` | barba da Forja |
+| `heronHair` | `#4a3a2c` | coque da Garça |
+| `foretoldBoots` | `#1d2028` | botas do Predestinado |
+| `elderBeard` | `#d8d2c2` | barba do Ancião |
 
 ## Sabre
 

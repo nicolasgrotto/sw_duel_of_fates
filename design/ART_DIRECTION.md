@@ -271,7 +271,22 @@ Pilotos:
 
 - **Guardião:** cabelo curto castanho (`guardianHair`), cinto largo de couro (`guardianLeather`) com fivela, braçadeiras de couro, botas escuras (`guardianBoots`) até a metade da canela.
 - **Sombra:** barra da capa rasgada em cinco pontas, botas altas quase pretas (`shadowBoots`) até perto do joelho.
-- **Bastião:** cabeça raspada (sem cabelo), duas placas no peito e caneleiras com joelheira na cor do acabamento, cinto escuro.
+- **Bastião:** cabeça raspada (sem cabelo), duas placas no peito na cor do acabamento, caneleiras com joelheira na cor da capa (na cor do acabamento clareavam a perna inteira nos trajes claros), cinto escuro.
+
+Peças acrescentadas para o resto do elenco: **rabo de cavalo** (`ponytail`, cai atrás do pescoço e balança com o pano), **coque** (`tied`), **barba** (`beard`: `short` ou `long`, aparece também sob o capuz), **gola alta** (`collar`), **mangas** (`sleeves`: `wide` alarga o antebraço até o pulso, `torn` termina em ponta; `arms: 'front'` só no braço da frente), **faixa com pontas** (`belt.ends`: duas pontas curtas que pendem atrás), **avental** (`apron`, do peito à barra, na metade da frente) e **braçadeiras grossas** (`bracers.heavy`).
+
+- **Vespa:** rabo de cavalo castanho-claro (`waspHair`), faixas nos antebraços na cor do acabamento.
+- **Espelho:** mangas largas na cor do manto e gola alta.
+- **Haste:** cabelo curto (`hasteHair`), cinto na cor do acabamento.
+- **Brasa:** faixa na cintura com pontas, ataduras claras nos antebraços (`wrapCloth`).
+- **Forja:** avental de couro escuro (`forgeApron`), barba curta (`forgeBeard`), braçadeiras grossas e cinto com fivela.
+- **Garça:** coque (`heronHair`) e botas altas na cor da capa.
+- **Ceifador:** faixa carmesim com pontas e braçadeiras carmesim.
+- **Eco:** manga rasgada só no braço da frente, cinto escuro.
+- **Sombra Desperta:** barra da capa rasgada, placas no peito na cor do acabamento, botas da Sombra.
+- **Soberano:** gola alta e mangas largas no manto.
+- **Predestinado:** cinto com fivela e botas escuras (`foretoldBoots`), em todas as variantes e trajes.
+- **Ancião:** barba longa branca (`elderBeard`) e mangas largas.
 
 ### Ceifador (v2.21)
 
