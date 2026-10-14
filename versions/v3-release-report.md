@@ -160,6 +160,14 @@ Medida sem limitação, ABBA, ruído ±2%: render do estresse 1,28 → 1,23 ms (
 
 1.964 testes passando; referência conferida; lista offline regenerada.
 
+## Opções aprovadas pelo autor (Claude)
+
+O autor aprovou as três opções da investigação, uma etapa por commit: reflexo mais leve, aura com duas cópias e medição por tempo de CPU. Mesmo ambiente; A = worktree temporário em `d96d28a`, B = árvore com a mudança; ABBA, viewport 844×390, DPR 3 limitado a 2, canvas 1688×780, 120 frames de aquecimento e 11 s. Carga externa registrada: durante parte da sessão um jogo aberto pelo usuário ocupava CPU e GPU (p95 de frame sem limitação ~50–90 ms); as rodadas abaixo foram feitas depois, com p95 ~17 ms.
+
+**Achado sobre a limitação 6×.** Uma sonda de 10⁶ raízes repetida a cada ~0,25 s na mesma página, sob CPU 6×, variou de 8 a 76 ms (sem limitação: 7 ms estável). A limitação do Chrome headless nesta máquina oscila entre ~1× e ~8× dentro de uma mesma execução; isso explica a calibração de 25–181 ms entre execuções e a variação de ±50% da maior janela. O tempo de CPU da thread (`tdur`) não conta o tempo suspenso pela limitação: 1,28 ms a 1× e 1,34 ms a 6× no mesmo caso.
+
+**1. Reflexo mais leve.** O reflexo passa a desenhar só as lâminas e uma silhueta de cor única por lutador (`drawFighterSilhouette`: capa, pernas, tronco, cabeça ou capuz e braços). Custo do bloco de reflexo na segunda passada, sem limitação, duelo no Santuário: corpo simplificado atual 0,225 ms; `drawFighterBody` com `overrideColor` 0,222 (sem ganho: as peças continuam sendo desenhadas); silhueta em poucas formas 0,149; só as lâminas ~0,09. Escolhida a silhueta em poucas formas. ABBA sem limitação, três rodadas (n=6 por lado): duelo render médio 0,76 → 0,72 ms (−5%), maior janela média 0,88 → 0,80; CPU por frame (`tdur`) 1,003 → 0,975 ms; estresse render 1,23 → 1,19 ms (−3%), `tdur` 1,435 → 1,403 ms; p95 de frame igual (17,0/16,8 e 17,2/17,2 ms). CPU 6×, duas rodadas (n=4): duelo render médio 5,96 → 6,04, maior janela média 8,64 → 8,33 ms; estresse 9,31 → 8,40, maior janela média 15,28 → 13,34 ms (pior 16,14 → 14,53); calibração 51–120 ms, então os números 6× são só indicativos. Visual conferido no Santuário, no Telhado e nas Salinas: sob a película a diferença quase não aparece.
+
 ## Offline e publicação
 
 **Causa encontrada e corrigida.** A instalação ficou presa porque o worker aguardava todos os cabeçalhos antes de consumir qualquer corpo. Respostas pendentes podiam reter as conexões necessárias aos demais arquivos. Um worker mínimo com um download completo isolou o problema; consumir imediatamente o corpo de uma cópia de cada resposta resolveu a instalação dos 174 arquivos. A resposta original é gravada depois da verificação completa, preservando sua URL. A explicação anterior de limitação do ambiente foi substituída por esse diagnóstico confirmado.

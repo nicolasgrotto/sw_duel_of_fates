@@ -364,7 +364,7 @@ Três planos de geometria procedural: pilares distantes em wall com alpha 0,25; 
 Templo em ruínas à noite, com uma lâmina d'água rasa no chão.
 
 - **Fundo**: lua grande e fria (glow em `arenaMoon`), colunas de pedra quebradas em alturas diferentes (`arenaStone`), um arco partido e escombros. Nada em contraste alto.
-- **Chão**: água escura (`arenaWater`) com borda clara (`arenaWaterEdge`). Os lutadores e as lâminas **se refletem** na água, de cabeça para baixo e escurecidos (regra de reflexo no VISUAL_SYSTEM).
+- **Chão**: água escura (`arenaWater`) com borda clara (`arenaWaterEdge`). Os lutadores e as lâminas **se refletem** na água, de cabeça para baixo e escurecidos; o corpo aparece como silhueta de uma cor só, e as lâminas com a cor delas (regra de reflexo no VISUAL_SYSTEM).
 - **Ambiente**: anéis de ondulação pequenos e lentos na superfície da água e poeira fina caindo na luz da lua.
 - **Atmosfera**: silêncio e respeito. É a arena mais calma do jogo.
 

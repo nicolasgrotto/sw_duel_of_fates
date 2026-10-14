@@ -432,6 +432,54 @@ function drawArms(renderer, fighter, pose, cloakColor, bodyColor, handColor, sev
   if (sleeveColor && severed !== 'frontArm') drawSleeve(renderer, pose.shoulderX + 3, pose.shoulderY + 3, pose.handX, pose.handY, sleeveColor, armWidth, sleeves.style);
 }
 
+function drawSilhouetteLeg(renderer, pose, kneeX, kneeY, footX, footY, color, width, cut) {
+  if (cut) {
+    renderer.line(pose.hipX, pose.hipY, kneeX, kneeY, color, width);
+    return;
+  }
+  drawLeg(renderer, pose, kneeX, kneeY, footX, footY, color, width);
+}
+
+function drawSilhouetteArm(renderer, startX, startY, handX, handY, color, width, cut) {
+  renderer.line(startX, startY, cut ? lerp(startX, handX, 0.5) : handX, cut ? lerp(startY, handY, 0.5) : handY, color, width);
+}
+
+function drawSilhouetteHead(renderer, fighter, pose, color) {
+  const { headX, headY, headRadius: radius } = pose;
+  if (!fighter.appearance.hoodUp) {
+    renderer.fillCircle(headX, headY, radius, color);
+    return;
+  }
+  const hoodRadius = radius * 1.3;
+  setThreePoints(hoodTipPoints, headX, headY - hoodRadius, headX - radius * 1.6, headY - radius * 1.3, headX - hoodRadius, headY);
+  renderer.fillPolygon(hoodTipPoints, color);
+  renderer.fillCircle(headX, headY, hoodRadius, color);
+}
+
+export function drawFighterSilhouette(renderer, fighter, pose, color, severed = null) {
+  const { height, appearance } = fighter;
+  const shoulderWidth = height * proportions.shoulderWidth * appearance.shoulderScale;
+  const flare = height * proportions.tunicFlare;
+  const legWidth = height * proportions.legWidth;
+  const armWidth = height * proportions.armWidth;
+
+  renderer.save();
+  renderer.translate(fighter.x, fighter.y);
+  renderer.scale(fighter.facing * (pose.turnScale ?? 1), 1);
+  renderer.translate(0, -pose.bodyLift);
+  renderer.rotate(pose.bodyRotation);
+
+  if (appearance.longCape) drawCape(renderer, fighter, pose, shoulderWidth, flare, color);
+  drawSilhouetteLeg(renderer, pose, pose.backKneeX, pose.backKneeY, pose.backFootX, pose.backFootY, color, legWidth, severed === 'backLeg');
+  drawSilhouetteLeg(renderer, pose, pose.frontKneeX, pose.frontKneeY, pose.frontFootX, pose.frontFootY, color, legWidth, severed === 'frontLeg');
+  drawTorso(renderer, fighter, pose, shoulderWidth, flare, color);
+  if (severed !== 'frontHead') drawSilhouetteHead(renderer, fighter, pose, color);
+  drawSilhouetteArm(renderer, pose.shoulderX - 3, pose.shoulderY + 4, lerp(pose.handX - 2, pose.freeHandX, pose.offHand), lerp(pose.handY, pose.freeHandY, pose.offHand), color, armWidth, severed === 'backArm');
+  drawSilhouetteArm(renderer, pose.shoulderX + 3, pose.shoulderY + 3, pose.handX, pose.handY, color, armWidth, severed === 'frontArm');
+
+  renderer.restore();
+}
+
 export function drawFighterBody(renderer, fighter, pose, floorY, withShadow = true, overrideColor = null, severed = null, simplified = overrideColor !== null) {
   const { height, appearance } = fighter;
   const cloakColor = overrideColor ?? appearance.cloakColor;

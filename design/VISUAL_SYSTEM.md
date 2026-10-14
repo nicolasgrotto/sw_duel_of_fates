@@ -323,7 +323,12 @@ Arena com `impactDust` levanta poeira nos pés de quem leva um golpe no chão (`
 
 ### Reflexo na água
 
-Quando a arena tem `reflection`, os corpos e as lâminas são desenhados espelhados no eixo do chão, logo depois do chão. Por cima vem uma película da cor da água (`reflection.cover`), que escurece o reflexo por igual, inclusive o brilho das lâminas. O reflexo nunca fica mais forte que os lutadores e não tem sombra no chão. Por desempenho, o reflexo usa o corpo simplificado das silhuetas (sem túnica sobreposta, placas, avental, faixa e fivela do cinto e olhos; pontas da faixa mantidas): a película já apagava esses detalhes.
+Quando a arena tem `reflection` (Santuário Alagado, Telhado Neon e Salinas de Vidro), as lâminas e uma **silhueta simples de cada lutador** são desenhadas espelhadas no eixo do chão, logo depois do chão. Por cima vem uma película da cor da água (`reflection.cover`), que escurece o reflexo por igual, inclusive o brilho das lâminas. O reflexo nunca fica mais forte que os lutadores e não tem sombra no chão.
+
+- **Silhueta:** uma cor só por lutador, a da capa (`appearance.cloakColor`), em poucas formas: capa longa, pernas, tronco com a barra da túnica, cabeça (ou capuz com a ponta) e os dois braços. Sem mãos, cabelo, barba, peças de roupa, ombreiras, cachecol, olhos, ferimento ou hit flash. A pose, o vento e a escala do corpo são os mesmos do lutador.
+- **Finalização:** a parte cortada some do reflexo (braço até o cotovelo, perna até o joelho, cabeça ausente), sem brasa e sem a peça que cai.
+- **Lâminas:** iguais às do duelo, com glow e núcleo, sob a mesma película.
+- **Motivo:** desempenho no orçamento 6× ([relatório](../versions/v3-release-report.md)). A película já apagava o detalhe interno; contorno, movimento e cor das lâminas continuam lendo na água.
 
 ### Lâmina carregando (Forja)
 

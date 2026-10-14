@@ -10,7 +10,7 @@ import { PowerRenderer, getStormDarkness } from './PowerRenderer.js';
 import { ProjectileRenderer } from './ProjectileRenderer.js';
 import { drawDebris, drawDesaturation, drawFlash, drawStormDarkness, drawStormStrikes, drawImpactLights, drawParticles, drawRings, drawShockwaves } from './effectsRenderer.js';
 import { applyWind, computePose, createPose, getBladeLockAdvantage } from './fighterPose.js';
-import { drawFighterBody } from './fighterRenderer.js';
+import { drawFighterBody, drawFighterSilhouette } from './fighterRenderer.js';
 import { drawFinisherPiece, getSeveredLimb } from './finisherRenderer.js';
 import { SaberTrail } from './SaberTrail.js';
 import { drawSaber, drawSaberBodyLight, drawSaberFloorLight, getBladeWorldPoints } from './saberRenderer.js';
@@ -165,8 +165,7 @@ export class DuelRenderer {
     renderer.translate(0, floorY * 2);
     renderer.scale(1, -1);
     for (const fighter of fighters) {
-      drawFighterBody(renderer, fighter, this.getPose(fighter), floorY, false, null, getSeveredLimb(fighter, this.showFinishers), true);
-      drawFinisherPiece(renderer, fighter, floorY, this.showFinishers);
+      drawFighterSilhouette(renderer, fighter, this.getPose(fighter), fighter.appearance.cloakColor, getSeveredLimb(fighter, this.showFinishers));
     }
     for (const fighter of fighters) {
       if (!this.holdsSeveredSaber(fighter)) drawSaber(renderer, fighter, this.getPose(fighter));
