@@ -202,3 +202,5 @@ Servidor desligado de fato e inacessível por fetch do Node: novas abas abriram 
 O autor pediu conferir pendências antes de publicar; offline agora concluído. Autorizou continuar as medições com a carga atual e registrar a limitação, e depois pediu corrigir a ressalva de desempenho. A investigação adicional acima não eliminou o excesso. Candidato `3.0.0` permanece em `v3-development`; correção do orçamento 6× ainda pendente. Integração na `main`, tag e envio ao GitHub não foram autorizados.
 
 Arquivos principais: `src/config/combatRulesConfig.js`, `src/config/powersConfig.js`, `src/characters/characterData.js`, `tools/simulate.js`, `tools/releaseMatrix.js`, `tools/reference-v2.json`, `src/core/StateMachine.js`, `src/states/GameState.js`, `src/states/ReplayState.js`, `sw.js`, testes de regras/poderes/atributos/referência/pilha/offline, `offline-resources.js`, `package.json` e documentação README/DESIGN/GAME_DESIGN/ARCHITECTURE/versions.
+
+**Publicação (2026-10-15).** O autor aprovou o critério de desempenho e a publicação: `v3-development` enviada, `main` atualizada por fast-forward e enviada, tag local `v3.0.0`.
