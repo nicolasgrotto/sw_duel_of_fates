@@ -12,7 +12,7 @@ export class MoveListState extends GameState {
     const character = this.params.character ?? characters[this.params.characterId];
     const bindings = this.game.input.bindings ?? keyBindings;
     this.title = formatText(texts.moveList.title, { name: character.name.toUpperCase() });
-    this.rows = buildMoveList(character, bindings, this.params.powers === true);
+    this.rows = buildMoveList(character, this.params.bindings ?? bindings, this.params.powers === true);
     this.footer = formatText(texts.controls.back, { back: formatActionKeys(bindings, Action.BACK) });
   }
 

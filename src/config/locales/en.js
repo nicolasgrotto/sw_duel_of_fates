@@ -511,6 +511,7 @@ export const en = {
       title: 'PAUSED',
       resume: 'Resume',
       moves: 'Move list',
+      playerMoves: 'Move list · P{player}',
       restart: 'Restart duel',
       quit: 'Quit to menu',
     },

@@ -511,6 +511,7 @@ export const ptBR = {
       title: 'PAUSADO',
       resume: 'Continuar',
       moves: 'Lista de golpes',
+      playerMoves: 'Lista de golpes · J{player}',
       restart: 'Reiniciar duelo',
       quit: 'Sair para o menu',
     },

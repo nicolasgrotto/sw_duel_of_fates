@@ -373,7 +373,7 @@ Controles
 - **Menu**: opções Duelar e Controles.
 - **Controles**: tabela de ações e teclas.
 - **Duelo**: melhor de 3 rounds. Intro de cada round, gameplay e K.O. `Esc` ou `P` pausa.
-- **Pausa**: sobreposta ao duelo congelado. Continuar, Reiniciar duelo, Sair para o menu.
+- **Pausa**: sobreposta ao duelo congelado. Continuar, Lista de golpes, Reiniciar duelo, Sair para o menu. No modo 2 Jogadores, a lista de golpes vira duas opções (J1 e J2), cada uma com o personagem e as teclas do seu jogador.
 - **Resultado**: VITÓRIA ou DERROTA, vencedor e estatísticas do duelo (tempo, golpes, defesas, parries). Revanche ou Menu principal.
 
 Detalhes visuais em [design/UI_GUIDELINES.md](design/UI_GUIDELINES.md).

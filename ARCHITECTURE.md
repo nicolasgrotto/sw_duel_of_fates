@@ -55,7 +55,7 @@ src/
     DuelState.js            ✅ duelo: intro, simulação, efeitos, HUD, fim do duelo
     PauseState.js           ✅ continuar, reiniciar, sair
     GameOverState.js        ✅ vitória/derrota, tabela de estatísticas dos dois lutadores, revanche
-    MoveListState.js        ✅ lista de golpes do personagem do jogador (aberta pela pausa)
+    MoveListState.js        ✅ lista de golpes do personagem do jogador (aberta pela pausa; no 2 Jogadores, uma por jogador, com `params.bindings` do J2)
     ReplayState.js          ✅ replay do golpe final: re-simula a janela gravada em câmera lenta
     OptionsState.js         ✅ dificuldade, efeitos, som, música, teclado, replay
     KeyRemapState.js        ✅ remapeamento das ações de luta (preset Personalizado)

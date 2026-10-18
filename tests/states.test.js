@@ -777,6 +777,25 @@ it('opens the move list of the player character from the pause and goes back', (
   assert.deepEqual(game.stateNames(), ['DuelState', 'PauseState']);
 });
 
+it('offers the move list of each player from the local pause', () => {
+  const game = createFakeGame();
+  game.changeState(StateId.DUEL, { mode: DuelMode.LOCAL, playerCharacter: 'wasp', opponentCharacter: 'guardian' });
+
+  game.step(Action.PAUSE);
+  assert.deepEqual(game.states.current.menu.items.map((item) => item.label), ['Continuar', 'Lista de golpes · J1', 'Lista de golpes · J2', 'Reiniciar duelo', 'Sair para o menu']);
+  game.step(Action.MENU_DOWN);
+  game.step(Action.CONFIRM);
+  assert.ok(game.states.current.title.includes('VESPA'));
+  assert.ok(game.states.current.rows.some((row) => row.keys === 'F'));
+
+  game.step(Action.BACK);
+  game.step(Action.MENU_DOWN);
+  game.step(Action.CONFIRM);
+  assert.deepEqual(game.stateNames(), ['DuelState', 'PauseState', 'MoveListState']);
+  assert.ok(game.states.current.title.includes('GUARDI'));
+  assert.ok(game.states.current.rows.some((row) => row.keys.startsWith('J /')));
+});
+
 it('counts the stats of both fighters for the result table', () => {
   const game = createFakeGame();
   game.changeState(StateId.DUEL);
