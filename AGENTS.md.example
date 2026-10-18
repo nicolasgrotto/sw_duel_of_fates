@@ -69,9 +69,9 @@ Antes de criar ou alterar qualquer elemento visual (tela, HUD, personagem, lâmi
 - Balanceamento fica em `src/config/`, sem números mágicos. Valide mudanças com `npm run simulate` e `npm run matrix`.
 - Módulos de lógica não acessam `window`, `document` ou canvas (testáveis em Node).
 
-## Regras de código
+## Regras de código **[personalize]**
 
-- Sem comentários no código: nomes claros; contexto e decisões vão para ARCHITECTURE.md.
+- Nomes claros; contexto e decisões vão para ARCHITECTURE.md.
 - Funções pequenas, classes coesas, baixo acoplamento.
 - Só `export` nomeado; imports com extensão `.js`; classes em `PascalCase.js`, o resto em `camelCase.js`.
 - Sem arquivos vazios ou placeholders "para depois".
