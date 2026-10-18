@@ -254,7 +254,7 @@ export class DuelState extends GameState {
       });
       return;
     }
-    const { score, parries, perfectParries, hitsTaken } = this.director;
+    const { score, parries, hitsTaken } = this.director;
     const best = this.game.settings.parryChallengeBest ?? 0;
     if (score > best) {
       this.game.settings.parryChallengeBest = score;
@@ -264,7 +264,7 @@ export class DuelState extends GameState {
       duelParams: this.params,
       title: texts.tutorial.challengeDoneTitle,
       subtitle: formatText(score > best ? texts.tutorial.newRecord : texts.tutorial.score, { score, best: Math.max(best, score) }),
-      summary: formatText(texts.tutorial.challengeSummary, { parries, perfectParries, hitsTaken }),
+      summary: formatText(texts.tutorial.challengeSummary, { parries, hitsTaken }),
       rematchLabel: texts.tutorial.tryAgain,
       rematchParams: this.params,
     });

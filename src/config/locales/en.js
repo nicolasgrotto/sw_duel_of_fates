@@ -350,7 +350,7 @@ export const en = {
       challengeDoneTitle: 'PARRY CHALLENGE',
       score: '{score} points   ·   Best  {best}',
       newRecord: '{score} points   ·   NEW RECORD',
-      challengeSummary: 'Parries  {parries}   ·   Perfect  {perfectParries}   ·   Hits taken  {hitsTaken}',
+      challengeSummary: 'Parries  {parries}   ·   Hits taken  {hitsTaken}',
       tryAgain: 'Try again',
     },
     moveList: {

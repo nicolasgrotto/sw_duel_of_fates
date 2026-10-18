@@ -68,6 +68,7 @@ describe('ParryChallenge', () => {
       hit(dummy, player, 'heavy'),
     ], player);
     assert.equal(challenge.score, 3);
+    assert.equal(challenge.parries, 2);
     assert.equal(challenge.hitsTaken, 1);
 
     challenge.update(tutorialConfig.challenge.duration);

@@ -350,7 +350,7 @@ export const ptBR = {
       challengeDoneTitle: 'DESAFIO DE PARRY',
       score: '{score} pontos   ·   Recorde  {best}',
       newRecord: '{score} pontos   ·   NOVO RECORDE',
-      challengeSummary: 'Parries  {parries}   ·   Perfeitos  {perfectParries}   ·   Golpes recebidos  {hitsTaken}',
+      challengeSummary: 'Parries  {parries}   ·   Golpes recebidos  {hitsTaken}',
       tryAgain: 'Tentar de novo',
     },
     moveList: {

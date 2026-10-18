@@ -486,7 +486,7 @@ Custos, tempos e números ficam em `src/config/movesConfig.js` e `fightersConfig
 
 No fim, a tela de resultado oferece o desafio de parry.
 
-**Desafio de parry** (menu → Desafio de parry, ou depois do tutorial): 45 segundos contra o boneco, que se aproxima e lança **só ataques fortes** (que dá para aparar por reação) em intervalos aleatórios. Parry vale 1 ponto, parry perfeito vale 2. Golpes recebidos não tiram pontos, mas aparecem no resumo. O recorde fica salvo no navegador (`settings.parryChallengeBest`).
+**Desafio de parry** (menu → Desafio de parry, ou depois do tutorial): 45 segundos contra o boneco, que se aproxima e lança **só ataques fortes** (que dá para aparar por reação) em intervalos aleatórios. Parry vale 1 ponto, parry perfeito vale 2. O resumo mostra o total de parries (perfeitos incluídos) e os golpes recebidos, que não tiram pontos. O recorde fica salvo no navegador (`settings.parryChallengeBest`).
 
 ## 17. Arcade
 

@@ -7,7 +7,6 @@ export class ParryChallenge {
     this.timeLeft = duration;
     this.score = 0;
     this.parries = 0;
-    this.perfectParries = 0;
     this.hitsTaken = 0;
   }
 
@@ -32,7 +31,7 @@ export class ParryChallenge {
         this.parries += 1;
         this.score += this.points.parry;
       } else if (event.type === CombatEvent.PERFECT_PARRY && event.defender === player) {
-        this.perfectParries += 1;
+        this.parries += 1;
         this.score += this.points.perfectParry;
       } else if (event.type === CombatEvent.HIT && event.defender === player) {
         this.hitsTaken += 1;
